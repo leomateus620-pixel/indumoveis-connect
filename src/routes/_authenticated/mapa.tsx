@@ -15,7 +15,7 @@ import { SPACE_STATUS, area, brl, toCents, centsToInput, DEAL_STATUS, CONTRACT_S
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/mapa")({
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { status?: string; space?: string; deal?: string } => ({
     status: typeof s.status === "string" ? s.status : undefined,
     space: typeof s.space === "string" ? s.space : undefined,
     deal: typeof s.deal === "string" ? s.deal : undefined,

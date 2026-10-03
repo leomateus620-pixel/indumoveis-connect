@@ -11,7 +11,7 @@ import { brl, fmtDate, today, toCents, centsToInput, fmtDateTime } from "@/lib/f
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/financeiro")({
-  validateSearch: (s: Record<string, unknown>) => ({ view: typeof s.view === "string" ? s.view : undefined }),
+  validateSearch: (s: Record<string, unknown>): { view?: string } => ({ view: typeof s.view === "string" ? s.view : undefined }),
   head: () => ({ meta: [{ title: "Financeiro Operacional — Sistema Indumóveis" }, { name: "description", content: "Parcelas, vencimentos e pagamentos registrados." }] }),
   component: FinanceiroPage,
 });

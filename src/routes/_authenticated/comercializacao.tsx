@@ -14,7 +14,7 @@ import { useDeals, useDeal, useSpaces, useContracts, useCan, useDbMutation, api,
 import { DEAL_STATUS, DEAL_TRANSITIONS, CONTRACT_STATUS, brl, area, fmtDate, fmtDateTime, toCents, centsToInput } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/comercializacao")({
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { status?: string; id?: string; company?: string } => ({
     status: typeof s.status === "string" ? s.status : undefined,
     id: typeof s.id === "string" ? s.id : undefined,
     company: typeof s.company === "string" ? s.company : undefined,
