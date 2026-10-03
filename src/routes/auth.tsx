@@ -1,194 +1,146 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { errMsg } from "@/lib/format";
+import { useMe } from "@/lib/api";
 import logoLight from "@/assets/logo-light.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: "Entrar — Sistema Indumóveis" },
-      { name: "description", content: "Acesso restrito às equipes da Indumóveis." },
-      { property: "og:title", content: "Entrar — Sistema Indumóveis" },
-      { property: "og:description", content: "Acesso restrito às equipes da Indumóveis." },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Entrar — Sistema Indumóveis" },
+    { name: "description", content: "Acesso às equipes da Indumóveis." },
+    { property: "og:title", content: "Entrar — Sistema Indumóveis" },
+    { property: "og:description", content: "Acesso às equipes da Indumóveis." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: AuthPage,
 });
 
+const allowed = ["/dashboard", "/mapa", "/comercializacao", "/empresas", "/contratos", "/vistorias", "/financeiro", "/agenda", "/documentos", "/admin"] as const;
+const moduleFor: Record<string, string> = { "/dashboard": "dashboard", "/mapa": "mapa", "/comercializacao": "comercial", "/empresas": "empresas", "/contratos": "contratos", "/vistorias": "vistorias", "/financeiro": "financeiro", "/agenda": "agenda", "/documentos": "documentos", "/admin": "admin" };
+function safeDestination(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return null;
+  try {
+    const url = new URL(value, window.location.origin);
+    if (url.origin !== window.location.origin) return null;
+    const root = allowed.find((p) => url.pathname === p || url.pathname.startsWith(p + "/"));
+    return root ? { path: url.pathname + url.search, module: moduleFor[root] } : null;
+  } catch { return null; }
+}
+
 function AuthPage() {
+  const { data: user, isPending, isError, refetch } = useQuery({
+    queryKey: ["auth", "session"],
+    queryFn: async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error && error.message !== "Auth session missing!") throw error;
+      return data.user;
+    },
+    retry: 1,
+  });
+  if (isPending) return <Status title="Verificando sessão" />;
+  if (isError) return <Status title="Não foi possível verificar sua sessão" action={<Button onClick={() => refetch()}>Tentar novamente</Button>} />;
+  return user ? <ResolveAccess userId={user.id} /> : <AuthForm />;
+}
+
+function ResolveAccess({ userId }: { userId: string }) {
+  const { data: me, isPending, isError, refetch } = useMe(userId);
   const navigate = useNavigate();
+  useEffect(() => {
+    if (!me || !me.roles.length) return;
+    const requested = safeDestination(new URLSearchParams(window.location.search).get("redirect") ?? sessionStorage.getItem("auth-redirect"));
+    sessionStorage.removeItem("auth-redirect");
+    const target = requested && me.perms[requested.module]?.read ? requested.path : "/dashboard";
+    navigate({ to: target, replace: true });
+  }, [me, navigate]);
+  if (isPending) return <Status title="Carregando seu perfil" />;
+  if (isError || !me) return <Status title="Não foi possível consultar seu acesso" detail="Sua sessão permanece ativa." action={<><Button onClick={() => refetch()}>Tentar novamente</Button><SignOut /></>} />;
+  if (!me.roles.length) return <Status title="Acesso aguardando liberação" detail="Sua conta ainda não possui um perfil autorizado. Solicite à administração a liberação do acesso." action={<><Button variant="outline" onClick={() => refetch()}>Verificar acesso</Button><SignOut /></>} />;
+  return <Status title="Preparando seu acesso" />;
+}
+
+function SignOut() {
+  const navigate = useNavigate();
+  return <Button variant="outline" onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth", replace: true }); }}>Sair</Button>;
+}
+function Status({ title, detail, action }: { title: string; detail?: string; action?: React.ReactNode }) {
+  return <main className="flex min-h-screen items-center justify-center px-6"><div className="max-w-sm space-y-4 text-center"><h1 className="font-display text-xl font-bold">{title}</h1>{detail && <p className="text-muted-foreground">{detail}</p>}<div className="flex justify-center gap-3">{action}</div></div></main>;
+}
+
+function AuthForm() {
   const [mode, setMode] = useState<"in" | "up">("in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ type: "err" | "ok"; text: string } | null>(null);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState<"email" | "google" | null>(null);
+  const [error, setError] = useState<Record<string, string>>({});
+  const [notice, setNotice] = useState("");
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard" });
-    });
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => {
-      if (s) navigate({ to: "/dashboard" });
-    });
-    return () => data.subscription.unsubscribe();
-  }, [navigate]);
-
+    const dest = safeDestination(new URLSearchParams(window.location.search).get("redirect"));
+    if (dest) sessionStorage.setItem("auth-redirect", dest.path);
+  }, []);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
-    setMsg(null);
+    if (busy) return;
+    const issues: Record<string, string> = {};
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) issues.email = "Informe um e-mail válido.";
+    if (password.length < 8) issues.password = "A senha deve ter pelo menos 8 caracteres.";
+    if (mode === "up" && !name.trim()) issues.name = "Informe seu nome completo.";
+    setError(issues);
+    if (Object.keys(issues).length) return;
+    setBusy("email"); setNotice("");
     try {
       if (mode === "in") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (authError) { setError({ password: "Não foi possível entrar. Confira e-mail e senha." }); return; }
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin, data: { full_name: name } },
-        });
-        if (error) throw error;
-        if (!data.session)
-          setMsg({
-            type: "ok",
-            text: "Conta criada. Confirme pelo link enviado ao seu e-mail para entrar.",
-          });
+        const { data, error: authError } = await supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: window.location.origin + "/auth", data: { full_name: name.trim() } } });
+        if (authError) { setError({ email: "Não foi possível criar a conta. Verifique os dados e tente novamente." }); return; }
+        if (!data.session) setNotice("Conta solicitada. Confira seu e-mail para confirmar o cadastro; o acesso aos módulos depende de um perfil autorizado.");
       }
-    } catch (err) {
-      setMsg({ type: "err", text: errMsg(err) });
-    } finally {
-      setBusy(false);
-    }
+    } catch { setError({ form: "Não foi possível concluir a solicitação. Tente novamente." }); }
+    finally { setBusy(null); }
   }
-
   async function google() {
-    const r = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/auth",
-    });
-    if (r.error) setMsg({ type: "err", text: errMsg(r.error) });
+    if (busy) return;
+    setBusy("google"); setError({}); setNotice("");
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+      if (result.error) setError({ form: "Não foi possível entrar com Google. Tente novamente." });
+      else if (!result.redirected && !("tokens" in result)) setError({ form: "O acesso com Google foi cancelado ou não pôde ser concluído. Tente novamente." });
+    } catch { setError({ form: "Não foi possível entrar com Google. Tente novamente." }); }
+    finally { setBusy(null); }
   }
-
-  return (
-    <div className="grid min-h-screen lg:grid-cols-[1.1fr_1fr]">
-      <aside className="relative hidden overflow-hidden bg-sidebar p-12 text-sidebar-foreground lg:flex lg:flex-col lg:justify-between">
-        {/* elementos geométricos da marca, apenas aqui */}
-        <div
-          className="absolute -right-32 top-40 h-40 w-[26rem] rotate-[35deg] bg-brand-taupe/45"
-          aria-hidden
-        />
-        <div
-          className="absolute -right-32 top-40 h-40 w-[26rem] -rotate-[35deg] bg-brand-taupe/45"
-          aria-hidden
-        />
-        <div
-          className="absolute right-24 top-[17.5rem] size-20 rounded-full bg-brand-red"
-          aria-hidden
-        />
-        <div className="absolute bottom-0 left-0 h-24 w-56 bg-brand-red" aria-hidden />
-        <div className="relative">
-          <img src={logoLight.url} alt="Indumóveis 2027" className="h-auto w-80" />
-        </div>
-        <p className="relative ml-60 max-w-xs font-display text-lg font-semibold leading-snug">
-          Inspiramos sonhos, impulsionamos negócios
-        </p>
-      </aside>
-      <main className="flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
-          <div className="mb-8 rounded-lg bg-sidebar p-5 lg:hidden">
-            <img src={logoLight.url} alt="Indumóveis 2027" className="mx-auto w-56" />
-          </div>
-          <h1 className="text-2xl font-extrabold">
-            {mode === "in" ? "Acessar o sistema" : "Criar acesso"}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "in"
-              ? "Use seu e-mail corporativo."
-              : "Após criar a conta, a administração atribui seu perfil de acesso."}
-          </p>
-          <form onSubmit={submit} className="mt-6 space-y-3">
-            {mode === "up" && (
-              <div className="space-y-1">
-                <label htmlFor="name" className="text-sm font-medium">
-                  Nome completo
-                </label>
-                <Input
-                  id="name"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  maxLength={120}
-                />
-              </div>
-            )}
-            <div className="space-y-1">
-              <label htmlFor="email" className="text-sm font-medium">
-                E-mail
-              </label>
-              <Input
-                id="email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1">
-              <label htmlFor="pw" className="text-sm font-medium">
-                Senha
-              </label>
-              <Input
-                id="pw"
-                type="password"
-                required
-                minLength={8}
-                autoComplete={mode === "in" ? "current-password" : "new-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            {msg && (
-              <p
-                role="alert"
-                className={msg.type === "err" ? "text-sm text-destructive" : "text-sm text-success"}
-              >
-                {msg.text}
-              </p>
-            )}
-            <Button type="submit" className="w-full" disabled={busy}>
-              {busy && <Loader2 className="size-4 animate-spin" />}
-              {mode === "in" ? "Entrar" : "Criar conta"}
-            </Button>
-          </form>
-          <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            ou
-            <span className="h-px flex-1 bg-border" />
-          </div>
-          <Button variant="outline" className="w-full" onClick={google}>
-            Continuar com Google
-          </Button>
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "in" ? "Ainda não tem acesso?" : "Já possui conta?"}{" "}
-            <button
-              type="button"
-              className="font-semibold text-primary underline-offset-4 hover:underline"
-              onClick={() => {
-                setMode(mode === "in" ? "up" : "in");
-                setMsg(null);
-              }}
-            >
-              {mode === "in" ? "Criar conta" : "Entrar"}
-            </button>
-          </p>
-        </div>
-      </main>
-    </div>
-  );
+  return <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
+    <aside className="relative hidden overflow-hidden bg-sidebar text-sidebar-foreground lg:flex lg:flex-col lg:justify-between p-10 xl:p-14">
+      <img src={logoLight.url} alt="Indumóveis 2027" className="relative z-10 w-56 h-auto xl:w-64" />
+      <div className="absolute right-0 top-[20%] size-52 rotate-45 bg-brand-taupe/40" aria-hidden />
+      <div className="absolute right-24 top-[28%] size-12 rounded-full bg-brand-red" aria-hidden />
+      <p className="relative max-w-xs font-display text-lg font-semibold leading-relaxed">Inspiramos sonhos,<br /> impulsionamos negócios</p>
+    </aside>
+    <main className="flex items-center justify-center px-6 py-12 sm:px-10 lg:px-16">
+      <div className="w-full max-w-[430px]">
+        <div className="mb-10 flex h-24 items-center justify-center rounded-md bg-sidebar lg:hidden"><img src={logoLight.url} alt="Indumóveis 2027" className="w-52 h-auto" /></div>
+        <h1 className="font-display text-[1.65rem] font-bold leading-tight">{mode === "in" ? "Acessar o sistema" : "Criar acesso"}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{mode === "in" ? "Entre com seu e-mail para continuar." : "Crie sua conta para solicitar acesso à equipe."}</p>
+        <form onSubmit={submit} className="mt-8 space-y-4" noValidate>
+          {mode === "up" && <div><label htmlFor="auth-name" className="mb-1.5 block text-sm font-medium">Nome completo</label><Input id="auth-name" autoComplete="name" value={name} maxLength={120} aria-invalid={!!error.name} aria-describedby={error.name ? "name-error" : undefined} onChange={(e) => setName(e.target.value)} className="h-12" />{error.name && <p id="name-error" className="mt-1 text-sm text-destructive">{error.name}</p>}</div>}
+          <div><label htmlFor="auth-email" className="mb-1.5 block text-sm font-medium">E-mail</label><Input id="auth-email" type="email" autoComplete="email" value={email} maxLength={254} aria-invalid={!!error.email} aria-describedby={error.email ? "email-error" : undefined} onChange={(e) => setEmail(e.target.value)} className="h-12" />{error.email && <p id="email-error" className="mt-1 text-sm text-destructive">{error.email}</p>}</div>
+          <div><label htmlFor="auth-password" className="mb-1.5 block text-sm font-medium">Senha</label><div className="relative"><Input id="auth-password" type={showPassword ? "text" : "password"} autoComplete={mode === "in" ? "current-password" : "new-password"} value={password} minLength={8} aria-invalid={!!error.password} aria-describedby={error.password ? "password-error" : undefined} onChange={(e) => setPassword(e.target.value)} className="h-12 pr-12" /><Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1 size-10" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</Button></div>{error.password && <p id="password-error" className="mt-1 text-sm text-destructive">{error.password}</p>}</div>
+          {error.form && <p role="alert" className="text-sm text-destructive">{error.form}</p>}
+          {notice && <p role="status" className="text-sm text-success">{notice}</p>}
+          <Button type="submit" className="h-12 w-full" disabled={!!busy}>{busy === "email" && <Loader2 className="animate-spin" />}{mode === "in" ? "Entrar" : "Criar conta"}</Button>
+        </form>
+        <div className="my-6 flex items-center gap-4 text-sm text-muted-foreground"><span className="h-px flex-1 bg-border" />ou<span className="h-px flex-1 bg-border" /></div>
+        <Button type="button" variant="outline" className="h-12 w-full" disabled={!!busy} onClick={google}>{busy === "google" ? <Loader2 className="animate-spin" /> : <span aria-hidden className="font-bold text-base text-primary">G</span>}Continuar com Google</Button>
+        <p className="mt-7 text-center text-sm text-muted-foreground">{mode === "in" ? "Ainda não tem acesso?" : "Já possui conta?"} <Button type="button" variant="link" className="h-auto px-1 py-0 font-semibold" disabled={!!busy} onClick={() => { setMode(mode === "in" ? "up" : "in"); setError({}); setNotice(""); }}>{mode === "in" ? "Criar conta" : "Entrar"}</Button></p>
+      </div>
+    </main>
+  </div>;
 }
