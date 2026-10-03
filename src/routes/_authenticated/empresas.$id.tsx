@@ -22,6 +22,7 @@ function CompanyPage() {
   const { id } = Route.useParams();
   const can = useCan("empresas");
   const com = useCan("comercial");
+  const docsCan = useCan("documentos");
   const { data: c, isLoading } = useCompany(id);
   const { data: deals = [] } = useDeals();
   const { data: contracts = [] } = useContracts();
@@ -108,8 +109,8 @@ function CompanyPage() {
             ))}
           </Section>
         </TabsContent>
-        <TabsContent value="docs" className="mt-4"><Section title="Documentos"><AttachedDocuments entityType="company" entityId={id} category="cadastro" canWrite={useCan("documentos").write} /></Section></TabsContent>
-        <TabsContent value="ativ" className="mt-4"><Section title="Atividades"><RelatedActivities type="company" id={id} canWrite={useCan("agenda").write} /></Section></TabsContent>
+        <TabsContent value="docs" className="mt-4"><Section title="Documentos"><AttachedDocuments entityType="company" entityId={id} category="cadastro" canWrite={docsCan.write} /></Section></TabsContent>
+        <TabsContent value="ativ" className="mt-4"><Section title="Atividades"><RelatedActivities type="company" id={id} /></Section></TabsContent>
       </Tabs>
       <CompanyDialog open={edit} onOpenChange={setEdit} company={c} />
       <ContactDialog open={contact} onOpenChange={setContact} companyId={id} />

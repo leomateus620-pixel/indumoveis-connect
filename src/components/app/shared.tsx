@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useCompanies, useProfiles, useDbMutation, api, useEditionId, useActivities, useMe } from "@/lib/api";
+import { useCompanies, useProfiles, useDbMutation, api, useEditionId, useActivities, useMe, useCan } from "@/lib/api";
 import { NativeSelect, FormRow, StatusBadge } from "./ui";
 import { ACTIVITY_STATUS, fmtDate } from "@/lib/format";
 
@@ -77,7 +77,9 @@ export function ConfirmNoteDialog({ open, onOpenChange, title, label, required, 
 }
 
 /** Atividades vinculadas a um registro, com criação rápida. */
-export function RelatedActivities({ type, id, canWrite }: { type: string; id: string; canWrite: boolean }) {
+export function RelatedActivities({ type, id, canWrite: cw }: { type: string; id: string; canWrite?: boolean }) {
+  const agenda = useCan("agenda");
+  const canWrite = cw ?? agenda.write;
   const { data = [] } = useActivities();
   const items = data.filter((a: any) => a.related_type === type && a.related_id === id);
   const [open, setOpen] = useState(false);

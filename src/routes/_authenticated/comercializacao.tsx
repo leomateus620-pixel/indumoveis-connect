@@ -144,7 +144,7 @@ function DealDetail({ id, canWrite, onEdit }: { id: string; canWrite: boolean; o
             ))}
           </ol>
         </Section>
-        <Section title="Atividades"><RelatedActivities type="deal" id={d.id} canWrite={useCan("agenda").write} /></Section>
+        <Section title="Atividades"><RelatedActivities type="deal" id={d.id} /></Section>
         <Section title="Documentos"><AttachedDocuments entityType="deal" entityId={d.id} category="geral" canWrite={canWrite} extraLinks={[{ type: "company", id: d.company_id }]} /></Section>
       </div>
       <ConfirmNoteDialog open={!!to} onOpenChange={(o) => !o && setTo(null)} busy={tr.isPending}

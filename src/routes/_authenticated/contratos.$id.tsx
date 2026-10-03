@@ -101,7 +101,7 @@ function ContractPage() {
               <li key={v.id} className="flex justify-between py-1"><span>v{v.version}</span><span className="tnum text-xs text-muted-foreground">{fmtDateTime(v.created_at)} · {name(v.created_by)}</span></li>
             ))}</ul>
           </Section>
-          <Section title="Atividades"><RelatedActivities type="contract" id={id} canWrite={useCan("agenda").write} /></Section>
+          <Section title="Atividades"><RelatedActivities type="contract" id={id} /></Section>
         </div>
       </div>
       <ConfirmNoteDialog open={!!to} onOpenChange={(o) => !o && setTo(null)} busy={tr.isPending} title={to ? LABEL[to] : ""}
