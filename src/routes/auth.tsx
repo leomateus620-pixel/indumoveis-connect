@@ -79,15 +79,15 @@ function AuthPage() {
       <aside className="relative hidden overflow-hidden bg-sidebar p-12 text-sidebar-foreground lg:flex lg:flex-col lg:justify-between">
         {/* elementos geométricos da marca, apenas aqui */}
         <div
-          className="absolute -right-16 top-24 h-40 w-[26rem] rotate-[35deg] bg-brand-taupe/70"
+          className="absolute -right-32 top-40 h-40 w-[26rem] rotate-[35deg] bg-brand-taupe/45"
           aria-hidden
         />
         <div
-          className="absolute -right-16 top-24 h-40 w-[26rem] -rotate-[35deg] bg-brand-taupe/70"
+          className="absolute -right-32 top-40 h-40 w-[26rem] -rotate-[35deg] bg-brand-taupe/45"
           aria-hidden
         />
         <div
-          className="absolute right-40 top-[11.5rem] size-20 rounded-full bg-brand-red"
+          className="absolute right-24 top-[17.5rem] size-20 rounded-full bg-brand-red"
           aria-hidden
         />
         <div className="absolute bottom-0 left-0 h-24 w-56 bg-brand-red" aria-hidden />
