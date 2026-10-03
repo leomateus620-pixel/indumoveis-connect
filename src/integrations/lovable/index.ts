@@ -29,7 +29,10 @@ export const lovable = {
       }
 
       try {
-        await supabase.auth.setSession(result.tokens);
+        const { data, error } = await supabase.auth.setSession(result.tokens);
+        if (error || !data.session || !data.user) {
+          return { error: error ?? new Error("Não foi possível confirmar o acesso com Google.") };
+        }
       } catch (e) {
         return { error: e instanceof Error ? e : new Error(String(e)) };
       }

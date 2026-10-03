@@ -1167,6 +1167,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      provision_initial_admin: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       register_payment: {
         Args: {
           p_amount_cents: number
