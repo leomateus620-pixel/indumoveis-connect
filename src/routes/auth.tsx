@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -69,7 +69,8 @@ function ResolveAccess({ userId }: { userId: string }) {
 
 function SignOut() {
   const navigate = useNavigate();
-  return <Button variant="outline" onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth", replace: true }); }}>Sair</Button>;
+  const queryClient = useQueryClient();
+  return <Button variant="outline" onClick={async () => { await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); navigate({ to: "/auth", replace: true }); }}>Sair</Button>;
 }
 function Status({ title, detail, action }: { title: string; detail?: string; action?: React.ReactNode }) {
   return <main className="flex min-h-screen items-center justify-center px-6"><div className="max-w-sm space-y-4 text-center"><h1 className="font-display text-xl font-bold">{title}</h1>{detail && <p className="text-muted-foreground">{detail}</p>}<div className="flex justify-center gap-3">{action}</div></div></main>;

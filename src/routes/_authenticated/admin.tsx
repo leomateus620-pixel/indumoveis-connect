@@ -113,7 +113,7 @@ function Users() {
                       <Checkbox
                         aria-label={`${ROLE_LABEL[r]} para ${p.email}`}
                         checked={on}
-                        disabled={m.isPending || (p.id === me?.id && r === "admin")}
+                        disabled={m.isPending || (on && p.id === me?.id && r === "admin")}
                         onCheckedChange={(v) => m.mutate({ user: p.id, role: r, on: !!v })}
                       />
                     </td>
