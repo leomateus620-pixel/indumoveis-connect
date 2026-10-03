@@ -191,11 +191,11 @@ export function AppShell() {
     </main>
   );
   return (
-    <AuthorizedShell compact={compact} open={open} setOpen={setOpen} setCompact={setCompact} me={me} current={current} toggle={toggle} />
+    <AuthorizedShell compact={compact} open={open} setOpen={setOpen} current={current} toggle={toggle} />
   );
 }
 
-function AuthorizedShell({ compact, open, setOpen, me, current, toggle }: { compact: boolean; open: boolean; setOpen: (v: boolean) => void; setCompact: (v: boolean) => void; me: NonNullable<ReturnType<typeof useMe>["data"]>; current: (typeof NAV)[number]; toggle: () => void }) {
+function AuthorizedShell({ compact, open, setOpen, current, toggle }: { compact: boolean; open: boolean; setOpen: (v: boolean) => void; current: (typeof NAV)[number]; toggle: () => void }) {
   const { data: edition } = useEdition();
   return (
     <div className="flex min-h-screen w-full">
