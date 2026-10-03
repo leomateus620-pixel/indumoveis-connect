@@ -13,11 +13,17 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedComercializacaoRouteImport } from './routes/_authenticated/comercializacao'
+import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated/contratos'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
 import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
+import { Route as AuthenticatedVistoriasRouteImport } from './routes/_authenticated/vistorias'
+import { Route as AuthenticatedContratosIndexRouteImport } from './routes/_authenticated/contratos.index'
+import { Route as AuthenticatedContratosIdRouteImport } from './routes/_authenticated/contratos.$id'
 import { Route as AuthenticatedEmpresasIndexRouteImport } from './routes/_authenticated/empresas.index'
 import { Route as AuthenticatedEmpresasIdRouteImport } from './routes/_authenticated/empresas.$id'
+import { Route as AuthenticatedVistoriasIndexRouteImport } from './routes/_authenticated/vistorias.index'
+import { Route as AuthenticatedVistoriasIdRouteImport } from './routes/_authenticated/vistorias.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -39,6 +45,11 @@ const AuthenticatedComercializacaoRoute =
     path: '/comercializacao',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedContratosRoute = AuthenticatedContratosRouteImport.update({
+  id: '/contratos',
+  path: '/contratos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -54,6 +65,23 @@ const AuthenticatedMapaRoute = AuthenticatedMapaRouteImport.update({
   path: '/mapa',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVistoriasRoute = AuthenticatedVistoriasRouteImport.update({
+  id: '/vistorias',
+  path: '/vistorias',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedContratosIndexRoute =
+  AuthenticatedContratosIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedContratosRoute,
+  } as any)
+const AuthenticatedContratosIdRoute =
+  AuthenticatedContratosIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedContratosRoute,
+  } as any)
 const AuthenticatedEmpresasIndexRoute =
   AuthenticatedEmpresasIndexRouteImport.update({
     id: '/',
@@ -65,16 +93,34 @@ const AuthenticatedEmpresasIdRoute = AuthenticatedEmpresasIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedEmpresasRoute,
 } as any)
+const AuthenticatedVistoriasIndexRoute =
+  AuthenticatedVistoriasIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedVistoriasRoute,
+  } as any)
+const AuthenticatedVistoriasIdRoute =
+  AuthenticatedVistoriasIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedVistoriasRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/comercializacao': typeof AuthenticatedComercializacaoRoute
+  '/contratos': typeof AuthenticatedContratosRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/empresas': typeof AuthenticatedEmpresasRouteWithChildren
   '/mapa': typeof AuthenticatedMapaRoute
+  '/vistorias': typeof AuthenticatedVistoriasRouteWithChildren
+  '/contratos/$id': typeof AuthenticatedContratosIdRoute
   '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
+  '/vistorias/$id': typeof AuthenticatedVistoriasIdRoute
+  '/contratos/': typeof AuthenticatedContratosIndexRoute
   '/empresas/': typeof AuthenticatedEmpresasIndexRoute
+  '/vistorias/': typeof AuthenticatedVistoriasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -82,8 +128,12 @@ export interface FileRoutesByTo {
   '/comercializacao': typeof AuthenticatedComercializacaoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/mapa': typeof AuthenticatedMapaRoute
+  '/contratos/$id': typeof AuthenticatedContratosIdRoute
   '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
+  '/vistorias/$id': typeof AuthenticatedVistoriasIdRoute
+  '/contratos': typeof AuthenticatedContratosIndexRoute
   '/empresas': typeof AuthenticatedEmpresasIndexRoute
+  '/vistorias': typeof AuthenticatedVistoriasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,11 +141,17 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/comercializacao': typeof AuthenticatedComercializacaoRoute
+  '/_authenticated/contratos': typeof AuthenticatedContratosRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/empresas': typeof AuthenticatedEmpresasRouteWithChildren
   '/_authenticated/mapa': typeof AuthenticatedMapaRoute
+  '/_authenticated/vistorias': typeof AuthenticatedVistoriasRouteWithChildren
+  '/_authenticated/contratos/$id': typeof AuthenticatedContratosIdRoute
   '/_authenticated/empresas/$id': typeof AuthenticatedEmpresasIdRoute
+  '/_authenticated/vistorias/$id': typeof AuthenticatedVistoriasIdRoute
+  '/_authenticated/contratos/': typeof AuthenticatedContratosIndexRoute
   '/_authenticated/empresas/': typeof AuthenticatedEmpresasIndexRoute
+  '/_authenticated/vistorias/': typeof AuthenticatedVistoriasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -103,11 +159,17 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/comercializacao'
+    | '/contratos'
     | '/dashboard'
     | '/empresas'
     | '/mapa'
+    | '/vistorias'
+    | '/contratos/$id'
     | '/empresas/$id'
+    | '/vistorias/$id'
+    | '/contratos/'
     | '/empresas/'
+    | '/vistorias/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -115,19 +177,29 @@ export interface FileRouteTypes {
     | '/comercializacao'
     | '/dashboard'
     | '/mapa'
+    | '/contratos/$id'
     | '/empresas/$id'
+    | '/vistorias/$id'
+    | '/contratos'
     | '/empresas'
+    | '/vistorias'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/comercializacao'
+    | '/_authenticated/contratos'
     | '/_authenticated/dashboard'
     | '/_authenticated/empresas'
     | '/_authenticated/mapa'
+    | '/_authenticated/vistorias'
+    | '/_authenticated/contratos/$id'
     | '/_authenticated/empresas/$id'
+    | '/_authenticated/vistorias/$id'
+    | '/_authenticated/contratos/'
     | '/_authenticated/empresas/'
+    | '/_authenticated/vistorias/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedComercializacaoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/contratos': {
+      id: '/_authenticated/contratos'
+      path: '/contratos'
+      fullPath: '/contratos'
+      preLoaderRoute: typeof AuthenticatedContratosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -187,6 +266,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/vistorias': {
+      id: '/_authenticated/vistorias'
+      path: '/vistorias'
+      fullPath: '/vistorias'
+      preLoaderRoute: typeof AuthenticatedVistoriasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contratos/': {
+      id: '/_authenticated/contratos/'
+      path: '/'
+      fullPath: '/contratos/'
+      preLoaderRoute: typeof AuthenticatedContratosIndexRouteImport
+      parentRoute: typeof AuthenticatedContratosRoute
+    }
+    '/_authenticated/contratos/$id': {
+      id: '/_authenticated/contratos/$id'
+      path: '/$id'
+      fullPath: '/contratos/$id'
+      preLoaderRoute: typeof AuthenticatedContratosIdRouteImport
+      parentRoute: typeof AuthenticatedContratosRoute
+    }
     '/_authenticated/empresas/': {
       id: '/_authenticated/empresas/'
       path: '/'
@@ -201,8 +301,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmpresasIdRouteImport
       parentRoute: typeof AuthenticatedEmpresasRoute
     }
+    '/_authenticated/vistorias/': {
+      id: '/_authenticated/vistorias/'
+      path: '/'
+      fullPath: '/vistorias/'
+      preLoaderRoute: typeof AuthenticatedVistoriasIndexRouteImport
+      parentRoute: typeof AuthenticatedVistoriasRoute
+    }
+    '/_authenticated/vistorias/$id': {
+      id: '/_authenticated/vistorias/$id'
+      path: '/$id'
+      fullPath: '/vistorias/$id'
+      preLoaderRoute: typeof AuthenticatedVistoriasIdRouteImport
+      parentRoute: typeof AuthenticatedVistoriasRoute
+    }
   }
 }
+
+interface AuthenticatedContratosRouteChildren {
+  AuthenticatedContratosIdRoute: typeof AuthenticatedContratosIdRoute
+  AuthenticatedContratosIndexRoute: typeof AuthenticatedContratosIndexRoute
+}
+
+const AuthenticatedContratosRouteChildren: AuthenticatedContratosRouteChildren =
+  {
+    AuthenticatedContratosIdRoute: AuthenticatedContratosIdRoute,
+    AuthenticatedContratosIndexRoute: AuthenticatedContratosIndexRoute,
+  }
+
+const AuthenticatedContratosRouteWithChildren =
+  AuthenticatedContratosRoute._addFileChildren(
+    AuthenticatedContratosRouteChildren,
+  )
 
 interface AuthenticatedEmpresasRouteChildren {
   AuthenticatedEmpresasIdRoute: typeof AuthenticatedEmpresasIdRoute
@@ -219,18 +349,38 @@ const AuthenticatedEmpresasRouteWithChildren =
     AuthenticatedEmpresasRouteChildren,
   )
 
+interface AuthenticatedVistoriasRouteChildren {
+  AuthenticatedVistoriasIdRoute: typeof AuthenticatedVistoriasIdRoute
+  AuthenticatedVistoriasIndexRoute: typeof AuthenticatedVistoriasIndexRoute
+}
+
+const AuthenticatedVistoriasRouteChildren: AuthenticatedVistoriasRouteChildren =
+  {
+    AuthenticatedVistoriasIdRoute: AuthenticatedVistoriasIdRoute,
+    AuthenticatedVistoriasIndexRoute: AuthenticatedVistoriasIndexRoute,
+  }
+
+const AuthenticatedVistoriasRouteWithChildren =
+  AuthenticatedVistoriasRoute._addFileChildren(
+    AuthenticatedVistoriasRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedComercializacaoRoute: typeof AuthenticatedComercializacaoRoute
+  AuthenticatedContratosRoute: typeof AuthenticatedContratosRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRouteWithChildren
   AuthenticatedMapaRoute: typeof AuthenticatedMapaRoute
+  AuthenticatedVistoriasRoute: typeof AuthenticatedVistoriasRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedComercializacaoRoute: AuthenticatedComercializacaoRoute,
+  AuthenticatedContratosRoute: AuthenticatedContratosRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmpresasRoute: AuthenticatedEmpresasRouteWithChildren,
   AuthenticatedMapaRoute: AuthenticatedMapaRoute,
+  AuthenticatedVistoriasRoute: AuthenticatedVistoriasRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

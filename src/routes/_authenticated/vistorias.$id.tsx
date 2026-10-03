@@ -30,6 +30,7 @@ function InspectionPage() {
   const { data: i, isLoading } = useInspection(id);
   const { data: all = [] } = useInspections();
   const name = useProfileName();
+  const agenda = useCan("agenda").write;
   const [notes, setNotes] = useState("");
   const [accName, setAccName] = useState("");
   const [accOk, setAccOk] = useState(false);
@@ -64,8 +65,6 @@ function InspectionPage() {
           {items.length === 0 && <p className="text-sm text-muted-foreground">Sem itens. Configure checklists em Administração.</p>}
           <ul className="space-y-4">
             {items.map((it: any) => {
-              const prev = counterpart ? null : null;
-              void prev;
               return (
                 <li key={it.id} className="rounded-md border p-3">
                   <p className="font-semibold">{it.label}</p>
@@ -77,7 +76,7 @@ function InspectionPage() {
                     ))}
                   </div>
                   <ItemNote item={it} disabled={!editable} onSave={(note) => item.mutate({ id: it.id, patch: { note } })} />
-                  {["avaria", "ausente"].includes(it.condition) && useCanAgenda() && (
+                  {["avaria", "ausente"].includes(it.condition) && agenda && (
                     <Button variant="link" size="sm" className="mt-1 h-auto px-0" onClick={() => setPend(it)}><Plus className="size-3" />Criar pendência</Button>
                   )}
                 </li>
@@ -112,7 +111,7 @@ function InspectionPage() {
           ) : <p className="text-sm text-muted-foreground">Aguardando conclusão.</p>}
         </Section>
 
-        <Section title="Pendências e atividades"><RelatedActivities type="inspection" id={id} canWrite={useCanAgenda()} /></Section>
+        <Section title="Pendências e atividades"><RelatedActivities type="inspection" id={id} canWrite={agenda} /></Section>
       </div>
       {pend && <ActivityDialog open={!!pend} onOpenChange={(o) => !o && setPend(null)} related={{ type: "inspection", id }}
         defaults={{ title: `Pendência ${i.spaces?.code}: ${pend.label}`, description: pend.note ?? "" }} />}
@@ -120,7 +119,6 @@ function InspectionPage() {
   );
 }
 
-function useCanAgenda() { return useCan("agenda").write; }
 
 function ItemNote({ item, disabled, onSave }: { item: any; disabled: boolean; onSave: (n: string) => void }) {
   const [v, setV] = useState(item.note ?? "");
