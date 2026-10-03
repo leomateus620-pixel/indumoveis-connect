@@ -1,0 +1,16 @@
+# Refinamento do acesso Indumóveis
+
+## Resultado esperado
+Uma tela de entrada e cadastro mais equilibrada, seguindo a marca do print e a composição real da aplicação, com campos acessíveis e feedback claro. O acesso aos módulos dependerá de **sessão válida e perfil autorizado**, sem promoção automática a administrador. Não incluir recuperação ou redefinição de senha e não publicar o aplicativo.
+
+## Implementação
+1. **Apresentação do acesso:** manter as duas colunas no desktop e uma composição compacta no celular; ajustar proporções da marca, frase institucional e formulário sem deslocamentos fixos. Usar Figtree e Plus Jakarta Sans já carregadas, tokens atuais de ameixa, taupe, vermelho e superfícies claras. Refinar hierarquia, campos e botões de 44–48 px, foco, divisor, ícone Google e texto de apoio neutro. Confinar os ajustes de estilo à tela de acesso.
+2. **Formulários e OAuth:** validar dados e apresentar erros junto aos campos, manter o preenchimento em falhas, oferecer mostrar/ocultar senha e autocomplete. Impedir envios repetidos, manter o rótulo do botão durante o carregamento e tratar início, cancelamento e retorno inválido do Google. Verificar o resultado de `setSession` na integração Lovable sem alterar provedores ou configurações externas silenciosamente.
+3. **Sessão, perfil e navegação:** separar verificação da sessão, carregamento de perfil/permissões, acesso autorizado, aguardando liberação e falha de consulta. Não mostrar conteúdo protegido quando o perfil for indefinido; na falha, oferecer nova tentativa e saída sem encerrar a sessão válida. Centralizar transições de identidade, limpar consultas sensíveis ao sair/trocar de conta e impedir resultados antigos de aparecerem para outra conta. Preservar apenas destinos internos e permitidos após o login, com Dashboard como padrão.
+4. **Provisionamento e autorização:** substituir `ensure_profile()` para criar apenas o perfil do próprio usuário autenticado, sem conceder papel. Adicionar proteção transacional no banco contra remoção/despromoção concorrente do último administrador. Manter RLS, os cinco perfis e as permissões atuais; ajustar a administração para apresentar erros de alteração de papéis. O administrador inicial será concedido somente por procedimento administrativo explícito, após indicação da conta responsável — **nenhuma conta será escolhida automaticamente**.
+5. **Conferência:** exercitar desktop e celular, entrada/cadastro, Google quando o retorno puder ser concluído no ambiente, navegação de retorno, saída, espera de liberação, erro de perfil e bloqueio do último administrador. Conferir que um usuário sem papel não recebe privilégios e que o estado de uma conta não vaza para outra.
+
+## Base técnica verificada
+- O acesso atual usa `auth.tsx`, `AppShell`, `useMe` em `api.ts`, o gate TanStack e a integração Google/Lovable; `useMe` chama `ensure_profile()`.
+- `ensure_profile()` atualmente promove quem entra se não houver administrador. A tela administrativa bloqueia apenas a remoção do próprio papel admin; não há proteção equivalente no banco.
+- A consulta atual encontrou **zero usuários, zero perfis e zero administradores**. A indicação de quem terá o primeiro acesso administrativo permanece pendente; até lá, novas contas ficarão em “Acesso aguardando liberação”.
