@@ -22,13 +22,14 @@ export const Route = createFileRoute("/auth")({
 });
 
 const allowed = ["/dashboard", "/mapa", "/comercializacao", "/empresas", "/contratos", "/vistorias", "/financeiro", "/agenda", "/documentos", "/admin"] as const;
+const detailPaths = ["/empresas", "/contratos", "/vistorias"] as const;
 const moduleFor: Record<string, string> = { "/dashboard": "dashboard", "/mapa": "mapa", "/comercializacao": "comercial", "/empresas": "empresas", "/contratos": "contratos", "/vistorias": "vistorias", "/financeiro": "financeiro", "/agenda": "agenda", "/documentos": "documentos", "/admin": "admin" };
 function safeDestination(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return null;
   try {
     const url = new URL(value, window.location.origin);
     if (url.origin !== window.location.origin) return null;
-    const root = allowed.find((p) => url.pathname === p || url.pathname.startsWith(p + "/"));
+    const root = allowed.find((p) => url.pathname === p || (detailPaths.some((d) => d === p) && new RegExp(`^${p}/[a-zA-Z0-9-]+/?$`).test(url.pathname)));
     return root ? { path: url.pathname + url.search, module: moduleFor[root] } : null;
   } catch { return null; }
 }
@@ -70,7 +71,7 @@ function ResolveAccess({ userId }: { userId: string }) {
 function SignOut() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  return <Button variant="outline" onClick={async () => { await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); navigate({ to: "/auth", replace: true }); }}>Sair</Button>;
+  return <Button variant="outline" onClick={async () => { await queryClient.cancelQueries(); queryClient.clear(); await supabase.auth.signOut(); queryClient.setQueryData(["auth", "session"], null); navigate({ to: "/auth", replace: true }); }}>Sair</Button>;
 }
 function Status({ title, detail, action }: { title: string; detail?: string; action?: React.ReactNode }) {
   return <main className="flex min-h-screen items-center justify-center px-6"><div className="max-w-sm space-y-4 text-center"><h1 className="font-display text-xl font-bold">{title}</h1>{detail && <p className="text-muted-foreground">{detail}</p>}<div className="flex justify-center gap-3">{action}</div></div></main>;
