@@ -100,6 +100,7 @@ export const DOC_CATEGORIES: Record<string, string> = {
 
 export function errMsg(e: unknown) {
   if (!e) return "Erro desconhecido";
-  if (typeof e === "object" && e && "message" in e) return String((e as { message: string }).message);
+  if (typeof e === "object" && e && "message" in e)
+    return String((e as { message: string }).message);
   return String(e);
 }
