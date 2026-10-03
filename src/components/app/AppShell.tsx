@@ -26,7 +26,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Loading } from "./ui";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
-import { Route as ProtectedRoute } from "@/routes/_authenticated/route";
 import logoLight from "@/assets/logo-light.png.asset.json";
 import markLight from "@/assets/mark-light.png.asset.json";
 
@@ -43,10 +42,9 @@ export const NAV = [
   { to: "/admin", label: "Administração", icon: Settings, module: "admin" },
 ] as const;
 
-function SidebarBody({ compact, onNavigate }: { compact: boolean; onNavigate?: () => void }) {
+function SidebarBody({ compact, userId, onNavigate }: { compact: boolean; userId: string; onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const user = ProtectedRoute.useRouteContext().user;
-  const { data: me } = useMe(user.id);
+  const { data: me } = useMe(userId);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   async function signOut() {
@@ -136,11 +134,10 @@ function SidebarBody({ compact, onNavigate }: { compact: boolean; onNavigate?: (
   );
 }
 
-export function AppShell() {
-  const user = ProtectedRoute.useRouteContext().user;
+export function AppShell({ userId }: { userId: string }) {
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
-  const { data: me, isLoading, isError, refetch } = useMe(user.id);
+  const { data: me, isLoading, isError, refetch } = useMe(userId);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -163,7 +160,7 @@ export function AppShell() {
   };
 
   if (isLoading || (!me && !isError)) return <div className="min-h-screen"><Loading /></div>;
-  if (isError || !me || me.id !== user.id) return (
+  if (isError || !me || me.id !== userId) return (
     <main className="flex min-h-screen items-center justify-center p-6">
       <div className="max-w-md space-y-4 text-center">
         <h1 className="font-display text-xl font-bold">Não foi possível consultar seu acesso</h1>
@@ -191,11 +188,11 @@ export function AppShell() {
     </main>
   );
   return (
-    <AuthorizedShell compact={compact} open={open} setOpen={setOpen} current={current} toggle={toggle} />
+    <AuthorizedShell compact={compact} open={open} setOpen={setOpen} userId={userId} current={current} toggle={toggle} />
   );
 }
 
-function AuthorizedShell({ compact, open, setOpen, current, toggle }: { compact: boolean; open: boolean; setOpen: (v: boolean) => void; current: (typeof NAV)[number]; toggle: () => void }) {
+function AuthorizedShell({ compact, open, setOpen, userId, current, toggle }: { compact: boolean; open: boolean; setOpen: (v: boolean) => void; userId: string; current: (typeof NAV)[number]; toggle: () => void }) {
   const { data: edition } = useEdition();
   return (
     <div className="flex min-h-screen w-full">
@@ -205,12 +202,12 @@ function AuthorizedShell({ compact, open, setOpen, current, toggle }: { compact:
           compact ? "w-[4.5rem]" : "w-64",
         )}
       >
-        <SidebarBody compact={compact} />
+        <SidebarBody compact={compact} userId={userId} />
       </aside>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="w-72 border-none p-0">
           <SheetTitle className="sr-only">Navegação</SheetTitle>
-          <SidebarBody compact={false} onNavigate={() => setOpen(false)} />
+          <SidebarBody compact={false} userId={userId} onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
       <div className="flex min-w-0 flex-1 flex-col">
