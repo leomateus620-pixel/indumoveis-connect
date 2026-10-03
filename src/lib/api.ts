@@ -41,12 +41,9 @@ export function useMe(userId?: string) {
       const roles = (
         await run<any[]>(db.from("user_roles").select("role").eq("user_id", u.user.id))
       ).map((r) => r.role as string);
-      const rp = await run<any[]>(
-        db
-          .from("role_permissions")
-          .select("*")
-          .in("role", roles.length ? roles : ["-"]),
-      );
+      const rp = roles.length
+        ? await run<any[]>(db.from("role_permissions").select("*").in("role", roles))
+        : [];
       const perms: Me["perms"] = {};
       const admin = roles.includes("admin");
       for (const m of [
