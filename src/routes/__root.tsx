@@ -123,10 +123,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    let identity: string | undefined;
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      if (event === "SIGNED_OUT") queryClient.clear();
+      if (event === "SIGNED_OUT" || (identity && identity !== session?.user.id)) queryClient.clear();
       else queryClient.invalidateQueries();
+      identity = session?.user.id;
       router.invalidate();
     });
     return () => data.subscription.unsubscribe();

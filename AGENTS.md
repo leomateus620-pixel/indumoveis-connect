@@ -17,5 +17,6 @@
 - Files are stored once in the private `documents` bucket; modules link them via `document_links` (polymorphic entity_type/entity_id) — the central and modules show the same file.
 - Agenda merges activities with dates already stored in inspections/installments instead of copying them.
 - Every edition-scoped table carries `edition_id`; the active edition comes from `editions.is_active`, never hardcoded dates.
-- First signed-in user becomes admin via `ensure_profile()`; no fixed accounts.
+- `ensure_profile()` creates only the caller's profile; the first admin is assigned explicitly through a controlled administrative action, never from sign-in — prevents privilege escalation when no admin exists.
+- The last admin role is protected by a transaction-level database guard — simultaneous demotions cannot leave the system without administration.
 - No Edge Functions yet: no external integrations exist; add server routes/server functions only when a secret-bearing integration is required.
