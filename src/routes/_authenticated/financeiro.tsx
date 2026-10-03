@@ -1,0 +1,340 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import {
+  PageHeader,
+  FilterBar,
+  SearchInput,
+  DataList,
+  EmptyState,
+  Loading,
+  Restricted,
+  Stat,
+  NativeSelect,
+  FormRow,
+  AttachedDocuments,
+  Section,
+} from "@/components/app/ui";
+import { RelatedLink } from "@/components/app/shared";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useInstallments, useContracts, useCan, useDbMutation, api } from "@/lib/api";
+import { brl, fmtDate, today, toCents, centsToInput, fmtDateTime } from "@/lib/format";
+import { cn } from "@/lib/utils";
+
+export const Route = createFileRoute("/_authenticated/financeiro")({
+  validateSearch: (s: Record<string, unknown>): { view?: string } => ({
+    view: typeof s.view === "string" ? s.view : undefined,
+  }),
+  head: () => ({
+    meta: [
+      { title: "Financeiro Operacional — Sistema Indumóveis" },
+      { name: "description", content: "Parcelas, vencimentos e pagamentos registrados." },
+    ],
+  }),
+  component: FinanceiroPage,
+});
+
+const paidOf = (i: any) =>
+  (i.payments ?? []).reduce((a: number, p: any) => a + Number(p.amount_cents), 0);
+
+function FinanceiroPage() {
+  const can = useCan("financeiro");
+  const { view } = Route.useSearch();
+  const navigate = useNavigate({ from: "/financeiro" });
+  const { data: inst = [], isLoading } = useInstallments(can.read);
+  const { data: contracts = [] } = useContracts();
+  const [q, setQ] = useState("");
+  const [sel, setSel] = useState<string | null>(null);
+  const t = today();
+  const status = (i: any) =>
+    i.status === "paga"
+      ? "Paga"
+      : i.status === "cancelada"
+        ? "Cancelada"
+        : i.due_date < t
+          ? "Vencida"
+          : paidOf(i) > 0
+            ? "Parcial"
+            : "A vencer";
+
+  const rows = useMemo(
+    () =>
+      inst.filter((i: any) => {
+        const s = status(i);
+        if (view === "vencidas" && s !== "Vencida") return false;
+        if (view === "abertas" && !["A vencer", "Parcial", "Vencida"].includes(s)) return false;
+        if (view === "pagas" && s !== "Paga") return false;
+        return (
+          !q ||
+          i.contracts?.companies?.trade_name?.toLowerCase().includes(q.toLowerCase()) ||
+          i.contracts?.number?.includes(q)
+        );
+      }),
+    [inst, view, q],
+  ); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Total negociado por contrato (uma vez por contrato, independentemente do nº de espaços)
+  const activeContracts = contracts.filter((c: any) => c.status !== "cancelado");
+  const contracted = activeContracts.reduce((a: number, c: any) => a + Number(c.total_cents), 0);
+  const forecast = inst
+    .filter((i: any) => i.status !== "cancelada")
+    .reduce((a: number, i: any) => a + Number(i.amount_cents), 0);
+  const received = inst.reduce((a: number, i: any) => a + paidOf(i), 0);
+  const overdue = inst
+    .filter((i: any) => status(i) === "Vencida")
+    .reduce((a: number, i: any) => a + Number(i.amount_cents) - paidOf(i), 0);
+  const noInst = activeContracts.filter((c: any) => !inst.some((i: any) => i.contract_id === c.id));
+
+  if (!can.read)
+    return (
+      <Restricted text="Informações financeiras são visíveis apenas para perfis autorizados." />
+    );
+  const selected = inst.find((i: any) => i.id === sel);
+
+  return (
+    <>
+      <PageHeader
+        title="Financeiro Operacional"
+        subtitle="Registros próprios do sistema — sem integração bancária, fiscal ou cobrança automática"
+      />
+      <div className="grid grid-cols-2 gap-3 px-4 pt-4 md:px-8 lg:grid-cols-4">
+        <Stat
+          label="Total em contratos"
+          value={brl(contracted)}
+          hint={`${activeContracts.length} contratos ativos`}
+        />
+        <Stat
+          label="A receber (parcelas)"
+          value={brl(forecast - received)}
+          hint={`de ${brl(forecast)} lançados`}
+        />
+        <Stat label="Recebido" value={brl(received)} />
+        <Stat label="Vencido" value={brl(overdue)} />
+      </div>
+      {noInst.length > 0 && (
+        <p className="mx-4 mt-3 rounded-md bg-warning-soft px-3 py-2 text-sm text-warning md:mx-8">
+          {noInst.length} contrato(s) sem parcelas lançadas:{" "}
+          {noInst.map((c: any, idx: number) => (
+            <span key={c.id}>
+              {idx > 0 && ", "}
+              <RelatedLink type="contract" id={c.id}>
+                {c.number}
+              </RelatedLink>
+            </span>
+          ))}
+        </p>
+      )}
+      <FilterBar>
+        <SearchInput value={q} onChange={setQ} placeholder="Empresa ou contrato" />
+        <NativeSelect
+          className="sm:w-44"
+          aria-label="Visão"
+          value={view ?? ""}
+          onChange={(e) => navigate({ to: ".", search: { view: e.target.value || undefined } })}
+        >
+          <option value="">Todas as parcelas</option>
+          <option value="abertas">Em aberto</option>
+          <option value="vencidas">Vencidas</option>
+          <option value="pagas">Pagas</option>
+        </NativeSelect>
+      </FilterBar>
+      {isLoading ? (
+        <Loading />
+      ) : rows.length === 0 ? (
+        <EmptyState title="Nenhuma parcela" text="Parcelas são geradas a partir do contrato." />
+      ) : (
+        <DataList
+          rows={rows}
+          rowKey={(i: any) => i.id}
+          selectedKey={sel ?? undefined}
+          onRowClick={(i: any) => setSel(i.id)}
+          columns={[
+            {
+              header: "Empresa",
+              cell: (i: any) => (
+                <span className="font-semibold">{i.contracts?.companies?.trade_name}</span>
+              ),
+            },
+            {
+              header: "Contrato",
+              cell: (i: any) => (
+                <span className="tnum">
+                  {i.contracts?.number} · {i.number}ª
+                </span>
+              ),
+            },
+            {
+              header: "Vencimento",
+              cell: (i: any) => <span className="tnum">{fmtDate(i.due_date)}</span>,
+            },
+            {
+              header: "Valor",
+              cell: (i: any) => <span className="tnum">{brl(i.amount_cents)}</span>,
+              className: "text-right",
+            },
+            {
+              header: "Recebido",
+              cell: (i: any) => <span className="tnum">{brl(paidOf(i))}</span>,
+              className: "text-right",
+            },
+            {
+              header: "Situação",
+              cell: (i: any) => {
+                const s = status(i);
+                return (
+                  <span
+                    className={cn(
+                      "text-xs font-semibold",
+                      s === "Vencida" && "text-destructive",
+                      s === "Paga" && "text-success",
+                    )}
+                  >
+                    {s}
+                  </span>
+                );
+              },
+            },
+          ]}
+        />
+      )}
+      <Sheet open={!!selected} onOpenChange={(o) => !o && setSel(null)}>
+        <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+          {selected && <InstallmentDetail i={selected} canWrite={can.write} />}
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
+
+function InstallmentDetail({ i, canWrite }: { i: any; canWrite: boolean }) {
+  const balance = Number(i.amount_cents) - paidOf(i);
+  const [amount, setAmount] = useState(centsToInput(balance));
+  const [date, setDate] = useState(today());
+  const [method, setMethod] = useState("");
+  const [note, setNote] = useState("");
+  const [key] = useState(() => crypto.randomUUID());
+  const m = useDbMutation(
+    () => {
+      const c = toCents(amount);
+      if (!c || c <= 0) throw new Error("Valor inválido");
+      return api.rpc("register_payment", {
+        p_installment_id: i.id,
+        p_amount_cents: c,
+        p_paid_on: date,
+        p_method: method || null,
+        p_note: note || null,
+        p_idempotency_key: key,
+      });
+    },
+    { success: "Pagamento registrado" },
+  );
+  return (
+    <>
+      <SheetHeader>
+        <SheetTitle className="font-display text-xl">
+          {i.number}ª parcela · {i.contracts?.companies?.trade_name}
+        </SheetTitle>
+      </SheetHeader>
+      <div className="space-y-4 px-4 pb-6">
+        <p className="text-sm">
+          <RelatedLink type="contract" id={i.contract_id}>
+            Contrato {i.contracts?.number}
+          </RelatedLink>{" "}
+          · vence {fmtDate(i.due_date)}
+        </p>
+        <div className="grid grid-cols-2 gap-3 text-sm tnum">
+          <div>
+            Valor
+            <br />
+            <strong>{brl(i.amount_cents)}</strong>
+          </div>
+          <div>
+            Saldo
+            <br />
+            <strong>{brl(balance)}</strong>
+          </div>
+        </div>
+        <Section title="Pagamentos registrados">
+          {(i.payments ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nenhum.</p>
+          ) : (
+            <ul className="divide-y text-sm">
+              {i.payments.map((p: any) => (
+                <li key={p.id} className="py-1.5 tnum">
+                  {fmtDate(p.paid_on)} · <strong>{brl(p.amount_cents)}</strong>{" "}
+                  {p.method && `· ${p.method}`}
+                  <br />
+                  <span className="text-xs text-muted-foreground">
+                    registrado {fmtDateTime(p.created_at)}
+                    {p.note && ` · ${p.note}`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
+        {canWrite && balance > 0 && i.status !== "cancelada" && (
+          <Section title="Registrar pagamento">
+            <form
+              className="space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                m.mutate(undefined);
+              }}
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <FormRow label="Valor (R$)" htmlFor="pa">
+                  <Input
+                    id="pa"
+                    inputMode="decimal"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                </FormRow>
+                <FormRow label="Data" htmlFor="pd">
+                  <Input
+                    id="pd"
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
+                </FormRow>
+              </div>
+              <FormRow label="Forma" htmlFor="pm">
+                <Input
+                  id="pm"
+                  maxLength={60}
+                  placeholder="PIX, boleto, transferência…"
+                  value={method}
+                  onChange={(e) => setMethod(e.target.value)}
+                />
+              </FormRow>
+              <FormRow label="Observação" htmlFor="pn">
+                <Input
+                  id="pn"
+                  maxLength={300}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+              </FormRow>
+              <Button type="submit" disabled={m.isPending || m.isSuccess}>
+                Registrar
+              </Button>
+            </form>
+          </Section>
+        )}
+        <Section title="Comprovantes">
+          <AttachedDocuments
+            entityType="installment"
+            entityId={i.id}
+            category="comprovante"
+            canWrite={canWrite}
+            extraLinks={[{ type: "contract", id: i.contract_id }]}
+          />
+        </Section>
+      </div>
+    </>
+  );
+}
