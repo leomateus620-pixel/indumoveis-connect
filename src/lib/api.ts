@@ -32,11 +32,11 @@ export type Me = {
 export function useMe(userId?: string) {
   return useQuery({
     queryKey: qk.me(userId),
-    enabled: !!userId,
+    enabled: true,
     retry: 1,
     queryFn: async (): Promise<Me | null> => {
       const { data: u, error: authError } = await supabase.auth.getUser();
-      if (authError || !u.user || u.user.id !== userId) throw new Error("Não foi possível confirmar a sessão.");
+      if (authError || !u.user || (userId && u.user.id !== userId)) throw new Error("Não foi possível confirmar a sessão.");
       await run(db.rpc("ensure_profile"));
       const roles = (
         await run<any[]>(db.from("user_roles").select("role").eq("user_id", u.user.id))
