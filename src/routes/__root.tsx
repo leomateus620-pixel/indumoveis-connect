@@ -130,6 +130,7 @@ function RootComponent() {
       if (event === "SIGNED_OUT" || (identity && identity !== session?.user.id)) queryClient.clear();
       else queryClient.invalidateQueries();
       identity = session?.user.id;
+      if (event !== "SIGNED_OUT") queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
       router.invalidate();
     });
     return () => data.subscription.unsubscribe();
