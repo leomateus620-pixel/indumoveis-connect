@@ -15,7 +15,7 @@ async function run<T>(p: PromiseLike<{ data: T; error: any }>): Promise<T> {
 }
 
 export const qk = {
-  me: ["db", "me"],
+  me: (userId: string | undefined) => ["db", "me", userId],
   edition: ["db", "edition"],
   list: (name: string, ...args: unknown[]) => ["db", name, ...args],
 };
@@ -29,12 +29,14 @@ export type Me = {
   perms: Record<string, { read: boolean; write: boolean }>;
 };
 
-export function useMe() {
+export function useMe(userId?: string) {
   return useQuery({
-    queryKey: qk.me,
+    queryKey: qk.me(userId),
+    enabled: !!userId,
+    retry: 1,
     queryFn: async (): Promise<Me | null> => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return null;
+      const { data: u, error: authError } = await supabase.auth.getUser();
+      if (authError || !u.user || u.user.id !== userId) throw new Error("Não foi possível confirmar a sessão.");
       await run(db.rpc("ensure_profile"));
       const roles = (
         await run<any[]>(db.from("user_roles").select("role").eq("user_id", u.user.id))
