@@ -33,11 +33,11 @@ function AgendaPage() {
   const t = today();
 
   // Datas vindas dos próprios registros (sem duplicar em atividades)
-  const items: Item[] = useMemo(() => [
+  const items: Item[] = useMemo(() => ([
     ...acts.map((a: any) => ({ key: a.id, date: a.due_at?.slice(0, 10) ?? null, title: a.title, source: "Atividade", activity: a, link: a.related_type ? { type: a.related_type, id: a.related_id } : undefined, done: a.status !== "aberta" })),
     ...ins.filter((i: any) => i.scheduled_for).map((i: any) => ({ key: "i" + i.id, date: i.scheduled_for, title: `Vistoria de ${i.kind === "entrega" ? "entrega" : "devolução"} · ${i.spaces?.code}`, source: "Vistoria", link: { type: "inspection", id: i.id }, done: i.status === "concluida" })),
     ...inst.map((i: any) => ({ key: "p" + i.id, date: i.due_date, title: `Vencimento ${i.number}ª parcela · ${i.contracts?.companies?.trade_name} · ${brl(i.amount_cents)}`, source: "Financeiro", link: { type: "contract", id: i.contract_id }, done: i.status !== "aberta" })),
-  ].filter((x) => filter === "todas" || (filter === "minhas" ? x.activity?.assignee_id === me?.id && !x.done : !x.done))
+  ] as Item[]).filter((x) => filter === "todas" || (filter === "minhas" ? x.activity?.assignee_id === me?.id && !x.done : !x.done))
     .sort((a, b) => (a.date ?? "9999").localeCompare(b.date ?? "9999")), [acts, ins, inst, filter, me?.id]);
 
   if (!can.read) return <Restricted />;
