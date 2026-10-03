@@ -51,6 +51,7 @@ function SidebarBody({ compact, userId, onNavigate }: { compact: boolean; userId
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
+    queryClient.setQueryData(["auth", "session"], null);
     navigate({ to: "/auth", replace: true });
   }
   return (
@@ -146,6 +147,7 @@ export function AppShell({ userId }: { userId: string }) {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
+    queryClient.setQueryData(["auth", "session"], null);
     navigate({ to: "/auth", replace: true });
   }
 
@@ -183,7 +185,7 @@ export function AppShell({ userId }: { userId: string }) {
       <div className="max-w-md space-y-4 text-center">
         <h1 className="font-display text-xl font-bold">Acesso não permitido</h1>
         <p className="text-muted-foreground">Seu perfil não permite consultar este módulo.</p>
-        <div className="flex justify-center gap-3"><Button asChild><Link to="/dashboard">Ir ao início</Link></Button><Button variant="outline" onClick={signOut}>Sair</Button></div>
+        <div className="flex justify-center gap-3"><Button asChild><Link to={NAV.find((n) => me.perms[n.module]?.read)?.to ?? "/auth"}>Ir ao início</Link></Button><Button variant="outline" onClick={signOut}>Sair</Button></div>
       </div>
     </main>
   );

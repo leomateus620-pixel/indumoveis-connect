@@ -59,7 +59,7 @@ function ResolveAccess({ userId }: { userId: string }) {
     if (!me || !me.roles.length) return;
     const requested = safeDestination(new URLSearchParams(window.location.search).get("redirect") ?? sessionStorage.getItem("auth-redirect"));
     sessionStorage.removeItem("auth-redirect");
-    const target = requested && me.perms[requested.module]?.read ? requested.path : "/dashboard";
+    const target = requested && me.perms[requested.module]?.read ? requested.path : (allowed.find((p) => me.perms[moduleFor[p]]?.read) ?? "/auth");
     navigate({ to: target as "/dashboard", replace: true });
   }, [me, navigate]);
   if (isPending) return <Status title="Carregando seu perfil" />;
