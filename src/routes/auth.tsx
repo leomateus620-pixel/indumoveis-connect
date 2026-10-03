@@ -48,7 +48,7 @@ function AuthPage() {
     retry: 1,
   });
   if (isPending) return <Status title="Verificando sessão" />;
-  if (isError) return <Status title="Não foi possível verificar sua sessão" action={<Button onClick={() => refetch()}>Tentar novamente</Button>} />;
+  if (isError) return <Status title="Não foi possível verificar sua sessão" action={<><Button onClick={() => refetch()}>Tentar novamente</Button><SignOut /></>} />;
   return user ? <ResolveAccess userId={user.id} /> : <AuthForm />;
 }
 
@@ -95,7 +95,8 @@ function AuthForm() {
     if (busy) return;
     const issues: Record<string, string> = {};
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) issues.email = "Informe um e-mail válido.";
-    if (password.length < 8) issues.password = "A senha deve ter pelo menos 8 caracteres.";
+    if (!password) issues.password = "Informe sua senha.";
+    else if (mode === "up" && password.length < 6) issues.password = "A senha deve ter pelo menos 6 caracteres.";
     if (mode === "up" && !name.trim()) issues.name = "Informe seu nome completo.";
     setError(issues);
     if (Object.keys(issues).length) return;
@@ -137,7 +138,7 @@ function AuthForm() {
         <form onSubmit={submit} className="mt-8 space-y-4" noValidate>
           {mode === "up" && <div><label htmlFor="auth-name" className="mb-1.5 block text-sm font-medium">Nome completo</label><Input id="auth-name" autoComplete="name" value={name} maxLength={120} aria-invalid={!!error.name} aria-describedby={error.name ? "name-error" : undefined} onChange={(e) => setName(e.target.value)} className="h-12" />{error.name && <p id="name-error" className="mt-1 text-sm text-destructive">{error.name}</p>}</div>}
           <div><label htmlFor="auth-email" className="mb-1.5 block text-sm font-medium">E-mail</label><Input id="auth-email" type="email" autoComplete="email" value={email} maxLength={254} aria-invalid={!!error.email} aria-describedby={error.email ? "email-error" : undefined} onChange={(e) => setEmail(e.target.value)} className="h-12" />{error.email && <p id="email-error" className="mt-1 text-sm text-destructive">{error.email}</p>}</div>
-          <div><label htmlFor="auth-password" className="mb-1.5 block text-sm font-medium">Senha</label><div className="relative"><Input id="auth-password" type={showPassword ? "text" : "password"} autoComplete={mode === "in" ? "current-password" : "new-password"} value={password} minLength={8} aria-invalid={!!error.password} aria-describedby={error.password ? "password-error" : undefined} onChange={(e) => setPassword(e.target.value)} className="h-12 pr-12" /><Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1 size-10" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</Button></div>{error.password && <p id="password-error" className="mt-1 text-sm text-destructive">{error.password}</p>}</div>
+           <div><label htmlFor="auth-password" className="mb-1.5 block text-sm font-medium">Senha</label><div className="relative"><Input id="auth-password" type={showPassword ? "text" : "password"} autoComplete={mode === "in" ? "current-password" : "new-password"} value={password} minLength={mode === "up" ? 6 : undefined} aria-invalid={!!error.password} aria-describedby={error.password ? "password-error" : undefined} onChange={(e) => setPassword(e.target.value)} className="h-12 pr-12" /><Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1 size-10" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff /> : <Eye />}</Button></div>{error.password && <p id="password-error" className="mt-1 text-sm text-destructive">{error.password}</p>}</div>
           {error.form && <p role="alert" className="text-sm text-destructive">{error.form}</p>}
           {notice && <p role="status" className="text-sm text-success">{notice}</p>}
           <Button type="submit" className="h-12 w-full" disabled={!!busy}>{busy === "email" && <Loader2 className="animate-spin" />}{mode === "in" ? "Entrar" : "Criar conta"}</Button>
