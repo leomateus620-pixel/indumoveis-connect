@@ -37,8 +37,11 @@ function AuthPage() {
   const { data: user, isPending, isError, refetch } = useQuery({
     queryKey: ["auth", "session"],
     queryFn: async () => {
+      const { data: stored, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!stored.session) return null;
       const { data, error } = await supabase.auth.getUser();
-      if (error && error.message !== "Auth session missing!") throw error;
+      if (error) throw error;
       return data.user;
     },
     retry: 1,
@@ -56,7 +59,7 @@ function ResolveAccess({ userId }: { userId: string }) {
     const requested = safeDestination(new URLSearchParams(window.location.search).get("redirect") ?? sessionStorage.getItem("auth-redirect"));
     sessionStorage.removeItem("auth-redirect");
     const target = requested && me.perms[requested.module]?.read ? requested.path : "/dashboard";
-    navigate({ to: target, replace: true });
+    navigate({ to: target as "/dashboard", replace: true });
   }, [me, navigate]);
   if (isPending) return <Status title="Carregando seu perfil" />;
   if (isError || !me) return <Status title="Não foi possível consultar seu acesso" detail="Sua sessão permanece ativa." action={<><Button onClick={() => refetch()}>Tentar novamente</Button><SignOut /></>} />;
