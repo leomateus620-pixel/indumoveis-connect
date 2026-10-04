@@ -130,3 +130,22 @@
 @utility font-display {
   font-family: var(--font-display);
 }
+
+.internal-app :is(input:not([type="checkbox"]), textarea) {
+  min-height: 2.75rem;
+  font-size: 1rem;
+}
+.internal-app :is(input, textarea, select, button, a):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (min-width: 640px) {
+  .internal-app :is(input:not([type="checkbox"]), textarea) { font-size: 0.875rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .internal-app *, .internal-app *::before, .internal-app *::after {
+    scroll-behavior: auto;
+    animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
+  }
+}

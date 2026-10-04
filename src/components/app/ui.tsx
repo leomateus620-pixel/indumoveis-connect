@@ -226,9 +226,9 @@ export function DataList<T>({
                 tabIndex={onRowClick ? 0 : undefined}
                 role={onRowClick ? "button" : undefined}
                 aria-label={onRowClick ? `Abrir ${columns[0]?.header}: ${rowKey(r)}` : undefined}
-                onClick={() => onRowClick?.(r)}
+                 onClick={(e) => { if (!(e.target as HTMLElement).closest("a, button, input")) onRowClick?.(r); }}
                 onKeyDown={(e) => {
-                   if ((e.key === "Enter" || e.key === " ") && onRowClick) { e.preventDefault(); onRowClick(r); }
+                   if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ") && onRowClick) { e.preventDefault(); onRowClick(r); }
                 }}
                 className={cn(
                   "border-t transition-colors focus-visible:outline-2 focus-visible:outline-ring",
@@ -252,8 +252,8 @@ export function DataList<T>({
              <div
                role={onRowClick ? "button" : undefined}
                tabIndex={onRowClick ? 0 : undefined}
-               onClick={() => onRowClick?.(r)}
-               onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && onRowClick) { e.preventDefault(); onRowClick(r); } }}
+               onClick={(e) => { if (!(e.target as HTMLElement).closest("a, button, input")) onRowClick?.(r); }}
+               onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ") && onRowClick) { e.preventDefault(); onRowClick(r); } }}
                className={cn("relative w-full p-4 text-left focus-visible:outline-2 focus-visible:outline-ring", onRowClick && "cursor-pointer active:bg-accent")}
              >
               {columns
@@ -267,7 +267,7 @@ export function DataList<T>({
                     )}
                   >
                     {i > 0 && <span className="text-xs text-muted-foreground">{c.header}</span>}
-                     <span className={cn("min-w-0 break-words text-right", i === 0 && "text-left font-semibold")}>{c.cell(r)}</span>
+                     <span className={cn("min-w-0 break-words text-right", i === 0 && "pr-5 text-left font-semibold")}>{c.cell(r)}</span>
                   </div>
                 ))}
                {onRowClick && <ChevronRight className="absolute right-3 top-4 size-4 text-muted-foreground" aria-hidden />}
