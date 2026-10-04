@@ -53,6 +53,7 @@ import {
   CONTRACT_STATUS,
 } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/mapa")({
   validateSearch: (
@@ -137,24 +138,9 @@ function MapaPage() {
           )
         }
       >
-        <div className="flex gap-1 pb-2" role="tablist">
-          {(["planta", "lista"] as const).map((v) => (
-            <button
-              key={v}
-              role="tab"
-              aria-selected={view === v}
-              onClick={() => setView(v)}
-              className={cn(
-                "rounded-md px-3 py-1.5 text-sm font-semibold",
-                view === v
-                  ? "bg-accent text-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {v === "planta" ? "Planta" : "Lista"}
-            </button>
-          ))}
-        </div>
+         <Tabs value={view} onValueChange={(v) => setView(v as "planta" | "lista")} className="pb-2">
+           <TabsList><TabsTrigger value="planta">Planta</TabsTrigger><TabsTrigger value="lista">Lista</TabsTrigger></TabsList>
+         </Tabs>
       </PageHeader>
       <FilterBar>
         <SearchInput value={q} onChange={setQ} placeholder="Buscar código ou setor" />
@@ -173,7 +159,7 @@ function MapaPage() {
             </option>
           ))}
         </NativeSelect>
-        <div className="flex flex-wrap gap-3 text-xs sm:ml-auto" aria-label="Legenda">
+         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground sm:ml-auto" aria-label="Legenda">
           {Object.entries(SPACE_STATUS).map(([k, v]) => (
             <span key={k} className="flex items-center gap-1.5">
               <span className={cn("size-3 rounded-sm border", FILL[k])} />
@@ -183,7 +169,7 @@ function MapaPage() {
         </div>
       </FilterBar>
       {highlightDeal && (
-        <div className="mx-4 mb-3 flex items-center justify-between rounded-md bg-accent px-3 py-2 text-sm md:mx-8">
+         <div className="mx-4 mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-l-2 border-primary bg-accent px-3 py-2 text-sm md:mx-6 xl:mx-8">
           <span>
             Destacando {highlightIds.size} espaço(s) da negociação com{" "}
             <strong>{highlightDeal.companies?.trade_name}</strong>
@@ -202,7 +188,7 @@ function MapaPage() {
         <Loading />
       ) : view === "planta" ? (
         plans.length === 0 ? (
-          <div className="px-4 md:px-8">
+           <div className="px-4 md:px-6 xl:px-8">
             <Pending title="Planta oficial não cadastrada">
               A planta dos pavilhões ainda não foi fornecida.{" "}
               {can.write
@@ -212,7 +198,7 @@ function MapaPage() {
             </Pending>
           </div>
         ) : (
-          <div className="px-4 pb-8 md:px-8">
+           <div className="px-4 pb-8 md:px-6 xl:px-8">
             {plans.length > 1 && (
               <NativeSelect
                 className="mb-3 sm:w-64"
@@ -230,9 +216,9 @@ function MapaPage() {
               <p className="mb-2 rounded-md bg-warning-soft px-3 py-2 text-sm text-warning">
                 Arraste sobre a planta para definir a área do espaço{" "}
                 {spaces.find((s: any) => s.id === placing)?.code}.{" "}
-                <button className="ml-2 underline" onClick={() => setPlacing(null)}>
+                 <Button type="button" size="sm" variant="outline" className="ml-2" onClick={() => setPlacing(null)}>
                   Cancelar
-                </button>
+                 </Button>
               </p>
             )}
             <PlanCanvas
