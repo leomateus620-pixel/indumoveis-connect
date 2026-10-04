@@ -21,6 +21,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
     meta: [
       { title: "Dashboard — Sistema Indumóveis" },
       { name: "description", content: "Visão operacional da edição." },
+      { property: "og:title", content: "Dashboard — Sistema Indumóveis" },
+      { property: "og:description", content: "Visão operacional da edição." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Dashboard,

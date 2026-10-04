@@ -37,6 +37,10 @@ export const Route = createFileRoute("/_authenticated/agenda")({
     meta: [
       { title: "Agenda / Atividades — Sistema Indumóveis" },
       { name: "description", content: "Prazos, reuniões, entregas e pendências." },
+      { property: "og:title", content: "Agenda / Atividades — Sistema Indumóveis" },
+      { property: "og:description", content: "Prazos, reuniões, entregas e pendências." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AgendaPage,

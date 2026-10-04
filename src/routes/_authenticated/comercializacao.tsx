@@ -73,6 +73,10 @@ export const Route = createFileRoute("/_authenticated/comercializacao")({
     meta: [
       { title: "Comercialização — Sistema Indumóveis" },
       { name: "description", content: "Reservas, negociações e vendas de espaços." },
+      { property: "og:title", content: "Comercialização — Sistema Indumóveis" },
+      { property: "og:description", content: "Reservas, negociações e vendas de espaços." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ComercialPage,

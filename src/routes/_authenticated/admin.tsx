@@ -27,6 +27,10 @@ export const Route = createFileRoute("/_authenticated/admin")({
     meta: [
       { title: "Administração — Sistema Indumóveis" },
       { name: "description", content: "Usuários, perfis, edição e parâmetros." },
+      { property: "og:title", content: "Administração — Sistema Indumóveis" },
+      { property: "og:description", content: "Usuários, perfis, edição e parâmetros." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AdminPage,

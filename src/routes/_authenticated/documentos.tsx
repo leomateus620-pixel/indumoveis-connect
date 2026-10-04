@@ -31,6 +31,10 @@ export const Route = createFileRoute("/_authenticated/documentos")({
     meta: [
       { title: "Documentos — Sistema Indumóveis" },
       { name: "description", content: "Central de documentos vinculados." },
+      { property: "og:title", content: "Documentos — Sistema Indumóveis" },
+      { property: "og:description", content: "Central de documentos vinculados." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DocumentosPage,

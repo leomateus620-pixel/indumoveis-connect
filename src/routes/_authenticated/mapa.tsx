@@ -67,6 +67,10 @@ export const Route = createFileRoute("/_authenticated/mapa")({
     meta: [
       { title: "Mapa Comercial — Sistema Indumóveis" },
       { name: "description", content: "Espaços, localização e situação comercial." },
+      { property: "og:title", content: "Mapa Comercial — Sistema Indumóveis" },
+      { property: "og:description", content: "Espaços, localização e situação comercial." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: MapaPage,

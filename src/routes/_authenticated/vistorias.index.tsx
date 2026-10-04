@@ -40,6 +40,10 @@ export const Route = createFileRoute("/_authenticated/vistorias/")({
     meta: [
       { title: "Vistorias — Sistema Indumóveis" },
       { name: "description", content: "Entrega e devolução de espaços." },
+      { property: "og:title", content: "Vistorias — Sistema Indumóveis" },
+      { property: "og:description", content: "Entrega e devolução de espaços." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: VistoriasPage,

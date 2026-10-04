@@ -31,6 +31,10 @@ export const Route = createFileRoute("/_authenticated/financeiro")({
     meta: [
       { title: "Financeiro Operacional — Sistema Indumóveis" },
       { name: "description", content: "Parcelas, vencimentos e pagamentos registrados." },
+      { property: "og:title", content: "Financeiro Operacional — Sistema Indumóveis" },
+      { property: "og:description", content: "Parcelas, vencimentos e pagamentos registrados." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: FinanceiroPage,

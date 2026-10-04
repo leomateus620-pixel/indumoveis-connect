@@ -40,6 +40,10 @@ export const Route = createFileRoute("/_authenticated/vistorias/$id")({
     meta: [
       { title: "Vistoria — Sistema Indumóveis" },
       { name: "description", content: "Checklist, fotos e aceite da vistoria." },
+      { property: "og:title", content: "Vistoria — Sistema Indumóveis" },
+      { property: "og:description", content: "Checklist, fotos e aceite da vistoria." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: InspectionPage,

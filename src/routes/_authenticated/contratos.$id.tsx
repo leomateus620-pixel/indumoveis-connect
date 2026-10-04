@@ -52,6 +52,10 @@ export const Route = createFileRoute("/_authenticated/contratos/$id")({
     meta: [
       { title: "Contrato — Sistema Indumóveis" },
       { name: "description", content: "Revisão, versões e situação do contrato." },
+      { property: "og:title", content: "Contrato — Sistema Indumóveis" },
+      { property: "og:description", content: "Revisão, versões e situação do contrato." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ContractPage,

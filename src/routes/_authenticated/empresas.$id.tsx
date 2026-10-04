@@ -33,6 +33,10 @@ export const Route = createFileRoute("/_authenticated/empresas/$id")({
     meta: [
       { title: "Ficha da empresa — Sistema Indumóveis" },
       { name: "description", content: "Dados, contatos e participação da empresa." },
+      { property: "og:title", content: "Ficha da empresa — Sistema Indumóveis" },
+      { property: "og:description", content: "Dados, contatos e participação da empresa." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CompanyPage,

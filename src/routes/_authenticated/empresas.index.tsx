@@ -20,6 +20,10 @@ export const Route = createFileRoute("/_authenticated/empresas/")({
     meta: [
       { title: "Empresas / Expositores — Sistema Indumóveis" },
       { name: "description", content: "Cadastro central de empresas e contatos." },
+      { property: "og:title", content: "Empresas / Expositores — Sistema Indumóveis" },
+      { property: "og:description", content: "Cadastro central de empresas e contatos." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: EmpresasPage,
