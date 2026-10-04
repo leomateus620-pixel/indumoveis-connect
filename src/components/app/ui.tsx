@@ -241,10 +241,17 @@ export function DataList<T>({
                 {columns.map((c, index) => (
                   <td key={c.header} className={cn("px-4 py-3 align-middle", c.className)}>
                     {index === 0 && onRowClick ? (
-                      <Button variant="link" className="h-auto min-h-8 justify-start px-0 text-left text-foreground" onClick={() => onRowClick(r)} aria-labelledby={`item-${rowKey(r)}`}>
+                      <Button
+                        variant="link"
+                        className="h-auto min-h-8 justify-start px-0 text-left text-foreground"
+                        onClick={() => onRowClick(r)}
+                        aria-labelledby={`item-${rowKey(r)}`}
+                      >
                         <span id={`item-${rowKey(r)}`}>{c.cell(r)}</span>
                       </Button>
-                    ) : c.cell(r)}
+                    ) : (
+                      c.cell(r)
+                    )}
                   </td>
                 ))}
               </tr>
@@ -289,7 +296,7 @@ export function DataList<T>({
                   >
                     {i > 0 && <span className="text-xs text-muted-foreground">{c.header}</span>}
                     <span
-                       id={i === 0 && onRowClick ? `row-${rowKey(r)}` : undefined}
+                      id={i === 0 && onRowClick ? `row-${rowKey(r)}` : undefined}
                       className={cn(
                         "min-w-0 break-words text-right",
                         i === 0 && "pr-5 text-left font-semibold",
