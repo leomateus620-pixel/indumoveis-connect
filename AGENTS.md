@@ -20,3 +20,4 @@
 - `ensure_profile()` creates only the caller's profile; `provision_initial_admin(uuid)` accepts only the service role and an explicitly selected existing account when no admin exists — prevents automatic privilege escalation from sign-in.
 - The last admin role is protected by a transaction-level database guard — simultaneous demotions cannot leave the system without administration.
 - No Edge Functions yet: no external integrations exist; add server routes/server functions only when a secret-bearing integration is required.
+- Internal menus share presentation primitives in `src/components/app/ui.tsx` and semantic surface tokens in `src/styles.css` — keeps desktop tables, mobile lists, and accessible controls consistent without changing data flows.
