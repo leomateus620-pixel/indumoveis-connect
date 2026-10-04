@@ -104,7 +104,13 @@ function AuthForm() {
     try {
       if (mode === "in") {
         const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-        if (authError) { setError({ password: "Não foi possível entrar. Confira e-mail e senha." }); return; }
+        if (authError) {
+          const notConfirmed = (authError as { code?: string }).code === "email_not_confirmed";
+          setError(notConfirmed
+            ? { email: "Seu e-mail ainda não foi confirmado. Abra o link enviado para sua caixa de entrada." }
+            : { password: "Não foi possível entrar. Confira e-mail e senha." });
+          return;
+        }
       } else {
         const { data, error: authError } = await supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: window.location.origin + "/auth", data: { full_name: name.trim() } } });
         if (authError) { setError({ email: "Não foi possível criar a conta. Verifique os dados e tente novamente." }); return; }
