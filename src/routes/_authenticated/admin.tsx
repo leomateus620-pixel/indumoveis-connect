@@ -40,8 +40,8 @@ function AdminPage() {
   return (
     <>
       <PageHeader title="Administração" />
-      <Tabs defaultValue="usuarios" className="p-4 md:p-8">
-        <TabsList className="flex-wrap">
+       <Tabs defaultValue="usuarios" className="min-w-0 p-4 md:p-6 xl:p-8">
+         <TabsList className="flex h-auto max-w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="usuarios">Usuários</TabsTrigger>
           <TabsTrigger value="perfis">Perfis e permissões</TabsTrigger>
           <TabsTrigger value="edicao">Edição e políticas</TabsTrigger>
@@ -87,8 +87,8 @@ function Users() {
         Usuários criam a própria conta na tela de acesso; aqui a administração atribui perfis. Não
         há contas ou senhas compartilhadas.
       </p>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+       <div className="overflow-x-auto border-y bg-card md:border-x">
+         <table className="w-full min-w-[40rem] text-sm">
           <thead className="text-left text-xs text-muted-foreground">
             <tr>
               <th className="py-2">Usuário</th>
@@ -102,7 +102,7 @@ function Users() {
           <tbody>
             {profiles.map((p: any) => (
               <tr key={p.id} className="border-t">
-                <td className="py-2">
+                 <td className="max-w-56 break-words px-3 py-3">
                   <p className="font-semibold">{p.full_name || "—"}</p>
                   <p className="text-xs text-muted-foreground">{p.email}</p>
                 </td>
@@ -149,8 +149,8 @@ function Perms() {
         Leitura permite consultar; edição permite criar, alterar e confirmar operações do módulo. As
         regras são aplicadas no servidor. Administração tem acesso total.
       </p>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+       <div className="overflow-x-auto border-y bg-card md:border-x">
+         <table className="w-full min-w-[40rem] text-sm">
           <thead className="text-left text-xs text-muted-foreground">
             <tr>
               <th className="py-2">Módulo</th>
@@ -344,7 +344,7 @@ function Checklists() {
         <TemplateEditor key={t.id} t={t} />
       ))}
       <form
-        className="flex gap-2"
+         className="flex flex-col gap-2 sm:flex-row"
         onSubmit={(e) => {
           e.preventDefault();
           if (name.trim()) add.mutate(undefined);
@@ -354,7 +354,7 @@ function Checklists() {
           placeholder="Nome do novo checklist"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="max-w-xs"
+           className="w-full sm:max-w-xs"
         />
         <Button type="submit" variant="outline">
           Adicionar
@@ -422,7 +422,7 @@ function Audit() {
     <Section title="Últimas 200 alterações">
       <ul className="divide-y text-sm">
         {data.map((a: any) => (
-          <li key={a.id} className="flex justify-between gap-3 py-1.5">
+           <li key={a.id} className="flex flex-col gap-1 py-2 sm:flex-row sm:justify-between sm:gap-3">
             <span>
               <strong>{name(a.actor)}</strong> {ACTION[a.action]}{" "}
               {TABLE_LABEL[a.table_name] ?? a.table_name}
