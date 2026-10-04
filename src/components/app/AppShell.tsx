@@ -74,7 +74,7 @@ function SidebarBody({ compact, userId, onNavigate }: { compact: boolean; userId
                 onClick={onNavigate}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex items-center gap-3 rounded-md px-3 py-2.5 text-[0.94rem] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-sidebar-ring",
+                   "relative flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-sidebar-ring",
                   active
                     ? "bg-sidebar-accent font-semibold text-sidebar-accent-foreground"
                     : "hover:bg-sidebar-accent/60",
@@ -88,14 +88,14 @@ function SidebarBody({ compact, userId, onNavigate }: { compact: boolean; userId
                     aria-hidden
                   />
                 )}
-                <item.icon className="size-5 shrink-0" strokeWidth={active ? 2.4 : 1.9} />
+                 <item.icon className="size-[1.15rem] shrink-0" strokeWidth={active ? 2.2 : 1.8} />
                 {!compact && <span className="truncate">{item.label}</span>}
               </Link>
             );
             return compact ? (
               <Tooltip key={item.to}>
                 <TooltipTrigger asChild>{link}</TooltipTrigger>
-                <TooltipContent side="right">{item.label}</TooltipContent>
+               <TooltipContent side="right">{item.label}</TooltipContent>
               </Tooltip>
             ) : (
               <div key={item.to}>{link}</div>
@@ -197,26 +197,27 @@ export function AppShell({ userId }: { userId: string }) {
 function AuthorizedShell({ compact, open, setOpen, userId, current, toggle }: { compact: boolean; open: boolean; setOpen: (v: boolean) => void; userId: string; current: (typeof NAV)[number]; toggle: () => void }) {
   const { data: edition } = useEdition();
   return (
-    <div className="flex min-h-screen w-full">
+       <div className="internal-app flex min-h-dvh w-full bg-workspace">
       <aside
         className={cn(
-          "sticky top-0 hidden h-screen shrink-0 transition-[width] md:block",
+           "sticky top-0 hidden h-dvh shrink-0 transition-[width] motion-reduce:transition-none md:block",
           compact ? "w-[4.5rem]" : "w-64",
         )}
       >
         <SidebarBody compact={compact} userId={userId} />
       </aside>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-72 border-none p-0">
+         <SheetContent side="left" className="w-[min(19rem,88vw)] overflow-y-auto border-none p-0">
           <SheetTitle className="sr-only">Navegação</SheetTitle>
           <SidebarBody compact={false} userId={userId} onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex h-11 items-center gap-2 border-b bg-card px-2 text-sm md:px-4">
+       <div className="flex min-w-0 flex-1 flex-col">
+         <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b bg-card px-3 text-sm md:px-6">
+           <div className="flex min-w-0 items-center gap-2">
           <Button
             type="button"
-            variant="ghost" size="icon" className="md:hidden"
+             variant="ghost" size="icon" className="min-h-11 min-w-11 md:hidden"
             aria-label="Abrir menu"
             onClick={() => setOpen(true)}
           >
@@ -230,8 +231,9 @@ function AuthorizedShell({ compact, open, setOpen, userId, current, toggle }: { 
           >
             {compact ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
           </Button>
-          <span className="font-semibold md:hidden">{current?.label}</span>
-          <span className="ml-auto truncate text-xs text-muted-foreground tnum">
+           <span className="truncate font-semibold md:hidden">{current?.label}</span>
+           </div>
+           <span className="tnum min-w-0 truncate text-right text-xs text-muted-foreground">
             {edition ? (
               <>
                 <span className="font-semibold text-foreground">{edition.name}</span> ·{" "}
@@ -242,7 +244,7 @@ function AuthorizedShell({ compact, open, setOpen, userId, current, toggle }: { 
             )}
           </span>
         </div>
-        <main className="min-w-0 flex-1"><Outlet /></main>
+         <main className="min-w-0 flex-1"><Outlet /></main>
       </div>
     </div>
   );
