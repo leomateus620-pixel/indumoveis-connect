@@ -99,7 +99,7 @@ function FinanceiroPage() {
         title="Financeiro Operacional"
         subtitle="Registros próprios do sistema — sem integração bancária, fiscal ou cobrança automática"
       />
-       <div className="grid gap-px bg-border px-4 pt-4 sm:grid-cols-2 md:px-6 xl:grid-cols-4 xl:px-8">
+      <div className="grid gap-px bg-border px-4 pt-4 sm:grid-cols-2 md:px-6 xl:grid-cols-4 xl:px-8">
         <Stat
           label="Total em contratos"
           value={brl(contracted)}
@@ -114,7 +114,7 @@ function FinanceiroPage() {
         <Stat label="Vencido" value={brl(overdue)} />
       </div>
       {noInst.length > 0 && (
-         <p className="mx-4 mt-3 border-l-2 border-warning bg-warning-soft px-3 py-2 text-sm text-warning md:mx-6 xl:mx-8">
+        <p className="mx-4 mt-3 border-l-2 border-warning bg-warning-soft px-3 py-2 text-sm text-warning md:mx-6 xl:mx-8">
           {noInst.length} contrato(s) sem parcelas lançadas:{" "}
           {noInst.map((c: any, idx: number) => (
             <span key={c.id}>
@@ -244,16 +244,16 @@ function InstallmentDetail({ i, canWrite }: { i: any; canWrite: boolean }) {
           </RelatedLink>{" "}
           · vence {fmtDate(i.due_date)}
         </p>
-         <div className="grid grid-cols-2 gap-px bg-border text-sm tnum">
-           <div className="min-w-0 bg-card p-3">
+        <div className="grid grid-cols-2 gap-px bg-border text-sm tnum">
+          <div className="min-w-0 bg-card p-3">
             Valor
             <br />
-             <strong className="block break-words text-base">{brl(i.amount_cents)}</strong>
+            <strong className="block break-words text-base">{brl(i.amount_cents)}</strong>
           </div>
-           <div className="min-w-0 bg-card p-3">
+          <div className="min-w-0 bg-card p-3">
             Saldo
             <br />
-             <strong className="block break-words text-base">{brl(balance)}</strong>
+            <strong className="block break-words text-base">{brl(balance)}</strong>
           </div>
         </div>
         <Section title="Pagamentos registrados">
@@ -284,7 +284,7 @@ function InstallmentDetail({ i, canWrite }: { i: any; canWrite: boolean }) {
                 m.mutate(undefined);
               }}
             >
-               <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <FormRow label="Valor (R$)" htmlFor="pa">
                   <Input
                     id="pa"

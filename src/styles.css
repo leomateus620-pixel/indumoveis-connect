@@ -118,7 +118,10 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     letter-spacing: 0;
   }
@@ -140,10 +143,14 @@
   outline-offset: 2px;
 }
 @media (min-width: 640px) {
-  .internal-app :is(input:not([type="checkbox"]), textarea) { font-size: 0.875rem; }
+  .internal-app :is(input:not([type="checkbox"]), textarea) {
+    font-size: 0.875rem;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .internal-app *, .internal-app *::before, .internal-app *::after {
+  .internal-app *,
+  .internal-app *::before,
+  .internal-app *::after {
     scroll-behavior: auto;
     animation-duration: 0.01ms;
     transition-duration: 0.01ms;

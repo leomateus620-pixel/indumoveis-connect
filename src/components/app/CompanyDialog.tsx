@@ -152,7 +152,10 @@ export function CompanyDialog({
             <Textarea id="cn" value={f.notes} onChange={set("notes")} />
           </FormRow>
           {err && (
-            <p role="alert" className="rounded-md border border-destructive/30 bg-danger-soft p-3 text-sm text-destructive">
+            <p
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-danger-soft p-3 text-sm text-destructive"
+            >
               {err}
             </p>
           )}

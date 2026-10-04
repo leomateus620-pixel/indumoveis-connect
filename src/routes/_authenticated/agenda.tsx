@@ -131,9 +131,12 @@ function AgendaPage() {
           )
         }
       >
-         <Tabs value={view} onValueChange={(v) => setView(v as "lista" | "mes")} className="pb-2">
-           <TabsList><TabsTrigger value="lista">Lista</TabsTrigger><TabsTrigger value="mes">Mês</TabsTrigger></TabsList>
-         </Tabs>
+        <Tabs value={view} onValueChange={(v) => setView(v as "lista" | "mes")} className="pb-2">
+          <TabsList>
+            <TabsTrigger value="lista">Lista</TabsTrigger>
+            <TabsTrigger value="mes">Mês</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </PageHeader>
       <FilterBar>
         <NativeSelect
@@ -153,12 +156,15 @@ function AgendaPage() {
         items.length === 0 ? (
           <EmptyState title="Nada pendente" />
         ) : (
-           <ul className="mx-4 mb-8 divide-y border-y bg-card md:mx-6 md:border-x xl:mx-8">
+          <ul className="mx-4 mb-8 divide-y border-y bg-card md:mx-6 md:border-x xl:mx-8">
             {items.map((x) => (
-               <li key={x.key} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-4 py-3 sm:flex">
+              <li
+                key={x.key}
+                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-4 py-3 sm:flex"
+              >
                 {x.activity && can.write ? (
                   <Checkbox
-                     aria-label={`Concluir ${x.title}`}
+                    aria-label={`Concluir ${x.title}`}
                     checked={x.done}
                     onCheckedChange={() => toggle.mutate(x.activity)}
                   />
@@ -188,10 +194,14 @@ function AgendaPage() {
                     )}
                   </p>
                 </div>
-                 {x.activity && <span className="hidden sm:inline-flex"><StatusBadge map={ACTIVITY_STATUS} value={x.activity.status} /></span>}
+                {x.activity && (
+                  <span className="hidden sm:inline-flex">
+                    <StatusBadge map={ACTIVITY_STATUS} value={x.activity.status} />
+                  </span>
+                )}
                 <span
                   className={cn(
-                     "tnum shrink-0 text-right text-xs sm:w-20",
+                    "tnum shrink-0 text-right text-xs sm:w-20",
                     x.date && x.date < t && !x.done
                       ? "font-semibold text-destructive"
                       : "text-muted-foreground",
@@ -231,7 +241,7 @@ function MonthGrid({
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const t = today();
   return (
-     <div className="px-4 pb-8 md:px-6 xl:px-8">
+    <div className="px-4 pb-8 md:px-6 xl:px-8">
       <div className="mb-2 flex items-center gap-2">
         <Button
           variant="outline"
@@ -253,7 +263,7 @@ function MonthGrid({
           <ChevronRight className="size-4" />
         </Button>
       </div>
-       <div className="grid grid-cols-7 overflow-hidden border bg-card text-xs">
+      <div className="grid grid-cols-7 overflow-hidden border bg-card text-xs">
         {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d) => (
           <div
             key={d}
@@ -269,7 +279,7 @@ function MonthGrid({
             <div
               key={k}
               className={cn(
-                 "min-h-16 min-w-0 border-b border-r p-1 sm:min-h-24 sm:p-1.5",
+                "min-h-16 min-w-0 border-b border-r p-1 sm:min-h-24 sm:p-1.5",
                 d.getMonth() !== month.getMonth() && "bg-muted/30 text-muted-foreground",
               )}
             >

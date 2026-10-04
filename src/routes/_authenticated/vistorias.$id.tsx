@@ -107,9 +107,9 @@ function InspectionPage() {
           </>
         }
       />
-       <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-6 xl:p-8">
+      <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-6 xl:p-8">
         <Section title="Vínculos">
-           <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Field label="Espaço">
               <RelatedLink type="space" id={i.space_id}>
                 {i.spaces?.code}
@@ -145,15 +145,15 @@ function InspectionPage() {
           <ul className="space-y-4">
             {items.map((it: any) => {
               return (
-                 <li key={it.id} className="border-t px-1 py-4">
+                <li key={it.id} className="border-t px-1 py-4">
                   <p className="font-semibold">{it.label}</p>
                   <div
                     className="mt-2 grid grid-cols-4 gap-2"
                     role="radiogroup"
                     aria-label={it.label}
                   >
-                       {CONDS.map((c) => (
-                       <Button
+                    {CONDS.map((c) => (
+                      <Button
                         key={c.v}
                         type="button"
                         role="radio"
@@ -161,12 +161,12 @@ function InspectionPage() {
                         disabled={!editable}
                         onClick={() => item.mutate({ id: it.id, patch: { condition: c.v } })}
                         className={cn(
-                           "min-h-11 min-w-0 px-1 text-xs font-semibold sm:text-sm",
+                          "min-h-11 min-w-0 px-1 text-xs font-semibold sm:text-sm",
                           it.condition === c.v ? c.cls : "bg-card hover:bg-accent",
                         )}
                       >
                         {c.label}
-                       </Button>
+                      </Button>
                     ))}
                   </div>
                   <ItemNote
@@ -334,7 +334,7 @@ function Comparison({ entregaId, current }: { entregaId: string; current: any[] 
   const before = data?.inspection_items ?? [];
   return (
     <Section title="Comparação com a entrega">
-       <table className="w-full table-fixed text-sm">
+      <table className="w-full table-fixed text-sm">
         <thead className="text-left text-xs text-muted-foreground">
           <tr>
             <th className="py-1">Item</th>
@@ -348,9 +348,9 @@ function Comparison({ entregaId, current }: { entregaId: string; current: any[] 
             const diff = b && b.condition !== c.condition;
             return (
               <tr key={c.id} className={cn("border-t", diff && "bg-warning-soft")}>
-                 <td className="break-words py-2 pr-2">{c.label}</td>
-                 <td className="break-words pr-2">{b?.condition ?? "—"}</td>
-                 <td className={cn("break-words", diff && "font-semibold")}>{c.condition}</td>
+                <td className="break-words py-2 pr-2">{c.label}</td>
+                <td className="break-words pr-2">{b?.condition ?? "—"}</td>
+                <td className={cn("break-words", diff && "font-semibold")}>{c.condition}</td>
               </tr>
             );
           })}

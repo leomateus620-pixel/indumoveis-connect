@@ -204,7 +204,7 @@ function DocumentosPage() {
                   {fmtDate(d.created_at)} · {name(d.uploaded_by)}
                 </span>
               ),
-               mobile: false,
+              mobile: false,
             },
             {
               header: "Ações",

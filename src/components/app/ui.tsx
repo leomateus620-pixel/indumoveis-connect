@@ -33,7 +33,9 @@ export function PageHeader({
           <h1 className="text-[1.45rem] leading-tight font-bold text-foreground md:text-[1.7rem]">
             {title}
           </h1>
-          {subtitle && <p className="mt-1 text-sm leading-snug text-muted-foreground">{subtitle}</p>}
+          {subtitle && (
+            <p className="mt-1 text-sm leading-snug text-muted-foreground">{subtitle}</p>
+          )}
         </div>
         <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">{actions}</div>
       </div>
@@ -187,7 +189,7 @@ export function Field({ label, children }: { label: string; children: ReactNode 
   return (
     <div className="min-w-0">
       <dt className="text-xs font-medium text-muted-foreground">{label}</dt>
-       <dd className="mt-1 break-words text-sm font-semibold leading-snug">{children ?? "—"}</dd>
+      <dd className="mt-1 break-words text-sm font-semibold leading-snug">{children ?? "—"}</dd>
     </div>
   );
 }
@@ -213,7 +215,11 @@ export function DataList<T>({
           <thead className="bg-surface-subtle text-left text-xs font-semibold text-muted-foreground">
             <tr>
               {columns.map((c) => (
-                <th scope="col" key={c.header} className={cn("px-4 py-3 whitespace-nowrap", c.className)}>
+                <th
+                  scope="col"
+                  key={c.header}
+                  className={cn("px-4 py-3 whitespace-nowrap", c.className)}
+                >
                   {c.header}
                 </th>
               ))}
@@ -226,9 +232,18 @@ export function DataList<T>({
                 tabIndex={onRowClick ? 0 : undefined}
                 role={onRowClick ? "button" : undefined}
                 aria-label={onRowClick ? `Abrir ${columns[0]?.header}: ${rowKey(r)}` : undefined}
-                 onClick={(e) => { if (!(e.target as HTMLElement).closest("a, button, input")) onRowClick?.(r); }}
+                onClick={(e) => {
+                  if (!(e.target as HTMLElement).closest("a, button, input")) onRowClick?.(r);
+                }}
                 onKeyDown={(e) => {
-                   if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ") && onRowClick) { e.preventDefault(); onRowClick(r); }
+                  if (
+                    e.target === e.currentTarget &&
+                    (e.key === "Enter" || e.key === " ") &&
+                    onRowClick
+                  ) {
+                    e.preventDefault();
+                    onRowClick(r);
+                  }
                 }}
                 className={cn(
                   "border-t transition-colors focus-visible:outline-2 focus-visible:outline-ring",
@@ -237,7 +252,7 @@ export function DataList<T>({
                 )}
               >
                 {columns.map((c) => (
-                   <td key={c.header} className={cn("px-4 py-3 align-middle", c.className)}>
+                  <td key={c.header} className={cn("px-4 py-3 align-middle", c.className)}>
                     {c.cell(r)}
                   </td>
                 ))}
@@ -249,29 +264,55 @@ export function DataList<T>({
       <ul className="divide-y border-y bg-card md:hidden">
         {rows.map((r) => (
           <li key={rowKey(r)}>
-             <div
-               role={onRowClick ? "button" : undefined}
-               tabIndex={onRowClick ? 0 : undefined}
-               onClick={(e) => { if (!(e.target as HTMLElement).closest("a, button, input")) onRowClick?.(r); }}
-               onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ") && onRowClick) { e.preventDefault(); onRowClick(r); } }}
-               className={cn("relative w-full p-4 text-left focus-visible:outline-2 focus-visible:outline-ring", onRowClick && "cursor-pointer active:bg-accent")}
-             >
+            <div
+              role={onRowClick ? "button" : undefined}
+              tabIndex={onRowClick ? 0 : undefined}
+              onClick={(e) => {
+                if (!(e.target as HTMLElement).closest("a, button, input")) onRowClick?.(r);
+              }}
+              onKeyDown={(e) => {
+                if (
+                  e.target === e.currentTarget &&
+                  (e.key === "Enter" || e.key === " ") &&
+                  onRowClick
+                ) {
+                  e.preventDefault();
+                  onRowClick(r);
+                }
+              }}
+              className={cn(
+                "relative w-full p-4 text-left focus-visible:outline-2 focus-visible:outline-ring",
+                onRowClick && "cursor-pointer active:bg-accent",
+              )}
+            >
               {columns
                 .filter((c) => c.mobile !== false)
                 .map((c, i) => (
                   <div
                     key={c.header}
                     className={cn(
-                       "flex min-w-0 items-start justify-between gap-3 text-sm",
-                       i > 0 && "mt-2",
+                      "flex min-w-0 items-start justify-between gap-3 text-sm",
+                      i > 0 && "mt-2",
                     )}
                   >
                     {i > 0 && <span className="text-xs text-muted-foreground">{c.header}</span>}
-                     <span className={cn("min-w-0 break-words text-right", i === 0 && "pr-5 text-left font-semibold")}>{c.cell(r)}</span>
+                    <span
+                      className={cn(
+                        "min-w-0 break-words text-right",
+                        i === 0 && "pr-5 text-left font-semibold",
+                      )}
+                    >
+                      {c.cell(r)}
+                    </span>
                   </div>
                 ))}
-               {onRowClick && <ChevronRight className="absolute right-3 top-4 size-4 text-muted-foreground" aria-hidden />}
-             </div>
+              {onRowClick && (
+                <ChevronRight
+                  className="absolute right-3 top-4 size-4 text-muted-foreground"
+                  aria-hidden
+                />
+              )}
+            </div>
           </li>
         ))}
       </ul>
@@ -294,12 +335,14 @@ export function Stat({
 }) {
   const inner = (
     <>
-       <p className="text-sm font-medium text-muted-foreground">{label}</p>
-       <p className="tnum mt-2 break-words font-display text-[1.55rem] leading-tight font-bold">{value}</p>
+      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <p className="tnum mt-2 break-words font-display text-[1.55rem] leading-tight font-bold">
+        {value}
+      </p>
       {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
     </>
   );
-   const cls = "block min-w-0 border-t-2 border-border bg-card px-4 py-4 transition-colors";
+  const cls = "block min-w-0 border-t-2 border-border bg-card px-4 py-4 transition-colors";
   return to ? (
     <Link
       to={to as any}
@@ -422,7 +465,7 @@ export function NativeSelect(props: React.SelectHTMLAttributes<HTMLSelectElement
     <select
       {...props}
       className={cn(
-         "h-11 w-full min-w-0 rounded-md border border-input bg-card px-3 text-base sm:text-sm focus-visible:outline-2 focus-visible:outline-ring",
+        "h-11 w-full min-w-0 rounded-md border border-input bg-card px-3 text-base sm:text-sm focus-visible:outline-2 focus-visible:outline-ring",
         props.className,
       )}
     />

@@ -102,7 +102,7 @@ function Dashboard() {
         title="Dashboard"
         subtitle={edition ? `Operação da edição ${edition.name}` : undefined}
       />
-       <div className="space-y-7 p-4 md:p-6 xl:p-8">
+      <div className="space-y-7 p-4 md:p-6 xl:p-8">
         {(plans.data?.length ?? 0) === 0 && s.total === 0 && (
           <Pending title="Espaços ainda não cadastrados">
             A planta oficial e a lista de espaços não foram fornecidas. Cadastre os espaços em{" "}
@@ -114,10 +114,8 @@ function Dashboard() {
         )}
 
         <div>
-           <h2 className="mb-3 font-display text-lg font-bold">
-            Comercialização
-          </h2>
-           <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+          <h2 className="mb-3 font-display text-lg font-bold">Comercialização</h2>
+          <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
             <Stat
               label="Espaços disponíveis"
               value={`${s.byStatus.disponivel ?? 0}`}
@@ -156,10 +154,8 @@ function Dashboard() {
 
         {fin.read && (
           <div>
-             <h2 className="mb-3 font-display text-lg font-bold">
-              Financeiro operacional
-            </h2>
-             <div className="grid gap-px bg-border sm:grid-cols-2 xl:grid-cols-4">
+            <h2 className="mb-3 font-display text-lg font-bold">Financeiro operacional</h2>
+            <div className="grid gap-px bg-border sm:grid-cols-2 xl:grid-cols-4">
               <Stat
                 label="Negociado"
                 value={brl(s.negotiated)}
@@ -201,7 +197,7 @@ function Dashboard() {
           </div>
         )}
 
-         <div className="grid gap-6 xl:grid-cols-2">
+        <div className="grid gap-6 xl:grid-cols-2">
           <Section title="Pendências que exigem ação">
             <ul className="divide-y text-sm">
               {s.reservedNoContract.map((d) => (

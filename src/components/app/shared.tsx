@@ -167,7 +167,7 @@ export function ConfirmNoteDialog({
         if (!o) setNote("");
       }}
     >
-        <DialogContent className="max-h-[min(90dvh,48rem)] overflow-y-auto">
+      <DialogContent className="max-h-[min(90dvh,48rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
