@@ -241,7 +241,7 @@ export function DataList<T>({
                 {columns.map((c, index) => (
                   <td key={c.header} className={cn("px-4 py-3 align-middle", c.className)}>
                     {index === 0 && onRowClick ? (
-                      <Button variant="link" className="h-auto min-h-8 justify-start px-0 text-left text-foreground" onClick={() => onRowClick(r)} aria-label={`Abrir ${c.header}`}>
+                      <Button variant="link" className="h-auto min-h-8 justify-start px-0 text-left text-foreground" onClick={() => onRowClick(r)} aria-label={`Abrir ${c.header}: ${rowKey(r)}`}>
                         {c.cell(r)}
                       </Button>
                     ) : c.cell(r)}
@@ -258,6 +258,7 @@ export function DataList<T>({
             <div
               role={onRowClick ? "button" : undefined}
               tabIndex={onRowClick ? 0 : undefined}
+              aria-labelledby={onRowClick ? `row-${rowKey(r)}` : undefined}
               onClick={(e) => {
                 if (!(e.target as HTMLElement).closest("a, button, input")) onRowClick?.(r);
               }}
@@ -288,6 +289,7 @@ export function DataList<T>({
                   >
                     {i > 0 && <span className="text-xs text-muted-foreground">{c.header}</span>}
                     <span
+                       id={i === 0 && onRowClick ? `row-${rowKey(r)}` : undefined}
                       className={cn(
                         "min-w-0 break-words text-right",
                         i === 0 && "pr-5 text-left font-semibold",
