@@ -94,17 +94,17 @@ function CompanyPage() {
           </>
         }
       />
-      <Tabs defaultValue="dados" className="p-4 md:p-8">
-        <TabsList className="flex-wrap">
+       <Tabs defaultValue="dados" className="min-w-0 p-4 md:p-6 xl:p-8">
+         <TabsList className="flex h-auto max-w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="dados">Dados</TabsTrigger>
           <TabsTrigger value="comercial">Negociações e espaços ({myDeals.length})</TabsTrigger>
           <TabsTrigger value="contratos">Contratos ({myContracts.length})</TabsTrigger>
           <TabsTrigger value="docs">Documentos</TabsTrigger>
           <TabsTrigger value="ativ">Atividades</TabsTrigger>
         </TabsList>
-        <TabsContent value="dados" className="mt-4 grid gap-4 lg:grid-cols-2">
+         <TabsContent value="dados" className="mt-5 grid gap-6 xl:grid-cols-2">
           <Section title="Cadastro">
-            <dl className="grid grid-cols-2 gap-3">
+             <dl className="grid gap-3 sm:grid-cols-2">
               <Field label="Nome fantasia">{c.trade_name}</Field>
               <Field label="Razão social">{c.legal_name}</Field>
               <Field label="CNPJ / CPF">
@@ -179,7 +179,7 @@ function CompanyPage() {
             )}
           </Section>
         </TabsContent>
-        <TabsContent value="comercial" className="mt-4 grid gap-4 lg:grid-cols-2">
+         <TabsContent value="comercial" className="mt-5 grid gap-6 xl:grid-cols-2">
           <Section title="Negociações">
             {myDeals.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhuma.</p>
