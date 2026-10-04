@@ -241,8 +241,8 @@ export function DataList<T>({
                 {columns.map((c, index) => (
                   <td key={c.header} className={cn("px-4 py-3 align-middle", c.className)}>
                     {index === 0 && onRowClick ? (
-                      <Button variant="link" className="h-auto min-h-8 justify-start px-0 text-left text-foreground" onClick={() => onRowClick(r)} aria-label={`Abrir ${c.header}: ${rowKey(r)}`}>
-                        {c.cell(r)}
+                      <Button variant="link" className="h-auto min-h-8 justify-start px-0 text-left text-foreground" onClick={() => onRowClick(r)} aria-labelledby={`item-${rowKey(r)}`}>
+                        <span id={`item-${rowKey(r)}`}>{c.cell(r)}</span>
                       </Button>
                     ) : c.cell(r)}
                   </td>
