@@ -73,6 +73,10 @@ export const Route = createFileRoute("/_authenticated/comercializacao")({
     meta: [
       { title: "Comercialização — Sistema Indumóveis" },
       { name: "description", content: "Reservas, negociações e vendas de espaços." },
+      { property: "og:title", content: "Comercialização — Sistema Indumóveis" },
+      { property: "og:description", content: "Reservas, negociações e vendas de espaços." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ComercialPage,
@@ -467,7 +471,7 @@ function DealDialog({
   );
   return (
     <Dialog open={!!deal} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{deal?.id ? "Editar negociação" : "Nova negociação"}</DialogTitle>
         </DialogHeader>
@@ -487,7 +491,7 @@ function DealDialog({
             </FormRow>
           </div>
           <div>
-            <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="mb-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <span className="text-sm font-medium">
                 Espaços *{" "}
                 <span className="text-muted-foreground">
@@ -495,7 +499,7 @@ function DealDialog({
                 </span>
               </span>
               <Input
-                className="h-8 w-40"
+                className="w-32 sm:w-40"
                 placeholder="Filtrar código"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
@@ -513,7 +517,7 @@ function DealDialog({
                 return (
                   <div
                     key={s.id}
-                    className="flex items-center gap-3 border-b px-3 py-2 last:border-0"
+                    className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 border-b px-3 py-3 last:border-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
                   >
                     <Checkbox
                       id={`sp-${s.id}`}
@@ -527,7 +531,7 @@ function DealDialog({
                         })
                       }
                     />
-                    <label htmlFor={`sp-${s.id}`} className="flex-1 text-sm">
+                    <label htmlFor={`sp-${s.id}`} className="min-w-0 break-words text-sm">
                       <strong>{s.code}</strong>{" "}
                       <span className="text-muted-foreground">
                         {s.sector} · {area(s.area_m2)}
@@ -536,7 +540,7 @@ function DealDialog({
                     {on && (
                       <Input
                         aria-label={`Valor ${s.code}`}
-                        className="h-8 w-32 text-right tnum"
+                        className="col-start-2 w-full text-right tnum sm:col-start-auto sm:w-32"
                         inputMode="decimal"
                         value={sel[s.id]}
                         onChange={(e) => setSel({ ...sel, [s.id]: e.target.value })}

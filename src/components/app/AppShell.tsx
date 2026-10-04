@@ -42,7 +42,15 @@ export const NAV = [
   { to: "/admin", label: "Administração", icon: Settings, module: "admin" },
 ] as const;
 
-function SidebarBody({ compact, userId, onNavigate }: { compact: boolean; userId: string; onNavigate?: () => void }) {
+function SidebarBody({
+  compact,
+  userId,
+  onNavigate,
+}: {
+  compact: boolean;
+  userId: string;
+  onNavigate?: () => void;
+}) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { data: me } = useMe(userId);
   const queryClient = useQueryClient();
@@ -74,7 +82,7 @@ function SidebarBody({ compact, userId, onNavigate }: { compact: boolean; userId
                 onClick={onNavigate}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex items-center gap-3 rounded-md px-3 py-2.5 text-[0.94rem] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-sidebar-ring",
+                  "relative flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-sidebar-ring",
                   active
                     ? "bg-sidebar-accent font-semibold text-sidebar-accent-foreground"
                     : "hover:bg-sidebar-accent/60",
@@ -88,7 +96,7 @@ function SidebarBody({ compact, userId, onNavigate }: { compact: boolean; userId
                     aria-hidden
                   />
                 )}
-                <item.icon className="size-5 shrink-0" strokeWidth={active ? 2.4 : 1.9} />
+                <item.icon className="size-[1.15rem] shrink-0" strokeWidth={active ? 2.2 : 1.8} />
                 {!compact && <span className="truncate">{item.label}</span>}
               </Link>
             );
@@ -161,77 +169,140 @@ export function AppShell({ userId }: { userId: string }) {
     });
   };
 
-  if (isLoading || (!me && !isError)) return <div className="min-h-screen"><Loading /></div>;
-  if (isError || !me || me.id !== userId) return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <div className="max-w-md space-y-4 text-center">
-        <h1 className="font-display text-xl font-bold">Não foi possível consultar seu acesso</h1>
-        <p className="text-muted-foreground">Sua sessão continua ativa. Tente novamente ou saia da conta.</p>
-        <div className="flex justify-center gap-3"><Button onClick={() => refetch()}>Tentar novamente</Button><Button variant="outline" onClick={signOut}>Sair</Button></div>
+  if (isLoading || (!me && !isError))
+    return (
+      <div className="min-h-screen">
+        <Loading />
       </div>
-    </main>
-  );
-  if (me.roles.length === 0) return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <div className="max-w-md space-y-4 text-center">
-        <h1 className="font-display text-xl font-bold">Acesso aguardando liberação</h1>
-        <p className="text-muted-foreground">Sua conta ({me.email}) ainda não possui perfil. Solicite à administração a liberação do acesso.</p>
-        <div className="flex justify-center gap-3"><Button variant="outline" onClick={() => refetch()}>Verificar acesso</Button><Button onClick={signOut}>Sair</Button></div>
-      </div>
-    </main>
-  );
-  if (!current || !me.perms[current.module]?.read) return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <div className="max-w-md space-y-4 text-center">
-        <h1 className="font-display text-xl font-bold">Acesso não permitido</h1>
-        <p className="text-muted-foreground">Seu perfil não permite consultar este módulo.</p>
-        <div className="flex justify-center gap-3"><Button asChild><Link to={NAV.find((n) => me.perms[n.module]?.read)?.to ?? "/auth"}>Ir ao início</Link></Button><Button variant="outline" onClick={signOut}>Sair</Button></div>
-      </div>
-    </main>
-  );
+    );
+  if (isError || !me || me.id !== userId)
+    return (
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <div className="max-w-md space-y-4 text-center">
+          <h1 className="font-display text-xl font-bold">Não foi possível consultar seu acesso</h1>
+          <p className="text-muted-foreground">
+            Sua sessão continua ativa. Tente novamente ou saia da conta.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button onClick={() => refetch()}>Tentar novamente</Button>
+            <Button variant="outline" onClick={signOut}>
+              Sair
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
+  if (me.roles.length === 0)
+    return (
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <div className="max-w-md space-y-4 text-center">
+          <h1 className="font-display text-xl font-bold">Acesso aguardando liberação</h1>
+          <p className="text-muted-foreground">
+            Sua conta ({me.email}) ainda não possui perfil. Solicite à administração a liberação do
+            acesso.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button variant="outline" onClick={() => refetch()}>
+              Verificar acesso
+            </Button>
+            <Button onClick={signOut}>Sair</Button>
+          </div>
+        </div>
+      </main>
+    );
+  if (!current || !me.perms[current.module]?.read)
+    return (
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <div className="max-w-md space-y-4 text-center">
+          <h1 className="font-display text-xl font-bold">Acesso não permitido</h1>
+          <p className="text-muted-foreground">Seu perfil não permite consultar este módulo.</p>
+          <div className="flex justify-center gap-3">
+            <Button asChild>
+              <Link to={NAV.find((n) => me.perms[n.module]?.read)?.to ?? "/auth"}>
+                Ir ao início
+              </Link>
+            </Button>
+            <Button variant="outline" onClick={signOut}>
+              Sair
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
   return (
-    <AuthorizedShell compact={compact} open={open} setOpen={setOpen} userId={userId} current={current} toggle={toggle} />
+    <AuthorizedShell
+      compact={compact}
+      open={open}
+      setOpen={setOpen}
+      userId={userId}
+      current={current}
+      toggle={toggle}
+    />
   );
 }
 
-function AuthorizedShell({ compact, open, setOpen, userId, current, toggle }: { compact: boolean; open: boolean; setOpen: (v: boolean) => void; userId: string; current: (typeof NAV)[number]; toggle: () => void }) {
+function AuthorizedShell({
+  compact,
+  open,
+  setOpen,
+  userId,
+  current,
+  toggle,
+}: {
+  compact: boolean;
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  userId: string;
+  current: (typeof NAV)[number];
+  toggle: () => void;
+}) {
   const { data: edition } = useEdition();
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="internal-app flex min-h-dvh w-full bg-workspace">
       <aside
         className={cn(
-          "sticky top-0 hidden h-screen shrink-0 transition-[width] md:block",
+          "sticky top-0 hidden h-dvh shrink-0 transition-[width] motion-reduce:transition-none md:block",
           compact ? "w-[4.5rem]" : "w-64",
         )}
       >
         <SidebarBody compact={compact} userId={userId} />
       </aside>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-72 border-none p-0">
+        <SheetContent side="left" className="w-[min(19rem,88vw)] overflow-y-auto border-none p-0">
           <SheetTitle className="sr-only">Navegação</SheetTitle>
           <SidebarBody compact={false} userId={userId} onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex h-11 items-center gap-2 border-b bg-card px-2 text-sm md:px-4">
-          <Button
-            type="button"
-            variant="ghost" size="icon" className="md:hidden"
-            aria-label="Abrir menu"
-            onClick={() => setOpen(true)}
-          >
-            <Menu className="size-5" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost" size="icon" className="hidden md:inline-flex"
-            aria-label={compact ? "Expandir menu" : "Recolher menu"}
-            onClick={toggle}
-          >
-            {compact ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
-          </Button>
-          <span className="font-semibold md:hidden">{current?.label}</span>
-          <span className="ml-auto truncate text-xs text-muted-foreground tnum">
+        <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b bg-card px-3 text-sm md:px-6">
+          <div className="flex min-w-0 items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="min-h-11 min-w-11 md:hidden"
+              aria-label="Abrir menu"
+              onClick={() => setOpen(true)}
+            >
+              <Menu className="size-5" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="hidden md:inline-flex"
+              aria-label={compact ? "Expandir menu" : "Recolher menu"}
+              onClick={toggle}
+            >
+              {compact ? (
+                <PanelLeftOpen className="size-4" />
+              ) : (
+                <PanelLeftClose className="size-4" />
+              )}
+            </Button>
+            <span className="truncate font-semibold md:hidden">{current?.label}</span>
+          </div>
+          <span className="tnum min-w-0 truncate text-right text-xs text-muted-foreground">
             {edition ? (
               <>
                 <span className="font-semibold text-foreground">{edition.name}</span> ·{" "}
@@ -242,7 +313,9 @@ function AuthorizedShell({ compact, open, setOpen, userId, current, toggle }: { 
             )}
           </span>
         </div>
-        <main className="min-w-0 flex-1"><Outlet /></main>
+        <main className="min-w-0 flex-1">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

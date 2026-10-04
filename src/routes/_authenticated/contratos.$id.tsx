@@ -52,6 +52,10 @@ export const Route = createFileRoute("/_authenticated/contratos/$id")({
     meta: [
       { title: "Contrato — Sistema Indumóveis" },
       { name: "description", content: "Revisão, versões e situação do contrato." },
+      { property: "og:title", content: "Contrato — Sistema Indumóveis" },
+      { property: "og:description", content: "Revisão, versões e situação do contrato." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ContractPage,
@@ -111,10 +115,10 @@ function ContractPage() {
           </>
         }
       />
-      <div className="grid gap-4 p-4 md:p-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-4">
+      <div className="grid min-w-0 gap-6 p-4 md:p-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:p-8">
+        <div className="min-w-0 space-y-5">
           <Section title="Revisão dos dados">
-            <dl className="grid grid-cols-2 gap-3 md:grid-cols-3">
+            <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <Field label="Razão social">
                 <RelatedLink type="company" id={c.company_id}>
                   {c.companies?.legal_name}
@@ -203,7 +207,7 @@ function ContractPage() {
             )}
           </Section>
         </div>
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-5">
           {can.write && CONTRACT_TRANSITIONS[c.status].length > 0 && (
             <Section title="Ações">
               <div className="flex flex-col gap-2">
@@ -260,7 +264,7 @@ function ContractPage() {
               ) : (
                 <ul className="divide-y text-sm">
                   {myInst.map((i: any) => (
-                    <li key={i.id} className="flex justify-between py-1.5 tnum">
+                    <li key={i.id} className="flex flex-wrap justify-between gap-1 py-2 tnum">
                       <span>
                         {i.number}ª · {fmtDate(i.due_date)}
                       </span>
@@ -284,7 +288,7 @@ function ContractPage() {
               {[...(c.contract_versions ?? [])]
                 .sort((a: any, b: any) => b.version - a.version)
                 .map((v: any) => (
-                  <li key={v.id} className="flex justify-between py-1">
+                  <li key={v.id} className="flex flex-wrap justify-between gap-1 py-2">
                     <span>v{v.version}</span>
                     <span className="tnum text-xs text-muted-foreground">
                       {fmtDateTime(v.created_at)} · {name(v.created_by)}

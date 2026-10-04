@@ -167,7 +167,7 @@ export function ConfirmNoteDialog({
         if (!o) setNote("");
       }}
     >
-      <DialogContent>
+      <DialogContent className="max-h-[min(90dvh,48rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -277,7 +277,7 @@ export function ActivityDialog({
   );
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[min(90dvh,48rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nova atividade</DialogTitle>
         </DialogHeader>

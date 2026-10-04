@@ -102,7 +102,7 @@ export function CompanyDialog({
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value });
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-xl">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>{company ? "Editar empresa" : "Nova empresa"}</DialogTitle>
         </DialogHeader>
@@ -152,7 +152,10 @@ export function CompanyDialog({
             <Textarea id="cn" value={f.notes} onChange={set("notes")} />
           </FormRow>
           {err && (
-            <p role="alert" className="text-sm text-destructive">
+            <p
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-danger-soft p-3 text-sm text-destructive"
+            >
               {err}
             </p>
           )}
