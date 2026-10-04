@@ -229,31 +229,22 @@ export function DataList<T>({
             {rows.map((r) => (
               <tr
                 key={rowKey(r)}
-                tabIndex={onRowClick ? 0 : undefined}
-                role={onRowClick ? "button" : undefined}
-                aria-label={onRowClick ? `Abrir ${columns[0]?.header}: ${rowKey(r)}` : undefined}
                 onClick={(e) => {
                   if (!(e.target as HTMLElement).closest("a, button, input")) onRowClick?.(r);
                 }}
-                onKeyDown={(e) => {
-                  if (
-                    e.target === e.currentTarget &&
-                    (e.key === "Enter" || e.key === " ") &&
-                    onRowClick
-                  ) {
-                    e.preventDefault();
-                    onRowClick(r);
-                  }
-                }}
                 className={cn(
-                  "border-t transition-colors focus-visible:outline-2 focus-visible:outline-ring",
+                  "border-t transition-colors",
                   onRowClick && "cursor-pointer hover:bg-accent/60",
                   selectedKey === rowKey(r) && "bg-accent",
                 )}
               >
-                {columns.map((c) => (
+                {columns.map((c, index) => (
                   <td key={c.header} className={cn("px-4 py-3 align-middle", c.className)}>
-                    {c.cell(r)}
+                    {index === 0 && onRowClick ? (
+                      <Button variant="link" className="h-auto min-h-8 justify-start px-0 text-left text-foreground" onClick={() => onRowClick(r)} aria-label={`Abrir ${c.header}`}>
+                        {c.cell(r)}
+                      </Button>
+                    ) : c.cell(r)}
                   </td>
                 ))}
               </tr>
