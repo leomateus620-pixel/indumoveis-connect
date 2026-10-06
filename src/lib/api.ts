@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { errMsg } from "./format";
-import { validateDocFile } from "./documents";
+import { mimeFor, validateDocFile } from "./documents";
 
 const db = supabase as any;
 
@@ -520,7 +520,7 @@ function putObject(path: string, file: File, token: string, onProgress?: (p: num
     xhr.open("POST", url);
     xhr.setRequestHeader("apikey", key);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    xhr.setRequestHeader("Content-Type", mimeFor(file.name));
     xhr.setRequestHeader("x-upsert", "false");
     xhr.upload.onprogress = (e) => e.lengthComputable && onProgress?.(e.loaded / e.total);
     xhr.onload = () => {
@@ -590,7 +590,7 @@ export async function uploadDocument(args: {
     p_title: args.title ?? null,
     p_description: args.description ?? null,
     p_category: args.category,
-    p_mime: args.file.type || null,
+    p_mime: mimeFor(args.file.name),
     p_size: args.file.size,
     p_links: args.links,
     p_idempotency_key: args.idempotencyKey ?? crypto.randomUUID(),
@@ -611,7 +611,7 @@ export async function uploadDocumentVersion(args: {
     p_root_id: args.rootId,
     p_expected_version: args.expectedVersion,
     p_name: args.file.name,
-    p_mime: args.file.type || null,
+    p_mime: mimeFor(args.file.name),
     p_size: args.file.size,
     p_idempotency_key: args.idempotencyKey ?? crypto.randomUUID(),
   });

@@ -98,3 +98,22 @@ export function canReadDocument(
   if (!perms.documentos?.read) return false;
   return linkTypes.every((t) => !!perms[DOC_LINK_MODULE[t]]?.read);
 }
+
+const MIME: Record<string, string> = {
+  pdf: "application/pdf",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  dwg: "application/acad",
+  zip: "application/zip",
+  txt: "text/plain",
+  csv: "text/csv",
+};
+/** Tipo de conteúdo derivado da extensão permitida — nunca o informado pelo arquivo. */
+export function mimeFor(name: string) {
+  return MIME[fileExt(name)] ?? "application/octet-stream";
+}
