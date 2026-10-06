@@ -809,39 +809,60 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          description: string | null
           edition_id: string | null
           id: string
+          idempotency_key: string | null
+          is_current: boolean
           mime_type: string | null
           name: string
           previous_id: string | null
+          root_id: string | null
           size_bytes: number | null
+          status: string
           storage_path: string
+          title: string | null
+          updated_at: string
           uploaded_by: string | null
           version: number
         }
         Insert: {
           category?: string
           created_at?: string
+          description?: string | null
           edition_id?: string | null
           id?: string
+          idempotency_key?: string | null
+          is_current?: boolean
           mime_type?: string | null
           name: string
           previous_id?: string | null
+          root_id?: string | null
           size_bytes?: number | null
+          status?: string
           storage_path: string
+          title?: string | null
+          updated_at?: string
           uploaded_by?: string | null
           version?: number
         }
         Update: {
           category?: string
           created_at?: string
+          description?: string | null
           edition_id?: string | null
           id?: string
+          idempotency_key?: string | null
+          is_current?: boolean
           mime_type?: string | null
           name?: string
           previous_id?: string | null
+          root_id?: string | null
           size_bytes?: number | null
+          status?: string
           storage_path?: string
+          title?: string | null
+          updated_at?: string
           uploaded_by?: string | null
           version?: number
         }
@@ -856,6 +877,13 @@ export type Database = {
           {
             foreignKeyName: "documents_previous_id_fkey"
             columns: ["previous_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_root_id_fkey"
+            columns: ["root_id"]
             isOneToOne: false
             referencedRelation: "documents"
             referencedColumns: ["id"]
@@ -1365,8 +1393,36 @@ export type Database = {
     }
     Functions: {
       activity_snapshot: { Args: { p_activity_id: string }; Returns: Json }
+      begin_document_upload: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_edition_id: string
+          p_idempotency_key: string
+          p_links: Json
+          p_mime: string
+          p_name: string
+          p_size: number
+          p_title: string
+        }
+        Returns: Json
+      }
+      begin_document_version: {
+        Args: {
+          p_expected_version: number
+          p_idempotency_key: string
+          p_mime: string
+          p_name: string
+          p_root_id: string
+          p_size: number
+        }
+        Returns: Json
+      }
       can_read: { Args: { _module: string }; Returns: boolean }
+      can_read_document: { Args: { _doc: string }; Returns: boolean }
+      can_read_document_object: { Args: { _path: string }; Returns: boolean }
       can_write: { Args: { _module: string }; Returns: boolean }
+      cancel_document_upload: { Args: { p_id: string }; Returns: undefined }
       create_contract_from_deal: {
         Args: { p_deal_id: string }
         Returns: string
@@ -1383,7 +1439,21 @@ export type Database = {
         Returns: string
       }
       deal_snapshot: { Args: { p_deal_id: string }; Returns: Json }
+      doc_entity_label: {
+        Args: { _id: string; _type: string }
+        Returns: string
+      }
+      doc_entity_module: { Args: { _type: string }; Returns: string }
+      doc_safe_path: {
+        Args: { _edition: string; _id: string; _name: string }
+        Returns: string
+      }
+      doc_validate_file: {
+        Args: { _name: string; _size: number }
+        Returns: undefined
+      }
       ensure_profile: { Args: never; Returns: Json }
+      finalize_document_upload: { Args: { p_id: string }; Returns: Json }
       generate_installments: {
         Args: {
           p_contract_id: string
@@ -1400,6 +1470,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      link_document: {
+        Args: { p_doc_id: string; p_entity_id: string; p_type: string }
+        Returns: undefined
       }
       provision_initial_admin: {
         Args: { p_user_id: string }
@@ -1487,6 +1561,25 @@ export type Database = {
         }
         Returns: string
       }
+      search_documents: {
+        Args: {
+          p_category: string
+          p_collection: string
+          p_edition_id: string
+          p_entity_id?: string
+          p_entity_type?: string
+          p_from: string
+          p_limit: number
+          p_link_type: string
+          p_offset: number
+          p_q: string
+          p_scope: string
+          p_sort: string
+          p_to: string
+          p_uploader: string
+        }
+        Returns: Json
+      }
       set_activity_status: {
         Args: {
           p_activity_id: string
@@ -1511,12 +1604,29 @@ export type Database = {
         }
         Returns: undefined
       }
+      unlink_document: {
+        Args: { p_doc_id: string; p_entity_id: string; p_type: string }
+        Returns: undefined
+      }
+      update_document_meta: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_root_id: string
+          p_title: string
+        }
+        Returns: undefined
+      }
       validate_activity_reference: {
         Args: {
           p_edition_id: string
           p_related_id: string
           p_related_type: string
         }
+        Returns: undefined
+      }
+      validate_doc_entity: {
+        Args: { _edition: string; _id: string; _type: string }
         Returns: undefined
       }
     }

@@ -1,0 +1,1 @@
+alter function public.search_documents(text, uuid, text, text, text, text, uuid, date, date, text, integer, integer, text, uuid) volatile;
