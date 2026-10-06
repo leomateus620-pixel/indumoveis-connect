@@ -1,4 +1,5 @@
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -7,9 +8,11 @@
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->
 
 ## Sistema Indumóveis — decisões de arquitetura
+
 - All data access goes through `src/lib/api.ts` (React Query hooks + `useDbMutation`); pages never query the backend directly — keeps one source of truth and uniform invalidation.
 - Authorization lives in the database: RLS uses `can_read/can_write(module)` driven by `user_roles` + `role_permissions`; UI checks via `useCan` are only cosmetic.
 - Multi-step operations (deal+spaces, transitions, contract creation/versions/status, installments, payments, inspections) are SECURITY DEFINER SQL functions that re-check permissions — guarantees atomicity and server-side conflict checks.

@@ -11,12 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  useCompanies,
-  useProfiles,
-  useActivities,
-  useCan,
-} from "@/lib/api";
+import { useCompanies, useProfiles, useActivities, useCan } from "@/lib/api";
 import { NativeSelect, StatusBadge } from "./ui";
 import { ACTIVITY_STATUS, fmtDate } from "@/lib/format";
 import { ActivityDialog } from "./ActivityDialog";
@@ -234,4 +229,3 @@ export function RelatedActivities({
     </div>
   );
 }
-

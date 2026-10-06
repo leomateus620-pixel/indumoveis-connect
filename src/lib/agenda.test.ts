@@ -39,21 +39,27 @@ describe("Agenda operacional", () => {
 
   it("Minhas atividades exige atribuição direta", () => {
     const rows = [item(), item({ key: "b", assigneeIds: ["p2"] })];
-    expect(filterAgendaItems(rows, { month: "2027-05", status: "minhas", assignee: "p1" }).map((x) => x.key)).toEqual(["a"]);
+    expect(
+      filterAgendaItems(rows, { month: "2027-05", status: "minhas", assignee: "p1" }).map(
+        (x) => x.key,
+      ),
+    ).toEqual(["a"]);
   });
 
   it("canceladas não elevam a conclusão", () => {
-    const metrics = agendaMetrics([
-      item(),
-      item({ key: "b", status: "concluida" }),
-      item({ key: "c", status: "cancelada" }),
-    ], "2027-05-10");
+    const metrics = agendaMetrics(
+      [item(), item({ key: "b", status: "concluida" }), item({ key: "c", status: "cancelada" })],
+      "2027-05-10",
+    );
     expect(metrics.completionRate).toBe(50);
     expect(metrics.completed).toBe(1);
   });
 
   it("contabiliza atraso e item sem data concretamente", () => {
-    const metrics = agendaMetrics([item({ date: "2027-05-01" }), item({ key: "b", date: null })], "2027-05-10");
+    const metrics = agendaMetrics(
+      [item({ date: "2027-05-01" }), item({ key: "b", date: null })],
+      "2027-05-10",
+    );
     expect(metrics.overdue).toBe(1);
     expect(metrics.unscheduled).toBe(1);
   });

@@ -98,7 +98,9 @@ export function buildAgendaItems({
       const assignees = activity.activity_assignees ?? [];
       const commissions = activity.activity_commissions ?? [];
       const category = activity.activity_categories?.name ?? "";
-      const people = assignees.map((row: any) => row.profiles?.full_name || row.profiles?.email || "");
+      const people = assignees.map(
+        (row: any) => row.profiles?.full_name || row.profiles?.email || "",
+      );
       const commissionNames = commissions.map((row: any) => row.commissions?.name || "");
       return {
         key: activity.id,
@@ -113,30 +115,42 @@ export function buildAgendaItems({
         assigneeIds: assignees.map((row: any) => row.profile_id),
         categoryId: activity.category_id,
         commissionIds: commissions.map((row: any) => row.commission_id),
-        searchable: [activity.title, activity.description, activity.location, category, ...people, ...commissionNames]
+        searchable: [
+          activity.title,
+          activity.description,
+          activity.location,
+          category,
+          ...people,
+          ...commissionNames,
+        ]
           .filter(Boolean)
           .join(" ")
           .toLocaleLowerCase("pt-BR"),
         activity,
-        link: activity.related_type && activity.related_id ? { type: activity.related_type, id: activity.related_id } : undefined,
+        link:
+          activity.related_type && activity.related_id
+            ? { type: activity.related_type, id: activity.related_id }
+            : undefined,
       };
     }),
-    ...inspections.filter((item) => item.scheduled_for).map((item) => ({
-      key: `inspection-${item.id}`,
-      source: "inspection" as const,
-      title: `Vistoria de ${item.kind === "entrega" ? "entrega" : "devolução"} · ${item.spaces?.code ?? "espaço"}`,
-      date: item.scheduled_for,
-      endDate: item.scheduled_for,
-      startAt: null,
-      endAt: null,
-      allDay: true,
-      status: item.status,
-      assigneeIds: item.inspector_id ? [item.inspector_id] : [],
-      categoryId: null,
-      commissionIds: [],
-      searchable: `vistoria ${item.kind} ${item.spaces?.code ?? ""}`.toLocaleLowerCase("pt-BR"),
-      link: { type: "inspection", id: item.id },
-    })),
+    ...inspections
+      .filter((item) => item.scheduled_for)
+      .map((item) => ({
+        key: `inspection-${item.id}`,
+        source: "inspection" as const,
+        title: `Vistoria de ${item.kind === "entrega" ? "entrega" : "devolução"} · ${item.spaces?.code ?? "espaço"}`,
+        date: item.scheduled_for,
+        endDate: item.scheduled_for,
+        startAt: null,
+        endAt: null,
+        allDay: true,
+        status: item.status,
+        assigneeIds: item.inspector_id ? [item.inspector_id] : [],
+        categoryId: null,
+        commissionIds: [],
+        searchable: `vistoria ${item.kind} ${item.spaces?.code ?? ""}`.toLocaleLowerCase("pt-BR"),
+        link: { type: "inspection", id: item.id },
+      })),
     ...installments.map((item) => ({
       key: `installment-${item.id}`,
       source: "installment" as const,
@@ -150,10 +164,17 @@ export function buildAgendaItems({
       assigneeIds: [],
       categoryId: null,
       commissionIds: [],
-      searchable: `vencimento parcela ${item.contracts?.companies?.trade_name ?? ""} ${item.contracts?.number ?? ""}`.toLocaleLowerCase("pt-BR"),
+      searchable:
+        `vencimento parcela ${item.contracts?.companies?.trade_name ?? ""} ${item.contracts?.number ?? ""}`.toLocaleLowerCase(
+          "pt-BR",
+        ),
       link: { type: "installment", id: item.id },
     })),
-  ].sort((a, b) => (a.startAt ?? `${a.date ?? "9999"}T23:59`).localeCompare(b.startAt ?? `${b.date ?? "9999"}T23:59`));
+  ].sort((a, b) =>
+    (a.startAt ?? `${a.date ?? "9999"}T23:59`).localeCompare(
+      b.startAt ?? `${b.date ?? "9999"}T23:59`,
+    ),
+  );
 }
 
 export type AgendaFilters = {
@@ -169,7 +190,8 @@ export function filterAgendaItems(items: AgendaItem[], filters: AgendaFilters) {
   const bounds = monthBounds(filters.month);
   const query = filters.query?.trim().toLocaleLowerCase("pt-BR") ?? "";
   return items.filter((item) => {
-    if (item.date && ((item.endDate ?? item.date) < bounds.start || item.date > bounds.end)) return false;
+    if (item.date && ((item.endDate ?? item.date) < bounds.start || item.date > bounds.end))
+      return false;
     if (query && !item.searchable.includes(query)) return false;
     if (filters.status && filters.status !== "todas") {
       if (filters.status === "minhas") {
@@ -178,7 +200,12 @@ export function filterAgendaItems(items: AgendaItem[], filters: AgendaFilters) {
     }
     if (filters.category && item.categoryId !== filters.category) return false;
     if (filters.commission && !item.commissionIds.includes(filters.commission)) return false;
-    if (filters.assignee && filters.status !== "minhas" && !item.assigneeIds.includes(filters.assignee)) return false;
+    if (
+      filters.assignee &&
+      filters.status !== "minhas" &&
+      !item.assigneeIds.includes(filters.assignee)
+    )
+      return false;
     return true;
   });
 }

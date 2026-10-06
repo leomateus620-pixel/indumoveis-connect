@@ -36,7 +36,8 @@ export function useMe(userId?: string) {
     retry: 1,
     queryFn: async (): Promise<Me | null> => {
       const { data: u, error: authError } = await supabase.auth.getUser();
-      if (authError || !u.user || (userId && u.user.id !== userId)) throw new Error("Não foi possível confirmar a sessão.");
+      if (authError || !u.user || (userId && u.user.id !== userId))
+        throw new Error("Não foi possível confirmar a sessão.");
       await run(db.rpc("ensure_profile"));
       const roles = (
         await run<any[]>(db.from("user_roles").select("role").eq("user_id", u.user.id))
@@ -272,7 +273,9 @@ export const useActivities = () => {
     () =>
       db
         .from("activities")
-        .select("*, activity_categories(id,name), activity_assignees(profile_id,is_primary,profiles(id,full_name,email)), activity_commissions(commission_id,commissions(id,name,is_coordinating)), activity_versions(id,version,created_at,actor)")
+        .select(
+          "*, activity_categories(id,name), activity_assignees(profile_id,is_primary,profiles(id,full_name,email)), activity_commissions(commission_id,commissions(id,name,is_coordinating)), activity_versions(id,version,created_at,actor)",
+        )
         .eq("edition_id", ed)
         .order("start_at", { ascending: true, nullsFirst: false }),
     [ed],
@@ -307,17 +310,33 @@ export function useAgendaPeople() {
       const roles = await run<any[]>(db.from("user_roles").select("user_id,role"));
       const ids = [...new Set(roles.map((row) => row.user_id))];
       if (!ids.length) return [];
-      const profiles = await run<any[]>(db.from("profiles").select("id,full_name,email").in("id", ids));
+      const profiles = await run<any[]>(
+        db.from("profiles").select("id,full_name,email").in("id", ids),
+      );
       return profiles
-        .map((profile) => ({ ...profile, roles: roles.filter((row) => row.user_id === profile.id).map((row) => row.role) }))
-        .sort((a, b) => (a.full_name || a.email || "").localeCompare(b.full_name || b.email || "", "pt-BR"));
+        .map((profile) => ({
+          ...profile,
+          roles: roles.filter((row) => row.user_id === profile.id).map((row) => row.role),
+        }))
+        .sort((a, b) =>
+          (a.full_name || a.email || "").localeCompare(b.full_name || b.email || "", "pt-BR"),
+        );
     },
   });
 }
 
-export const saveActivity = (args: Record<string, unknown>) => api.rpc<string>("save_activity", args);
-export const setActivityStatus = (id: string, status: "aberta" | "concluida" | "cancelada", version: number) =>
-  api.rpc<number>("set_activity_status", { p_activity_id: id, p_status: status, p_expected_version: version });
+export const saveActivity = (args: Record<string, unknown>) =>
+  api.rpc<string>("save_activity", args);
+export const setActivityStatus = (
+  id: string,
+  status: "aberta" | "concluida" | "cancelada",
+  version: number,
+) =>
+  api.rpc<number>("set_activity_status", {
+    p_activity_id: id,
+    p_status: status,
+    p_expected_version: version,
+  });
 
 export const useDocuments = () =>
   useList("documents", () =>
