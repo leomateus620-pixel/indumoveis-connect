@@ -106,7 +106,7 @@ function FinanceiroPage() {
       />
       <div className="grid gap-px bg-border px-4 pt-4 sm:grid-cols-2 md:px-6 xl:grid-cols-4 xl:px-8">
         <Stat
-          label="Total em contratos"
+          label="Contratado"
           value={brl(contracted)}
           hint={`${activeContracts.length} contratos ativos`}
         />
