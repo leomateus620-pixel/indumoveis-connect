@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const AGENDA_TIME_ZONE = "America/Sao_Paulo";
 
 export type AgendaSource = "activity" | "inspection" | "installment";
