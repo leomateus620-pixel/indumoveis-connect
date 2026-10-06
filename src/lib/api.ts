@@ -338,25 +338,129 @@ export const setActivityStatus = (
     p_expected_version: version,
   });
 
-export const useDocuments = () =>
-  useList("documents", () =>
-    db.from("documents").select("*, document_links(*)").order("created_at", { ascending: false }),
+// ---------- Documentos ----------
+export type DocSearch = {
+  scope: "edition" | "general" | "all";
+  editionId?: string | null;
+  q?: string;
+  category?: string;
+  collection?: "all" | "recent" | "unlinked";
+  linkType?: string;
+  uploader?: string;
+  from?: string;
+  to?: string;
+  sort?: "recent" | "name" | "category";
+  limit?: number;
+  offset?: number;
+  entityType?: string;
+  entityId?: string;
+};
+export type DocSearchResult = {
+  rows: any[];
+  total: number;
+  facets: { all: number; recent: number; unlinked: number; categories: Record<string, number> };
+};
+function searchDocs(p: DocSearch) {
+  return run<DocSearchResult>(
+    db.rpc("search_documents", {
+      p_scope: p.scope,
+      p_edition_id: p.editionId ?? null,
+      p_q: p.q || null,
+      p_category: p.category || null,
+      p_collection: p.collection || "all",
+      p_link_type: p.linkType || null,
+      p_uploader: p.uploader || null,
+      p_from: p.from || null,
+      p_to: p.to || null,
+      p_sort: p.sort || "recent",
+      p_limit: p.limit ?? 25,
+      p_offset: p.offset ?? 0,
+      p_entity_type: p.entityType ?? null,
+      p_entity_id: p.entityId ?? null,
+    }),
   );
+}
+export const useDocumentSearch = (p: DocSearch, enabled = true) =>
+  useQuery({
+    queryKey: qk.list("documents", p),
+    queryFn: () => searchDocs(p),
+    enabled: enabled && (p.scope !== "edition" || !!p.editionId),
+    placeholderData: (prev) => prev,
+  });
+/** Anexos de um registro: somente a versão vigente de cada documento (mesma regra da central). */
 export const useEntityDocuments = (type: string, id?: string) =>
   useQuery({
-    queryKey: qk.list("entity_docs", type, id),
+    queryKey: qk.list("documents", "entity", type, id),
     enabled: !!id,
+    queryFn: async () =>
+      (await searchDocs({ scope: "all", entityType: type, entityId: id, limit: 100 })).rows,
+  });
+/** Versão vigente de uma cadeia (para seleção fora da página atual). */
+export const useCurrentDocument = (rootId?: string) =>
+  useQuery({
+    queryKey: qk.list("documents", "current", rootId),
+    enabled: !!rootId,
     queryFn: async () => {
-      const links = await run<any[]>(
+      const rows = await run<any[]>(
         db
-          .from("document_links")
-          .select("document_id, documents(*)")
-          .eq("entity_type", type)
-          .eq("entity_id", id),
+          .from("documents")
+          .select("*, document_links(*)")
+          .eq("root_id", rootId)
+          .eq("is_current", true)
+          .eq("status", "ativo")
+          .limit(1),
       );
-      return links.map((l) => l.documents).filter(Boolean);
+      return rows[0] ?? null;
     },
   });
+export const useDocumentLinks = (rootId?: string) =>
+  useQuery({
+    queryKey: qk.list("documents", "links", rootId),
+    enabled: !!rootId,
+    queryFn: async () => {
+      const links = await run<any[]>(
+        db.from("document_links").select("*").eq("document_id", rootId),
+      );
+      const labels = await Promise.all(
+        links.map((l) =>
+          run<string | null>(
+            db.rpc("doc_entity_label", { _type: l.entity_type, _id: l.entity_id }),
+          ).catch(() => null),
+        ),
+      );
+      return links.map((l, i) => ({ type: l.entity_type, id: l.entity_id, label: labels[i] }));
+    },
+  });
+export const useDocumentVersions = (rootId?: string) =>
+  useQuery({
+    queryKey: qk.list("documents", "versions", rootId),
+    enabled: !!rootId,
+    queryFn: () =>
+      run<any[]>(
+        db
+          .from("documents")
+          .select("*")
+          .eq("root_id", rootId)
+          .eq("status", "ativo")
+          .order("version", { ascending: false }),
+      ),
+  });
+export const updateDocumentMeta = (v: {
+  rootId: string;
+  title: string;
+  description: string;
+  category: string;
+}) =>
+  api.rpc("update_document_meta", {
+    p_root_id: v.rootId,
+    p_title: v.title,
+    p_description: v.description,
+    p_category: v.category,
+  });
+export const linkDocument = (docId: string, type: string, id: string) =>
+  api.rpc("link_document", { p_doc_id: docId, p_type: type, p_entity_id: id });
+export const unlinkDocument = (docId: string, type: string, id: string) =>
+  api.rpc("unlink_document", { p_doc_id: docId, p_type: type, p_entity_id: id });
 
 export const useProfiles = () =>
   useList("profiles", () => db.from("profiles").select("*").order("full_name"));
