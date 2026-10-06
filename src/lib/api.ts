@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { errMsg } from "./format";
+import { validateDocFile } from "./documents";
 
 const db = supabase as any;
 
@@ -505,45 +506,123 @@ export const api = {
 };
 
 // ---------- Arquivos ----------
+// Envio em duas fases: o banco reserva o registro pendente e define o caminho; o arquivo é
+// enviado ao armazenamento; só então o banco confere o objeto e ativa o documento.
+// Em falha antes da ativação, o envio é compensado (objeto e registro pendente próprios).
+type Reserved = { id: string; storage_path: string; status: string; version?: number };
+
+function putObject(path: string, file: File, token: string, onProgress?: (p: number) => void) {
+  const base = import.meta.env.VITE_SUPABASE_URL as string;
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+  const url = `${base}/storage/v1/object/documents/${path.split("/").map(encodeURIComponent).join("/")}`;
+  return new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.setRequestHeader("apikey", key);
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    xhr.setRequestHeader("x-upsert", "false");
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress?.(e.loaded / e.total);
+    xhr.onload = () => {
+      // 409/400 "Duplicate" = objeto já enviado numa tentativa anterior do mesmo envio.
+      if (xhr.status < 300 || /Duplicate|already exists/i.test(xhr.responseText)) resolve();
+      else {
+        let msg = `Falha no envio (${xhr.status})`;
+        try {
+          msg = JSON.parse(xhr.responseText).message || msg;
+        } catch {
+          /* resposta não-JSON */
+        }
+        reject(new Error(msg));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Conexão interrompida durante o envio."));
+    xhr.onabort = () => reject(new Error("Envio cancelado."));
+    xhr.send(file);
+  });
+}
+
+async function completeUpload(r: Reserved, file: File, onProgress?: (p: number) => void) {
+  if (r.status === "ativo") return r;
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) throw new Error("Sessão expirada. Entre novamente.");
+  try {
+    await putObject(r.storage_path, file, token, onProgress);
+  } catch (e) {
+    await compensate(r);
+    throw e;
+  }
+  try {
+    await api.rpc("finalize_document_upload", { p_id: r.id });
+  } catch {
+    // Uma nova tentativa de finalização antes de compensar (falha de rede transitória).
+    try {
+      await api.rpc("finalize_document_upload", { p_id: r.id });
+    } catch (e2) {
+      await compensate(r);
+      throw e2;
+    }
+  }
+  return { ...r, status: "ativo" };
+}
+
+async function compensate(r: Reserved) {
+  await supabase.storage.from("documents").remove([r.storage_path]).catch(() => {});
+  await api.rpc("cancel_document_upload", { p_id: r.id }).catch(() => {});
+}
+
 export async function uploadDocument(args: {
   file: File;
   category: string;
   editionId?: string | null;
   links: { type: string; id: string }[];
-  previousId?: string;
-  version?: number;
+  title?: string;
+  description?: string;
+  idempotencyKey?: string;
+  onProgress?: (p: number) => void;
 }) {
-  const { data: u } = await supabase.auth.getUser();
-  const path = `${args.editionId ?? "geral"}/${crypto.randomUUID()}-${args.file.name.replace(/[^\w.-]+/g, "_")}`;
-  const up = await supabase.storage
-    .from("documents")
-    .upload(path, args.file, { contentType: args.file.type });
-  if (up.error) throw up.error;
-  const doc = await api.insert("documents", {
-    edition_id: args.editionId ?? null,
-    name: args.file.name,
-    category: args.category,
-    storage_path: path,
-    mime_type: args.file.type,
-    size_bytes: args.file.size,
-    uploaded_by: u.user?.id,
-    previous_id: args.previousId ?? null,
-    version: args.version ?? 1,
+  const v = validateDocFile(args.file);
+  if (v) throw new Error(v);
+  const r = await api.rpc<Reserved>("begin_document_upload", {
+    p_edition_id: args.editionId ?? null,
+    p_name: args.file.name,
+    p_title: args.title ?? null,
+    p_description: args.description ?? null,
+    p_category: args.category,
+    p_mime: args.file.type || null,
+    p_size: args.file.size,
+    p_links: args.links,
+    p_idempotency_key: args.idempotencyKey ?? crypto.randomUUID(),
   });
-  if (args.links.length) {
-    await run(
-      db
-        .from("document_links")
-        .insert(
-          args.links.map((l) => ({ document_id: doc.id, entity_type: l.type, entity_id: l.id })),
-        ),
-    );
-  }
-  return doc;
+  return completeUpload(r, args.file, args.onProgress);
 }
 
-export async function signedUrl(path: string, seconds = 300) {
-  const { data, error } = await supabase.storage.from("documents").createSignedUrl(path, seconds);
+export async function uploadDocumentVersion(args: {
+  rootId: string;
+  expectedVersion: number;
+  file: File;
+  idempotencyKey?: string;
+  onProgress?: (p: number) => void;
+}) {
+  const v = validateDocFile(args.file);
+  if (v) throw new Error(v);
+  const r = await api.rpc<Reserved>("begin_document_version", {
+    p_root_id: args.rootId,
+    p_expected_version: args.expectedVersion,
+    p_name: args.file.name,
+    p_mime: args.file.type || null,
+    p_size: args.file.size,
+    p_idempotency_key: args.idempotencyKey ?? crypto.randomUUID(),
+  });
+  return completeUpload(r, args.file, args.onProgress);
+}
+
+/** URL temporária gerada sob demanda; nunca persistida. */
+export async function signedUrl(path: string, seconds = 300, download?: string) {
+  const { data, error } = await supabase.storage
+    .from("documents")
+    .createSignedUrl(path, seconds, download ? { download } : undefined);
   if (error) throw error;
   return data.signedUrl;
 }
