@@ -96,6 +96,7 @@ export type Edition = {
   reservation_hold_days: number | null;
   reservation_expiry_action: string | null;
   contract_template: string | null;
+  timezone: string;
 };
 export function useEdition() {
   return useQuery({
@@ -271,13 +272,52 @@ export const useActivities = () => {
     () =>
       db
         .from("activities")
-        .select("*")
+        .select("*, activity_categories(id,name), activity_assignees(profile_id,is_primary,profiles(id,full_name,email)), activity_commissions(commission_id,commissions(id,name,is_coordinating)), activity_versions(id,version,created_at,actor)")
         .eq("edition_id", ed)
-        .order("due_at", { ascending: true, nullsFirst: false }),
+        .order("start_at", { ascending: true, nullsFirst: false }),
     [ed],
     !!ed,
   );
 };
+
+export const useActivityCategories = () => {
+  const ed = useEditionId();
+  return useList(
+    "activity_categories",
+    () => db.from("activity_categories").select("*").eq("edition_id", ed).order("name"),
+    [ed],
+    !!ed,
+  );
+};
+
+export const useCommissions = () => {
+  const ed = useEditionId();
+  return useList(
+    "commissions",
+    () => db.from("commissions").select("*").eq("edition_id", ed).order("name"),
+    [ed],
+    !!ed,
+  );
+};
+
+export function useAgendaPeople() {
+  return useQuery<any[]>({
+    queryKey: qk.list("agenda_people"),
+    queryFn: async () => {
+      const roles = await run<any[]>(db.from("user_roles").select("user_id,role"));
+      const ids = [...new Set(roles.map((row) => row.user_id))];
+      if (!ids.length) return [];
+      const profiles = await run<any[]>(db.from("profiles").select("id,full_name,email").in("id", ids));
+      return profiles
+        .map((profile) => ({ ...profile, roles: roles.filter((row) => row.user_id === profile.id).map((row) => row.role) }))
+        .sort((a, b) => (a.full_name || a.email || "").localeCompare(b.full_name || b.email || "", "pt-BR"));
+    },
+  });
+}
+
+export const saveActivity = (args: Record<string, unknown>) => api.rpc<string>("save_activity", args);
+export const setActivityStatus = (id: string, status: "aberta" | "concluida" | "cancelada", version: number) =>
+  api.rpc<number>("set_activity_status", { p_activity_id: id, p_status: status, p_expected_version: version });
 
 export const useDocuments = () =>
   useList("documents", () =>
