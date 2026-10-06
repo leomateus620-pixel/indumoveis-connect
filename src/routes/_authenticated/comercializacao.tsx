@@ -11,6 +11,8 @@ import {
   EmptyState,
   Loading,
   Restricted,
+  ErrorBox,
+  NotFoundState,
   NativeSelect,
   FormRow,
   Field,
@@ -29,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { dealGuidance } from "@/lib/journey";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   Dialog,
@@ -86,7 +89,8 @@ function ComercialPage() {
   const can = useCan("comercial");
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/comercializacao" });
-  const { data: deals = [], isLoading } = useDeals();
+  const dq = useDeals();
+  const { data: deals = [], isLoading } = dq;
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<any | null>(null);
   const name = useProfileName();
@@ -152,6 +156,8 @@ function ComercialPage() {
       </FilterBar>
       {isLoading ? (
         <Loading />
+      ) : dq.isError ? (
+        <ErrorBox error={dq.error} onRetry={() => void dq.refetch()} />
       ) : rows.length === 0 ? (
         <EmptyState
           title={deals.length ? "Nenhuma negociação neste filtro" : "Nenhuma negociação registrada"}
@@ -218,7 +224,8 @@ function DealDetail({
   canWrite: boolean;
   onEdit: (d: any) => void;
 }) {
-  const { data: d, isLoading } = useDeal(id);
+  const q = useDeal(id);
+  const { data: d, isLoading } = q;
   const { data: contracts = [] } = useContracts();
   const { data: edition } = useEdition();
   const ctCan = useCan("contratos");
@@ -237,8 +244,15 @@ function DealDetail({
       onSuccess: (cid) => navigate({ to: "/contratos/$id", params: { id: cid } }),
     },
   );
-  if (isLoading || !d) return <Loading />;
+  if (isLoading) return <Loading />;
+  if (q.isError) return <ErrorBox error={q.error} onRetry={() => void q.refetch()} />;
+  if (!d) return <NotFoundState title="Negociação não encontrada" />;
   const contract = contracts.find((c: any) => c.deal_id === id && c.status !== "cancelado");
+  const locked = contract && ["emitido", "assinado"].includes(contract.status);
+  const guide = dealGuidance(d.status, contract);
+  const actions = DEAL_TRANSITIONS[d.status].filter(
+    (s) => s !== "contratada" && !(locked && ["proposta", "negociacao"].includes(s)),
+  );
   const expired =
     d.status === "reservada" &&
     edition?.reservation_hold_days &&
@@ -258,6 +272,26 @@ function DealDetail({
             </span>
           )}
         </div>
+        {(guide.next || guide.pend.length > 0) && (
+          <div className="rounded-md border bg-card p-3 text-sm">
+            {guide.next && (
+              <p>
+                <span className="text-muted-foreground">Próxima ação: </span>
+                <strong>{guide.next}</strong>
+              </p>
+            )}
+            {guide.pend.length > 0 && (
+              <ul className="mt-1 list-inside list-disc text-warning">
+                {guide.pend.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            )}
+            {["perdida", "cancelada"].includes(d.status) && (
+              <p className="text-muted-foreground">Espaços liberados.</p>
+            )}
+          </div>
+        )}
         <dl className="grid grid-cols-2 gap-3">
           <Field label="Razão social">
             <RelatedLink type="company" id={d.company_id}>
@@ -278,7 +312,7 @@ function DealDetail({
         )}
         {canWrite && (
           <div className="flex flex-wrap gap-2">
-            {DEAL_TRANSITIONS[d.status].map((s) => (
+            {actions.map((s) => (
               <Button
                 key={s}
                 size="sm"
@@ -294,7 +328,7 @@ function DealDetail({
                       : `Mover para ${DEAL_STATUS[s].label.toLowerCase()}`}
               </Button>
             ))}
-            {!["contratada", "perdida", "cancelada"].includes(d.status) && (
+            {!locked && !["contratada", "perdida", "cancelada"].includes(d.status) && (
               <Button size="sm" variant="outline" onClick={() => onEdit(d)}>
                 Editar
               </Button>
@@ -396,6 +430,11 @@ function DealDetail({
         title={to ? `Confirmar: ${DEAL_STATUS[to].label}` : ""}
         label={to && ["perdida", "cancelada"].includes(to) ? "Motivo" : "Observação"}
         required={!!to && ["perdida", "cancelada"].includes(to)}
+        hint={
+          to && ["perdida", "cancelada"].includes(to)
+            ? "Os espaços serão liberados e o contrato ativo será cancelado. Parcelas sem pagamento são canceladas; pagamentos recebidos são mantidos."
+            : undefined
+        }
         onConfirm={(note) => tr.mutate({ to: to!, note })}
       />
     </>

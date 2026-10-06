@@ -200,7 +200,7 @@ export const useDeal = (id?: string) =>
   );
 
 const CONTRACT_SELECT =
-  "*, companies(id, trade_name, legal_name, tax_id), contract_spaces(space_id, spaces(id, code, area_m2)), deals(id, status, conditions)";
+  "*, companies(id, trade_name, legal_name, tax_id), contract_spaces(space_id, spaces(id, code, area_m2)), deals(id, status, conditions, company_id, total_cents, deal_spaces(space_id, price_cents))";
 export const useContracts = () => {
   const ed = useEditionId();
   return useList(
@@ -231,7 +231,7 @@ export const useInstallments = (enabled = true) => {
     () =>
       db
         .from("installments")
-        .select("*, payments(*), contracts(id, number, company_id, companies(trade_name))")
+        .select("*, payments(*), contracts(id, number, status, company_id, companies(trade_name))")
         .eq("edition_id", ed)
         .order("due_date"),
     [ed],

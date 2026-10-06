@@ -7,6 +7,8 @@ import {
   Section,
   Field,
   Loading,
+  ErrorBox,
+  NotFoundState,
   Restricted,
   StatusBadge,
   AttachedDocuments,
@@ -47,7 +49,8 @@ function CompanyPage() {
   const can = useCan("empresas");
   const com = useCan("comercial");
   const docsCan = useCan("documentos");
-  const { data: c, isLoading } = useCompany(id);
+  const cq = useCompany(id);
+  const { data: c, isLoading } = cq;
   const { data: deals = [] } = useDeals();
   const { data: contracts = [] } = useContracts();
   const [edit, setEdit] = useState(false);
@@ -57,7 +60,18 @@ function CompanyPage() {
   });
   if (!can.read) return <Restricted />;
   if (isLoading) return <Loading />;
-  if (!c) return <p className="p-8">Empresa não encontrada.</p>;
+  if (cq.isError) return <ErrorBox error={cq.error} onRetry={() => void cq.refetch()} />;
+  if (!c)
+    return (
+      <NotFoundState
+        title="Empresa não encontrada"
+        back={
+          <Link to="/empresas" className="text-sm font-semibold text-primary">
+            Voltar para empresas
+          </Link>
+        }
+      />
+    );
   const myDeals = deals.filter((d: any) => d.company_id === id);
   const myContracts = contracts.filter((x: any) => x.company_id === id);
   const spaces = myDeals
@@ -98,6 +112,32 @@ function CompanyPage() {
           </>
         }
       />
+      <dl className="grid grid-cols-2 gap-px border-b bg-border text-sm lg:grid-cols-4">
+        {(
+          [
+            [
+              "Negociações ativas",
+              myDeals.filter((d: any) => ["proposta", "negociacao", "reservada"].includes(d.status))
+                .length,
+            ],
+            ["Espaços vinculados", spaces.length],
+            ["Contratos ativos", myContracts.filter((x: any) => x.status !== "cancelado").length],
+            [
+              "Valor contratado",
+              brl(
+                myContracts
+                  .filter((x: any) => x.status !== "cancelado")
+                  .reduce((a: number, x: any) => a + Number(x.total_cents), 0),
+              ),
+            ],
+          ] as [string, string | number][]
+        ).map(([k, v]) => (
+          <div key={k} className="bg-card px-4 py-2.5 md:px-6">
+            <dt className="text-xs text-muted-foreground">{k} · edição ativa</dt>
+            <dd className="tnum font-semibold">{v}</dd>
+          </div>
+        ))}
+      </dl>
       <Tabs defaultValue="dados" className="min-w-0 p-4 md:p-6 xl:p-8">
         <TabsList className="flex h-auto max-w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="dados">Dados</TabsTrigger>

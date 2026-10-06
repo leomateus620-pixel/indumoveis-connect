@@ -152,15 +152,49 @@ export function Loading() {
     </div>
   );
 }
-export function ErrorBox({ error }: { error: unknown }) {
+export function ErrorBox({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
   return (
     <div
       role="alert"
-      className="m-4 rounded-md border border-destructive/30 bg-danger-soft p-4 text-sm text-destructive md:m-6"
+      className="m-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/30 bg-danger-soft p-4 text-sm text-destructive md:m-6"
     >
-      Não foi possível carregar: {errMsg(error)}
+      <span>Não foi possível carregar: {errMsg(error)}</span>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="min-h-9 rounded-md border border-destructive/40 bg-card px-3 font-semibold hover:bg-background"
+        >
+          Tentar novamente
+        </button>
+      )}
     </div>
   );
+}
+
+export function NotFoundState({ title, back }: { title: string; back?: ReactNode }) {
+  return (
+    <div className="m-4 rounded-md border bg-card p-5 text-sm md:m-6">
+      <p className="font-semibold">{title}</p>
+      <p className="text-muted-foreground">
+        O registro não existe, foi removido ou não está visível para o seu perfil.
+      </p>
+      {back && <div className="mt-3">{back}</div>}
+    </div>
+  );
+}
+
+/** Estado de uma consulta: carregando, erro com nova tentativa, ou conteúdo. */
+export function QueryState({
+  q,
+  children,
+}: {
+  q: { isLoading: boolean; isError: boolean; error: unknown; refetch: () => unknown };
+  children: ReactNode;
+}) {
+  if (q.isLoading) return <Loading />;
+  if (q.isError) return <ErrorBox error={q.error} onRetry={() => void q.refetch()} />;
+  return <>{children}</>;
 }
 
 export function Section({
