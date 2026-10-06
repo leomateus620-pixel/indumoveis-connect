@@ -510,7 +510,7 @@ function TimelineRow({
                 {activity.location}
               </span>
             )}
-            {(activity?.activity_assignees?.length ?? 0) > 0 && (
+            {activity && (activity.activity_assignees?.length ?? 0) > 0 && (
               <span className="inline-flex items-center gap-1">
                 <Users className="size-3" />
                 {activity.activity_assignees
@@ -588,21 +588,23 @@ function Dashboard({
   return (
     <div className="space-y-8 px-4 py-5 md:px-6 xl:px-8">
       <section className="grid gap-px border bg-border sm:grid-cols-2 xl:grid-cols-5">
-        {[
+        {(
+          [
           ["Próximas", metrics.upcoming, { status: "aberta" }],
           ["Abertas", metrics.open, { status: "aberta" }],
           ["Atrasadas", metrics.overdue, { status: "aberta" }],
           ["Concluídas", metrics.completed, { status: "concluida" }],
           ["Sem data", metrics.unscheduled, { status: "aberta" }],
-        ].map(([label, value, patch]) => (
+          ] as [string, number, Partial<Search>][]
+        ).map(([label, value, patch]) => (
           <button
             key={String(label)}
             type="button"
-            onClick={() => onFilter(patch as Partial<Search>)}
+            onClick={() => onFilter(patch)}
             className="bg-card p-4 text-left transition-colors hover:bg-accent"
           >
             <span className="text-xs font-medium text-muted-foreground">{label}</span>
-            <strong className="tnum mt-1 block text-2xl">{value as number}</strong>
+            <strong className="tnum mt-1 block text-2xl">{value}</strong>
           </button>
         ))}
       </section>
