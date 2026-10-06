@@ -25,7 +25,11 @@ describe("documentos", () => {
     expect(currentVersion(rows)?.version).toBe(2);
   });
   it("exige leitura de todas as origens vinculadas", () => {
-    const perms = { documentos: { read: true }, contratos: { read: true }, financeiro: { read: false } };
+    const perms = {
+      documentos: { read: true },
+      contratos: { read: true },
+      financeiro: { read: false },
+    };
     expect(canReadDocument(perms, [])).toBe(true);
     expect(canReadDocument(perms, ["contract"])).toBe(true);
     expect(canReadDocument(perms, ["contract", "installment"])).toBe(false);

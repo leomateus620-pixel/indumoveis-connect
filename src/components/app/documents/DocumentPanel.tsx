@@ -2,7 +2,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Download, ExternalLink, History, Link2, Loader2, RefreshCw, Upload } from "lucide-react";
 import { toast } from "sonner";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +37,11 @@ import { DocIcon, LinkChips, LinkPicker } from "./common";
  *  Nunca renderiza HTML/SVG enviado. Em falha (ex.: link expirado), gera nova URL uma vez. */
 function useDocBlob(path?: string, name?: string, mime?: string | null) {
   const mode = name ? previewMode(name, mime) : "none";
-  const [state, setState] = useState<{ url?: string; status: "idle" | "loading" | "ok" | "expired" | "error"; error?: string }>({ status: "idle" });
+  const [state, setState] = useState<{
+    url?: string;
+    status: "idle" | "loading" | "ok" | "expired" | "error";
+    error?: string;
+  }>({ status: "idle" });
   const [nonce, setNonce] = useState(0);
   useEffect(() => {
     if (!path || mode === "none") return;
@@ -45,10 +55,17 @@ function useDocBlob(path?: string, name?: string, mime?: string | null) {
           const res = await fetch(u);
           if (!res.ok) {
             if (attempt === 0) continue;
-            throw Object.assign(new Error(`HTTP ${res.status}`), { expired: res.status === 400 || res.status === 403 });
+            throw Object.assign(new Error(`HTTP ${res.status}`), {
+              expired: res.status === 400 || res.status === 403,
+            });
           }
           const buf = await res.arrayBuffer();
-          const type = mode === "pdf" ? "application/pdf" : mime?.startsWith("image/") && mime !== "image/svg+xml" ? mime : "image/png";
+          const type =
+            mode === "pdf"
+              ? "application/pdf"
+              : mime?.startsWith("image/") && mime !== "image/svg+xml"
+                ? mime
+                : "image/png";
           objectUrl = URL.createObjectURL(new Blob([buf], { type }));
           if (!cancelled) setState({ status: "ok", url: objectUrl });
           return;
@@ -94,7 +111,10 @@ export function DocumentPanel({
   const d = docQ.data;
   return (
     <Sheet open={!!rootId} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent side="right" className="docs-panel flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-xl">
+      <SheetContent
+        side="right"
+        className="docs-panel flex w-full flex-col gap-0 overflow-y-auto p-0 sm:max-w-xl"
+      >
         {docQ.isLoading ? (
           <Loading />
         ) : docQ.isError ? (
@@ -123,9 +143,12 @@ function PanelBody({ d, tab, onTab }: { d: any; tab?: string; onTab?: (t: string
         <div className="flex items-start gap-3">
           <DocIcon name={d.name} mime={d.mime_type} />
           <div className="min-w-0">
-            <SheetTitle className="font-display text-base leading-tight break-words">{d.title || d.name}</SheetTitle>
+            <SheetTitle className="font-display text-base leading-tight break-words">
+              {d.title || d.name}
+            </SheetTitle>
             <SheetDescription className="mt-0.5 text-xs">
-              {DOC_CATEGORIES[d.category] ?? d.category} · v{d.version} vigente · {fmtDate(d.created_at)} · {name(d.uploaded_by)}
+              {DOC_CATEGORIES[d.category] ?? d.category} · v{d.version} vigente ·{" "}
+              {fmtDate(d.created_at)} · {name(d.uploaded_by)}
             </SheetDescription>
           </div>
         </div>
@@ -195,14 +218,18 @@ function Preview({ d }: { d: any }) {
         <DocIcon name={d.name} mime={d.mime_type} className="size-12" />
         <p className="font-semibold">{d.name}</p>
         <p className="text-muted-foreground">
-          Prévia não disponível para este formato ({fmtBytes(d.size_bytes)}). Use “Baixar” para abrir no seu computador.
+          Prévia não disponível para este formato ({fmtBytes(d.size_bytes)}). Use “Baixar” para
+          abrir no seu computador.
         </p>
       </div>
     );
   if (b.status === "loading" || b.status === "idle") return <Loading />;
   if (b.status === "expired" || b.status === "error")
     return (
-      <div role="alert" className="rounded-md border border-destructive/30 bg-danger-soft p-4 text-sm text-destructive">
+      <div
+        role="alert"
+        className="rounded-md border border-destructive/30 bg-danger-soft p-4 text-sm text-destructive"
+      >
         <p>
           {b.status === "expired"
             ? "O acesso temporário ao arquivo expirou ou foi recusado."
@@ -214,9 +241,17 @@ function Preview({ d }: { d: any }) {
       </div>
     );
   return b.mode === "pdf" ? (
-    <iframe title={`Prévia de ${d.name}`} src={b.url} className="h-[65vh] w-full rounded-md border bg-card" />
+    <iframe
+      title={`Prévia de ${d.name}`}
+      src={b.url}
+      className="h-[65vh] w-full rounded-md border bg-card"
+    />
   ) : (
-    <img src={b.url} alt={d.title || d.name} className="max-h-[65vh] w-full rounded-md border bg-card object-contain" />
+    <img
+      src={b.url}
+      alt={d.title || d.name}
+      className="max-h-[65vh] w-full rounded-md border bg-card object-contain"
+    />
   );
 }
 
@@ -232,16 +267,26 @@ function Details({ d, canWrite }: { d: any; canWrite: boolean }) {
     setDescription(d.description ?? "");
     setCategory(d.category);
   }, [d.id, d.title, d.description, d.category]);
-  const dirty = title !== (d.title ?? "") || description !== (d.description ?? "") || category !== d.category;
-  const save = useDbMutation(() => updateDocumentMeta({ rootId: d.root_id, title, description, category }), {
-    success: "Detalhes salvos",
-  });
-  const link = useDbMutation((l: { type: string; id: string }) => linkDocument(d.id, l.type, l.id), {
-    success: "Vínculo adicionado",
-  });
-  const unlink = useDbMutation((l: { type: string; id: string }) => unlinkDocument(d.id, l.type, l.id), {
-    success: "Vínculo removido (o documento continua na central)",
-  });
+  const dirty =
+    title !== (d.title ?? "") || description !== (d.description ?? "") || category !== d.category;
+  const save = useDbMutation(
+    () => updateDocumentMeta({ rootId: d.root_id, title, description, category }),
+    {
+      success: "Detalhes salvos",
+    },
+  );
+  const link = useDbMutation(
+    (l: { type: string; id: string }) => linkDocument(d.id, l.type, l.id),
+    {
+      success: "Vínculo adicionado",
+    },
+  );
+  const unlink = useDbMutation(
+    (l: { type: string; id: string }) => unlinkDocument(d.id, l.type, l.id),
+    {
+      success: "Vínculo removido (o documento continua na central)",
+    },
+  );
   void qc;
   const links = linksQ.data ?? [];
   return (
@@ -254,14 +299,34 @@ function Details({ d, canWrite }: { d: any; canWrite: boolean }) {
             if (dirty && !save.isPending) save.mutate(undefined);
           }}
         >
-          <FormRow label="Título de exibição" htmlFor="meta-title" hint={`Nome original: ${d.name}`}>
-            <Input id="meta-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={d.name} maxLength={200} />
+          <FormRow
+            label="Título de exibição"
+            htmlFor="meta-title"
+            hint={`Nome original: ${d.name}`}
+          >
+            <Input
+              id="meta-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={d.name}
+              maxLength={200}
+            />
           </FormRow>
           <FormRow label="Descrição" htmlFor="meta-desc">
-            <Textarea id="meta-desc" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={1000} />
+            <Textarea
+              id="meta-desc"
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={1000}
+            />
           </FormRow>
           <FormRow label="Categoria" htmlFor="meta-cat">
-            <NativeSelect id="meta-cat" value={category} onChange={(e) => setCategory(e.target.value)}>
+            <NativeSelect
+              id="meta-cat"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
               {Object.entries(DOC_CATEGORIES).map(([k, v]) => (
                 <option key={k} value={k}>
                   {v}
@@ -283,11 +348,15 @@ function Details({ d, canWrite }: { d: any; canWrite: boolean }) {
         ) : (
           <>
             <ul className="space-y-1">
-              {links.length === 0 && <li className="text-muted-foreground">Documento geral, sem vínculo.</li>}
+              {links.length === 0 && (
+                <li className="text-muted-foreground">Documento geral, sem vínculo.</li>
+              )}
               {links.map((l: any) => (
                 <li key={l.type + l.id} className="flex items-center justify-between gap-2">
                   <span className="min-w-0 truncate">
-                    <span className="text-xs font-semibold text-muted-foreground">{DOC_LINK_LABEL[l.type]} · </span>
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {DOC_LINK_LABEL[l.type]} ·{" "}
+                    </span>
                     <RelatedLink type={l.type} id={l.id}>
                       {l.label ?? "Abrir origem"}
                     </RelatedLink>
@@ -297,7 +366,10 @@ function Details({ d, canWrite }: { d: any; canWrite: boolean }) {
                       size="sm"
                       variant="ghost"
                       disabled={unlink.isPending}
-                      onClick={() => confirm("Remover este vínculo? O documento não será excluído.") && unlink.mutate(l)}
+                      onClick={() =>
+                        confirm("Remover este vínculo? O documento não será excluído.") &&
+                        unlink.mutate(l)
+                      }
                     >
                       Remover
                     </Button>
@@ -340,7 +412,12 @@ function Versions({ d, canWrite }: { d: any; canWrite: boolean }) {
     setError(null);
     setProgress(0);
     try {
-      await uploadDocumentVersion({ rootId: d.root_id, expectedVersion: d.version, file, onProgress: setProgress });
+      await uploadDocumentVersion({
+        rootId: d.root_id,
+        expectedVersion: d.version,
+        file,
+        onProgress: setProgress,
+      });
       await qc.invalidateQueries({ queryKey: ["db"] });
       toast.success(`Versão ${d.version + 1} enviada`);
     } catch (e) {
@@ -371,9 +448,18 @@ function Versions({ d, canWrite }: { d: any; canWrite: boolean }) {
           <p className="mt-1 text-xs text-muted-foreground">
             Vínculos, título e categoria são mantidos. A versão anterior é preservada.
           </p>
-          {progress !== null && <Progress className="mt-2" value={Math.round(progress * 100)} aria-label="Progresso da nova versão" />}
+          {progress !== null && (
+            <Progress
+              className="mt-2"
+              value={Math.round(progress * 100)}
+              aria-label="Progresso da nova versão"
+            />
+          )}
           {error && (
-            <p role="alert" className="mt-2 rounded-md border border-destructive/30 bg-danger-soft p-3 text-destructive">
+            <p
+              role="alert"
+              className="mt-2 rounded-md border border-destructive/30 bg-danger-soft p-3 text-destructive"
+            >
               Não foi salvo: {error}
             </p>
           )}
@@ -391,13 +477,23 @@ function Versions({ d, canWrite }: { d: any; canWrite: boolean }) {
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">
                   v{v.version}{" "}
-                  {v.is_current && <span className="docs-current ml-1 rounded px-1.5 py-0.5 text-[11px] font-bold">Vigente</span>}
+                  {v.is_current && (
+                    <span className="docs-current ml-1 rounded px-1.5 py-0.5 text-[11px] font-bold">
+                      Vigente
+                    </span>
+                  )}
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {v.name} · {fmtBytes(v.size_bytes)} · {fmtDate(v.created_at)} · {name(v.uploaded_by)}
+                  {v.name} · {fmtBytes(v.size_bytes)} · {fmtDate(v.created_at)} ·{" "}
+                  {name(v.uploaded_by)}
                 </p>
               </div>
-              <Button size="sm" variant="ghost" aria-label={`Baixar versão ${v.version}`} onClick={() => openFresh(v.storage_path, v.name)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                aria-label={`Baixar versão ${v.version}`}
+                onClick={() => openFresh(v.storage_path, v.name)}
+              >
                 <Download className="size-4" />
               </Button>
             </li>

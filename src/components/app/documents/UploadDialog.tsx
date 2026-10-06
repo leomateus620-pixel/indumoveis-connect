@@ -101,11 +101,16 @@ export function UploadDialog({
         <DialogHeader>
           <DialogTitle className="font-display">Enviar documento</DialogTitle>
           <DialogDescription>
-            Até 25 MB · PDF, imagens, Office, DWG, ZIP, TXT ou CSV. O arquivo fica no armazenamento privado.
+            Até 25 MB · PDF, imagens, Office, DWG, ZIP, TXT ou CSV. O arquivo fica no armazenamento
+            privado.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
-          <FormRow label="Arquivo" htmlFor="doc-file" hint={file ? `${file.name} · ${fmtBytes(file.size)}` : undefined}>
+          <FormRow
+            label="Arquivo"
+            htmlFor="doc-file"
+            hint={file ? `${file.name} · ${fmtBytes(file.size)}` : undefined}
+          >
             <Input
               id="doc-file"
               type="file"
@@ -115,11 +120,21 @@ export function UploadDialog({
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               aria-invalid={!!fileError}
             />
-            {fileError && <p className="text-xs text-destructive" role="alert">{fileError}</p>}
+            {fileError && (
+              <p className="text-xs text-destructive" role="alert">
+                {fileError}
+              </p>
+            )}
           </FormRow>
           <div className="grid gap-4 sm:grid-cols-2">
             <FormRow label="Categoria" htmlFor="doc-cat">
-              <NativeSelect id="doc-cat" value={category} onChange={(e) => setCategory(e.target.value)} required disabled={busy}>
+              <NativeSelect
+                id="doc-cat"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+                disabled={busy}
+              >
                 {Object.entries(DOC_CATEGORIES).map(([k, v]) => (
                   <option key={k} value={k}>
                     {v}
@@ -139,32 +154,69 @@ export function UploadDialog({
               </NativeSelect>
             </FormRow>
           </div>
-          <FormRow label="Título de exibição (opcional)" htmlFor="doc-title" hint="O nome original do arquivo é preservado.">
-            <Input id="doc-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} disabled={busy} />
+          <FormRow
+            label="Título de exibição (opcional)"
+            htmlFor="doc-title"
+            hint="O nome original do arquivo é preservado."
+          >
+            <Input
+              id="doc-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={200}
+              disabled={busy}
+            />
           </FormRow>
           <FormRow label="Descrição (opcional)" htmlFor="doc-desc">
-            <Textarea id="doc-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} maxLength={1000} disabled={busy} />
+            <Textarea
+              id="doc-desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              maxLength={1000}
+              disabled={busy}
+            />
           </FormRow>
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium">Vínculos</legend>
-            <LinkChips value={links} locked={locked} onRemove={(l) => setLinks((p) => p.filter((x) => x.type + x.id !== l.type + l.id))} />
-            {!busy && <LinkPicker id="doc-link" selected={links} onAdd={(l) => setLinks((p) => [...p, l])} />}
+            <LinkChips
+              value={links}
+              locked={locked}
+              onRemove={(l) => setLinks((p) => p.filter((x) => x.type + x.id !== l.type + l.id))}
+            />
+            {!busy && (
+              <LinkPicker
+                id="doc-link"
+                selected={links}
+                onAdd={(l) => setLinks((p) => [...p, l])}
+              />
+            )}
           </fieldset>
           {progress !== null && (
             <div className="space-y-1" aria-live="polite">
               <Progress value={Math.round(progress * 100)} aria-label="Progresso do envio" />
               <p className="text-xs text-muted-foreground">
-                {progress < 1 ? `Enviando… ${Math.round(progress * 100)}%` : "Conferindo e registrando…"}
+                {progress < 1
+                  ? `Enviando… ${Math.round(progress * 100)}%`
+                  : "Conferindo e registrando…"}
               </p>
             </div>
           )}
           {error && (
-            <p role="alert" className="rounded-md border border-destructive/30 bg-danger-soft p-3 text-sm text-destructive">
+            <p
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-danger-soft p-3 text-sm text-destructive"
+            >
               Não foi salvo: {error}. Nada ficou pela metade — você pode tentar novamente.
             </p>
           )}
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={busy}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={!file || !!fileError || busy}>

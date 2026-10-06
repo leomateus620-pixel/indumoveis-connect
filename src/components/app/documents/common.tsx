@@ -62,7 +62,11 @@ export function DocIcon({
   return (
     <span
       aria-hidden
-      className={cn("docs-icon inline-flex size-9 shrink-0 items-center justify-center rounded-md", TONE[k], className)}
+      className={cn(
+        "docs-icon inline-flex size-9 shrink-0 items-center justify-center rounded-md",
+        TONE[k],
+        className,
+      )}
     >
       <I className="size-4" />
     </span>
@@ -85,7 +89,9 @@ export function useLinkTargets(): { options: LinkTarget[]; isLoading: boolean } 
   const options = useMemo(() => {
     const o: LinkTarget[] = [];
     if (can("company"))
-      (companies.data ?? []).forEach((c: any) => o.push({ type: "company", id: c.id, label: c.trade_name }));
+      (companies.data ?? []).forEach((c: any) =>
+        o.push({ type: "company", id: c.id, label: c.trade_name }),
+      );
     if (can("deal"))
       (deals.data ?? []).forEach((d: any) =>
         o.push({ type: "deal", id: d.id, label: `Negociação · ${d.companies?.trade_name ?? "—"}` }),
@@ -99,7 +105,9 @@ export function useLinkTargets(): { options: LinkTarget[]; isLoading: boolean } 
         }),
       );
     if (can("space"))
-      (spaces.data ?? []).forEach((s: any) => o.push({ type: "space", id: s.id, label: `Espaço ${s.code}` }));
+      (spaces.data ?? []).forEach((s: any) =>
+        o.push({ type: "space", id: s.id, label: `Espaço ${s.code}` }),
+      );
     if (can("inspection"))
       (inspections.data ?? []).forEach((i: any) =>
         o.push({ type: "inspection", id: i.id, label: `Vistoria · ${i.spaces?.code ?? ""}` }),
@@ -113,9 +121,20 @@ export function useLinkTargets(): { options: LinkTarget[]; isLoading: boolean } 
         }),
       );
     if (can("activity"))
-      (activities.data ?? []).forEach((a: any) => o.push({ type: "activity", id: a.id, label: a.title }));
+      (activities.data ?? []).forEach((a: any) =>
+        o.push({ type: "activity", id: a.id, label: a.title }),
+      );
     return o;
-  }, [me, companies.data, deals.data, contracts.data, spaces.data, inspections.data, installments.data, activities.data]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    me,
+    companies.data,
+    deals.data,
+    contracts.data,
+    spaces.data,
+    inspections.data,
+    installments.data,
+    activities.data,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
   return { options, isLoading: companies.isLoading || deals.isLoading || contracts.isLoading };
 }
 
@@ -128,12 +147,18 @@ export function LinkChips({
   onRemove?: (l: LinkTarget) => void;
   locked?: string[];
 }) {
-  if (!value.length) return <p className="text-xs text-muted-foreground">Sem vínculos (documento geral).</p>;
+  if (!value.length)
+    return <p className="text-xs text-muted-foreground">Sem vínculos (documento geral).</p>;
   return (
     <ul className="flex flex-wrap gap-1.5">
       {value.map((l) => (
-        <li key={l.type + l.id} className="docs-chip inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs">
-          <span className="font-semibold text-muted-foreground">{DOC_LINK_LABEL[l.type] ?? l.type}</span>
+        <li
+          key={l.type + l.id}
+          className="docs-chip inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs"
+        >
+          <span className="font-semibold text-muted-foreground">
+            {DOC_LINK_LABEL[l.type] ?? l.type}
+          </span>
           <span className="max-w-48 truncate">{l.label ?? "registro sem acesso"}</span>
           {onRemove && !locked.includes(l.type + l.id) && (
             <button
@@ -184,7 +209,12 @@ export function LinkPicker({
           placeholder="Buscar empresa, contrato, espaço, atividade…"
           aria-label="Buscar registro para vincular"
         />
-        <NativeSelect className="sm:w-40" aria-label="Tipo de registro" value={type} onChange={(e) => setType(e.target.value)}>
+        <NativeSelect
+          className="sm:w-40"
+          aria-label="Tipo de registro"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+        >
           <option value="">Todos os tipos</option>
           {types.map((t) => (
             <option key={t} value={t}>
@@ -211,7 +241,9 @@ export function LinkPicker({
                   className="flex min-h-10 w-full items-center gap-2 px-3 text-left hover:bg-accent focus-visible:bg-accent focus-visible:outline-none"
                 >
                   <Plus className="size-3.5 text-muted-foreground" />
-                  <span className="text-xs font-semibold text-muted-foreground">{DOC_LINK_LABEL[o.type]}</span>
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {DOC_LINK_LABEL[o.type]}
+                  </span>
                   <span className="truncate">{o.label}</span>
                 </button>
               </li>

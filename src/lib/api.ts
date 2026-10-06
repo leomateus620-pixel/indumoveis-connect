@@ -568,7 +568,10 @@ async function completeUpload(r: Reserved, file: File, onProgress?: (p: number) 
 }
 
 async function compensate(r: Reserved) {
-  await supabase.storage.from("documents").remove([r.storage_path]).catch(() => {});
+  await supabase.storage
+    .from("documents")
+    .remove([r.storage_path])
+    .catch(() => {});
   await api.rpc("cancel_document_upload", { p_id: r.id }).catch(() => {});
 }
 

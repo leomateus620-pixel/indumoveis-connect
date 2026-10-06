@@ -52,7 +52,8 @@ export function validateDocFile(file: { name: string; size: number }): string | 
   return null;
 }
 
-export type DocKind = "pdf" | "image" | "sheet" | "doc" | "slides" | "cad" | "archive" | "text" | "other";
+export type DocKind =
+  "pdf" | "image" | "sheet" | "doc" | "slides" | "cad" | "archive" | "text" | "other";
 export function docKind(name: string, mime?: string | null): DocKind {
   const e = fileExt(name);
   if (e === "pdf") return "pdf";
@@ -81,20 +82,15 @@ export function fmtBytes(n?: number | null) {
 }
 
 /** Versão vigente de uma cadeia: a ativa marcada como atual (ou a de maior número). */
-export function currentVersion<T extends { version: number; is_current?: boolean; status?: string }>(
-  rows: T[],
-): T | undefined {
+export function currentVersion<
+  T extends { version: number; is_current?: boolean; status?: string },
+>(rows: T[]): T | undefined {
   const active = rows.filter((r) => (r.status ?? "ativo") === "ativo");
-  return (
-    active.find((r) => r.is_current) ?? [...active].sort((a, b) => b.version - a.version)[0]
-  );
+  return active.find((r) => r.is_current) ?? [...active].sort((a, b) => b.version - a.version)[0];
 }
 
 /** Um documento só pode ser lido por quem lê Documentos e TODAS as origens vinculadas. */
-export function canReadDocument(
-  perms: Record<string, { read: boolean }>,
-  linkTypes: string[],
-) {
+export function canReadDocument(perms: Record<string, { read: boolean }>, linkTypes: string[]) {
   if (!perms.documentos?.read) return false;
   return linkTypes.every((t) => !!perms[DOC_LINK_MODULE[t]]?.read);
 }

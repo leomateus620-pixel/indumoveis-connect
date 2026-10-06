@@ -60,7 +60,8 @@ export function AttachedDocuments({
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium">{d.display_name}</span>
                   <span className="block truncate text-xs text-muted-foreground">
-                    v{d.version} vigente · {DOC_CATEGORIES[d.category] ?? d.category} · {fmtDate(d.created_at)}
+                    v{d.version} vigente · {DOC_CATEGORIES[d.category] ?? d.category} ·{" "}
+                    {fmtDate(d.created_at)}
                   </span>
                 </span>
               </button>
@@ -87,7 +88,13 @@ export function AttachedDocuments({
           ...extraLinks.map((l) => ({ ...l, label: l.label ?? DOC_LINK_LABEL[l.type] })),
         ]}
       />
-      <AttachExisting open={attach} onOpenChange={setAttach} entityType={entityType} entityId={entityId} taken={docs.map((d: any) => d.root_id)} />
+      <AttachExisting
+        open={attach}
+        onOpenChange={setAttach}
+        entityType={entityType}
+        entityId={entityId}
+        taken={docs.map((d: any) => d.root_id)}
+      />
       <DocumentPanel rootId={open} onClose={() => setOpen(undefined)} />
     </div>
   );
@@ -118,18 +125,32 @@ function AttachExisting({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-display">Associar documento existente</DialogTitle>
-          <DialogDescription>O mesmo arquivo passa a aparecer aqui e na central, sem novo envio.</DialogDescription>
+          <DialogDescription>
+            O mesmo arquivo passa a aparecer aqui e na central, sem novo envio.
+          </DialogDescription>
         </DialogHeader>
         <div className="relative">
-          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-          <Input className="pl-9" autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por título, arquivo ou registro" aria-label="Buscar documento" />
+          <Search
+            className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <Input
+            className="pl-9"
+            autoFocus
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Buscar por título, arquivo ou registro"
+            aria-label="Buscar documento"
+          />
         </div>
         {res.isError ? (
           <ErrorBox error={res.error} onRetry={() => void res.refetch()} />
         ) : (
           <ul className="max-h-72 divide-y overflow-auto rounded-md border text-sm">
             {res.isLoading && <li className="p-3 text-muted-foreground">Buscando…</li>}
-            {!res.isLoading && rows.length === 0 && <li className="p-3 text-muted-foreground">Nenhum documento disponível.</li>}
+            {!res.isLoading && rows.length === 0 && (
+              <li className="p-3 text-muted-foreground">Nenhum documento disponível.</li>
+            )}
             {rows.map((d: any) => (
               <li key={d.id}>
                 <button
