@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type ReactNode, useRef, useState } from "react";
+import { type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { FileUp, Loader2, Lock, Paperclip, Search, ExternalLink, ChevronRight } from "lucide-react";
+import { Loader2, Lock, Search, ExternalLink, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { fmtDate, DOC_CATEGORIES, errMsg } from "@/lib/format";
+import { errMsg } from "@/lib/format";
 import { signedUrl } from "@/lib/api";
 import { toast } from "sonner";
 
