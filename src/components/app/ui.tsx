@@ -6,13 +6,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { fmtDate, DOC_CATEGORIES, errMsg } from "@/lib/format";
-import {
-  signedUrl,
-  uploadDocument,
-  useEntityDocuments,
-  useEditionId,
-  useDbMutation,
-} from "@/lib/api";
+import { signedUrl } from "@/lib/api";
 import { toast } from "sonner";
 
 export function PageHeader({
@@ -391,90 +385,6 @@ export function Stat({
 }
 
 /** Lista de documentos vinculados a um registro + anexar. Usa o mesmo arquivo da central. */
-export function AttachedDocuments({
-  entityType,
-  entityId,
-  category,
-  canWrite,
-  extraLinks = [],
-}: {
-  entityType: string;
-  entityId: string;
-  category: string;
-  canWrite: boolean;
-  extraLinks?: { type: string; id: string }[];
-}) {
-  const { data: docs = [], isLoading } = useEntityDocuments(entityType, entityId);
-  const edition = useEditionId();
-  const ref = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
-  const m = useDbMutation(
-    (file: File) =>
-      uploadDocument({
-        file,
-        category,
-        editionId: edition,
-        links: [{ type: entityType, id: entityId }, ...extraLinks],
-      }),
-    { success: "Arquivo anexado" },
-  );
-  return (
-    <div>
-      {isLoading ? (
-        <p className="text-sm text-muted-foreground">Carregando…</p>
-      ) : docs.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nenhum arquivo vinculado.</p>
-      ) : (
-        <ul className="divide-y text-sm">
-          {docs.map((d: any) => (
-            <li key={d.id} className="flex items-center justify-between gap-2 py-2">
-              <div className="flex min-w-0 items-center gap-2">
-                <Paperclip className="size-4 shrink-0 text-muted-foreground" />
-                <span className="truncate">{d.name}</span>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  v{d.version} · {DOC_CATEGORIES[d.category] ?? d.category} ·{" "}
-                  {fmtDate(d.created_at)}
-                </span>
-              </div>
-              <OpenDoc path={d.storage_path} />
-            </li>
-          ))}
-        </ul>
-      )}
-      {canWrite && (
-        <>
-          <input
-            ref={ref}
-            type="file"
-            className="hidden"
-            onChange={async (e) => {
-              const f = e.target.files?.[0];
-              if (!f) return;
-              setBusy(true);
-              try {
-                await m.mutateAsync(f);
-              } finally {
-                setBusy(false);
-                e.target.value = "";
-              }
-            }}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3"
-            disabled={busy}
-            onClick={() => ref.current?.click()}
-          >
-            {busy ? <Loader2 className="size-4 animate-spin" /> : <FileUp className="size-4" />}{" "}
-            Anexar arquivo
-          </Button>
-        </>
-      )}
-    </div>
-  );
-}
-
 export function OpenDoc({ path }: { path: string }) {
   return (
     <Button

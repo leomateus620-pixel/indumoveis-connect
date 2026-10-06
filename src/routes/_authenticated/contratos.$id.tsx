@@ -9,7 +9,6 @@ import {
   Loading,
   Restricted,
   StatusBadge,
-  AttachedDocuments,
   Pending,
   FormRow,
   ErrorBox,
@@ -21,6 +20,7 @@ import {
   useProfileName,
   RelatedActivities,
 } from "@/components/app/shared";
+import { AttachedDocuments } from "@/components/app/documents/AttachedDocuments";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
