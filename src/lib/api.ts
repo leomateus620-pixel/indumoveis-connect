@@ -240,7 +240,7 @@ export const useInstallments = (enabled = true) => {
   );
 };
 
-export const useInspections = () => {
+export const useInspections = (enabled = true) => {
   const ed = useEditionId();
   return useList(
     "inspections",
@@ -251,7 +251,7 @@ export const useInspections = () => {
         .eq("edition_id", ed)
         .order("scheduled_for", { ascending: true }),
     [ed],
-    !!ed,
+    !!ed && enabled,
   );
 };
 export const useInspection = (id?: string) =>

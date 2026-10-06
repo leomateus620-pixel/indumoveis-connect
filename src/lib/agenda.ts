@@ -197,3 +197,18 @@ export function agendaMetrics(items: AgendaItem[], today: string) {
     unscheduled: open.filter((item) => !item.date).length,
   };
 }
+
+export function groupAgendaItemsByDate(items: AgendaItem[]) {
+  return items.reduce<Record<string, AgendaItem[]>>((groups, item) => {
+    if (!item.date) return groups;
+    (groups[item.date] ??= []).push(item);
+    return groups;
+  }, {});
+}
+
+export function groupAgendaItemsAcrossDays(items: AgendaItem[]) {
+  return items.reduce<Record<string, AgendaItem[]>>((groups, item) => {
+    for (const date of daysForItem(item)) (groups[date] ??= []).push(item);
+    return groups;
+  }, {});
+}
