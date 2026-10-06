@@ -149,7 +149,9 @@ export function ConfirmNoteDialog({
   required,
   onConfirm,
   busy,
+  hint,
 }: {
+  hint?: string;
   open: boolean;
   onOpenChange: (o: boolean) => void;
   title: string;
@@ -171,6 +173,7 @@ export function ConfirmNoteDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
+        {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
         <FormRow label={label + (required ? " *" : "")} htmlFor="cnote">
           <Textarea
             id="cnote"

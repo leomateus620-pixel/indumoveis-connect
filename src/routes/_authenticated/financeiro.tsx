@@ -14,7 +14,9 @@ import {
   FormRow,
   AttachedDocuments,
   Section,
+  ErrorBox,
 } from "@/components/app/ui";
+import { financeSummary, needsReview, paidOf } from "@/lib/journey";
 import { RelatedLink } from "@/components/app/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,8 +26,9 @@ import { brl, fmtDate, today, toCents, centsToInput, fmtDateTime } from "@/lib/f
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/financeiro")({
-  validateSearch: (s: Record<string, unknown>): { view?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { view?: string; contract?: string } => ({
     view: typeof s.view === "string" ? s.view : undefined,
+    contract: typeof s.contract === "string" ? s.contract : undefined,
   }),
   head: () => ({
     meta: [
@@ -40,15 +43,17 @@ export const Route = createFileRoute("/_authenticated/financeiro")({
   component: FinanceiroPage,
 });
 
-const paidOf = (i: any) =>
-  (i.payments ?? []).reduce((a: number, p: any) => a + Number(p.amount_cents), 0);
 
 function FinanceiroPage() {
   const can = useCan("financeiro");
-  const { view } = Route.useSearch();
+  const { view, contract } = Route.useSearch();
   const navigate = useNavigate({ from: "/financeiro" });
-  const { data: inst = [], isLoading } = useInstallments(can.read);
-  const { data: contracts = [] } = useContracts();
+  const iq = useInstallments(can.read);
+  const { data: allInst = [], isLoading } = iq;
+  const { data: allContracts = [] } = useContracts();
+  const inst = contract ? allInst.filter((i: any) => i.contract_id === contract) : allInst;
+  const contracts = contract ? allContracts.filter((c: any) => c.id === contract) : allContracts;
+  const contractRow = allContracts.find((c: any) => c.id === contract);
   const [q, setQ] = useState("");
   const [sel, setSel] = useState<string | null>(null);
   const t = today();
@@ -76,16 +81,12 @@ function FinanceiroPage() {
           i.contracts?.number?.includes(q)
         );
       }),
-    [inst, view, q],
+    [inst, view, q], // eslint-disable-line react-hooks/exhaustive-deps
   ); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Total negociado por contrato (uma vez por contrato, independentemente do nº de espaços)
   const activeContracts = contracts.filter((c: any) => c.status !== "cancelado");
-  const contracted = activeContracts.reduce((a: number, c: any) => a + Number(c.total_cents), 0);
-  const forecast = inst
-    .filter((i: any) => i.status !== "cancelada")
-    .reduce((a: number, i: any) => a + Number(i.amount_cents), 0);
-  const received = inst.reduce((a: number, i: any) => a + paidOf(i), 0);
+  const { contracted, forecast, received, open } = financeSummary(contracts, inst);
   const overdue = inst
     .filter((i: any) => status(i) === "Vencida")
     .reduce((a: number, i: any) => a + Number(i.amount_cents) - paidOf(i), 0);
@@ -110,12 +111,12 @@ function FinanceiroPage() {
           hint={`${activeContracts.length} contratos ativos`}
         />
         <Stat
-          label="A receber (parcelas)"
-          value={brl(forecast - received)}
-          hint={`de ${brl(forecast)} lançados`}
+          label="Previsto em parcelas"
+          value={brl(forecast)}
+          hint={`${brl(Math.max(0, contracted - forecast))} ainda sem parcelas`}
         />
-        <Stat label="Recebido" value={brl(received)} />
-        <Stat label="Vencido" value={brl(overdue)} />
+        <Stat label="Recebido" value={brl(received)} hint="inclui contratos cancelados" />
+        <Stat label="Saldo em aberto" value={brl(open)} hint={`${brl(overdue)} vencido`} />
       </div>
       {noInst.length > 0 && (
         <p className="mx-4 mt-3 border-l-2 border-warning bg-warning-soft px-3 py-2 text-sm text-warning md:mx-6 xl:mx-8">
@@ -131,12 +132,26 @@ function FinanceiroPage() {
         </p>
       )}
       <FilterBar>
+        {contract && (
+          <span className="inline-flex min-h-9 items-center gap-2 rounded-md border bg-card px-3 text-sm">
+            Contrato <strong className="tnum">{contractRow?.number ?? "…"}</strong>
+            <button
+              type="button"
+              className="text-xs font-semibold text-primary"
+              onClick={() => navigate({ to: ".", search: (p) => ({ ...p, contract: undefined }) })}
+            >
+              Limpar
+            </button>
+          </span>
+        )}
         <SearchInput value={q} onChange={setQ} placeholder="Empresa ou contrato" />
         <NativeSelect
           className="sm:w-44"
           aria-label="Visão"
           value={view ?? ""}
-          onChange={(e) => navigate({ to: ".", search: { view: e.target.value || undefined } })}
+          onChange={(e) =>
+            navigate({ to: ".", search: (p) => ({ ...p, view: e.target.value || undefined }) })
+          }
         >
           <option value="">Todas as parcelas</option>
           <option value="abertas">Em aberto</option>
@@ -146,8 +161,13 @@ function FinanceiroPage() {
       </FilterBar>
       {isLoading ? (
         <Loading />
+      ) : iq.isError ? (
+        <ErrorBox error={iq.error} onRetry={() => void iq.refetch()} />
       ) : rows.length === 0 ? (
-        <EmptyState title="Nenhuma parcela" text="Parcelas são geradas a partir do contrato." />
+        <EmptyState
+          title={inst.length ? "Nenhuma parcela neste filtro" : "Nenhuma parcela lançada"}
+          text="Parcelas são geradas no contrato, depois da emissão."
+        />
       ) : (
         <DataList
           rows={rows}
@@ -187,6 +207,12 @@ function FinanceiroPage() {
               header: "Situação",
               cell: (i: any) => {
                 const s = status(i);
+                if (needsReview(i))
+                  return (
+                    <span className="text-xs font-semibold text-warning">
+                      {s} · Revisar (contrato cancelado)
+                    </span>
+                  );
                 return (
                   <span
                     className={cn(

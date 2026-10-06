@@ -14,6 +14,8 @@
 - Authorization lives in the database: RLS uses `can_read/can_write(module)` driven by `user_roles` + `role_permissions`; UI checks via `useCan` are only cosmetic.
 - Multi-step operations (deal+spaces, transitions, contract creation/versions/status, installments, payments, inspections) are SECURITY DEFINER SQL functions that re-check permissions — guarantees atomicity and server-side conflict checks.
 - Space commercial status is derived (`space_status_v`) from deals, never stored — map, dashboard and lists can't diverge.
+- Deal/contract/installment reconciliation (signature→contracted, cancellation cascade, unpaid-installment cancellation, edit locks, version checks) lives only in the SQL transition functions; the client mirrors rules in `src/lib/journey.ts` for display only — one write path, no divergent states.
+- Contracts store a `deal_snapshot` taken at preparation/refresh; divergence is computed by comparing it with the live deal — emitted/signed text is never rewritten.
 - Files are stored once in the private `documents` bucket; modules link them via `document_links` (polymorphic entity_type/entity_id) — the central and modules show the same file.
 - Agenda merges activities with dates already stored in inspections/installments instead of copying them.
 - Every edition-scoped table carries `edition_id`; the active edition comes from `editions.is_active`, never hardcoded dates.

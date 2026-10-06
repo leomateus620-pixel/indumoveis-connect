@@ -338,6 +338,7 @@ export type Database = {
           created_by: string | null
           current_version: number
           deal_id: string
+          deal_snapshot: Json | null
           edition_id: string
           id: string
           issued_at: string | null
@@ -355,6 +356,7 @@ export type Database = {
           created_by?: string | null
           current_version?: number
           deal_id: string
+          deal_snapshot?: Json | null
           edition_id: string
           id?: string
           issued_at?: string | null
@@ -372,6 +374,7 @@ export type Database = {
           created_by?: string | null
           current_version?: number
           deal_id?: string
+          deal_snapshot?: Json | null
           edition_id?: string
           id?: string
           issued_at?: string | null
@@ -1149,6 +1152,7 @@ export type Database = {
         }
         Returns: string
       }
+      deal_snapshot: { Args: { p_deal_id: string }; Returns: Json }
       ensure_profile: { Args: never; Returns: Json }
       generate_installments: {
         Args: {
@@ -1171,6 +1175,14 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      reconcile_contract_cancellation: {
+        Args: { p_contract_id: string }
+        Returns: undefined
+      }
+      refresh_contract_from_deal: {
+        Args: { p_contract_id: string; p_expected_version: number }
+        Returns: undefined
+      }
       register_payment: {
         Args: {
           p_amount_cents: number
@@ -1183,7 +1195,11 @@ export type Database = {
         Returns: string
       }
       save_contract_body: {
-        Args: { p_body: string; p_contract_id: string }
+        Args: {
+          p_body: string
+          p_contract_id: string
+          p_expected_version: number
+        }
         Returns: number
       }
       save_deal: {

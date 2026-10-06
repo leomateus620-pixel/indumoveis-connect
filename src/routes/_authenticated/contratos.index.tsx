@@ -8,6 +8,7 @@ import {
   DataList,
   EmptyState,
   Loading,
+  ErrorBox,
   Restricted,
   StatusBadge,
   NativeSelect,
@@ -31,7 +32,8 @@ export const Route = createFileRoute("/_authenticated/contratos/")({
 
 function ContratosPage() {
   const can = useCan("contratos");
-  const { data = [], isLoading } = useContracts();
+  const lq = useContracts();
+  const { data = [], isLoading } = lq;
   const [q, setQ] = useState("");
   const [st, setSt] = useState("");
   const navigate = useNavigate();
@@ -71,6 +73,8 @@ function ContratosPage() {
       </FilterBar>
       {isLoading ? (
         <Loading />
+      ) : lq.isError ? (
+        <ErrorBox error={lq.error} onRetry={() => void lq.refetch()} />
       ) : rows.length === 0 ? (
         <EmptyState
           title="Nenhum contrato"

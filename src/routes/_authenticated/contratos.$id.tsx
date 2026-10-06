@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import {
   PageHeader,
@@ -12,6 +12,8 @@ import {
   AttachedDocuments,
   Pending,
   FormRow,
+  ErrorBox,
+  NotFoundState,
 } from "@/components/app/ui";
 import {
   ConfirmNoteDialog,
@@ -46,6 +48,7 @@ import {
   fmtDateTime,
   today,
 } from "@/lib/format";
+import { snapshotDiff, snapshotOfDeal, splitInstallments } from "@/lib/journey";
 
 export const Route = createFileRoute("/_authenticated/contratos/$id")({
   head: () => ({
@@ -64,7 +67,7 @@ export const Route = createFileRoute("/_authenticated/contratos/$id")({
 const LABEL: Record<string, string> = {
   emitido: "Emitir documento",
   elaboracao: "Voltar para elaboração",
-  assinado: "Registrar assinatura",
+  assinado: "Registrar assinatura e concluir contratação",
   cancelado: "Cancelar contrato",
 };
 
@@ -72,7 +75,8 @@ function ContractPage() {
   const { id } = Route.useParams();
   const can = useCan("contratos");
   const fin = useCan("financeiro");
-  const { data: c, isLoading } = useContract(id);
+  const cq = useContract(id);
+  const { data: c, isLoading } = cq;
   const { data: inst = [] } = useInstallments(fin.read);
   const { data: files = [] } = useEntityDocuments("contract", id);
   const name = useProfileName();
@@ -83,7 +87,12 @@ function ContractPage() {
     if (c) setBody(c.body ?? "");
   }, [c?.id, c?.current_version]); // eslint-disable-line react-hooks/exhaustive-deps
   const save = useDbMutation(
-    () => api.rpc("save_contract_body", { p_contract_id: id, p_body: body }),
+    () =>
+      api.rpc("save_contract_body", {
+        p_contract_id: id,
+        p_body: body,
+        p_expected_version: c?.current_version,
+      }),
     { success: "Nova versão salva" },
   );
   const tr = useDbMutation(
@@ -91,11 +100,35 @@ function ContractPage() {
       api.rpc("set_contract_status", { p_contract_id: id, p_to: v.to, p_note: v.note }),
     { success: "Situação atualizada", onSuccess: () => setTo(null) },
   );
+  const refresh = useDbMutation(
+    () =>
+      api.rpc("refresh_contract_from_deal", {
+        p_contract_id: id,
+        p_expected_version: c?.current_version,
+      }),
+    { success: "Dados atualizados a partir da negociação" },
+  );
   if (!can.read) return <Restricted />;
   if (isLoading) return <Loading />;
-  if (!c) return <p className="p-8">Contrato não encontrado.</p>;
+  if (cq.isError) return <ErrorBox error={cq.error} onRetry={() => void cq.refetch()} />;
+  if (!c)
+    return (
+      <NotFoundState
+        title="Contrato não encontrado"
+        back={
+          <Link to="/contratos" className="text-sm font-semibold text-primary">
+            Voltar para contratos
+          </Link>
+        }
+      />
+    );
   const myInst = inst.filter((i: any) => i.contract_id === id);
   const dirty = body !== (c.body ?? "");
+  const diff =
+    c.deals && c.status !== "cancelado"
+      ? snapshotDiff(c.deal_snapshot, snapshotOfDeal(c.deals))
+      : [];
+  const canGenerate = ["emitido", "assinado"].includes(c.status);
 
   return (
     <>
@@ -115,6 +148,46 @@ function ContractPage() {
           </>
         }
       />
+      <dl className="grid gap-px border-b bg-border text-sm sm:grid-cols-2 lg:grid-cols-5">
+        {(
+          [
+            ["Origem", <RelatedLink key="o" type="deal" id={c.deal_id}>Abrir negociação</RelatedLink>],
+            ["Empresa", <RelatedLink key="e" type="company" id={c.company_id}>{c.companies?.trade_name}</RelatedLink>],
+            ["Espaços", c.contract_spaces?.map((x: any) => x.spaces?.code).join(", ") || "—"],
+            ["Valor", <span key="v" className="tnum font-semibold">{brl(c.total_cents)}</span>],
+            ["Versão", <span key="ve" className="tnum">v{c.current_version}</span>],
+          ] as [string, ReactNode][]
+        ).map(([k, v]) => (
+          <div key={k} className="min-w-0 bg-card px-4 py-2.5 md:px-6">
+            <dt className="text-xs text-muted-foreground">{k}</dt>
+            <dd className="truncate">{v}</dd>
+          </div>
+        ))}
+      </dl>
+      {diff.length > 0 && (
+        <div
+          role="status"
+          className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-3 border-l-2 border-warning bg-warning-soft px-3 py-2 text-sm text-warning md:mx-6 xl:mx-8"
+        >
+          <span>
+            A negociação mudou depois da preparação deste contrato:{" "}
+            <strong>{diff.join(", ")}</strong>.{" "}
+            {c.status === "elaboracao"
+              ? "Atualize os dados antes de emitir."
+              : "O documento emitido/assinado não é alterado; volte para elaboração para revisar."}
+          </span>
+          {c.status === "elaboracao" && can.write && (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={refresh.isPending || dirty}
+              onClick={() => refresh.mutate(undefined)}
+            >
+              Atualizar a partir da negociação
+            </Button>
+          )}
+        </div>
+      )}
       <div className="grid min-w-0 gap-6 p-4 md:p-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:p-8">
         <div className="min-w-0 space-y-5">
           <Section title="Revisão dos dados">
@@ -215,7 +288,7 @@ function ContractPage() {
                   <Button
                     key={s}
                     variant={s === "cancelado" || s === "elaboracao" ? "outline" : "default"}
-                    disabled={dirty}
+                    disabled={dirty || (s === "emitido" && diff.length > 0)}
                     onClick={() => setTo(s)}
                   >
                     {LABEL[s]}
@@ -224,6 +297,15 @@ function ContractPage() {
                 {dirty && (
                   <p className="text-xs text-warning">Salve o texto antes de mudar a situação.</p>
                 )}
+                {diff.length > 0 && c.status === "elaboracao" && (
+                  <p className="text-xs text-warning">
+                    Atualize os dados divergentes antes de emitir.
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Cancelar libera os espaços e cancela parcelas sem pagamento. Pagamentos recebidos
+                  são mantidos.
+                </p>
                 {c.status === "emitido" && (
                   <p className="text-xs text-muted-foreground">
                     Anexar o arquivo assinado não registra a assinatura automaticamente.
@@ -252,7 +334,7 @@ function ContractPage() {
               actions={
                 fin.write &&
                 myInst.length === 0 &&
-                c.status !== "cancelado" && (
+                canGenerate && (
                   <Button size="sm" variant="outline" onClick={() => setGen(true)}>
                     Gerar parcelas
                   </Button>
@@ -260,7 +342,11 @@ function ContractPage() {
               }
             >
               {myInst.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Nenhuma parcela lançada.</p>
+                <p className="text-sm text-muted-foreground">
+                  {canGenerate || c.status === "cancelado"
+                    ? "Nenhuma parcela lançada."
+                    : "Parcelas podem ser geradas depois da emissão do contrato."}
+                </p>
               ) : (
                 <ul className="divide-y text-sm">
                   {myInst.map((i: any) => (
@@ -270,6 +356,7 @@ function ContractPage() {
                       </span>
                       <span>
                         {brl(i.amount_cents)} · {i.status}
+                        {c.status === "cancelado" && i.status !== "cancelada" && " · revisar"}
                       </span>
                     </li>
                   ))}
@@ -277,9 +364,10 @@ function ContractPage() {
               )}
               <Link
                 to="/financeiro"
+                search={{ contract: id }}
                 className="mt-2 inline-block text-xs font-semibold text-primary"
               >
-                Abrir financeiro
+                Ver no Financeiro
               </Link>
             </Section>
           )}
@@ -310,9 +398,18 @@ function ContractPage() {
         label={
           to === "assinado"
             ? "Como a assinatura foi obtida (ex.: assinatura física em 12/03, via digitalizada anexada)"
-            : "Observação"
+            : to === "cancelado"
+              ? "Motivo do cancelamento"
+              : "Observação"
         }
-        required={to === "assinado"}
+        required={to === "assinado" || to === "cancelado"}
+        hint={
+          to === "assinado"
+            ? "A negociação passa a contratada na mesma operação."
+            : to === "cancelado"
+              ? "A negociação é cancelada e os espaços liberados. Parcelas sem pagamento são canceladas; pagamentos recebidos são mantidos, sem devolução automática."
+              : undefined
+        }
         onConfirm={(note) => tr.mutate({ to: to!, note })}
       />
       <GenerateDialog open={gen} onOpenChange={setGen} contractId={id} total={c.total_cents} />
@@ -334,6 +431,9 @@ function GenerateDialog({
   const [n, setN] = useState(1);
   const [first, setFirst] = useState(today());
   const [interval, setInterval] = useState(1);
+  const preview =
+    first && interval >= 1 && interval <= 12 ? splitInstallments(total, n, first, interval) : [];
+  const sum = preview.reduce((a, p) => a + p.amount_cents, 0);
   const m = useDbMutation(
     () =>
       api.rpc("generate_installments", {
@@ -379,9 +479,46 @@ function GenerateDialog({
             />
           </FormRow>
         </div>
+        {preview.length > 0 ? (
+          <div className="max-h-56 overflow-y-auto rounded-md border text-sm">
+            <table className="w-full tnum">
+              <thead className="bg-muted text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-1.5 text-left">Parcela</th>
+                  <th className="px-3 py-1.5 text-left">Vencimento</th>
+                  <th className="px-3 py-1.5 text-right">Valor</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {preview.map((p) => (
+                  <tr key={p.number}>
+                    <td className="px-3 py-1.5">{p.number}ª</td>
+                    <td className="px-3 py-1.5">{fmtDate(p.due_date)}</td>
+                    <td className="px-3 py-1.5 text-right">{brl(p.amount_cents)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="border-t font-semibold">
+                <tr>
+                  <td className="px-3 py-1.5" colSpan={2}>
+                    Soma
+                  </td>
+                  <td className="px-3 py-1.5 text-right">{brl(sum)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        ) : (
+          <p className="text-sm text-destructive">
+            Informe de 1 a 36 parcelas, a data e um intervalo de 1 a 12 meses.
+          </p>
+        )}
         <DialogFooter>
-          <Button disabled={m.isPending} onClick={() => m.mutate(undefined)}>
-            Gerar
+          <Button
+            disabled={m.isPending || preview.length === 0 || sum !== total}
+            onClick={() => m.mutate(undefined)}
+          >
+            Confirmar {preview.length} parcela(s)
           </Button>
         </DialogFooter>
       </DialogContent>

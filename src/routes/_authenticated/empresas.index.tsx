@@ -9,6 +9,7 @@ import {
   DataList,
   EmptyState,
   Loading,
+  ErrorBox,
   Restricted,
 } from "@/components/app/ui";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,8 @@ export const Route = createFileRoute("/_authenticated/empresas/")({
 
 function EmpresasPage() {
   const can = useCan("empresas");
-  const { data = [], isLoading } = useCompanies();
+  const lq = useCompanies();
+  const { data = [], isLoading } = lq;
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -66,6 +68,8 @@ function EmpresasPage() {
       </FilterBar>
       {isLoading ? (
         <Loading />
+      ) : lq.isError ? (
+        <ErrorBox error={lq.error} onRetry={() => void lq.refetch()} />
       ) : rows.length === 0 ? (
         <EmptyState
           title={data.length ? "Nenhuma empresa encontrada" : "Nenhuma empresa cadastrada"}
