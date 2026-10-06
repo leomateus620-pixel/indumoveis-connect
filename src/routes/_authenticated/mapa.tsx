@@ -545,7 +545,7 @@ function PlanUpload() {
       <input
         ref={ref}
         type="file"
-        accept="image/*"
+        accept=".jpg,.jpeg,.png,.webp"
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];

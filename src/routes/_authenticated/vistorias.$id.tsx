@@ -434,7 +434,7 @@ function Photos({
           <input
             ref={ref}
             type="file"
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.webp"
             capture="environment"
             multiple
             className="hidden"
