@@ -704,12 +704,7 @@ function Calendar({
     return d.toISOString().slice(0, 10);
   });
   const byDay = groupAgendaItemsAcrossDays(items);
-  const selectedDay =
-    day && day.startsWith(month)
-      ? day
-      : today.startsWith(month)
-        ? today
-        : `${month}-01`;
+  const selectedDay = day && day.startsWith(month) ? day : today.startsWith(month) ? today : `${month}-01`;
   const selectedRows = byDay[selectedDay] ?? [];
   return (
     <div className="grid gap-5 px-4 py-5 lg:grid-cols-[minmax(0,1fr)_20rem] md:px-6 xl:px-8">
