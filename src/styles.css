@@ -156,3 +156,15 @@
     transition-duration: 0.01ms;
   }
 }
+
+/* Central de Documentos — tokens locais (não afetam outros módulos) */
+.docs-icon { border: 1px solid color-mix(in oklch, currentColor 18%, transparent); }
+.docs-tone-red { color: var(--brand-red); background: color-mix(in oklch, var(--brand-red) 9%, var(--card)); }
+.docs-tone-plum { color: var(--brand-plum); background: var(--plum-soft); }
+.docs-tone-taupe { color: color-mix(in oklch, var(--brand-taupe) 70%, var(--foreground)); background: color-mix(in oklch, var(--brand-taupe) 12%, var(--card)); }
+.docs-tone-green { color: oklch(0.45 0.09 150); background: oklch(0.95 0.03 150); }
+.docs-chip { background: var(--card); border-color: color-mix(in oklch, var(--brand-plum) 20%, var(--border)); }
+.docs-current { color: var(--card); background: var(--brand-plum); }
+.docs-surface { background: color-mix(in oklch, var(--brand-taupe) 6%, var(--card)); }
+.docs-nav-item[aria-current="true"] { color: var(--brand-plum); border-color: var(--brand-red); background: var(--plum-soft); }
+.docs-row[aria-selected="true"] { background: var(--plum-soft); box-shadow: inset 3px 0 0 var(--brand-red); }
