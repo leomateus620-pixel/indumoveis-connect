@@ -1,0 +1,1 @@
+grant execute on function public.validate_activity_reference(uuid,text,uuid) to authenticated;
