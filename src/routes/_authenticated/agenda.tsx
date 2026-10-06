@@ -26,6 +26,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActivityDialog } from "@/components/app/ActivityDialog";
 import { RelatedLink, RELATED_LABEL } from "@/components/app/shared";
+import { AttachedDocuments } from "@/components/app/documents/AttachedDocuments";
 import {
   EmptyState,
   ErrorBox,
@@ -845,6 +846,16 @@ function ActivityDetails({
               Abrir {RELATED_LABEL[activity.related_type] ?? "origem"}
             </RelatedLink>
           )}
+          <section className="space-y-2 border-t pt-4">
+            <h3 className="text-xs font-medium text-muted-foreground">Documentos</h3>
+            <AttachedDocuments
+              entityType="activity"
+              entityId={activity.id}
+              entityLabel={activity.title}
+              category="geral"
+              canWrite={canWrite}
+            />
+          </section>
           {canWrite && (
             <div className="flex flex-wrap gap-2 border-t pt-4">
               <Button onClick={onEdit}>Editar</Button>

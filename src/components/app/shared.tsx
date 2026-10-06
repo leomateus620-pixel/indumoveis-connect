@@ -67,6 +67,12 @@ export function RelatedLink({
           {children}
         </Link>
       );
+    case "activity":
+      return (
+        <Link to="/agenda" search={{ activity: id }} className={cls}>
+          {children}
+        </Link>
+      );
     case "installment":
       return (
         <Link to="/financeiro" className={cls}>

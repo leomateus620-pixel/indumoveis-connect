@@ -11,11 +11,11 @@ import {
   NotFoundState,
   Restricted,
   StatusBadge,
-  AttachedDocuments,
   FormRow,
 } from "@/components/app/ui";
 import { RelatedActivities, RelatedLink } from "@/components/app/shared";
 import { CompanyDialog } from "@/components/app/CompanyDialog";
+import { AttachedDocuments } from "@/components/app/documents/AttachedDocuments";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";

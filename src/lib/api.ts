@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { errMsg } from "./format";
+import { mimeFor, validateDocFile } from "./documents";
 
 const db = supabase as any;
 
@@ -338,25 +339,129 @@ export const setActivityStatus = (
     p_expected_version: version,
   });
 
-export const useDocuments = () =>
-  useList("documents", () =>
-    db.from("documents").select("*, document_links(*)").order("created_at", { ascending: false }),
+// ---------- Documentos ----------
+export type DocSearch = {
+  scope: "edition" | "general" | "all";
+  editionId?: string | null;
+  q?: string;
+  category?: string;
+  collection?: "all" | "recent" | "unlinked";
+  linkType?: string;
+  uploader?: string;
+  from?: string;
+  to?: string;
+  sort?: "recent" | "name" | "category";
+  limit?: number;
+  offset?: number;
+  entityType?: string;
+  entityId?: string;
+};
+export type DocSearchResult = {
+  rows: any[];
+  total: number;
+  facets: { all: number; recent: number; unlinked: number; categories: Record<string, number> };
+};
+function searchDocs(p: DocSearch) {
+  return run<DocSearchResult>(
+    db.rpc("search_documents", {
+      p_scope: p.scope,
+      p_edition_id: p.editionId ?? null,
+      p_q: p.q || null,
+      p_category: p.category || null,
+      p_collection: p.collection || "all",
+      p_link_type: p.linkType || null,
+      p_uploader: p.uploader || null,
+      p_from: p.from || null,
+      p_to: p.to || null,
+      p_sort: p.sort || "recent",
+      p_limit: p.limit ?? 25,
+      p_offset: p.offset ?? 0,
+      p_entity_type: p.entityType ?? null,
+      p_entity_id: p.entityId ?? null,
+    }),
   );
+}
+export const useDocumentSearch = (p: DocSearch, enabled = true) =>
+  useQuery({
+    queryKey: qk.list("documents", p),
+    queryFn: () => searchDocs(p),
+    enabled: enabled && (p.scope !== "edition" || !!p.editionId),
+    placeholderData: (prev) => prev,
+  });
+/** Anexos de um registro: somente a versão vigente de cada documento (mesma regra da central). */
 export const useEntityDocuments = (type: string, id?: string) =>
   useQuery({
-    queryKey: qk.list("entity_docs", type, id),
+    queryKey: qk.list("documents", "entity", type, id),
     enabled: !!id,
+    queryFn: async () =>
+      (await searchDocs({ scope: "all", entityType: type, entityId: id, limit: 100 })).rows,
+  });
+/** Versão vigente de uma cadeia (para seleção fora da página atual). */
+export const useCurrentDocument = (rootId?: string) =>
+  useQuery({
+    queryKey: qk.list("documents", "current", rootId),
+    enabled: !!rootId,
     queryFn: async () => {
-      const links = await run<any[]>(
+      const rows = await run<any[]>(
         db
-          .from("document_links")
-          .select("document_id, documents(*)")
-          .eq("entity_type", type)
-          .eq("entity_id", id),
+          .from("documents")
+          .select("*, document_links(*)")
+          .eq("root_id", rootId)
+          .eq("is_current", true)
+          .eq("status", "ativo")
+          .limit(1),
       );
-      return links.map((l) => l.documents).filter(Boolean);
+      return rows[0] ?? null;
     },
   });
+export const useDocumentLinks = (rootId?: string) =>
+  useQuery({
+    queryKey: qk.list("documents", "links", rootId),
+    enabled: !!rootId,
+    queryFn: async () => {
+      const links = await run<any[]>(
+        db.from("document_links").select("*").eq("document_id", rootId),
+      );
+      const labels = await Promise.all(
+        links.map((l) =>
+          run<string | null>(
+            db.rpc("doc_entity_label", { _type: l.entity_type, _id: l.entity_id }),
+          ).catch(() => null),
+        ),
+      );
+      return links.map((l, i) => ({ type: l.entity_type, id: l.entity_id, label: labels[i] }));
+    },
+  });
+export const useDocumentVersions = (rootId?: string) =>
+  useQuery({
+    queryKey: qk.list("documents", "versions", rootId),
+    enabled: !!rootId,
+    queryFn: () =>
+      run<any[]>(
+        db
+          .from("documents")
+          .select("*")
+          .eq("root_id", rootId)
+          .eq("status", "ativo")
+          .order("version", { ascending: false }),
+      ),
+  });
+export const updateDocumentMeta = (v: {
+  rootId: string;
+  title: string;
+  description: string;
+  category: string;
+}) =>
+  api.rpc("update_document_meta", {
+    p_root_id: v.rootId,
+    p_title: v.title,
+    p_description: v.description,
+    p_category: v.category,
+  });
+export const linkDocument = (docId: string, type: string, id: string) =>
+  api.rpc("link_document", { p_doc_id: docId, p_type: type, p_entity_id: id });
+export const unlinkDocument = (docId: string, type: string, id: string) =>
+  api.rpc("unlink_document", { p_doc_id: docId, p_type: type, p_entity_id: id });
 
 export const useProfiles = () =>
   useList("profiles", () => db.from("profiles").select("*").order("full_name"));
@@ -401,45 +506,126 @@ export const api = {
 };
 
 // ---------- Arquivos ----------
+// Envio em duas fases: o banco reserva o registro pendente e define o caminho; o arquivo é
+// enviado ao armazenamento; só então o banco confere o objeto e ativa o documento.
+// Em falha antes da ativação, o envio é compensado (objeto e registro pendente próprios).
+type Reserved = { id: string; storage_path: string; status: string; version?: number };
+
+function putObject(path: string, file: File, token: string, onProgress?: (p: number) => void) {
+  const base = import.meta.env.VITE_SUPABASE_URL as string;
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+  const url = `${base}/storage/v1/object/documents/${path.split("/").map(encodeURIComponent).join("/")}`;
+  return new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.setRequestHeader("apikey", key);
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.setRequestHeader("Content-Type", mimeFor(file.name));
+    xhr.setRequestHeader("x-upsert", "false");
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress?.(e.loaded / e.total);
+    xhr.onload = () => {
+      // 409/400 "Duplicate" = objeto já enviado numa tentativa anterior do mesmo envio.
+      if (xhr.status < 300 || /Duplicate|already exists/i.test(xhr.responseText)) resolve();
+      else {
+        let msg = `Falha no envio (${xhr.status})`;
+        try {
+          msg = JSON.parse(xhr.responseText).message || msg;
+        } catch {
+          /* resposta não-JSON */
+        }
+        reject(new Error(msg));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Conexão interrompida durante o envio."));
+    xhr.onabort = () => reject(new Error("Envio cancelado."));
+    xhr.send(file);
+  });
+}
+
+async function completeUpload(r: Reserved, file: File, onProgress?: (p: number) => void) {
+  if (r.status === "ativo") return r;
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) throw new Error("Sessão expirada. Entre novamente.");
+  try {
+    await putObject(r.storage_path, file, token, onProgress);
+  } catch (e) {
+    await compensate(r);
+    throw e;
+  }
+  try {
+    await api.rpc("finalize_document_upload", { p_id: r.id });
+  } catch {
+    // Uma nova tentativa de finalização antes de compensar (falha de rede transitória).
+    try {
+      await api.rpc("finalize_document_upload", { p_id: r.id });
+    } catch (e2) {
+      await compensate(r);
+      throw e2;
+    }
+  }
+  return { ...r, status: "ativo" };
+}
+
+async function compensate(r: Reserved) {
+  await supabase.storage
+    .from("documents")
+    .remove([r.storage_path])
+    .catch(() => {});
+  await api.rpc("cancel_document_upload", { p_id: r.id }).catch(() => {});
+}
+
 export async function uploadDocument(args: {
   file: File;
   category: string;
   editionId?: string | null;
   links: { type: string; id: string }[];
-  previousId?: string;
-  version?: number;
+  title?: string;
+  description?: string;
+  idempotencyKey?: string;
+  onProgress?: (p: number) => void;
 }) {
-  const { data: u } = await supabase.auth.getUser();
-  const path = `${args.editionId ?? "geral"}/${crypto.randomUUID()}-${args.file.name.replace(/[^\w.-]+/g, "_")}`;
-  const up = await supabase.storage
-    .from("documents")
-    .upload(path, args.file, { contentType: args.file.type });
-  if (up.error) throw up.error;
-  const doc = await api.insert("documents", {
-    edition_id: args.editionId ?? null,
-    name: args.file.name,
-    category: args.category,
-    storage_path: path,
-    mime_type: args.file.type,
-    size_bytes: args.file.size,
-    uploaded_by: u.user?.id,
-    previous_id: args.previousId ?? null,
-    version: args.version ?? 1,
+  const v = validateDocFile(args.file);
+  if (v) throw new Error(v);
+  const r = await api.rpc<Reserved>("begin_document_upload", {
+    p_edition_id: args.editionId ?? null,
+    p_name: args.file.name,
+    p_title: args.title ?? null,
+    p_description: args.description ?? null,
+    p_category: args.category,
+    p_mime: mimeFor(args.file.name),
+    p_size: args.file.size,
+    p_links: args.links,
+    p_idempotency_key: args.idempotencyKey ?? crypto.randomUUID(),
   });
-  if (args.links.length) {
-    await run(
-      db
-        .from("document_links")
-        .insert(
-          args.links.map((l) => ({ document_id: doc.id, entity_type: l.type, entity_id: l.id })),
-        ),
-    );
-  }
-  return doc;
+  return completeUpload(r, args.file, args.onProgress);
 }
 
-export async function signedUrl(path: string, seconds = 300) {
-  const { data, error } = await supabase.storage.from("documents").createSignedUrl(path, seconds);
+export async function uploadDocumentVersion(args: {
+  rootId: string;
+  expectedVersion: number;
+  file: File;
+  idempotencyKey?: string;
+  onProgress?: (p: number) => void;
+}) {
+  const v = validateDocFile(args.file);
+  if (v) throw new Error(v);
+  const r = await api.rpc<Reserved>("begin_document_version", {
+    p_root_id: args.rootId,
+    p_expected_version: args.expectedVersion,
+    p_name: args.file.name,
+    p_mime: mimeFor(args.file.name),
+    p_size: args.file.size,
+    p_idempotency_key: args.idempotencyKey ?? crypto.randomUUID(),
+  });
+  return completeUpload(r, args.file, args.onProgress);
+}
+
+/** URL temporária gerada sob demanda; nunca persistida. */
+export async function signedUrl(path: string, seconds = 300, download?: string) {
+  const { data, error } = await supabase.storage
+    .from("documents")
+    .createSignedUrl(path, seconds, download ? { download } : undefined);
   if (error) throw error;
   return data.signedUrl;
 }

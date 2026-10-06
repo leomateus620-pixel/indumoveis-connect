@@ -19,7 +19,9 @@
 - Space commercial status is derived (`space_status_v`) from deals, never stored — map, dashboard and lists can't diverge.
 - Deal/contract/installment reconciliation (signature→contracted, cancellation cascade, unpaid-installment cancellation, edit locks, version checks) lives only in the SQL transition functions; the client mirrors rules in `src/lib/journey.ts` for display only — one write path, no divergent states.
 - Contracts store a `deal_snapshot` taken at preparation/refresh; divergence is computed by comparing it with the live deal — emitted/signed text is never rewritten.
-- Files are stored once in the private `documents` bucket; modules link them via `document_links` (polymorphic entity_type/entity_id) — the central and modules show the same file.
+- Files are stored once in the private `documents` bucket; links live on the chain's root document (`document_links`, polymorphic incl. `activity`) so every version shares them — the central and modules show the same file.
+- Document access requires reading Documentos AND every linked source module (`can_read_document`), applied equally to rows, links and Storage objects — a less restricted link can never expose a sensitive file.
+- Document uploads are two-phase (`begin_document_upload`/`begin_document_version` → Storage → `finalize_document_upload`, with own-pending compensation) and the next version number is computed and locked server-side — no orphans, no client-side versioning.
 - Agenda merges activities with dates already stored in inspections/installments instead of copying them.
 - Agenda uses `activities.start_at` as its canonical timestamp in the edition timezone; `due_at` is a synchronized compatibility field, while inspection and installment dates remain civil dates in their source tables.
 - Activity content, assignees, commissions, status, version history, and catalog maintenance are persisted through atomic database functions with permission and concurrency checks.

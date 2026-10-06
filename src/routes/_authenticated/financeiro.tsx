@@ -12,11 +12,11 @@ import {
   Stat,
   NativeSelect,
   FormRow,
-  AttachedDocuments,
   Section,
   ErrorBox,
 } from "@/components/app/ui";
 import { financeSummary, needsReview, paidOf } from "@/lib/journey";
+import { AttachedDocuments } from "@/components/app/documents/AttachedDocuments";
 import { RelatedLink } from "@/components/app/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
