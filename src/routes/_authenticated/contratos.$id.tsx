@@ -151,11 +151,31 @@ function ContractPage() {
       <dl className="grid gap-px border-b bg-border text-sm sm:grid-cols-2 lg:grid-cols-5">
         {(
           [
-            ["Origem", <RelatedLink key="o" type="deal" id={c.deal_id}>Abrir negociação</RelatedLink>],
-            ["Empresa", <RelatedLink key="e" type="company" id={c.company_id}>{c.companies?.trade_name}</RelatedLink>],
+            [
+              "Origem",
+              <RelatedLink key="o" type="deal" id={c.deal_id}>
+                Abrir negociação
+              </RelatedLink>,
+            ],
+            [
+              "Empresa",
+              <RelatedLink key="e" type="company" id={c.company_id}>
+                {c.companies?.trade_name}
+              </RelatedLink>,
+            ],
             ["Espaços", c.contract_spaces?.map((x: any) => x.spaces?.code).join(", ") || "—"],
-            ["Valor", <span key="v" className="tnum font-semibold">{brl(c.total_cents)}</span>],
-            ["Versão", <span key="ve" className="tnum">v{c.current_version}</span>],
+            [
+              "Valor",
+              <span key="v" className="tnum font-semibold">
+                {brl(c.total_cents)}
+              </span>,
+            ],
+            [
+              "Versão",
+              <span key="ve" className="tnum">
+                v{c.current_version}
+              </span>,
+            ],
           ] as [string, ReactNode][]
         ).map(([k, v]) => (
           <div key={k} className="min-w-0 bg-card px-4 py-2.5 md:px-6">

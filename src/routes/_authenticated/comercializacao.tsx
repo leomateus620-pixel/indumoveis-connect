@@ -251,9 +251,7 @@ function DealDetail({
   const locked = contract && ["emitido", "assinado"].includes(contract.status);
   const guide = dealGuidance(d.status, contract);
   const actions = DEAL_TRANSITIONS[d.status].filter(
-    (s) =>
-      s !== "contratada" &&
-      !(locked && ["proposta", "negociacao"].includes(s)),
+    (s) => s !== "contratada" && !(locked && ["proposta", "negociacao"].includes(s)),
   );
   const expired =
     d.status === "reservada" &&

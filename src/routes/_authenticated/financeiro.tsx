@@ -43,7 +43,6 @@ export const Route = createFileRoute("/_authenticated/financeiro")({
   component: FinanceiroPage,
 });
 
-
 function FinanceiroPage() {
   const can = useCan("financeiro");
   const { view, contract } = Route.useSearch();

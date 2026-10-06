@@ -37,11 +37,20 @@ describe("financeSummary", () => {
 });
 
 describe("snapshotDiff", () => {
-  const base = { company_id: "c", conditions: "", total_cents: 10, spaces: [{ space_id: "a", price_cents: 10 }] };
+  const base = {
+    company_id: "c",
+    conditions: "",
+    total_cents: 10,
+    spaces: [{ space_id: "a", price_cents: 10 }],
+  };
   it("detects price change", () => {
-    expect(snapshotDiff(base, { ...base, total_cents: 20, spaces: [{ space_id: "a", price_cents: 20 }] })).toEqual([
-      "Valores dos espaços",
-    ]);
+    expect(
+      snapshotDiff(base, {
+        ...base,
+        total_cents: 20,
+        spaces: [{ space_id: "a", price_cents: 20 }],
+      }),
+    ).toEqual(["Valores dos espaços"]);
   });
   it("is empty when unchanged", () => {
     expect(snapshotDiff(base, base)).toEqual([]);
@@ -50,6 +59,8 @@ describe("snapshotDiff", () => {
 
 describe("dealGuidance", () => {
   it("asks to register signature when contract issued", () => {
-    expect(dealGuidance("reservada", { status: "emitido" }).pend).toContain("Assinatura não registrada");
+    expect(dealGuidance("reservada", { status: "emitido" }).pend).toContain(
+      "Assinatura não registrada",
+    );
   });
 });

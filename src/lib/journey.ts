@@ -63,12 +63,17 @@ export function snapshotDiff(saved: DealSnapshot | null | undefined, current: De
   if (!saved) return [];
   const out: string[] = [];
   if (saved.company_id !== current.company_id) out.push("Empresa");
-  const a = (saved.spaces ?? []).map((s) => s.space_id).sort().join(",");
+  const a = (saved.spaces ?? [])
+    .map((s) => s.space_id)
+    .sort()
+    .join(",");
   const b = current.spaces.map((s) => s.space_id).join(",");
   if (a !== b) out.push("Espaços");
   else if (
     saved.spaces.some(
-      (s) => Number(s.price_cents) !== current.spaces.find((c) => c.space_id === s.space_id)?.price_cents,
+      (s) =>
+        Number(s.price_cents) !==
+        current.spaces.find((c) => c.space_id === s.space_id)?.price_cents,
     )
   )
     out.push("Valores dos espaços");
@@ -84,7 +89,9 @@ export function dealGuidance(status: string, contract?: { status: string } | nul
   let next = "";
   if (status === "proposta") next = "Iniciar a negociação.";
   if (status === "negociacao") {
-    next = contract ? "Registrar a reserva dos espaços." : "Preparar o contrato ou registrar a reserva.";
+    next = contract
+      ? "Registrar a reserva dos espaços."
+      : "Preparar o contrato ou registrar a reserva.";
     if (!contract) pend.push("Contrato ainda não preparado");
   }
   if (status === "reservada") {

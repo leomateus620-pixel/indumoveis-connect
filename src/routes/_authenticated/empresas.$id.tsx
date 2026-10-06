@@ -115,10 +115,21 @@ function CompanyPage() {
       <dl className="grid grid-cols-2 gap-px border-b bg-border text-sm lg:grid-cols-4">
         {(
           [
-            ["Negociações ativas", myDeals.filter((d: any) => ["proposta", "negociacao", "reservada"].includes(d.status)).length],
+            [
+              "Negociações ativas",
+              myDeals.filter((d: any) => ["proposta", "negociacao", "reservada"].includes(d.status))
+                .length,
+            ],
             ["Espaços vinculados", spaces.length],
             ["Contratos ativos", myContracts.filter((x: any) => x.status !== "cancelado").length],
-            ["Valor contratado", brl(myContracts.filter((x: any) => x.status !== "cancelado").reduce((a: number, x: any) => a + Number(x.total_cents), 0))],
+            [
+              "Valor contratado",
+              brl(
+                myContracts
+                  .filter((x: any) => x.status !== "cancelado")
+                  .reduce((a: number, x: any) => a + Number(x.total_cents), 0),
+              ),
+            ],
           ] as [string, string | number][]
         ).map(([k, v]) => (
           <div key={k} className="bg-card px-4 py-2.5 md:px-6">
