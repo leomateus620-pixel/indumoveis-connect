@@ -590,11 +590,11 @@ function Dashboard({
       <section className="grid gap-px border bg-border sm:grid-cols-2 xl:grid-cols-5">
         {(
           [
-          ["Próximas", metrics.upcoming, { status: "aberta" }],
-          ["Abertas", metrics.open, { status: "aberta" }],
-          ["Atrasadas", metrics.overdue, { status: "aberta" }],
-          ["Concluídas", metrics.completed, { status: "concluida" }],
-          ["Sem data", metrics.unscheduled, { status: "aberta" }],
+            ["Próximas", metrics.upcoming, { status: "aberta" }],
+            ["Abertas", metrics.open, { status: "aberta" }],
+            ["Atrasadas", metrics.overdue, { status: "aberta" }],
+            ["Concluídas", metrics.completed, { status: "concluida" }],
+            ["Sem data", metrics.unscheduled, { status: "aberta" }],
           ] as [string, number, Partial<Search>][]
         ).map(([label, value, patch]) => (
           <button
