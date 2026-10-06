@@ -1,0 +1,1 @@
+alter function public.validate_activity_reference(uuid,text,uuid) security invoker;

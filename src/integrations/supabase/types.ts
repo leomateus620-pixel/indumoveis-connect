@@ -16,53 +16,232 @@ export type Database = {
     Tables: {
       activities: {
         Row: {
+          all_day: boolean
           assignee_id: string | null
+          category_id: string | null
           created_at: string
           created_by: string | null
           description: string | null
           due_at: string | null
           edition_id: string
+          end_at: string | null
           id: string
+          idempotency_key: string | null
           kind: string
+          location: string | null
           related_id: string | null
           related_type: string | null
+          start_at: string | null
           status: Database["public"]["Enums"]["activity_status"]
           title: string
+          updated_at: string
+          version: number
         }
         Insert: {
+          all_day?: boolean
           assignee_id?: string | null
+          category_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           due_at?: string | null
           edition_id: string
+          end_at?: string | null
           id?: string
+          idempotency_key?: string | null
           kind?: string
+          location?: string | null
           related_id?: string | null
           related_type?: string | null
+          start_at?: string | null
           status?: Database["public"]["Enums"]["activity_status"]
           title: string
+          updated_at?: string
+          version?: number
         }
         Update: {
+          all_day?: boolean
           assignee_id?: string | null
+          category_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           due_at?: string | null
           edition_id?: string
+          end_at?: string | null
           id?: string
+          idempotency_key?: string | null
           kind?: string
+          location?: string | null
           related_id?: string | null
           related_type?: string | null
+          start_at?: string | null
           status?: Database["public"]["Enums"]["activity_status"]
           title?: string
+          updated_at?: string
+          version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "activities_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "activity_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "activities_edition_id_fkey"
             columns: ["edition_id"]
             isOneToOne: false
             referencedRelation: "editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_assignees: {
+        Row: {
+          activity_id: string
+          created_at: string
+          is_primary: boolean
+          profile_id: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          is_primary?: boolean
+          profile_id: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          is_primary?: boolean
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_assignees_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_assignees_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_categories: {
+        Row: {
+          created_at: string
+          edition_id: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          source: string | null
+          updated_at: string
+          verified_on: string | null
+        }
+        Insert: {
+          created_at?: string
+          edition_id: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          source?: string | null
+          updated_at?: string
+          verified_on?: string | null
+        }
+        Update: {
+          created_at?: string
+          edition_id?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          source?: string | null
+          updated_at?: string
+          verified_on?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_categories_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_commissions: {
+        Row: {
+          activity_id: string
+          commission_id: string
+          created_at: string
+        }
+        Insert: {
+          activity_id: string
+          commission_id: string
+          created_at?: string
+        }
+        Update: {
+          activity_id?: string
+          commission_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_commissions_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_commissions_commission_id_fkey"
+            columns: ["commission_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_versions: {
+        Row: {
+          activity_id: string
+          actor: string | null
+          created_at: string
+          id: string
+          snapshot: Json
+          version: number
+        }
+        Insert: {
+          activity_id: string
+          actor?: string | null
+          created_at?: string
+          id?: string
+          snapshot: Json
+          version: number
+        }
+        Update: {
+          activity_id?: string
+          actor?: string | null
+          created_at?: string
+          id?: string
+          snapshot?: Json
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_versions_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
             referencedColumns: ["id"]
           },
         ]
@@ -120,6 +299,53 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      commissions: {
+        Row: {
+          created_at: string
+          edition_id: string
+          id: string
+          is_active: boolean
+          is_coordinating: boolean
+          name: string
+          slug: string
+          source_url: string | null
+          updated_at: string
+          verified_on: string | null
+        }
+        Insert: {
+          created_at?: string
+          edition_id: string
+          id?: string
+          is_active?: boolean
+          is_coordinating?: boolean
+          name: string
+          slug: string
+          source_url?: string | null
+          updated_at?: string
+          verified_on?: string | null
+        }
+        Update: {
+          created_at?: string
+          edition_id?: string
+          id?: string
+          is_active?: boolean
+          is_coordinating?: boolean
+          name?: string
+          slug?: string
+          source_url?: string | null
+          updated_at?: string
+          verified_on?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       companies: {
         Row: {
@@ -647,6 +873,7 @@ export type Database = {
           reservation_expiry_action: string | null
           reservation_hold_days: number | null
           starts_on: string
+          timezone: string
           venue: string | null
           year: number
         }
@@ -660,6 +887,7 @@ export type Database = {
           reservation_expiry_action?: string | null
           reservation_hold_days?: number | null
           starts_on: string
+          timezone?: string
           venue?: string | null
           year: number
         }
@@ -673,6 +901,7 @@ export type Database = {
           reservation_expiry_action?: string | null
           reservation_hold_days?: number | null
           starts_on?: string
+          timezone?: string
           venue?: string | null
           year?: number
         }
@@ -1135,6 +1364,7 @@ export type Database = {
       }
     }
     Functions: {
+      activity_snapshot: { Args: { p_activity_id: string }; Returns: Json }
       can_read: { Args: { _module: string }; Returns: boolean }
       can_write: { Args: { _module: string }; Returns: boolean }
       create_contract_from_deal: {
@@ -1194,6 +1424,47 @@ export type Database = {
         }
         Returns: string
       }
+      save_activity: {
+        Args: {
+          p_activity_id: string
+          p_all_day: boolean
+          p_assignee_ids: string[]
+          p_category_id: string
+          p_commission_ids: string[]
+          p_description: string
+          p_edition_id: string
+          p_end_local: string
+          p_expected_version: number
+          p_idempotency_key: string
+          p_kind: string
+          p_location: string
+          p_primary_assignee: string
+          p_related_id: string
+          p_related_type: string
+          p_start_local: string
+          p_title: string
+        }
+        Returns: string
+      }
+      save_activity_category: {
+        Args: {
+          p_edition_id: string
+          p_id: string
+          p_is_active: boolean
+          p_name: string
+        }
+        Returns: string
+      }
+      save_commission: {
+        Args: {
+          p_edition_id: string
+          p_id: string
+          p_is_active: boolean
+          p_is_coordinating: boolean
+          p_name: string
+        }
+        Returns: string
+      }
       save_contract_body: {
         Args: {
           p_body: string
@@ -1216,6 +1487,14 @@ export type Database = {
         }
         Returns: string
       }
+      set_activity_status: {
+        Args: {
+          p_activity_id: string
+          p_expected_version: number
+          p_status: Database["public"]["Enums"]["activity_status"]
+        }
+        Returns: number
+      }
       set_contract_status: {
         Args: {
           p_contract_id: string
@@ -1229,6 +1508,14 @@ export type Database = {
           p_deal_id: string
           p_note: string
           p_to: Database["public"]["Enums"]["deal_status"]
+        }
+        Returns: undefined
+      }
+      validate_activity_reference: {
+        Args: {
+          p_edition_id: string
+          p_related_id: string
+          p_related_type: string
         }
         Returns: undefined
       }

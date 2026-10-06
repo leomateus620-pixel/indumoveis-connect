@@ -1,4 +1,5 @@
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -7,9 +8,11 @@
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->
 
 ## Sistema Indumóveis — decisões de arquitetura
+
 - All data access goes through `src/lib/api.ts` (React Query hooks + `useDbMutation`); pages never query the backend directly — keeps one source of truth and uniform invalidation.
 - Authorization lives in the database: RLS uses `can_read/can_write(module)` driven by `user_roles` + `role_permissions`; UI checks via `useCan` are only cosmetic.
 - Multi-step operations (deal+spaces, transitions, contract creation/versions/status, installments, payments, inspections) are SECURITY DEFINER SQL functions that re-check permissions — guarantees atomicity and server-side conflict checks.
@@ -18,6 +21,8 @@
 - Contracts store a `deal_snapshot` taken at preparation/refresh; divergence is computed by comparing it with the live deal — emitted/signed text is never rewritten.
 - Files are stored once in the private `documents` bucket; modules link them via `document_links` (polymorphic entity_type/entity_id) — the central and modules show the same file.
 - Agenda merges activities with dates already stored in inspections/installments instead of copying them.
+- Agenda uses `activities.start_at` as its canonical timestamp in the edition timezone; `due_at` is a synchronized compatibility field, while inspection and installment dates remain civil dates in their source tables.
+- Activity content, assignees, commissions, status, version history, and catalog maintenance are persisted through atomic database functions with permission and concurrency checks.
 - Every edition-scoped table carries `edition_id`; the active edition comes from `editions.is_active`, never hardcoded dates.
 - `ensure_profile()` creates only the caller's profile; `provision_initial_admin(uuid)` accepts only the service role and an explicitly selected existing account when no admin exists — prevents automatic privilege escalation from sign-in.
 - The last admin role is protected by a transaction-level database guard — simultaneous demotions cannot leave the system without administration.

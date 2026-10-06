@@ -11,18 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  useCompanies,
-  useProfiles,
-  useDbMutation,
-  api,
-  useEditionId,
-  useActivities,
-  useMe,
-  useCan,
-} from "@/lib/api";
-import { NativeSelect, FormRow, StatusBadge } from "./ui";
+import { useCompanies, useProfiles, useActivities, useCan } from "@/lib/api";
+import { FormRow, NativeSelect, StatusBadge } from "./ui";
 import { ACTIVITY_STATUS, fmtDate } from "@/lib/format";
+import { ActivityDialog } from "./ActivityDialog";
+export { ActivityDialog } from "./ActivityDialog";
 
 export const RELATED_LABEL: Record<string, string> = {
   company: "Empresa",
@@ -234,114 +227,5 @@ export function RelatedActivities({
       )}
       <ActivityDialog open={open} onOpenChange={setOpen} related={{ type, id }} />
     </div>
-  );
-}
-
-export function ActivityDialog({
-  open,
-  onOpenChange,
-  related,
-  defaults,
-}: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  related?: { type: string; id: string };
-  defaults?: { title?: string; description?: string };
-}) {
-  const edition = useEditionId();
-  const { data: me } = useMe();
-  const [title, setTitle] = useState(defaults?.title ?? "");
-  const [desc, setDesc] = useState(defaults?.description ?? "");
-  const [due, setDue] = useState("");
-  const [assignee, setAssignee] = useState("");
-  const [kind, setKind] = useState("tarefa");
-  const m = useDbMutation(
-    () =>
-      api.insert("activities", {
-        edition_id: edition,
-        title: title.trim(),
-        description: desc || null,
-        kind,
-        due_at: due ? new Date(due).toISOString() : null,
-        assignee_id: assignee || me?.id,
-        related_type: related?.type ?? null,
-        related_id: related?.id ?? null,
-        created_by: me?.id,
-      }),
-    {
-      success: "Atividade registrada",
-      onSuccess: () => {
-        onOpenChange(false);
-        setTitle("");
-        setDesc("");
-        setDue("");
-      },
-    },
-  );
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[min(90dvh,48rem)] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Nova atividade</DialogTitle>
-        </DialogHeader>
-        <form
-          className="space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            m.mutate(undefined);
-          }}
-        >
-          <FormRow label="Título *" htmlFor="at">
-            <Input
-              id="at"
-              required
-              maxLength={200}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </FormRow>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <FormRow label="Tipo" htmlFor="ak">
-              <NativeSelect id="ak" value={kind} onChange={(e) => setKind(e.target.value)}>
-                <option value="tarefa">Tarefa</option>
-                <option value="reuniao">Reunião</option>
-                <option value="prazo">Prazo</option>
-                <option value="entrega">Entrega</option>
-                <option value="pendencia">Pendência</option>
-              </NativeSelect>
-            </FormRow>
-            <FormRow label="Data e hora" htmlFor="ad">
-              <Input
-                id="ad"
-                type="datetime-local"
-                value={due}
-                onChange={(e) => setDue(e.target.value)}
-              />
-            </FormRow>
-          </div>
-          <FormRow label="Responsável" htmlFor="ar">
-            <ProfileSelect id="ar" value={assignee} onChange={setAssignee} placeholder="Eu mesmo" />
-          </FormRow>
-          <FormRow label="Descrição" htmlFor="ads">
-            <Textarea
-              id="ads"
-              maxLength={2000}
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
-            />
-          </FormRow>
-          {related && (
-            <p className="text-xs text-muted-foreground">
-              Vinculada a: {RELATED_LABEL[related.type]}
-            </p>
-          )}
-          <DialogFooter>
-            <Button type="submit" disabled={m.isPending}>
-              Salvar
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }

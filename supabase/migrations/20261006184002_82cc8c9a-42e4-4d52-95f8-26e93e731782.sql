@@ -1,0 +1,1 @@
+delete from public.activities where title = 'Validação integrada da Agenda' and location = 'Local de validação' and created_at >= now() - interval '1 hour';
