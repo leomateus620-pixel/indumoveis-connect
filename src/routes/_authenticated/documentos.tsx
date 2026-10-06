@@ -206,7 +206,7 @@ function DocumentosPage() {
       </PageHeader>
 
       <div className="space-y-2 border-b bg-card/60 px-4 py-3 md:px-6 xl:px-8">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))]">
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] [&>*:first-child]:col-span-2 lg:[&>*:first-child]:col-span-1">
           <SearchInput
             value={q}
             onChange={setQ}
