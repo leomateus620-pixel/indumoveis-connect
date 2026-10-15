@@ -1,0 +1,98 @@
+{
+  "files": 104,
+  "errors": 17338,
+  "warnings": 12,
+  "nonFormatting": [
+    {
+      "file": "\\src\\components\\app\\documents\\common.tsx",
+      "line": 79,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\components\\app\\documents\\common.tsx",
+      "line": 128,
+      "rule": "react-hooks/exhaustive-deps",
+      "severity": 1,
+      "message": "React Hook useMemo has a missing dependency: 'can'. Either include it or remove the dependency array."
+    },
+    {
+      "file": "\\src\\components\\app\\documents\\common.tsx",
+      "line": 137,
+      "rule": null,
+      "severity": 1,
+      "message": "Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')."
+    },
+    {
+      "file": "\\src\\components\\app\\shared.tsx",
+      "line": 20,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\components\\app\\shared.tsx",
+      "line": 133,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\components\\ui\\badge.tsx",
+      "line": 32,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\components\\ui\\button.tsx",
+      "line": 49,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\components\\ui\\form.tsx",
+      "line": 163,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\components\\ui\\navigation-menu.tsx",
+      "line": 111,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\components\\ui\\sidebar.tsx",
+      "line": 743,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\components\\ui\\toggle.tsx",
+      "line": 42,
+      "rule": "react-refresh/only-export-components",
+      "severity": 1,
+      "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components."
+    },
+    {
+      "file": "\\src\\integrations\\supabase\\previewAuthStorage.ts",
+      "line": 38,
+      "rule": "prefer-const",
+      "severity": 2,
+      "message": "'timer' is never reassigned. Use 'const' instead."
+    },
+    {
+      "file": "\\src\\routes\\_authenticated\\financeiro.tsx",
+      "line": 84,
+      "rule": null,
+      "severity": 1,
+      "message": "Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')."
+    }
+  ]
+}

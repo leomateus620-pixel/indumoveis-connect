@@ -167,6 +167,63 @@ export const useSpaces = () => {
     !!ed,
   );
 };
+
+// O mapa territorial não precisa de preços, compradores, contratos ou notas.
+// A view continua sendo a única fonte de situação; sem leitura Comercial a
+// security_invoker view não consegue confirmar as negociações protegidas por RLS.
+export type MapCommercialSpace = {
+  id: string;
+  edition_id: string;
+  sector: string | null;
+  commercial_status: string | null;
+};
+export function useMapCommercialSpaces(enabled = true) {
+  const editionId = useEditionId();
+  const map = useCan("mapa");
+  const commercial = useCan("comercial");
+  const permitted = map.read && commercial.read;
+  return useQuery<MapCommercialSpace[]>({
+    queryKey: qk.list("spaces", "commercial-map", editionId, permitted),
+    enabled: enabled && !!editionId && permitted,
+    retry: 1,
+    queryFn: ({ signal }) =>
+      run<MapCommercialSpace[]>(
+        db
+          .from("space_status_v")
+          .select("id, edition_id, sector, commercial_status")
+          .eq("edition_id", editionId)
+          .abortSignal(signal),
+      ),
+  });
+}
+
+export type MapDealSpaces = {
+  id: string;
+  edition_id: string;
+  deal_spaces: { space_id: string }[];
+};
+export function useMapDealSpaces(dealId?: string, enabled = true) {
+  const editionId = useEditionId();
+  const map = useCan("mapa");
+  const commercial = useCan("comercial");
+  const permitted = map.read && commercial.read;
+  return useQuery<MapDealSpaces | null>({
+    queryKey: qk.list("deal", "commercial-map", editionId, dealId, permitted),
+    enabled: enabled && !!editionId && !!dealId && permitted,
+    retry: 1,
+    queryFn: ({ signal }) =>
+      run<MapDealSpaces | null>(
+        db
+          .from("deals")
+          .select("id, edition_id, deal_spaces(space_id)")
+          .eq("edition_id", editionId)
+          .eq("id", dealId)
+          .abortSignal(signal)
+          .maybeSingle(),
+      ),
+  });
+}
+
 export const useFloorPlans = () => {
   const ed = useEditionId();
   return useList(

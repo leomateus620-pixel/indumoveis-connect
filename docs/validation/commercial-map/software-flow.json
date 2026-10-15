@@ -1,0 +1,4297 @@
+{
+  "generatedAt": "2026-10-15T22:11:28.371Z",
+  "baseURL": "http://127.0.0.1:4174",
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "Chromium software ANGLE/SwiftShader",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Not tested",
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "browser": "153.0.8010.12",
+    "actualGL": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Google)",
+      "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    }
+  },
+  "mode": "full",
+  "layouts": [
+    {
+      "viewport": "360x800",
+      "usefulMs": 1968.6097,
+      "scrollWidth": 360,
+      "viewportWidth": 360,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 794.8999999761581
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 1080.6000000238419
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 1927.8999999761581
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 1927.8999999761581
+        }
+      ]
+    },
+    {
+      "viewport": "390x844",
+      "usefulMs": 600.0252999999993,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 425.2000000476837
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 494.39999997615814
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 572.8999999761581
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 572.8999999761581
+        }
+      ]
+    },
+    {
+      "viewport": "844x390",
+      "usefulMs": 603.6923000000006,
+      "scrollWidth": 844,
+      "viewportWidth": 844,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 442.6999999284744
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 503.1999999284744
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 577.2999999523163
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 577.2999999523163
+        }
+      ]
+    },
+    {
+      "viewport": "768x1024",
+      "usefulMs": 599.3112000000001,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 421.3000000715256
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 505.60000002384186
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 578.4000000953674
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 578.4000000953674
+        }
+      ]
+    },
+    {
+      "viewport": "1366x768",
+      "usefulMs": 420.79209999999875,
+      "scrollWidth": 1366,
+      "viewportWidth": 1366,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 442.10000002384186
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 510.6999999284744
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 606.1000000238419
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 606.1000000238419
+        }
+      ]
+    },
+    {
+      "viewport": "1920x1080",
+      "usefulMs": 416.67750000000524,
+      "scrollWidth": 1920,
+      "viewportWidth": 1920,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 428
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 515.7999999523163
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 615.1000000238419
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 615.1000000238419
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "layout journeys 360x800",
+      "passed": true,
+      "detail": {
+        "representation": "ready",
+        "initialLayout": {
+          "stage": {
+            "x": 0,
+            "y": 104,
+            "width": 360,
+            "height": 696
+          },
+          "mapFractionBelowGlobalHeader": 0.8415774081615691,
+          "controls": [
+            {
+              "label": "Buscar lote, pavilhão ou via",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Opções de visualização",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Tela cheia",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "3D",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Superior",
+              "width": 56.46875,
+              "height": 44
+            },
+            {
+              "label": "Oblíqua",
+              "width": 53.484375,
+              "height": 44
+            },
+            {
+              "label": "Aproximar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Afastar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Reenquadrar parque",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Mover mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Girar mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Legenda",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Ajuda de navegação",
+              "width": 44,
+              "height": 44
+            }
+          ],
+          "below44": []
+        },
+        "diagnostics": {
+          "enabled": true,
+          "instance": "51900f0c-051c-49bc-8ab1-d90c073df467",
+          "active": true,
+          "contextCount": 1,
+          "frames": 220,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 38,
+          "triangles": 748,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            360,
+            744
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            45.390016141674074,
+            102.59183472622101
+          ],
+          "frameIntervals": {
+            "count": 208,
+            "min": 0,
+            "median": 16.699999999999818,
+            "p95": 16.800000000000182,
+            "max": 133.29999999999995,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 220,
+            "min": 0.20000004768371582,
+            "median": 0.5,
+            "p95": 1.5999999046325684,
+            "max": 71,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 6124.600000023842,
+          "readyAt": 1927.7999999523163
+        }
+      }
+    },
+    {
+      "name": "layout journeys 390x844",
+      "passed": true,
+      "detail": {
+        "representation": "ready",
+        "initialLayout": {
+          "stage": {
+            "x": 0,
+            "y": 104,
+            "width": 390,
+            "height": 740
+          },
+          "mapFractionBelowGlobalHeader": 0.8564354978015075,
+          "controls": [
+            {
+              "label": "Buscar lote, pavilhão ou via",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Opções de visualização",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Tela cheia",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "3D",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Superior",
+              "width": 56.46875,
+              "height": 44
+            },
+            {
+              "label": "Oblíqua",
+              "width": 53.484375,
+              "height": 44
+            },
+            {
+              "label": "Aproximar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Afastar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Reenquadrar parque",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Mover mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Girar mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Legenda",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Ajuda de navegação",
+              "width": 44,
+              "height": 44
+            }
+          ],
+          "below44": []
+        },
+        "diagnostics": {
+          "enabled": true,
+          "instance": "c6a46dc6-ce65-44ec-a8c0-1c2d94931b19",
+          "active": true,
+          "contextCount": 1,
+          "frames": 233,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 38,
+          "triangles": 748,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            390,
+            740
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            45.2585923779565,
+            101.87177856680093
+          ],
+          "frameIntervals": {
+            "count": 218,
+            "min": 0.06799999999998363,
+            "median": 16.699999999999818,
+            "p95": 33.19999999999982,
+            "max": 116.57200000000006,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 233,
+            "min": 0.19999992847442627,
+            "median": 0.5,
+            "p95": 2.100000023841858,
+            "max": 58.60000002384186,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 5321.600000023842,
+          "readyAt": 572.8999999761581
+        }
+      }
+    },
+    {
+      "name": "layout journeys 844x390",
+      "passed": true,
+      "detail": {
+        "representation": "ready",
+        "initialLayout": {
+          "stage": {
+            "x": 72,
+            "y": 96,
+            "width": 772,
+            "height": 294
+          },
+          "mapFractionBelowGlobalHeader": 0.8131684998333485,
+          "controls": [
+            {
+              "label": "3D",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Superior",
+              "width": 68.328125,
+              "height": 44
+            },
+            {
+              "label": "Oblíqua",
+              "width": 65.078125,
+              "height": 44
+            },
+            {
+              "label": "Buscar lote, pavilhão ou via",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Opções de visualização",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Tela cheia",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Aproximar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Afastar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Reenquadrar parque",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Mover mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Girar mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Legenda",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Ajuda de navegação",
+              "width": 44,
+              "height": 44
+            }
+          ],
+          "below44": []
+        },
+        "diagnostics": {
+          "enabled": true,
+          "instance": "972c1d3e-f158-49fb-ade2-00f8e67b9f99",
+          "active": true,
+          "contextCount": 1,
+          "frames": 226,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 43,
+          "triangles": 782,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            844,
+            342
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            66.18611970704796,
+            60.607212999688294
+          ],
+          "frameIntervals": {
+            "count": 214,
+            "min": 16.533999999999878,
+            "median": 16.699999999999818,
+            "p95": 16.700000000000273,
+            "max": 66.63999999999999,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 226,
+            "min": 0.19999992847442627,
+            "median": 0.5,
+            "p95": 1.2999999523162842,
+            "max": 54,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 4442.599999904633,
+          "readyAt": 577.2999999523163
+        }
+      }
+    },
+    {
+      "name": "layout journeys 768x1024",
+      "passed": true,
+      "detail": {
+        "representation": "ready",
+        "initialLayout": {
+          "stage": {
+            "x": 72,
+            "y": 104,
+            "width": 696,
+            "height": 920
+          },
+          "mapFractionBelowGlobalHeader": 0.9084409056398095,
+          "controls": [
+            {
+              "label": "Buscar lote, pavilhão ou via",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Opções de visualização",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Tela cheia",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "3D",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Superior",
+              "width": 60.328125,
+              "height": 44
+            },
+            {
+              "label": "Oblíqua",
+              "width": 57.078125,
+              "height": 44
+            },
+            {
+              "label": "Aproximar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Afastar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Reenquadrar parque",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Mover mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Girar mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Legenda",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Ajuda de navegação",
+              "width": 44,
+              "height": 44
+            }
+          ],
+          "below44": []
+        },
+        "diagnostics": {
+          "enabled": true,
+          "instance": "9e6d4719-c7c4-47e4-9f26-2f47327ed315",
+          "active": true,
+          "contextCount": 1,
+          "frames": 184,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 28,
+          "triangles": 706,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            768,
+            968
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            44.93996206883913,
+            78.69532422287887
+          ],
+          "frameIntervals": {
+            "count": 170,
+            "min": 0.068000000000211,
+            "median": 16.699999999999818,
+            "p95": 66.60000000000036,
+            "max": 150,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 184,
+            "min": 0.20000004768371582,
+            "median": 0.5,
+            "p95": 1.5,
+            "max": 51.300000071525574,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 6960.400000095367,
+          "readyAt": 578.4000000953674
+        }
+      }
+    },
+    {
+      "name": "layout journeys 1366x768",
+      "passed": true,
+      "detail": {
+        "representation": "ready",
+        "initialLayout": {
+          "stage": {
+            "x": 72,
+            "y": 104,
+            "width": 1294,
+            "height": 664
+          },
+          "mapFractionBelowGlobalHeader": 0.8872740389001589,
+          "controls": [
+            {
+              "label": "Buscar lote, pavilhão ou via",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Opções de visualização",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Tela cheia",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "3D",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Superior",
+              "width": 68.328125,
+              "height": 44
+            },
+            {
+              "label": "Oblíqua",
+              "width": 65.078125,
+              "height": 44
+            },
+            {
+              "label": "Aproximar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Afastar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Reenquadrar parque",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Mover mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Girar mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Legenda",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Ajuda de navegação",
+              "width": 44,
+              "height": 44
+            }
+          ],
+          "below44": []
+        },
+        "diagnostics": {
+          "enabled": true,
+          "instance": "0528b275-2196-4271-943b-cbf49ae5a2c7",
+          "active": true,
+          "contextCount": 1,
+          "frames": 159,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 33,
+          "triangles": 758,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1366,
+            712
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            54.13367703633587,
+            60.608955
+          ],
+          "frameIntervals": {
+            "count": 143,
+            "min": 0,
+            "median": 16.699999999999818,
+            "p95": 100,
+            "max": 216.69999999999982,
+            "stallsAbove200Ms": 1
+          },
+          "renderDurations": {
+            "count": 159,
+            "min": 0.10000002384185791,
+            "median": 0.5999999046325684,
+            "p95": 1.600000023841858,
+            "max": 70.60000002384186,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 8101,
+          "readyAt": 606.1000000238419
+        }
+      }
+    },
+    {
+      "name": "layout journeys 1920x1080",
+      "passed": true,
+      "detail": {
+        "representation": "ready",
+        "initialLayout": {
+          "stage": {
+            "x": 72,
+            "y": 104,
+            "width": 1848,
+            "height": 976
+          },
+          "mapFractionBelowGlobalHeader": 0.9286634390848372,
+          "controls": [
+            {
+              "label": "Buscar lote, pavilhão ou via",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Opções de visualização",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Tela cheia",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "3D",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Superior",
+              "width": 68.328125,
+              "height": 44
+            },
+            {
+              "label": "Oblíqua",
+              "width": 65.078125,
+              "height": 44
+            },
+            {
+              "label": "Aproximar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Afastar",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Reenquadrar parque",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Mover mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Girar mapa",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Legenda",
+              "width": 44,
+              "height": 44
+            },
+            {
+              "label": "Ajuda de navegação",
+              "width": 44,
+              "height": 44
+            }
+          ],
+          "below44": []
+        },
+        "diagnostics": {
+          "enabled": true,
+          "instance": "e247fa70-fbd0-445e-8f9c-49dd808c28dc",
+          "active": true,
+          "contextCount": 1,
+          "frames": 168,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 28,
+          "triangles": 718,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 0.713180413418185,
+          "buffer": [
+            1369,
+            730
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            46.990348732797756,
+            60.60895499999999
+          ],
+          "frameIntervals": {
+            "count": 152,
+            "min": 0,
+            "median": 16.699999999999818,
+            "p95": 83.40000000000009,
+            "max": 250,
+            "stallsAbove200Ms": 1
+          },
+          "renderDurations": {
+            "count": 168,
+            "min": 0.19999992847442627,
+            "median": 0.6000000238418579,
+            "p95": 3.600000023841858,
+            "max": 75.60000002384186,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 9797.100000023842,
+          "readyAt": 615.1000000238419
+        }
+      }
+    },
+    {
+      "name": "five cold and warm openings medium",
+      "passed": true,
+      "detail": {
+        "name": "medium",
+        "cpu": 1,
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "targetMs": 3000,
+        "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+        "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+        "samples": [
+          {
+            "state": "cold",
+            "usefulMs": 1337.2788,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 848.7000000476837
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 852
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1089.2000000476837
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1094.3000000715256
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1178.3000000715256
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1312.9000000953674
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1312.9000000953674
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1312.9000000953674
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 111.70000004768372
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 117.90000009536743
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 228.70000004768372
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 143.1774000000005,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1395.3438000000024,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 907.3999999761581
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 910.8999999761581
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1281.1999999284744
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1290.8999999761581
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1333.5
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1398.1999999284744
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1398.1999999284744
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1398.3999999761581
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 129.60000002384186
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 122.30000007152557
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 227.29999995231628
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 91.54449999999633,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1346.4174000000057,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 858.1999999284744
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 861.6999999284744
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1112.1999999284744
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1117.1999999284744
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1191
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1333.3999999761581
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1333.3999999761581
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1333.5
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 122
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 114
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 242.20000004768372
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 105.70799999999872,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1494.2958999999973,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 865.5999999046326
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 869
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1096.5
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1101.3999999761581
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1177
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1497.0999999046326
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1497.0999999046326
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1497.0999999046326
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 115.30000007152557
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 138.39999997615814
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 218.59999990463257
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 90.03349999999045,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1319.2956000000122,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 879.2999999523163
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 882.6000000238419
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1104.6999999284744
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1109.7999999523163
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1191
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1288.3999999761581
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1288.3999999761581
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1288.5
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 120.60000002384186
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 144.20000004768372
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 213.40000009536743
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 93.9826999999932,
+            "representation": "ready"
+          }
+        ],
+        "cold": {
+          "n": 5,
+          "medianMs": 1346.4174000000057,
+          "worstMs": 1494.2958999999973,
+          "passed": true
+        },
+        "warm": {
+          "n": 5,
+          "medianMs": 93.9826999999932,
+          "worstMs": 143.1774000000005,
+          "passed": true
+        },
+        "accepted": true
+      }
+    },
+    {
+      "name": "five cold and warm openings weak-cpu4",
+      "passed": true,
+      "detail": {
+        "name": "weak-cpu4",
+        "cpu": 4,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "targetMs": 5000,
+        "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+        "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+        "samples": [
+          {
+            "state": "cold",
+            "usefulMs": 2102.0877000000037,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1509.9000000953674
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1529.9000000953674
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1781.4000000953674
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1806
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1896
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 2047.4000000953674
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 2047.4000000953674
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 2047.6000000238419
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 132.39999997615814
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 226.60000002384186
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 223.5
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1817.719499999992,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 2080.398000000001,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1493.8999999761581
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1510.8999999761581
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1765.2999999523163
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1787.1999999284744
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1891.8999999761581
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 2037.1999999284744
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 2037.2999999523163
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 2037.2999999523163
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 135.39999997615814
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 225.60000002384186
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 222.69999992847443
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1280.9854999999952,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1262.8117000000057,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1193.6000000238419
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1211.7000000476837
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1460.5
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1470
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1564.8999999761581
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1669.7999999523163
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1669.7999999523163
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1669.8999999761581
+              }
+            ],
+            "transferBytes": 428271,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 121
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 220.89999997615814
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 225.79999995231628
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1528.2187000000122,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1851.8166999999958,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1343.0999999046326
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1353.8999999761581
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1581.5999999046326
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1594.3999999761581
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1699.8999999761581
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1805.0999999046326
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1805.0999999046326
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1805.1999999284744
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 133
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 225.79999995231628
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 212
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1284.2553000000044,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 2062.6796999999933,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1448.7999999523163
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1468.2000000476837
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1721.6000000238419
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1743.1000000238419
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1857.2000000476837
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 2013.2000000476837
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 2013.2000000476837
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 2013.3999999761581
+              }
+            ],
+            "transferBytes": 430216,
+            "featureResources": [
+              {
+                "file": "mapa-OaSgC3q6.js",
+                "transferSize": 10490,
+                "encodedBodySize": 10190,
+                "duration": 135.80000007152557
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 230.89999997615814
+              },
+              {
+                "file": "MapRenderer-Bgud21OJ.js",
+                "transferSize": 150387,
+                "encodedBodySize": 150087,
+                "duration": 223.79999995231628
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1747.3177000000142,
+            "representation": "ready"
+          }
+        ],
+        "cold": {
+          "n": 5,
+          "medianMs": 2062.6796999999933,
+          "worstMs": 2102.0877000000037,
+          "passed": true
+        },
+        "warm": {
+          "n": 5,
+          "medianMs": 1528.2187000000122,
+          "worstMs": 1817.719499999992,
+          "passed": true
+        },
+        "accepted": true
+      }
+    },
+    {
+      "name": "existing host WebGL renderer information",
+      "passed": true,
+      "detail": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Google)",
+        "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+      }
+    },
+    {
+      "name": "30 selections, 20 closes, same renderer",
+      "passed": true,
+      "detail": {
+        "n": 30,
+        "samples": [
+          {
+            "eventToDOMMs": 3.700000047683716,
+            "eventToSubmittedDrawMs": 21,
+            "automationToDOMMs": 194.80000007152557
+          },
+          {
+            "eventToDOMMs": 1.399999976158142,
+            "eventToSubmittedDrawMs": 6.700000047683716,
+            "automationToDOMMs": 438.10000002384186
+          },
+          {
+            "eventToDOMMs": 1.399999976158142,
+            "eventToSubmittedDrawMs": 182.79999995231628,
+            "automationToDOMMs": 520.7000000476837
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 46.89999997615814,
+            "automationToDOMMs": 333.39999997615814
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 77.09999990463257,
+            "automationToDOMMs": 304.90000009536743
+          },
+          {
+            "eventToDOMMs": 1.1999999284744263,
+            "eventToSubmittedDrawMs": 5.5,
+            "automationToDOMMs": 406.39999997615814
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 27,
+            "automationToDOMMs": 270.89999997615814
+          },
+          {
+            "eventToDOMMs": 0.8000000715255737,
+            "eventToSubmittedDrawMs": 47.5,
+            "automationToDOMMs": 307.5
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 25.600000023841858,
+            "automationToDOMMs": 362.5
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 65.89999997615814,
+            "automationToDOMMs": 514.0999999046326
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 35.10000002384186,
+            "automationToDOMMs": 374.2000000476837
+          },
+          {
+            "eventToDOMMs": 1.2000000476837158,
+            "eventToSubmittedDrawMs": 55.200000047683716,
+            "automationToDOMMs": 783.2000000476837
+          },
+          {
+            "eventToDOMMs": 0.9000000953674316,
+            "eventToSubmittedDrawMs": 19,
+            "automationToDOMMs": 685.1000000238419
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 59.60000002384186,
+            "automationToDOMMs": 457.2999999523163
+          },
+          {
+            "eventToDOMMs": 0.7999999523162842,
+            "eventToSubmittedDrawMs": 95.19999992847443,
+            "automationToDOMMs": 454.59999990463257
+          },
+          {
+            "eventToDOMMs": 1,
+            "eventToSubmittedDrawMs": 5.100000023841858,
+            "automationToDOMMs": 738.4000000953674
+          },
+          {
+            "eventToDOMMs": 1,
+            "eventToSubmittedDrawMs": 5.299999952316284,
+            "automationToDOMMs": 953.1000000238419
+          },
+          {
+            "eventToDOMMs": 0.7999999523162842,
+            "eventToSubmittedDrawMs": 36,
+            "automationToDOMMs": 407.10000002384186
+          },
+          {
+            "eventToDOMMs": 0.8000000715255737,
+            "eventToSubmittedDrawMs": 79.30000007152557,
+            "automationToDOMMs": 372.39999997615814
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 65.19999992847443,
+            "automationToDOMMs": 394.7000000476837
+          },
+          {
+            "eventToDOMMs": 1.399999976158142,
+            "eventToSubmittedDrawMs": 35.39999997615814,
+            "automationToDOMMs": 808
+          },
+          {
+            "eventToDOMMs": 1.5,
+            "eventToSubmittedDrawMs": 52.5,
+            "automationToDOMMs": 446.10000002384186
+          },
+          {
+            "eventToDOMMs": 0.7999999523162842,
+            "eventToSubmittedDrawMs": 33.10000002384186,
+            "automationToDOMMs": 364
+          },
+          {
+            "eventToDOMMs": 0.8999999761581421,
+            "eventToSubmittedDrawMs": 146.29999995231628,
+            "automationToDOMMs": 398.89999997615814
+          },
+          {
+            "eventToDOMMs": 1.2000000476837158,
+            "eventToSubmittedDrawMs": 43.700000047683716,
+            "automationToDOMMs": 533.6000000238419
+          },
+          {
+            "eventToDOMMs": 0.8000000715255737,
+            "eventToSubmittedDrawMs": 3.399999976158142,
+            "automationToDOMMs": 496.40000009536743
+          },
+          {
+            "eventToDOMMs": 0.8000000715255737,
+            "eventToSubmittedDrawMs": 3.399999976158142,
+            "automationToDOMMs": 299.6999999284744
+          },
+          {
+            "eventToDOMMs": 0.7000000476837158,
+            "eventToSubmittedDrawMs": 56.800000071525574,
+            "automationToDOMMs": 500.2000000476837
+          },
+          {
+            "eventToDOMMs": 0.7999999523162842,
+            "eventToSubmittedDrawMs": 52.5,
+            "automationToDOMMs": 250.60000002384186
+          },
+          {
+            "eventToDOMMs": 0.6000000238418579,
+            "eventToSubmittedDrawMs": 4.100000023841858,
+            "automationToDOMMs": 287.7000000476837
+          }
+        ],
+        "medianDOMMs": 0.8999999761581421,
+        "p95DOMMs": 1.5,
+        "p95SubmittedDrawMs": 146.29999995231628,
+        "accepted": true,
+        "before": {
+          "enabled": true,
+          "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+          "active": true,
+          "contextCount": 1,
+          "frames": 7,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 44,
+          "triangles": 782,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            95.5,
+            55
+          ],
+          "frameIntervals": {
+            "count": 6,
+            "min": 16.59999999999991,
+            "median": 16.700000000000045,
+            "p95": 99.976,
+            "max": 99.976,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 7,
+            "min": 1.399999976158142,
+            "median": 2.899999976158142,
+            "p95": 60.89999997615814,
+            "max": 60.89999997615814,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 564.1999999284744,
+          "readyAt": 571
+        },
+        "after": {
+          "enabled": true,
+          "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+          "active": true,
+          "contextCount": 1,
+          "frames": 606,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 0,
+          "drawCalls": 9,
+          "triangles": 224,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            167.76870541709897,
+            81.13173180716183
+          ],
+          "frameIntervals": {
+            "count": 508,
+            "min": 0,
+            "median": 49.900000000001455,
+            "p95": 116.69999999999982,
+            "max": 983.3,
+            "stallsAbove200Ms": 2
+          },
+          "renderDurations": {
+            "count": 606,
+            "min": 0.10000002384185791,
+            "median": 0.3999999761581421,
+            "p95": 1,
+            "max": 60.89999997615814,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 40799.39999997616,
+          "readyAt": 571
+        },
+        "note": "DOM acknowledgement measured separately; screenshots confirm content, not input-to-photon latency."
+      }
+    },
+    {
+      "name": "20 view cycles and pavilion inspection/return cycles",
+      "passed": true,
+      "detail": {
+        "cycles": 20,
+        "before": {
+          "enabled": true,
+          "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+          "active": true,
+          "contextCount": 1,
+          "frames": 606,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 0,
+          "drawCalls": 9,
+          "triangles": 224,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            167.76870541709897,
+            81.13173180716183
+          ],
+          "frameIntervals": {
+            "count": 508,
+            "min": 0,
+            "median": 49.900000000001455,
+            "p95": 116.69999999999982,
+            "max": 983.3,
+            "stallsAbove200Ms": 2
+          },
+          "renderDurations": {
+            "count": 606,
+            "min": 0.10000002384185791,
+            "median": 0.3999999761581421,
+            "p95": 1,
+            "max": 60.89999997615814,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 40799.39999997616,
+          "readyAt": 571
+        },
+        "after": {
+          "enabled": true,
+          "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+          "active": true,
+          "contextCount": 1,
+          "frames": 1457,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 31,
+          "triangles": 402,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            122.744,
+            77.87313499999999
+          ],
+          "frameIntervals": {
+            "count": 1314,
+            "min": 0,
+            "median": 50,
+            "p95": 116.69999999999709,
+            "max": 983.3,
+            "stallsAbove200Ms": 2
+          },
+          "renderDurations": {
+            "count": 1457,
+            "min": 0.10000002384185791,
+            "median": 0.3999999761581421,
+            "p95": 0.8999999761581421,
+            "max": 60.89999997615814,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 93606.39999997616,
+          "readyAt": 571
+        }
+      }
+    },
+    {
+      "name": "real canvas picking, drag rejection, cancellation and manual interruption",
+      "passed": true,
+      "detail": {
+        "enabled": true,
+        "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+        "active": true,
+        "contextCount": 1,
+        "frames": 1600,
+        "createdContexts": 1,
+        "activeContexts": 1,
+        "activeLoops": 1,
+        "drawCalls": 29,
+        "triangles": 704,
+        "geometries": 44,
+        "textures": 1,
+        "programs": 6,
+        "textureBytes": 4194304,
+        "dpr": 1,
+        "buffer": [
+          1294,
+          664
+        ],
+        "tier": "light",
+        "cameraState": "manual",
+        "target": [
+          44.06146583819087,
+          60.0125082163675
+        ],
+        "frameIntervals": {
+          "count": 1449,
+          "min": 0,
+          "median": 50,
+          "p95": 116.69999999999709,
+          "max": 983.3,
+          "stallsAbove200Ms": 2
+        },
+        "renderDurations": {
+          "count": 1600,
+          "min": 0.10000002384185791,
+          "median": 0.40000009536743164,
+          "p95": 0.8999999761581421,
+          "max": 60.89999997615814,
+          "stallsAbove200Ms": 0
+        },
+        "contextLosses": 0,
+        "lastSelectedId": "indumoveis:pavilion:1",
+        "selectionDrawAt": 99576,
+        "readyAt": 571
+      }
+    },
+    {
+      "name": "keyboard search and Esc restores useful focus",
+      "passed": true,
+      "detail": {
+        "tag": "BUTTON",
+        "label": "Buscar lote, pavilhão ou via"
+      }
+    },
+    {
+      "name": "sidebar resize preserves selected identity and renderer",
+      "passed": true,
+      "detail": {
+        "before": {
+          "enabled": true,
+          "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+          "active": true,
+          "contextCount": 1,
+          "frames": 1630,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 27,
+          "triangles": 344,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "transition",
+          "target": [
+            121.31901494082807,
+            60.578106071967056
+          ],
+          "frameIntervals": {
+            "count": 1473,
+            "min": 0,
+            "median": 50,
+            "p95": 116.69999999999709,
+            "max": 983.3,
+            "stallsAbove200Ms": 3
+          },
+          "renderDurations": {
+            "count": 1630,
+            "min": 0.10000002384185791,
+            "median": 0.3999999761581421,
+            "p95": 0.8999999761581421,
+            "max": 60.89999997615814,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": "indumoveis:external:lot:70",
+          "selectionDrawAt": 103275.19999992847,
+          "readyAt": 571
+        },
+        "after": {
+          "enabled": true,
+          "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+          "active": true,
+          "contextCount": 1,
+          "frames": 1640,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 17,
+          "triangles": 282,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            160.42783500000002,
+            77.20691000000001
+          ],
+          "frameIntervals": {
+            "count": 1483,
+            "min": 0,
+            "median": 50,
+            "p95": 116.69999999999709,
+            "max": 983.3,
+            "stallsAbove200Ms": 4
+          },
+          "renderDurations": {
+            "count": 1640,
+            "min": 0.10000002384185791,
+            "median": 0.3999999761581421,
+            "p95": 0.8999999761581421,
+            "max": 60.89999997615814,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": "indumoveis:external:lot:70",
+          "selectionDrawAt": 103275.19999992847,
+          "readyAt": 571
+        }
+      }
+    },
+    {
+      "name": "30s active navigation light",
+      "passed": false,
+      "detail": {
+        "quality": "light",
+        "durationMs": 30749.007500000007,
+        "rounds": 16,
+        "samples": 647,
+        "medianFps": 20,
+        "p95IntervalMs": 50.10000000000582,
+        "stallsAbove200Ms": 0,
+        "targetFps": 30,
+        "accepted": false,
+        "diagnostics": {
+          "enabled": true,
+          "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+          "active": true,
+          "contextCount": 1,
+          "frames": 2302,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 16,
+          "triangles": 290,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "transition",
+          "target": [
+            158.63256146700888,
+            62.81096314842136
+          ],
+          "frameIntervals": {
+            "count": 647,
+            "min": 16.59999999999127,
+            "median": 50,
+            "p95": 50.10000000000582,
+            "max": 166.60000000000582,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 648,
+            "min": 0.10000002384185791,
+            "median": 0.3999999761581421,
+            "p95": 0.5999999046325684,
+            "max": 4.899999976158142,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 104114.79999995232,
+          "readyAt": 571
+        },
+        "rendererInfo": {
+          "vendor": "WebKit",
+          "renderer": "WebKit WebGL",
+          "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+          "unmaskedVendor": "Google Inc. (Google)",
+          "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        "note": "Renderer submitted-frame timing during continuous scripted input; not input-to-photon or physical-device GPU validation."
+      }
+    },
+    {
+      "name": "30s active navigation balanced",
+      "passed": false,
+      "detail": {
+        "quality": "balanced",
+        "durationMs": 30960.032400000026,
+        "rounds": 18,
+        "samples": 629,
+        "medianFps": 20,
+        "p95IntervalMs": 50.10000000000582,
+        "stallsAbove200Ms": 0,
+        "targetFps": 50,
+        "accepted": false,
+        "diagnostics": {
+          "enabled": true,
+          "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+          "active": true,
+          "contextCount": 1,
+          "frames": 2959,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 11,
+          "triangles": 274,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "balanced",
+          "cameraState": "transition",
+          "target": [
+            157.29320642143836,
+            45.92633122596193
+          ],
+          "frameIntervals": {
+            "count": 629,
+            "min": 16.5679999999993,
+            "median": 50,
+            "p95": 50.10000000000582,
+            "max": 100.10000000000582,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 631,
+            "min": 0.19999992847442627,
+            "median": 0.3999999761581421,
+            "p95": 0.5,
+            "max": 0.9000000953674316,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 104114.79999995232,
+          "readyAt": 571
+        },
+        "rendererInfo": {
+          "vendor": "WebKit",
+          "renderer": "WebKit WebGL",
+          "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+          "unmaskedVendor": "Google Inc. (Google)",
+          "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+        },
+        "note": "Renderer submitted-frame timing during continuous scripted input; not input-to-photon or physical-device GPU validation."
+      }
+    },
+    {
+      "name": "10 exits/reentries clean up own WebGL context",
+      "passed": true,
+      "detail": [
+        {
+          "contexts": {
+            "created": 1,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": true,
+            "instance": "6bc22de9-db78-4bde-b0ee-d8f82175a3a0",
+            "active": false,
+            "contextCount": 0,
+            "frames": 2973,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 11,
+            "triangles": 270,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "balanced",
+            "cameraState": "idle",
+            "target": [
+              156.10608315374483,
+              45.98752317757303
+            ],
+            "frameIntervals": {
+              "count": 642,
+              "min": 16.5679999999993,
+              "median": 50,
+              "p95": 66.5,
+              "max": 100.10000000000582,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 645,
+              "min": 0.19999992847442627,
+              "median": 0.3999999761581421,
+              "p95": 0.5,
+              "max": 0.9000000953674316,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 104114.79999995232,
+            "readyAt": 571
+          }
+        },
+        {
+          "contexts": {
+            "created": 2,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "35c4cee4-a3c2-4de2-a905-906f97365ed7",
+            "active": false,
+            "contextCount": 0,
+            "frames": 11,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 170861.79999995232,
+            "readyAt": 170908.69999992847
+          }
+        },
+        {
+          "contexts": {
+            "created": 3,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "2fd3a713-b42f-4058-bdf5-424d878797b9",
+            "active": false,
+            "contextCount": 0,
+            "frames": 13,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 172251.69999992847,
+            "readyAt": 172260.69999992847
+          }
+        },
+        {
+          "contexts": {
+            "created": 4,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "e0980bac-b817-4736-b8f0-c9cf952e48d9",
+            "active": false,
+            "contextCount": 0,
+            "frames": 9,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 173725.10000002384,
+            "readyAt": 173755
+          }
+        },
+        {
+          "contexts": {
+            "created": 5,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "d16e99d4-101e-4652-8e03-ffe4df83bcad",
+            "active": false,
+            "contextCount": 0,
+            "frames": 12,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 175258.5,
+            "readyAt": 175286.39999997616
+          }
+        },
+        {
+          "contexts": {
+            "created": 6,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "f36c9c16-47e0-4051-8531-1d1c714bda26",
+            "active": false,
+            "contextCount": 0,
+            "frames": 13,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 176810.5,
+            "readyAt": 176831.10000002384
+          }
+        },
+        {
+          "contexts": {
+            "created": 7,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "431cf536-8d71-4f4b-a294-a4b5a2100a39",
+            "active": false,
+            "contextCount": 0,
+            "frames": 13,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 178433.10000002384,
+            "readyAt": 178461.19999992847
+          }
+        },
+        {
+          "contexts": {
+            "created": 8,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "6dbd55f9-5ba6-4b37-9f17-c33c33805cfa",
+            "active": false,
+            "contextCount": 0,
+            "frames": 12,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 179891.10000002384,
+            "readyAt": 179895.79999995232
+          }
+        },
+        {
+          "contexts": {
+            "created": 9,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "d04522fb-8ae1-4f05-836f-2cfe8eee2619",
+            "active": false,
+            "contextCount": 0,
+            "frames": 13,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 181326.39999997616,
+            "readyAt": 181346.89999997616
+          }
+        },
+        {
+          "contexts": {
+            "created": 10,
+            "active": 0
+          },
+          "diagnostic": {
+            "enabled": false,
+            "instance": "12286c10-224d-460c-84fe-6dde7c59a343",
+            "active": false,
+            "contextCount": 0,
+            "frames": 14,
+            "createdContexts": 1,
+            "activeContexts": 0,
+            "activeLoops": 0,
+            "drawCalls": 44,
+            "triangles": 782,
+            "geometries": 44,
+            "textures": 1,
+            "programs": 6,
+            "textureBytes": 4194304,
+            "dpr": 1,
+            "buffer": [
+              1294,
+              664
+            ],
+            "tier": "light",
+            "cameraState": "idle",
+            "target": [
+              95.5,
+              55
+            ],
+            "frameIntervals": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "renderDurations": {
+              "count": 0,
+              "min": null,
+              "median": null,
+              "p95": null,
+              "max": null,
+              "stallsAbove200Ms": 0
+            },
+            "contextLosses": 0,
+            "lastSelectedId": null,
+            "selectionDrawAt": 182910.29999995232,
+            "readyAt": 182936.79999995232
+          }
+        }
+      ]
+    },
+    {
+      "name": "external font CSS delayed 5s does not block useful map",
+      "passed": true,
+      "detail": {
+        "usefulMs": 413.1620000000112,
+        "mediaWhilePending": "print",
+        "mediaAfterStylesheetLoad": "all",
+        "delayMs": 5000,
+        "note": "Delayed intercepted external CSS response tests browser stylesheet loading; font rasterization uses existing fallbacks."
+      }
+    },
+    {
+      "name": "resilience no-webgl",
+      "passed": true,
+      "detail": {
+        "usefulMs": 423.79120000003604,
+        "representation": "2d",
+        "contexts": {
+          "created": 0,
+          "active": 0
+        },
+        "diagnostics": null
+      }
+    },
+    {
+      "name": "resilience chunk-failure",
+      "passed": true,
+      "detail": {
+        "usefulMs": 432.46609999996144,
+        "representation": "2d",
+        "contexts": {
+          "created": 0,
+          "active": 0
+        },
+        "diagnostics": null
+      }
+    },
+    {
+      "name": "resilience commercial-api-failure",
+      "passed": true,
+      "detail": {
+        "usefulMs": 401.05160000000615,
+        "representation": "ready",
+        "contexts": {
+          "created": 1,
+          "active": 1
+        },
+        "diagnostics": {
+          "enabled": true,
+          "instance": "bf4c1eaf-2927-4366-81a2-a42f5b9dbe9b",
+          "active": true,
+          "contextCount": 1,
+          "frames": 45,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 0,
+          "drawCalls": 17,
+          "triangles": 296,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            160.42783500000002,
+            77.20691000000001
+          ],
+          "frameIntervals": {
+            "count": 41,
+            "min": 16.59999999999991,
+            "median": 16.699999999999818,
+            "p95": 16.799999999999955,
+            "max": 916.7,
+            "stallsAbove200Ms": 1
+          },
+          "renderDurations": {
+            "count": 45,
+            "min": 0.2999999523162842,
+            "median": 0.7000000476837158,
+            "p95": 3.6999999284744263,
+            "max": 79.29999995231628,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": "indumoveis:external:lot:70",
+          "selectionDrawAt": 1038.7999999523163,
+          "readyAt": 601.6000000238419
+        }
+      }
+    },
+    {
+      "name": "resilience reduced-motion",
+      "passed": true,
+      "detail": {
+        "usefulMs": 614.9543999999878,
+        "representation": "ready",
+        "contexts": {
+          "created": 1,
+          "active": 1
+        },
+        "diagnostics": {
+          "enabled": true,
+          "instance": "92ffbd29-28ce-45e8-87a1-51879d2999a4",
+          "active": true,
+          "contextCount": 1,
+          "frames": 29,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 0,
+          "drawCalls": 17,
+          "triangles": 296,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "light",
+          "cameraState": "idle",
+          "target": [
+            160.42783500000002,
+            77.20691000000001
+          ],
+          "frameIntervals": {
+            "count": 27,
+            "min": 16.600000000000023,
+            "median": 16.699999999999932,
+            "p95": 16.700000000000045,
+            "max": 83.20400000000001,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 29,
+            "min": 0.3999999761581421,
+            "median": 1.0999999046325684,
+            "p95": 5.400000095367432,
+            "max": 69.89999997615814,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": "indumoveis:external:lot:70",
+          "selectionDrawAt": 850.2000000476837,
+          "readyAt": 612.9000000953674
+        }
+      }
+    },
+    {
+      "name": "context loss recovery finite, identity preserved",
+      "passed": true,
+      "detail": {
+        "scrollWidth": 1366,
+        "viewportWidth": 1366,
+        "canvases": 0,
+        "contexts": {
+          "created": 2,
+          "active": 0
+        },
+        "marks": [
+          {
+            "name": "indumoveis-map:renderer-start",
+            "startTime": 441.2000000476837
+          },
+          {
+            "name": "indumoveis-map:essential-prepared",
+            "startTime": 526.8999999761581
+          },
+          {
+            "name": "indumoveis-map:first-valid-draw",
+            "startTime": 621.1000000238419
+          },
+          {
+            "name": "indumoveis-map:controls-ready",
+            "startTime": 621.1000000238419
+          },
+          {
+            "name": "indumoveis-map:renderer-disposed",
+            "startTime": 2164.899999976158
+          },
+          {
+            "name": "indumoveis-map:renderer-start",
+            "startTime": 2182
+          },
+          {
+            "name": "indumoveis-map:essential-prepared",
+            "startTime": 2234.2000000476837
+          },
+          {
+            "name": "indumoveis-map:first-valid-draw",
+            "startTime": 2313.2000000476837
+          },
+          {
+            "name": "indumoveis-map:controls-ready",
+            "startTime": 2313.2000000476837
+          },
+          {
+            "name": "indumoveis-map:renderer-disposed",
+            "startTime": 2843.5
+          }
+        ]
+      }
+    },
+    {
+      "name": "fallback mobile labels, drag, zoom and search without engine chunk",
+      "passed": true,
+      "detail": {
+        "labels": [
+          {
+            "text": "P1 · Mostra",
+            "screenFontPx": 11.999993768494566
+          },
+          {
+            "text": "P14",
+            "screenFontPx": 11.999993768494566
+          },
+          {
+            "text": "P12",
+            "screenFontPx": 11.999993768494566
+          },
+          {
+            "text": "P8",
+            "screenFontPx": 11.999993768494566
+          },
+          {
+            "text": "P3",
+            "screenFontPx": 11.999993768494566
+          }
+        ],
+        "contexts": {
+          "created": 0,
+          "active": 0
+        }
+      }
+    },
+    {
+      "name": "visibility pause, gesture cancellation and return without hidden frame interval",
+      "passed": true,
+      "detail": {
+        "mode": "Headless tabs stayed visible; document.hidden/visibilityState + visibilitychange explicitly simulated",
+        "hiddenFrames": 30,
+        "pausedFrames": 30,
+        "projectedBefore": {
+          "x": 513.1993825195764,
+          "y": 436.08339663081847
+        },
+        "projectedAfter": {
+          "x": 513.1993825195764,
+          "y": 436.08339663081847
+        },
+        "addedIntervals": [
+          16.64800000000014,
+          16.700000000000045
+        ],
+        "commercialReads": 1,
+        "instance": "842d18f7-db7f-4c20-964f-bc33e877e660"
+      }
+    },
+    {
+      "name": "Financeiro and Documentos never request renderer on direct entry",
+      "passed": true,
+      "detail": [
+        {
+          "route": "financeiro",
+          "rendererRequests": [],
+          "canvases": 0
+        },
+        {
+          "route": "documentos",
+          "rendererRequests": [],
+          "canvases": 0
+        }
+      ]
+    },
+    {
+      "name": "mobile pinch, remaining pointer and orientation",
+      "passed": true,
+      "detail": {
+        "before": {
+          "enabled": true,
+          "instance": "d16f9758-a61a-403e-96a5-80f27be5fbc2",
+          "active": true,
+          "contextCount": 1,
+          "frames": 53,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 42,
+          "triangles": 422,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            390,
+            740
+          ],
+          "tier": "light",
+          "cameraState": "transition",
+          "target": [
+            109.59828376574366,
+            59.840693552600044
+          ],
+          "frameIntervals": {
+            "count": 50,
+            "min": 16.59999999999991,
+            "median": 16.699999999999818,
+            "p95": 33.30000000000018,
+            "max": 99.90000000000003,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 53,
+            "min": 0.3999999761581421,
+            "median": 0.6999999284744263,
+            "p95": 2.899999976158142,
+            "max": 48.199999928474426,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": "indumoveis:external:lot:70",
+          "selectionDrawAt": 1356,
+          "readyAt": 525.1999999284744
+        },
+        "after": {
+          "enabled": true,
+          "instance": "d16f9758-a61a-403e-96a5-80f27be5fbc2",
+          "active": true,
+          "contextCount": 1,
+          "frames": 55,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 44,
+          "triangles": 772,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            772,
+            294
+          ],
+          "tier": "light",
+          "cameraState": "transition",
+          "target": [
+            118.21614783855568,
+            62.78503772186083
+          ],
+          "frameIntervals": {
+            "count": 52,
+            "min": 16.59999999999991,
+            "median": 16.699999999999818,
+            "p95": 33.30000000000018,
+            "max": 99.90000000000003,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 55,
+            "min": 0.3999999761581421,
+            "median": 0.6999999284744263,
+            "p95": 2.899999976158142,
+            "max": 48.199999928474426,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": "indumoveis:external:lot:70",
+          "selectionDrawAt": 1356,
+          "readyAt": 525.1999999284744
+        },
+        "note": "Synthetic CDP touch in Chromium; not physical-device touch verification."
+      }
+    }
+  ],
+  "openings": [
+    {
+      "name": "medium",
+      "cpu": 1,
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "targetMs": 3000,
+      "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+      "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+      "samples": [
+        {
+          "state": "cold",
+          "usefulMs": 1337.2788,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 848.7000000476837
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 852
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1089.2000000476837
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1094.3000000715256
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1178.3000000715256
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1312.9000000953674
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1312.9000000953674
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1312.9000000953674
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 111.70000004768372
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 117.90000009536743
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 228.70000004768372
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 143.1774000000005,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1395.3438000000024,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 907.3999999761581
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 910.8999999761581
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1281.1999999284744
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1290.8999999761581
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1333.5
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1398.1999999284744
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1398.1999999284744
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1398.3999999761581
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 129.60000002384186
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 122.30000007152557
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 227.29999995231628
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 91.54449999999633,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1346.4174000000057,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 858.1999999284744
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 861.6999999284744
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1112.1999999284744
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1117.1999999284744
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1191
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1333.3999999761581
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1333.3999999761581
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1333.5
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 122
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 114
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 242.20000004768372
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 105.70799999999872,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1494.2958999999973,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 865.5999999046326
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 869
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1096.5
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1101.3999999761581
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1177
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1497.0999999046326
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1497.0999999046326
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1497.0999999046326
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 115.30000007152557
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 138.39999997615814
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 218.59999990463257
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 90.03349999999045,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1319.2956000000122,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 879.2999999523163
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 882.6000000238419
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1104.6999999284744
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1109.7999999523163
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1191
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1288.3999999761581
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1288.3999999761581
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1288.5
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 120.60000002384186
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 144.20000004768372
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 213.40000009536743
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 93.9826999999932,
+          "representation": "ready"
+        }
+      ],
+      "cold": {
+        "n": 5,
+        "medianMs": 1346.4174000000057,
+        "worstMs": 1494.2958999999973,
+        "passed": true
+      },
+      "warm": {
+        "n": 5,
+        "medianMs": 93.9826999999932,
+        "worstMs": 143.1774000000005,
+        "passed": true
+      },
+      "accepted": true
+    },
+    {
+      "name": "weak-cpu4",
+      "cpu": 4,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "targetMs": 5000,
+      "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+      "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+      "samples": [
+        {
+          "state": "cold",
+          "usefulMs": 2102.0877000000037,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1509.9000000953674
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1529.9000000953674
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1781.4000000953674
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1806
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1896
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2047.4000000953674
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2047.4000000953674
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2047.6000000238419
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 132.39999997615814
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 226.60000002384186
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 223.5
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1817.719499999992,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 2080.398000000001,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1493.8999999761581
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1510.8999999761581
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1765.2999999523163
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1787.1999999284744
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1891.8999999761581
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2037.1999999284744
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2037.2999999523163
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2037.2999999523163
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 135.39999997615814
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 225.60000002384186
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 222.69999992847443
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1280.9854999999952,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1262.8117000000057,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1193.6000000238419
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1211.7000000476837
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1460.5
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1470
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1564.8999999761581
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1669.7999999523163
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1669.7999999523163
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1669.8999999761581
+            }
+          ],
+          "transferBytes": 428271,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 121
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 220.89999997615814
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 225.79999995231628
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1528.2187000000122,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1851.8166999999958,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1343.0999999046326
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1353.8999999761581
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1581.5999999046326
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1594.3999999761581
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1699.8999999761581
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1805.0999999046326
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1805.0999999046326
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1805.1999999284744
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 133
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 225.79999995231628
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 212
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1284.2553000000044,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 2062.6796999999933,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1448.7999999523163
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1468.2000000476837
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1721.6000000238419
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1743.1000000238419
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1857.2000000476837
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2013.2000000476837
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2013.2000000476837
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2013.3999999761581
+            }
+          ],
+          "transferBytes": 430216,
+          "featureResources": [
+            {
+              "file": "mapa-OaSgC3q6.js",
+              "transferSize": 10490,
+              "encodedBodySize": 10190,
+              "duration": 135.80000007152557
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 230.89999997615814
+            },
+            {
+              "file": "MapRenderer-Bgud21OJ.js",
+              "transferSize": 150387,
+              "encodedBodySize": 150087,
+              "duration": 223.79999995231628
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1747.3177000000142,
+          "representation": "ready"
+        }
+      ],
+      "cold": {
+        "n": 5,
+        "medianMs": 2062.6796999999933,
+        "worstMs": 2102.0877000000037,
+        "passed": true
+      },
+      "warm": {
+        "n": 5,
+        "medianMs": 1528.2187000000122,
+        "worstMs": 1817.719499999992,
+        "passed": true
+      },
+      "accepted": true
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/documentos",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/documentos",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/documentos",
+      "text": "TypeError: L.map is not a function\n    at L (http://127.0.0.1:4174/assets/documentos-BwPYfYlh.js:1:5367)\n    at Eo (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:47513)\n    at gc (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:69969)\n    at Nc (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:80217)\n    at Mu (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:115574)\n    at ku (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:114657)\n    at Ou (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:114496)\n    at gu (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:111024)\n    at ld (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:122991)\n    at id (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:121551)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/documentos",
+      "text": "TypeError: L.map is not a function\n    at L (http://127.0.0.1:4174/assets/documentos-BwPYfYlh.js:1:5367)\n    at Eo (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:47513)\n    at gc (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:69969)\n    at Nc (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:80217)\n    at Mu (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:115574)\n    at ku (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:114657)\n    at Ou (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:114496)\n    at gu (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:111367)\n    at ld (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:122991)\n    at id (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:121551)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/documentos",
+      "text": "TypeError: L.map is not a function\n    at L (http://127.0.0.1:4174/assets/documentos-BwPYfYlh.js:1:5367)\n    at Eo (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:47513)\n    at gc (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:69969)\n    at Nc (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:80217)\n    at Mu (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:115574)\n    at ku (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:114657)\n    at Ou (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:114496)\n    at gu (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:111367)\n    at ld (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:122991)\n    at id (http://127.0.0.1:4174/assets/index-Dk84HfRX.js:9:121551)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "unexpectedRequests": [],
+  "summary": {
+    "usefulMedianMs": 599.3112000000001,
+    "usefulWorstMs": 1968.6097,
+    "passedChecks": 25,
+    "failedChecks": 2
+  },
+  "evidenceFormat": "Compact JSON: all frame intervals and render-duration arrays are summarized uniformly; quantiles/counts use every recorded value. Full raw arrays remain in the local artifact identified by rawArtifact and are reproduced by the committed browser harness.",
+  "rawArtifact": "artifacts.local/commercial-map-final/validation.json",
+  "evidenceScope": "Earlier complete SwiftShader flow, before final live-handoff/AUTO-degradation changes. Both manual profiles missed navigation targets at 20 FPS with explicit CPU1 and no leaked contexts. The cause was not isolated; Intel results do not erase this limitation."
+}
