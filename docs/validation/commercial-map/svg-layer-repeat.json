@@ -1,0 +1,2177 @@
+{
+  "generatedAt": "2026-10-15T22:29:47.420Z",
+  "baseURL": "http://127.0.0.1:4174",
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [
+      "/assets/MapRenderer-BGI3RIOg.js"
+    ],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "browser": "153.0.8010.12",
+    "actualGL": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Intel)",
+      "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "mode": "full",
+  "layouts": [
+    {
+      "viewport": "360x800",
+      "usefulMs": 1463.9163,
+      "scrollWidth": 360,
+      "viewportWidth": 360,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 877.3999999761581
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 1197.8000000715256
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 1339.1000000238419
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 1339.2000000476837
+        }
+      ]
+    },
+    {
+      "viewport": "390x844",
+      "usefulMs": 458.43679999999995,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 465
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 514.7999999523163
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 587.3999999761581
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 587.3999999761581
+        }
+      ]
+    },
+    {
+      "viewport": "844x390",
+      "usefulMs": 757.7085000000006,
+      "scrollWidth": 844,
+      "viewportWidth": 844,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 519.3999999761581
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 645.5
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 722.1000000238419
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 722.1000000238419
+        }
+      ]
+    },
+    {
+      "viewport": "768x1024",
+      "usefulMs": 566.1610000000001,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 577.4000000953674
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 633.8000000715256
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 711.9000000953674
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 711.9000000953674
+        }
+      ]
+    },
+    {
+      "viewport": "1366x768",
+      "usefulMs": 813.0331999999999,
+      "scrollWidth": 1366,
+      "viewportWidth": 1366,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 546.6000000238419
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 618.3000000715256
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 693.9000000953674
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 693.9000000953674
+        }
+      ]
+    },
+    {
+      "viewport": "1920x1080",
+      "usefulMs": 729.8282999999992,
+      "scrollWidth": 1920,
+      "viewportWidth": 1920,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 596.7999999523163
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 656.8999999761581
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 735.6000000238419
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 735.6000000238419
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "five cold and warm openings medium",
+      "passed": true,
+      "detail": {
+        "name": "medium",
+        "cpu": 1,
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "targetMs": 3000,
+        "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+        "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+        "samples": [
+          {
+            "state": "cold",
+            "usefulMs": 1570.5151000000005,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1162
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1166.6000000238419
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1405.3000000715256
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1411.8000000715256
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1471.9000000953674
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1538.7000000476837
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1538.8000000715256
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1538.8000000715256
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 118.10000002384186
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 212.80000007152557
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 227.89999997615814
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 141.04290000000037,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1547.3757999999998,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1099.5
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1103.6000000238419
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1343.7999999523163
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1349.6999999284744
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1400.1999999284744
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1474.3999999761581
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1474.3999999761581
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1474.5
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 127.69999992847443
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 206
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 229.5
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 96.08159999999953,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1633.2104999999992,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1149.4000000953674
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1153.6000000238419
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1382.4000000953674
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1389.1000000238419
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1442.4000000953674
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1516.2000000476837
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1516.2000000476837
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1516.2000000476837
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 128.29999995231628
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 212.5
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 217.79999995231628
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 196.3837999999996,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1540.2252000000008,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1108.1000000238419
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1112
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1354.7999999523163
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1360.5
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1406.7999999523163
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1467.6000000238419
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1467.6000000238419
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1467.7000000476837
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 130.69999992847443
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 207.5
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 234
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 97.15390000000116,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1540.0410999999986,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1087.6999999284744
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1091.6000000238419
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1315.3999999761581
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1321.1000000238419
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 1367.3999999761581
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 1431.6000000238419
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 1431.6000000238419
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 1431.6999999284744
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 134.79999995231628
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 197
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 213.90000009536743
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 114.6234000000004,
+            "representation": "ready"
+          }
+        ],
+        "cold": {
+          "n": 5,
+          "medianMs": 1547.3757999999998,
+          "worstMs": 1633.2104999999992,
+          "passed": true
+        },
+        "warm": {
+          "n": 5,
+          "medianMs": 114.6234000000004,
+          "worstMs": 196.3837999999996,
+          "passed": true
+        },
+        "accepted": true
+      }
+    },
+    {
+      "name": "five cold and warm openings weak-cpu4",
+      "passed": true,
+      "detail": {
+        "name": "weak-cpu4",
+        "cpu": 4,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "targetMs": 5000,
+        "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+        "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+        "samples": [
+          {
+            "state": "cold",
+            "usefulMs": 1764.2777999999998,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1681.1000000238419
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1698.8999999761581
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1938.2000000476837
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1953.1000000238419
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 2118.100000023842
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 2242
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 2242.2000000476837
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 2242.3000000715256
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 132.10000002384186
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 208.69999992847443
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 214.20000004768372
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1271.5325000000012,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1837.6141000000025,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1754.1999999284744
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1771.6000000238419
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 2024
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 2039.1000000238419
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 2188.1999999284744
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 2328.399999976158
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 2328.5
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 2328.5
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 143.70000004768372
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 235.29999995231628
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 228.89999997615814
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1490.3305,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1818.0892999999996,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1728.1000000238419
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1746.1000000238419
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 2007.1000000238419
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 2020.3999999761581
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 2168.100000023842
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 2308.2000000476837
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 2308.2000000476837
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 2308.2000000476837
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 136.5
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 228.5
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 233.60000002384186
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1412.9179999999978,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1721.2972000000009,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1628.5
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1647
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 1890.6999999284744
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 1906.1999999284744
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 2078.1999999284744
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 2218.5
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 2218.5
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 2218.5999999046326
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 135.60000002384186
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 234.39999997615814
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 219.69999992847443
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1588.8236999999936,
+            "representation": "ready"
+          },
+          {
+            "state": "cold",
+            "usefulMs": 1809.6630000000005,
+            "representation": "ready",
+            "marks": [
+              {
+                "name": "indumoveis:2d-interactive",
+                "ms": 1728.7999999523163
+              },
+              {
+                "name": "indumoveis:geometry-available",
+                "ms": 1745.3999999761581
+              },
+              {
+                "name": "indumoveis:renderer-chunk",
+                "ms": 2006.5
+              },
+              {
+                "name": "indumoveis-map:renderer-start",
+                "ms": 2024.7000000476837
+              },
+              {
+                "name": "indumoveis-map:essential-prepared",
+                "ms": 2180.899999976158
+              },
+              {
+                "name": "indumoveis-map:first-valid-draw",
+                "ms": 2310.5
+              },
+              {
+                "name": "indumoveis-map:controls-ready",
+                "ms": 2310.5
+              },
+              {
+                "name": "indumoveis:3d-interactive",
+                "ms": 2310.7000000476837
+              }
+            ],
+            "transferBytes": 430909,
+            "featureResources": [
+              {
+                "file": "mapa-D6Vlvl8n.js",
+                "transferSize": 10878,
+                "encodedBodySize": 10578,
+                "duration": 139.60000002384186
+              },
+              {
+                "file": "mapa-BtQDEtkP.css",
+                "transferSize": 3360,
+                "encodedBodySize": 3060,
+                "duration": 227.79999995231628
+              },
+              {
+                "file": "MapRenderer-BGI3RIOg.js",
+                "transferSize": 150686,
+                "encodedBodySize": 150386,
+                "duration": 233.89999997615814
+              }
+            ]
+          },
+          {
+            "state": "warm-SPA-reentry",
+            "usefulMs": 1305.5964999999997,
+            "representation": "ready"
+          }
+        ],
+        "cold": {
+          "n": 5,
+          "medianMs": 1809.6630000000005,
+          "worstMs": 1837.6141000000025,
+          "passed": true
+        },
+        "warm": {
+          "n": 5,
+          "medianMs": 1412.9179999999978,
+          "worstMs": 1588.8236999999936,
+          "passed": true
+        },
+        "accepted": true
+      }
+    },
+    {
+      "name": "existing host WebGL renderer information",
+      "passed": true,
+      "detail": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "name": "fallback mobile labels, drag, zoom and search without engine chunk",
+      "passed": true,
+      "detail": {
+        "labels": [
+          {
+            "text": "P1 · Mostra",
+            "screenFontPx": 11.999993768494566
+          },
+          {
+            "text": "P14",
+            "screenFontPx": 11.999993768494566
+          },
+          {
+            "text": "P12",
+            "screenFontPx": 11.999993768494566
+          },
+          {
+            "text": "P8",
+            "screenFontPx": 11.999993768494566
+          },
+          {
+            "text": "P3",
+            "screenFontPx": 11.999993768494566
+          }
+        ],
+        "lotLabelFit": [
+          {
+            "level": 0,
+            "visible": []
+          },
+          {
+            "level": 1,
+            "visible": []
+          },
+          {
+            "level": 2,
+            "visible": []
+          },
+          {
+            "level": 3,
+            "visible": [
+              {
+                "text": "01",
+                "fits": true
+              },
+              {
+                "text": "15",
+                "fits": true
+              },
+              {
+                "text": "16",
+                "fits": true
+              },
+              {
+                "text": "17",
+                "fits": true
+              },
+              {
+                "text": "18",
+                "fits": true
+              },
+              {
+                "text": "19",
+                "fits": true
+              },
+              {
+                "text": "21",
+                "fits": true
+              },
+              {
+                "text": "11",
+                "fits": true
+              },
+              {
+                "text": "12",
+                "fits": true
+              },
+              {
+                "text": "13",
+                "fits": true
+              },
+              {
+                "text": "14",
+                "fits": true
+              },
+              {
+                "text": "23",
+                "fits": true
+              },
+              {
+                "text": "28",
+                "fits": true
+              },
+              {
+                "text": "51",
+                "fits": true
+              },
+              {
+                "text": "56",
+                "fits": true
+              },
+              {
+                "text": "57",
+                "fits": true
+              },
+              {
+                "text": "61",
+                "fits": true
+              },
+              {
+                "text": "65",
+                "fits": true
+              },
+              {
+                "text": "66",
+                "fits": true
+              },
+              {
+                "text": "69",
+                "fits": true
+              }
+            ]
+          },
+          {
+            "level": 4,
+            "visible": [
+              {
+                "text": "01",
+                "fits": true
+              },
+              {
+                "text": "02",
+                "fits": true
+              },
+              {
+                "text": "03",
+                "fits": true
+              },
+              {
+                "text": "04",
+                "fits": true
+              },
+              {
+                "text": "05",
+                "fits": true
+              },
+              {
+                "text": "06",
+                "fits": true
+              },
+              {
+                "text": "07",
+                "fits": true
+              },
+              {
+                "text": "08",
+                "fits": true
+              },
+              {
+                "text": "15",
+                "fits": true
+              },
+              {
+                "text": "16",
+                "fits": true
+              },
+              {
+                "text": "17",
+                "fits": true
+              },
+              {
+                "text": "18",
+                "fits": true
+              },
+              {
+                "text": "19",
+                "fits": true
+              },
+              {
+                "text": "20",
+                "fits": true
+              },
+              {
+                "text": "21",
+                "fits": true
+              },
+              {
+                "text": "22",
+                "fits": true
+              },
+              {
+                "text": "09 / 10",
+                "fits": true
+              },
+              {
+                "text": "11",
+                "fits": true
+              },
+              {
+                "text": "12",
+                "fits": true
+              },
+              {
+                "text": "13",
+                "fits": true
+              },
+              {
+                "text": "23",
+                "fits": true
+              },
+              {
+                "text": "24",
+                "fits": true
+              },
+              {
+                "text": "25",
+                "fits": true
+              },
+              {
+                "text": "26",
+                "fits": true
+              },
+              {
+                "text": "27",
+                "fits": true
+              },
+              {
+                "text": "28",
+                "fits": true
+              },
+              {
+                "text": "29",
+                "fits": true
+              },
+              {
+                "text": "30",
+                "fits": true
+              },
+              {
+                "text": "37 / 38",
+                "fits": true
+              },
+              {
+                "text": "41 / 42",
+                "fits": true
+              },
+              {
+                "text": "45",
+                "fits": true
+              },
+              {
+                "text": "46",
+                "fits": true
+              },
+              {
+                "text": "47",
+                "fits": true
+              },
+              {
+                "text": "48",
+                "fits": true
+              },
+              {
+                "text": "51",
+                "fits": true
+              },
+              {
+                "text": "52",
+                "fits": true
+              },
+              {
+                "text": "53",
+                "fits": true
+              },
+              {
+                "text": "54",
+                "fits": true
+              },
+              {
+                "text": "55",
+                "fits": true
+              },
+              {
+                "text": "56",
+                "fits": true
+              },
+              {
+                "text": "57",
+                "fits": true
+              },
+              {
+                "text": "58",
+                "fits": true
+              },
+              {
+                "text": "59",
+                "fits": true
+              },
+              {
+                "text": "60",
+                "fits": true
+              },
+              {
+                "text": "61",
+                "fits": true
+              },
+              {
+                "text": "62",
+                "fits": true
+              },
+              {
+                "text": "63",
+                "fits": true
+              },
+              {
+                "text": "64",
+                "fits": true
+              },
+              {
+                "text": "65",
+                "fits": true
+              },
+              {
+                "text": "66",
+                "fits": true
+              },
+              {
+                "text": "67",
+                "fits": true
+              },
+              {
+                "text": "68",
+                "fits": true
+              },
+              {
+                "text": "69",
+                "fits": true
+              }
+            ]
+          }
+        ],
+        "contexts": {
+          "created": 0,
+          "active": 0
+        }
+      }
+    }
+  ],
+  "openings": [
+    {
+      "name": "medium",
+      "cpu": 1,
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "targetMs": 3000,
+      "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+      "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+      "samples": [
+        {
+          "state": "cold",
+          "usefulMs": 1570.5151000000005,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1162
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1166.6000000238419
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1405.3000000715256
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1411.8000000715256
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1471.9000000953674
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1538.7000000476837
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1538.8000000715256
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1538.8000000715256
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 118.10000002384186
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 212.80000007152557
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 227.89999997615814
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 141.04290000000037,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1547.3757999999998,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1099.5
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1103.6000000238419
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1343.7999999523163
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1349.6999999284744
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1400.1999999284744
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1474.3999999761581
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1474.3999999761581
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1474.5
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 127.69999992847443
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 206
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 229.5
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 96.08159999999953,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1633.2104999999992,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1149.4000000953674
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1153.6000000238419
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1382.4000000953674
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1389.1000000238419
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1442.4000000953674
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1516.2000000476837
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1516.2000000476837
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1516.2000000476837
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 128.29999995231628
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 212.5
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 217.79999995231628
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 196.3837999999996,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1540.2252000000008,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1108.1000000238419
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1112
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1354.7999999523163
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1360.5
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1406.7999999523163
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1467.6000000238419
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1467.6000000238419
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1467.7000000476837
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 130.69999992847443
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 207.5
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 234
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 97.15390000000116,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1540.0410999999986,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1087.6999999284744
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1091.6000000238419
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1315.3999999761581
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1321.1000000238419
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1367.3999999761581
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1431.6000000238419
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1431.6000000238419
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1431.6999999284744
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 134.79999995231628
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 197
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 213.90000009536743
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 114.6234000000004,
+          "representation": "ready"
+        }
+      ],
+      "cold": {
+        "n": 5,
+        "medianMs": 1547.3757999999998,
+        "worstMs": 1633.2104999999992,
+        "passed": true
+      },
+      "warm": {
+        "n": 5,
+        "medianMs": 114.6234000000004,
+        "worstMs": 196.3837999999996,
+        "passed": true
+      },
+      "accepted": true
+    },
+    {
+      "name": "weak-cpu4",
+      "cpu": 4,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "targetMs": 5000,
+      "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+      "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+      "samples": [
+        {
+          "state": "cold",
+          "usefulMs": 1764.2777999999998,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1681.1000000238419
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1698.8999999761581
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1938.2000000476837
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1953.1000000238419
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2118.100000023842
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2242
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2242.2000000476837
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2242.3000000715256
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 132.10000002384186
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 208.69999992847443
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 214.20000004768372
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1271.5325000000012,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1837.6141000000025,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1754.1999999284744
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1771.6000000238419
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 2024
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 2039.1000000238419
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2188.1999999284744
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2328.399999976158
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2328.5
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2328.5
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 143.70000004768372
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 235.29999995231628
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 228.89999997615814
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1490.3305,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1818.0892999999996,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1728.1000000238419
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1746.1000000238419
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 2007.1000000238419
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 2020.3999999761581
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2168.100000023842
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2308.2000000476837
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2308.2000000476837
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2308.2000000476837
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 136.5
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 228.5
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 233.60000002384186
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1412.9179999999978,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1721.2972000000009,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1628.5
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1647
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1890.6999999284744
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1906.1999999284744
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2078.1999999284744
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2218.5
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2218.5
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2218.5999999046326
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 135.60000002384186
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 234.39999997615814
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 219.69999992847443
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1588.8236999999936,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1809.6630000000005,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1728.7999999523163
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1745.3999999761581
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 2006.5
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 2024.7000000476837
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2180.899999976158
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2310.5
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2310.5
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2310.7000000476837
+            }
+          ],
+          "transferBytes": 430909,
+          "featureResources": [
+            {
+              "file": "mapa-D6Vlvl8n.js",
+              "transferSize": 10878,
+              "encodedBodySize": 10578,
+              "duration": 139.60000002384186
+            },
+            {
+              "file": "mapa-BtQDEtkP.css",
+              "transferSize": 3360,
+              "encodedBodySize": 3060,
+              "duration": 227.79999995231628
+            },
+            {
+              "file": "MapRenderer-BGI3RIOg.js",
+              "transferSize": 150686,
+              "encodedBodySize": 150386,
+              "duration": 233.89999997615814
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1305.5964999999997,
+          "representation": "ready"
+        }
+      ],
+      "cold": {
+        "n": 5,
+        "medianMs": 1809.6630000000005,
+        "worstMs": 1837.6141000000025,
+        "passed": true
+      },
+      "warm": {
+        "n": 5,
+        "medianMs": 1412.9179999999978,
+        "worstMs": 1588.8236999999936,
+        "passed": true
+      },
+      "accepted": true
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/financeiro",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    }
+  ],
+  "unexpectedRequests": [],
+  "summary": {
+    "usefulMedianMs": 729.8282999999992,
+    "usefulWorstMs": 1463.9163,
+    "passedChecks": 4,
+    "failedChecks": 0
+  },
+  "evidenceFormat": "Compact JSON: all frame intervals and render-duration arrays are summarized uniformly; quantiles/counts use every recorded value. Full raw arrays remain in the local artifact identified by rawArtifact and are reproduced by the committed browser harness.",
+  "rawArtifact": "artifacts.local/commercial-map-svg-layer/validation.json"
+}

@@ -1,0 +1,32 @@
+{
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "Chromium software ANGLE/SwiftShader",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Not tested",
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "browser": "153.0.8010.12"
+  },
+  "observations": [
+    {
+      "name": "30s active navigation light",
+      "passed": false,
+      "medianFps": 20,
+      "p95IntervalMs": 66.69999999999709,
+      "stallsAbove200Ms": 1,
+      "samples": 612
+    },
+    {
+      "name": "30s active navigation balanced",
+      "passed": false,
+      "medianFps": 20,
+      "p95IntervalMs": 66.70000000001164,
+      "stallsAbove200Ms": 0,
+      "samples": 637
+    }
+  ],
+  "status": "Historical exploratory run: a CPU4 context remained open after a mobile navigation harness failure, and subsequent contexts did not explicitly reset CPU throttling. A later full run with explicit CPU1 and no leaked context again measured 20 FPS in SwiftShader; see software-flow.json. Therefore the initial protocol defects are not accepted as a causal explanation. No samples were selectively removed."
+}

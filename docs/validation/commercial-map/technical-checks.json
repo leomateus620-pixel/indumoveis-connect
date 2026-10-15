@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-15",
+  "branch": "codex/indumoveis-commercial-map",
+  "baselineCommit": "c1e18d9",
+  "build": { "command": "npm run build", "passed": true },
+  "typescript": { "command": "node node_modules/typescript/bin/tsc --noEmit", "passed": true },
+  "tests": { "command": "npm test", "passed": 47, "failed": 0, "baselinePassed": 18 },
+  "lint": {
+    "command": "npm run lint -- --format json --output-file artifacts.local/commercial-map-final-lint.json",
+    "passed": false,
+    "errors": 17158,
+    "formattingErrors": 17157,
+    "warnings": 12,
+    "otherError": {
+      "file": "src/integrations/supabase/previewAuthStorage.ts",
+      "line": 38,
+      "rule": "prefer-const",
+      "preexisting": true
+    },
+    "baselineErrors": 17338,
+    "baselineWarnings": 12,
+    "scopedNewFeatureFontsRouteAndScripts": "passed",
+    "api": "passed with prettier endOfLine:auto to accept the existing file EOLs"
+  },
+  "generatedRoutes": "Unchanged; build-only EOL differences restored",
+  "deployment": "Not performed",
+  "databaseMigrations": "None",
+  "referenceRepository": "Read only"
+}

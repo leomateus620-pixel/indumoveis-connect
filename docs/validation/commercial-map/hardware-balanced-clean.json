@@ -1,0 +1,351 @@
+{
+  "generatedAt": "2026-10-15T22:08:19.902Z",
+  "baseURL": "http://127.0.0.1:4174",
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Not tested",
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "browser": "153.0.8010.12",
+    "actualGL": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Intel)",
+      "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "mode": "full",
+  "layouts": [
+    {
+      "viewport": "360x800",
+      "usefulMs": 1484.8189000000002,
+      "scrollWidth": 360,
+      "viewportWidth": 360,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 774.7999999523163
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 1164.5
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 1338.1000000238419
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 1338.1000000238419
+        }
+      ]
+    },
+    {
+      "viewport": "390x844",
+      "usefulMs": 705.1898000000001,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 572.2999999523163
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 626.3999999761581
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 689.2999999523163
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 689.2999999523163
+        }
+      ]
+    },
+    {
+      "viewport": "844x390",
+      "usefulMs": 686.2141000000001,
+      "scrollWidth": 844,
+      "viewportWidth": 844,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 541.1999999284744
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 598.8999999761581
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 668.7999999523163
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 668.7999999523163
+        }
+      ]
+    },
+    {
+      "viewport": "768x1024",
+      "usefulMs": 689.5662000000002,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 543.3999999761581
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 598.8999999761581
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 667.2000000476837
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 667.2000000476837
+        }
+      ]
+    },
+    {
+      "viewport": "1366x768",
+      "usefulMs": 791.4369000000006,
+      "scrollWidth": 1366,
+      "viewportWidth": 1366,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 628.0999999046326
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 699.3999999761581
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 779
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 779.0999999046326
+        }
+      ]
+    },
+    {
+      "viewport": "1920x1080",
+      "usefulMs": 812.9645999999993,
+      "scrollWidth": 1920,
+      "viewportWidth": 1920,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 584.1000000238419
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 642
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 716.2000000476837
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 716.2999999523163
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "existing host WebGL renderer information",
+      "passed": true,
+      "detail": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    {
+      "name": "30s active navigation balanced",
+      "passed": true,
+      "detail": {
+        "quality": "balanced",
+        "durationMs": 30325.8399,
+        "rounds": 63,
+        "samples": 1817,
+        "medianFps": 59.880239520962,
+        "p95IntervalMs": 16.799999999999272,
+        "stallsAbove200Ms": 0,
+        "targetFps": 50,
+        "accepted": true,
+        "diagnostics": {
+          "enabled": true,
+          "instance": "acb67c9f-6820-44fa-8ff1-d3d16f8e9f1c",
+          "active": true,
+          "contextCount": 1,
+          "frames": 1888,
+          "createdContexts": 1,
+          "activeContexts": 1,
+          "activeLoops": 1,
+          "drawCalls": 44,
+          "triangles": 902,
+          "geometries": 44,
+          "textures": 1,
+          "programs": 6,
+          "textureBytes": 4194304,
+          "dpr": 1,
+          "buffer": [
+            1294,
+            664
+          ],
+          "tier": "balanced",
+          "cameraState": "transition",
+          "target": [
+            86.1334242896654,
+            50.52156278736238
+          ],
+          "frameIntervals": {
+            "count": 1817,
+            "min": 12.799999999999272,
+            "median": 16.69999999999891,
+            "p95": 16.799999999999272,
+            "max": 20,
+            "stallsAbove200Ms": 0
+          },
+          "renderDurations": {
+            "count": 1819,
+            "min": 0.19999992847442627,
+            "median": 0.5,
+            "p95": 1,
+            "max": 3.100000023841858,
+            "stallsAbove200Ms": 0
+          },
+          "contextLosses": 0,
+          "lastSelectedId": null,
+          "selectionDrawAt": 611.6000000238419,
+          "readyAt": 627.3999999761581
+        },
+        "rendererInfo": {
+          "vendor": "WebKit",
+          "renderer": "WebKit WebGL",
+          "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+          "unmaskedVendor": "Google Inc. (Intel)",
+          "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+        },
+        "note": "Renderer submitted-frame timing during continuous scripted input; not input-to-photon or physical-device GPU validation."
+      }
+    }
+  ],
+  "openings": [],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4174/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "unexpectedRequests": [],
+  "summary": {
+    "usefulMedianMs": 705.1898000000001,
+    "usefulWorstMs": 1484.8189000000002,
+    "passedChecks": 2,
+    "failedChecks": 0
+  },
+  "evidenceFormat": "Compact JSON: all frame intervals and render-duration arrays are summarized uniformly; quantiles/counts use every recorded value. Full raw arrays remain in the local artifact identified by rawArtifact and are reproduced by the committed browser harness.",
+  "rawArtifact": "artifacts.local/commercial-map-hardware-balanced-clean/validation.json"
+}
