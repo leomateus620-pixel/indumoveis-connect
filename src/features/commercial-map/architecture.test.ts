@@ -57,7 +57,9 @@ describe("static presentation architecture", () => {
         meshes++;
         triangles += object.geometry.getAttribute("position").count / 3;
       });
-      expect(meshes).toBeLessThanOrEqual(15);
+      // Semantic PBR batches retain one shared material per family. The
+      // individual roof groups must remain independently inspectable.
+      expect(meshes).toBeLessThanOrEqual(32);
       expect(triangles).toBeLessThan(20000);
       for (const entity of pavilions) {
         const roof = model.roofs.get(entity.id)!;
@@ -121,6 +123,39 @@ describe("static presentation architecture", () => {
     expect(clipped).toContainEqual([0.5, 1.5]);
     expect(clipped).toContainEqual([4.5, 1.5]);
     expect(clipped.every((point) => point[1] >= 1.5)).toBe(true);
+  });
+
+  it("separates wall, concrete, sheet, glass and metal while preserving finite local UVs", () => {
+    const model = buildArchitecture(ENTITIES);
+    try {
+      const families = new Set<THREE.Material>();
+      model.group.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        const material = object.material as THREE.MeshStandardMaterial;
+        families.add(material);
+        expect(material.isMeshStandardMaterial).toBe(true);
+        const position = object.geometry.getAttribute("position");
+        const uv = object.geometry.getAttribute("uv");
+        const color = object.geometry.getAttribute("color");
+        expect(uv.count).toBe(position.count);
+        expect(Array.from(uv.array).every(Number.isFinite)).toBe(true);
+        expect(new Set(uv.array).size).toBeGreaterThan(1);
+        // Warm tones belong to the semantic material, not stale beige vertex
+        // multipliers contaminating every facade/roof texture.
+        for (let i = 0; i < color.count; i++)
+          expect(color.getX(i) - color.getZ(i)).toBeLessThan(0.015);
+      });
+      expect(families.size).toBe(6);
+      const family = (name: string) =>
+        (model.group.children.find((child) => child.name === name) as THREE.Mesh).material;
+      const roof = model.roofs.get("indumoveis:pavilion:1")!.children[0] as THREE.Mesh;
+      expect(roof.material).not.toBe(family("walls"));
+      expect(family("walls")).not.toBe(family("floors-contact"));
+      expect(family("entry-glazing")).not.toBe(family("entry-lintels"));
+      expect(model.textureBytes).toBeLessThan(0.5 * 1024 * 1024);
+    } finally {
+      model.dispose();
+    }
   });
 
   it("keeps facade panels behind posts and meets the roof underside without coplanar overlap", () => {

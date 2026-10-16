@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { MapEntity, Point } from "./data/territory";
 import { pointInPolygon, polygonBounds, signedPolygonArea } from "./geometry";
+import { createSurfaceMaterials, type SurfaceMaterials } from "./surfaceMaterials";
 
 /** Drawing proportions only. The source coordinate system is not measured in metres. */
 export const PAVEMENT = {
@@ -8,8 +9,8 @@ export const PAVEMENT = {
   walkElevation: -0.018,
   paintElevation: -0.012,
   junctionTolerance: 0.025,
-  grainTile: 0.75,
-  textureSize: 64,
+  grainTile: 1.5,
+  textureSize: 128,
 } as const;
 
 const EPSILON = 1e-7;
@@ -279,42 +280,27 @@ function surfaceGeometry(polygons: readonly Point[][], elevation: number, textur
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  // The semantic material is also shared with vertex-coloured architecture.
+  // Built-in Standard materials have no defaultAttributeValues fallback: an
+  // absent colour attribute would read GL's zero and turn asphalt/paint black.
+  geometry.setAttribute(
+    "color",
+    new THREE.Float32BufferAttribute(new Float32Array(positions.length).fill(1), 3),
+  );
   if (textured) geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
   geometry.computeVertexNormals();
   return geometry;
 }
 
-/** Deterministic small aggregate atlas: low contrast, mipmapped, shared by the
- * complete asphalt network, no shader hooks or runtime canvas texture churn. */
-function aggregateTexture() {
-  const size = PAVEMENT.textureSize;
-  const pixels = new Uint8Array(size * size * 4);
-  let seed = 725913;
-  for (let i = 0; i < size * size; i++) {
-    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-    const value = 240 + ((seed >>> 24) % 13);
-    pixels.set([value, value, value, 255], i * 4);
-  }
-  const texture = new THREE.DataTexture(pixels, size, size, THREE.RGBAFormat);
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 2;
-  texture.needsUpdate = true;
-  return texture;
-}
-
 /** Exactly three visible batches. Source-road selection/picking remains with the
  * renderer and its original entities; these derived meshes never own an ID. */
-export function createPavement(entities: readonly MapEntity[]) {
+export function createPavement(entities: readonly MapEntity[], sharedSurfaces?: SurfaceMaterials) {
+  const surfaces = sharedSurfaces ?? createSurfaceMaterials();
   const topology = derivePavement(entities);
   const group = new THREE.Group();
   group.name = "indumoveis-derived-pavement";
   const resources: (THREE.BufferGeometry | THREE.Material | THREE.Texture)[] = [];
-  const texture = aggregateTexture();
-  resources.push(texture);
+  if (!sharedSurfaces) resources.push(...surfaces.textures, ...Object.values(surfaces.materials));
   const paint = topology.lateralEdges.map(({ a, b, inward, width }): Point[] => [
     a,
     b,
@@ -325,29 +311,33 @@ export function createPavement(entities: readonly MapEntity[]) {
     {
       polygons: topology.asphaltCells,
       elevation: PAVEMENT.asphaltElevation,
-      material: new THREE.MeshLambertMaterial({ color: "#62676a", map: texture }),
+      material: surfaces.materials.asphalt,
       textured: true,
     },
     {
       polygons: topology.walkCells,
       elevation: PAVEMENT.walkElevation,
-      material: new THREE.MeshLambertMaterial({ color: "#d5cec1" }),
+      material: surfaces.materials.concrete,
+      textured: true,
     },
     {
       polygons: paint,
       elevation: PAVEMENT.paintElevation,
-      material: new THREE.MeshLambertMaterial({ color: "#f2f0e9" }),
+      material: surfaces.materials.whitePaint,
+      textured: true,
     },
   ];
   for (const { polygons, elevation, material, textured } of batches) {
     const geometry = surfaceGeometry(polygons, elevation, textured);
-    resources.push(geometry, material);
-    group.add(new THREE.Mesh(geometry, material));
+    resources.push(geometry);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.receiveShadow = true;
+    group.add(mesh);
   }
   return {
     group,
     resources,
     topology,
-    textureBytes: Math.ceil((PAVEMENT.textureSize ** 2 * 4 * 4) / 3),
+    textureBytes: sharedSurfaces ? 0 : surfaces.textureBytes,
   };
 }

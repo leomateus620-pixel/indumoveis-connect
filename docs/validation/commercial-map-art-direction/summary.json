@@ -1,0 +1,2470 @@
+{
+  "generatedAt": "2026-10-16T04:20:06.004Z",
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [
+      "/assets/MapRenderer-BeVQLkfg.js"
+    ],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "browser": "153.0.8010.12",
+    "actualGL": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Intel)",
+      "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "summary": {
+    "usefulMedianMs": 684.0869000000021,
+    "usefulWorstMs": 1038.2217,
+    "passedChecks": 60,
+    "failedChecks": 0
+  },
+  "openings": [
+    {
+      "name": "medium",
+      "cpu": 1,
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "targetMs": 3000,
+      "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+      "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+      "samples": [
+        {
+          "state": "cold",
+          "usefulMs": 1079.7544000000053,
+          "ready3DMs": 1365.1199999999953,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 846.9000000003725
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 850.4000000003725
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1091.9000000003725
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1095
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1196.800000000745
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1301.5
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1301.5
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1301.5999999996275
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 114.70000000111759
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 116.5
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 232.69999999925494
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 92.62189999999828,
+          "ready3DMs": 332.6217000000179,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1348.8507999999856,
+          "ready3DMs": 1403.1171000000031,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 887.4000000003725
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 890.7000000011176
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1139
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1147.4000000003725
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1248
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1355.2000000011176
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1355.2000000011176
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1355.2000000011176
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 120
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 122.29999999888241
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 236.19999999925494
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 75.9761999999755,
+          "ready3DMs": 319.57299999997485,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1148.2654000000039,
+          "ready3DMs": 1485.4918999999936,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 936
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 940.7000000011176
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1184.5
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1187.2000000011176
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1286
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1395.5
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1395.5
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1395.5999999996275
+            }
+          ],
+          "transferBytes": 443061,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 118.40000000037253
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 165.69999999925494
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 235
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 90.9378999999899,
+          "ready3DMs": 313.9749999999767,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1141.9165999999968,
+          "ready3DMs": 1476.2098000000115,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 905.5999999996275
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 909
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1166.5999999996275
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1170.4000000003725
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1269.9000000003725
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1377.5999999996275
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1377.5999999996275
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1377.7000000011176
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 116.10000000149012
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 119.09999999962747
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 249.30000000074506
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 89.31970000002184,
+          "ready3DMs": 316.8695000000007,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1115.082699999999,
+          "ready3DMs": 1406.2632000000158,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 884
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 888.7000000011176
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1133.6000000014901
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1137.800000000745
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 1241.2000000011176
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 1342.9000000003725
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 1343
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 1343
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 123.80000000074506
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 117.30000000074506
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 236.19999999925494
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 73.91560000000754,
+          "ready3DMs": 297.7361000000092,
+          "representation": "ready"
+        }
+      ],
+      "cold": {
+        "n": 5,
+        "medianMs": 1141.9165999999968,
+        "worstMs": 1348.8507999999856,
+        "median3DMs": 1406.2632000000158,
+        "worst3DMs": 1485.4918999999936,
+        "ready3DCount": 5,
+        "passed": true
+      },
+      "warm": {
+        "n": 5,
+        "medianMs": 89.31970000002184,
+        "worstMs": 92.62189999999828,
+        "median3DMs": 316.8695000000007,
+        "worst3DMs": 332.6217000000179,
+        "ready3DCount": 5,
+        "passed": true
+      },
+      "accepted": true
+    },
+    {
+      "name": "weak-cpu4",
+      "cpu": 4,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "targetMs": 5000,
+      "network": "10Mbps down/up, RTT latency80ms via Chromium CDP",
+      "cache": "Cold fresh browser contexts; warm SPA reentry keeps evaluated chunks; fixture routing disables HTTP cache",
+      "samples": [
+        {
+          "state": "cold",
+          "usefulMs": 2574.521299999993,
+          "ready3DMs": 2586.491699999984,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1532.199999999255
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1550.699999999255
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1814
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1846.0999999996275
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2223.5999999996275
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2465
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2465
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2465.0999999996275
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 147.5
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 209.60000000149012
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 232.80000000074506
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1770.2741000000096,
+          "ready3DMs": 1920.590600000025,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1752.1349000000046,
+          "ready3DMs": 2538.5941999999923,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1521.199999999255
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1537.5999999996275
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1806.9000000003725
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1818.5999999996275
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2194.4000000003725
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2425.2999999988824
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2425.2999999988824
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2425.5
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 149.69999999925494
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 239
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 235
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1384.013799999986,
+          "ready3DMs": 1856.2200000000012,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1741.4447999999975,
+          "ready3DMs": 2548.45689999999,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1507.7999999988824
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1524.5
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1805
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1816.0999999996275
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2196.5
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2426.5
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2426.5
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2426.7999999988824
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 151.09999999962747
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 228.2999999988824
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 248
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1396.4133000000147,
+          "ready3DMs": 1888.0264000000025,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1756.748900000006,
+          "ready3DMs": 2510.4731999999785,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1488
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1505
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1776.199999999255
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1790.3999999985099
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2167.5999999996275
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2405.5999999996275
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2405.5999999996275
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2405.7999999988824
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 144.7000000011176
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 226.7999999988824
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 237.2999999988824
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1471.4954000000143,
+          "ready3DMs": 1875.2896000000183,
+          "representation": "ready"
+        },
+        {
+          "state": "cold",
+          "usefulMs": 1734.651600000012,
+          "ready3DMs": 2490.3411999999953,
+          "representation": "ready",
+          "marks": [
+            {
+              "name": "indumoveis:2d-interactive",
+              "ms": 1486.0999999996275
+            },
+            {
+              "name": "indumoveis:geometry-available",
+              "ms": 1503.5999999996275
+            },
+            {
+              "name": "indumoveis:renderer-chunk",
+              "ms": 1770.3999999985099
+            },
+            {
+              "name": "indumoveis-map:renderer-start",
+              "ms": 1780.3999999985099
+            },
+            {
+              "name": "indumoveis-map:essential-prepared",
+              "ms": 2156.0999999996275
+            },
+            {
+              "name": "indumoveis-map:first-valid-draw",
+              "ms": 2389.0999999996275
+            },
+            {
+              "name": "indumoveis-map:controls-ready",
+              "ms": 2389.0999999996275
+            },
+            {
+              "name": "indumoveis:3d-interactive",
+              "ms": 2389.0999999996275
+            }
+          ],
+          "transferBytes": 445006,
+          "featureResources": [
+            {
+              "file": "mapa-Bmp08JUH.js",
+              "transferSize": 12086,
+              "encodedBodySize": 11786,
+              "duration": 128.80000000074506
+            },
+            {
+              "file": "mapa-CbaO1JQB.css",
+              "transferSize": 4472,
+              "encodedBodySize": 4172,
+              "duration": 213
+            },
+            {
+              "file": "MapRenderer-BeVQLkfg.js",
+              "transferSize": 160382,
+              "encodedBodySize": 160082,
+              "duration": 235.90000000037253
+            }
+          ]
+        },
+        {
+          "state": "warm-SPA-reentry",
+          "usefulMs": 1737.1765000000014,
+          "ready3DMs": 1889.8220999999903,
+          "representation": "ready"
+        }
+      ],
+      "cold": {
+        "n": 5,
+        "medianMs": 1752.1349000000046,
+        "worstMs": 2574.521299999993,
+        "median3DMs": 2538.5941999999923,
+        "worst3DMs": 2586.491699999984,
+        "ready3DCount": 5,
+        "passed": true
+      },
+      "warm": {
+        "n": 5,
+        "medianMs": 1471.4954000000143,
+        "worstMs": 1770.2741000000096,
+        "median3DMs": 1888.0264000000025,
+        "worst3DMs": 1920.590600000025,
+        "ready3DCount": 5,
+        "passed": true
+      },
+      "accepted": true
+    }
+  ],
+  "benchmarks": [
+    {
+      "name": "30s active navigation light",
+      "quality": "light",
+      "durationMs": 30134.59210000001,
+      "samples": 1807,
+      "medianFps": 59.880239520968516,
+      "p95IntervalMs": 16.70000000001164,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 80,
+        "triangles": 80000,
+        "textureBytes": 16777216,
+        "dpr": 1,
+        "bufferPixels": 1000000
+      },
+      "peakBudget": {
+        "drawCalls": 49,
+        "triangles": 12502,
+        "textures": 7,
+        "textureBytes": 4565678,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          21.04548834676413,
+          226.12110946538354,
+          194.25751253660817
+        ],
+        "target": [
+          95.5,
+          55
+        ],
+        "distance": 275.8022575129895,
+        "polar": 0.6096180191001339,
+        "azimuth": -0.4909845472586295
+      }
+    },
+    {
+      "name": "30s active navigation balanced",
+      "quality": "balanced",
+      "durationMs": 30089.755799999984,
+      "samples": 1799,
+      "medianFps": 59.880239520968516,
+      "p95IntervalMs": 16.70000000001164,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 150,
+        "triangles": 200000,
+        "textureBytes": 33554432,
+        "dpr": 1.5,
+        "bufferPixels": 2000000
+      },
+      "peakBudget": {
+        "drawCalls": 49,
+        "triangles": 12500,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          21.045488346763875,
+          226.1211094653836,
+          194.25751253660835
+        ],
+        "target": [
+          95.5,
+          55
+        ],
+        "distance": 275.80225751298974,
+        "polar": 0.6096180191001347,
+        "azimuth": -0.4909845472586304
+      }
+    },
+    {
+      "name": "30s active navigation light near lot70",
+      "quality": "light",
+      "durationMs": 30391.54859999998,
+      "samples": 1821,
+      "medianFps": 59.8802395210207,
+      "p95IntervalMs": 16.70000000001164,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 80,
+        "triangles": 80000,
+        "textureBytes": 16777216,
+        "dpr": 1,
+        "bufferPixels": 1000000
+      },
+      "peakBudget": {
+        "drawCalls": 25,
+        "triangles": 7000,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          148.66655743316306,
+          35.7194355733567,
+          99.20485507871359
+        ],
+        "target": [
+          160.42783500000002,
+          77.20691000000001
+        ],
+        "distance": 43.56736525622661,
+        "polar": 0.6096180191001341,
+        "azimuth": -0.49098454725863006
+      }
+    },
+    {
+      "name": "30s active navigation light bosque-P1",
+      "quality": "light",
+      "durationMs": 30158.71430000005,
+      "samples": 1808,
+      "medianFps": 59.8802395210207,
+      "p95IntervalMs": 16.70000000001164,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 80,
+        "triangles": 80000,
+        "textureBytes": 16777216,
+        "dpr": 1,
+        "bufferPixels": 1000000
+      },
+      "peakBudget": {
+        "drawCalls": 35,
+        "triangles": 12274,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          30.761106196307388,
+          44.62035710751089,
+          88.08856516986951
+        ],
+        "target": [
+          45.453175,
+          60.608955
+        ],
+        "distance": 54.42391137379076,
+        "polar": 0.6096180191001341,
+        "azimuth": -0.49098454725863067
+      }
+    },
+    {
+      "name": "30s active navigation balanced bosque-P1",
+      "quality": "balanced",
+      "durationMs": 30042.2169,
+      "samples": 1800,
+      "medianFps": 59.8802395210207,
+      "p95IntervalMs": 16.79999999998836,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 150,
+        "triangles": 200000,
+        "textureBytes": 33554432,
+        "dpr": 1.5,
+        "bufferPixels": 2000000
+      },
+      "peakBudget": {
+        "drawCalls": 35,
+        "triangles": 12272,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          30.76110619630739,
+          44.62035710751089,
+          88.08856516986951
+        ],
+        "target": [
+          45.453175,
+          60.608955
+        ],
+        "distance": 54.42391137379076,
+        "polar": 0.6096180191001341,
+        "azimuth": -0.49098454725863055
+      }
+    },
+    {
+      "name": "30s active navigation light pavilions8-13-3",
+      "quality": "light",
+      "durationMs": 30357.1985,
+      "samples": 1818,
+      "medianFps": 59.8802395210207,
+      "p95IntervalMs": 16.70000000001164,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 80,
+        "triangles": 80000,
+        "textureBytes": 16777216,
+        "dpr": 1,
+        "bufferPixels": 1000000
+      },
+      "peakBudget": {
+        "drawCalls": 29,
+        "triangles": 7118,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          90.71640717477452,
+          30.49541376549962,
+          95.76386713606988
+        ],
+        "target": [
+          100.75758,
+          76.983155
+        ],
+        "distance": 37.195571789838006,
+        "polar": 0.6096180191001339,
+        "azimuth": -0.49098454725863083
+      }
+    },
+    {
+      "name": "30s active navigation balanced pavilions8-13-3",
+      "quality": "balanced",
+      "durationMs": 30358.560799999977,
+      "samples": 1818,
+      "medianFps": 59.8802395210207,
+      "p95IntervalMs": 16.79999999998836,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 150,
+        "triangles": 200000,
+        "textureBytes": 33554432,
+        "dpr": 1.5,
+        "bufferPixels": 2000000
+      },
+      "peakBudget": {
+        "drawCalls": 29,
+        "triangles": 7118,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          90.71640717477452,
+          30.495413765499624,
+          95.76386713606988
+        ],
+        "target": [
+          100.75758,
+          76.983155
+        ],
+        "distance": 37.19557178983801,
+        "polar": 0.6096180191001339,
+        "azimuth": -0.49098454725863083
+      }
+    },
+    {
+      "name": "30s active navigation light B7",
+      "quality": "light",
+      "durationMs": 30292.498299999977,
+      "samples": 1815,
+      "medianFps": 59.88023952091634,
+      "p95IntervalMs": 16.70000000001164,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 80,
+        "triangles": 80000,
+        "textureBytes": 16777216,
+        "dpr": 1,
+        "bufferPixels": 1000000
+      },
+      "peakBudget": {
+        "drawCalls": 27,
+        "triangles": 7012,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          131.83705787220293,
+          19.95636164738365,
+          93.8219683316204
+        ],
+        "target": [
+          138.408055,
+          81.53176999999998
+        ],
+        "distance": 24.34098084476563,
+        "polar": 0.6096180191001341,
+        "azimuth": -0.49098454725863067
+      }
+    },
+    {
+      "name": "30s active navigation balanced B7",
+      "quality": "balanced",
+      "durationMs": 30023.760800000047,
+      "samples": 1799,
+      "medianFps": 59.88023952091634,
+      "p95IntervalMs": 16.79999999998836,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 150,
+        "triangles": 200000,
+        "textureBytes": 33554432,
+        "dpr": 1.5,
+        "bufferPixels": 2000000
+      },
+      "peakBudget": {
+        "drawCalls": 27,
+        "triangles": 7012,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          131.83705787220293,
+          19.95636164738365,
+          93.82196833162041
+        ],
+        "target": [
+          138.408055,
+          81.53176999999998
+        ],
+        "distance": 24.34098084476564,
+        "polar": 0.6096180191001346,
+        "azimuth": -0.49098454725863017
+      }
+    },
+    {
+      "name": "30s active navigation light asphalt-crossing",
+      "quality": "light",
+      "durationMs": 30159.992299999925,
+      "samples": 1807,
+      "medianFps": 59.880239521125056,
+      "p95IntervalMs": 16.79999999998836,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 80,
+        "triangles": 80000,
+        "textureBytes": 16777216,
+        "dpr": 1,
+        "bufferPixels": 1000000
+      },
+      "peakBudget": {
+        "drawCalls": 24,
+        "triangles": 10488,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          64.62670660305025,
+          13.83052343066752,
+          74.04014544231242
+        ],
+        "target": [
+          69.18065943997738,
+          65.52256698805986
+        ],
+        "distance": 16.86923257091286,
+        "polar": 0.6096180191001346,
+        "azimuth": -0.4909845472586318
+      }
+    },
+    {
+      "name": "30s active navigation balanced asphalt-crossing",
+      "quality": "balanced",
+      "durationMs": 30258.440199999954,
+      "samples": 1813,
+      "medianFps": 59.88023952091634,
+      "p95IntervalMs": 16.70000000001164,
+      "stallsAbove200Ms": 0,
+      "budget": {
+        "drawCalls": 150,
+        "triangles": 200000,
+        "textureBytes": 33554432,
+        "dpr": 1.5,
+        "bufferPixels": 2000000
+      },
+      "peakBudget": {
+        "drawCalls": 24,
+        "triangles": 10488,
+        "textures": 8,
+        "textureBytes": 5253806,
+        "dpr": 1,
+        "bufferPixels": 847570
+      },
+      "budgetAccepted": true,
+      "accepted": true,
+      "rendererInfo": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "startPose": {
+        "position": [
+          64.62670660305027,
+          13.830523430667522,
+          74.04014544231245
+        ],
+        "target": [
+          69.18065943997738,
+          65.52256698805986
+        ],
+        "distance": 16.86923257091287,
+        "polar": 0.6096180191001351,
+        "azimuth": -0.4909845472586291
+      }
+    }
+  ],
+  "selection": {
+    "n": 30,
+    "medianDOMMs": 0.8000000007450581,
+    "p95DOMMs": 1.900000000372529,
+    "p95SubmittedDrawMs": 14.300000000745058,
+    "accepted": true
+  },
+  "ambient": {
+    "actualIdleHz": 19.918981410517297,
+    "ambientFrames": 64,
+    "durationMs": 3213.015699999989
+  },
+  "layouts": [
+    {
+      "name": "layout journeys 360x800",
+      "mapFraction": 0.8564125295508275
+    },
+    {
+      "name": "layout journeys 390x844",
+      "mapFraction": 0.8644440149465276
+    },
+    {
+      "name": "layout journeys 844x390",
+      "mapFraction": 0.8444232342514317
+    },
+    {
+      "name": "layout journeys 768x1024",
+      "mapFraction": 0.8898506689278312
+    },
+    {
+      "name": "layout journeys 1366x768",
+      "mapFraction": 0.9093444100978877
+    },
+    {
+      "name": "layout journeys 1920x1080",
+      "mapFraction": 0.9368309339239572
+    }
+  ],
+  "streetPoseCount": 18,
+  "maxStreetGlyphHeightPx": 12.999995051192625,
+  "svg": {
+    "samples": [
+      {
+        "zoom": 0,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.119503725949271
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.119503725949271
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.119503604993182
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.119503604993182
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.0796472,
+            "visible": false,
+            "textHeightPx": 2.0122027362182053
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.119503604993182
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.119503604993182
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.119503725949271
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.119503725949271
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.119503725949271
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.119503604993182
+          }
+        ]
+      },
+      {
+        "zoom": 1,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1434043746406632
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1434043746406632
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.14340430661579
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.14340430661579
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.0681573,
+            "visible": false,
+            "textHeightPx": 2.012530829767555
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.14340430661579
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.14340430661579
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1434043746406632
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1434043746406632
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1434043746406632
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 2.14340430661579
+          }
+        ]
+      },
+      {
+        "zoom": 2,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.0699829,
+            "visible": false,
+            "textHeightPx": 2.0154398207187407
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 3.1720853412421506
+          }
+        ]
+      },
+      {
+        "zoom": 3,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.0812589,
+            "visible": false,
+            "textHeightPx": 2.021513061937993
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.715719,
+            "visible": false,
+            "textHeightPx": 4.189484108559802
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.206502300934702
+          }
+        ]
+      },
+      {
+        "zoom": 4,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.102557,
+            "visible": false,
+            "textHeightPx": 2.032581843514779
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 4.247802675401427
+          }
+        ]
+      },
+      {
+        "zoom": 5,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.16187,
+            "visible": false,
+            "textHeightPx": 1.0617108017224097
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 5.29736294524713
+          }
+        ]
+      },
+      {
+        "zoom": 6,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.356835937469131
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.356835937469131
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 6.356835720353773
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 6.356835720353773
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.204227,
+            "visible": false,
+            "textHeightPx": 1.093430366708187
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 6.356835720353773
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 6.356835720353773
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.356835937469131
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 6.356835720353773
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.356835937469131
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 6.356835720353773
+          }
+        ]
+      },
+      {
+        "zoom": 7,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 8.428202681856122
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 8.428202681856122
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.4282027233035475
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.4282027233035475
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.228062,
+            "visible": false,
+            "textHeightPx": 2.125200768860184
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.4282027233035475
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.4282027233035475
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 8.428202681856122
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 8.428202681856122
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 8.428187368123018
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 7.4282027233035475
+          }
+        ]
+      },
+      {
+        "zoom": 8,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.221547,
+            "visible": false,
+            "textHeightPx": 2.145949561108801
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 9.513843120691947
+          }
+        ]
+      },
+      {
+        "zoom": 9,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": true,
+            "textHeightPx": 11.616613223887509
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": true,
+            "textHeightPx": 11.616613223887509
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": true,
+            "textHeightPx": 11.616613223887509
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 11.616613223887509
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.229723,
+            "visible": false,
+            "textHeightPx": 4.181602767663308
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.773876,
+            "visible": false,
+            "textHeightPx": 11.611772817280428
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 11.616613223887509
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 11.616613223887509
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 11.616613223887509
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 11.616613223887509
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 11.616613223887509
+          }
+        ]
+      },
+      {
+        "zoom": 10,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.78,
+            "visible": true,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.78,
+            "visible": true,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.254927,
+            "visible": false,
+            "textHeightPx": 4.241832980506652
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 12.739935069034537
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.78,
+            "visible": false,
+            "textHeightPx": 12.739935069034537
+          }
+        ]
+      },
+      {
+        "zoom": 11,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.638221,
+            "visible": true,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.638221,
+            "visible": true,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.638221,
+            "visible": false,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.638221,
+            "visible": false,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.250773,
+            "visible": false,
+            "textHeightPx": 5.285469844191992
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.638221,
+            "visible": false,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.638221,
+            "visible": false,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.638221,
+            "visible": false,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.638221,
+            "visible": false,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.638221,
+            "visible": false,
+            "textHeightPx": 12.726526498921649
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.638221,
+            "visible": false,
+            "textHeightPx": 12.726526498921649
+          }
+        ]
+      },
+      {
+        "zoom": 12,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.522742,
+            "visible": true,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.256368,
+            "visible": false,
+            "textHeightPx": 6.350208727287317
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.522742,
+            "visible": false,
+            "textHeightPx": 12.714082569946264
+          }
+        ]
+      },
+      {
+        "zoom": 13,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.262315,
+            "visible": false,
+            "textHeightPx": 7.429998005638515
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.42856,
+            "visible": false,
+            "textHeightPx": 12.702514506974824
+          }
+        ]
+      },
+      {
+        "zoom": 14,
+        "labels": [
+          {
+            "text": "Rua Argentina",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Rua Uruguai",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Rua Brasil",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Alameda Mercosul",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Rua Brasília",
+            "worldFont": 0.260152,
+            "visible": false,
+            "textHeightPx": 9.511742694836604
+          },
+          {
+            "text": "Rua La Paz",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Av. Benvenuto de Conti",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Avenida dos Imigrantes",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Calçada do Arvoredo",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Passeio · Espaço de eventos",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          },
+          {
+            "text": "Passeio · setor leste",
+            "worldFont": 0.351656,
+            "visible": false,
+            "textHeightPx": 12.69173729832514
+          }
+        ]
+      }
+    ],
+    "selected": [
+      {
+        "text": "Rua Argentina",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 3.1364775367037834
+      },
+      {
+        "text": "Rua Uruguai",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 3.1364775367037834
+      },
+      {
+        "text": "Rua Brasil",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 2.1364775853729516
+      },
+      {
+        "text": "Alameda Mercosul",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 2.1364775853729516
+      },
+      {
+        "text": "Rua Brasília",
+        "worldFont": 0.0475724,
+        "visible": false,
+        "textHeightPx": 2.008323722022786
+      },
+      {
+        "text": "Rua La Paz",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 2.1364775853729516
+      },
+      {
+        "text": "Av. Benvenuto de Conti",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 2.1364775853729516
+      },
+      {
+        "text": "Avenida dos Imigrantes",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 3.1364775367037834
+      },
+      {
+        "text": "Calçada do Arvoredo",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 3.1364775367037834
+      },
+      {
+        "text": "Passeio · Espaço de eventos",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 3.1364775367037834
+      },
+      {
+        "text": "Passeio · setor leste",
+        "worldFont": 0.78,
+        "visible": false,
+        "textHeightPx": 2.1364775853729516
+      }
+    ],
+    "contexts": {
+      "created": 0,
+      "active": 0
+    }
+  },
+  "errors": [],
+  "unexpectedRequests": [],
+  "failedChecks": [],
+  "performanceFailures": []
+}

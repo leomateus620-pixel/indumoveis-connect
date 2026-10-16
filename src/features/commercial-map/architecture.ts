@@ -1,5 +1,10 @@
 import * as THREE from "three";
 import type { MapEntity, Point } from "./data/territory";
+import {
+  createSurfaceMaterials,
+  type SurfaceMaterials,
+  type SurfaceFamily,
+} from "./surfaceMaterials";
 
 /** Presentation only: no value in this module is a metre or a surveyed elevation. */
 export type RoofProfile =
@@ -39,7 +44,7 @@ type Frame = {
   width: number;
   depth: number;
 };
-type Bucket = { positions: number[]; colors: number[] };
+type Bucket = { positions: number[]; colors: number[]; uvs: number[]; roofAxis?: 0 | 1 };
 
 export interface ArchitectureDefinition {
   profile: RoofProfile;
@@ -64,6 +69,7 @@ export interface MapArchitecture {
   roofs: Map<string, THREE.Group>;
   pickables: THREE.Mesh[];
   visualBounds: Map<string, ArchitectureBounds>;
+  textureBytes: number;
   dispose(): void;
 }
 
@@ -193,8 +199,8 @@ function roofSegments(profile: RoofProfile): RoofSegment[] {
     .map((p, i) => ({ start: p[0], end: points[i + 1][0], from: p[1], to: points[i + 1][1] }));
 }
 
-function bucket(): Bucket {
-  return { positions: [], colors: [] };
+function bucket(roofAxis?: 0 | 1): Bucket {
+  return { positions: [], colors: [], uvs: [], roofAxis };
 }
 function triangle(target: Bucket, a: Vertex, b: Vertex, c: Vertex, color: string, normal?: Vertex) {
   if (normal) {
@@ -207,6 +213,25 @@ function triangle(target: Bucket, a: Vertex, b: Vertex, c: Vertex, color: string
     if (dot < 0) [b, c] = [c, b];
   }
   target.positions.push(...a, ...b, ...c);
+  // Coordinates stay in the building's local frame before placement. Roof U
+  // follows the ridge and V the short span: all pitches share sheet direction.
+  // Wall projection uses the dominant local face, at the same tile scale.
+  const ab = b.map((n, i) => n - a[i]);
+  const ac = c.map((n, i) => n - a[i]);
+  const nx = ab[1] * ac[2] - ab[2] * ac[1];
+  const ny = ab[2] * ac[0] - ab[0] * ac[2];
+  const nz = ab[0] * ac[1] - ab[1] * ac[0];
+  for (const p of [a, b, c]) {
+    if (target.roofAxis !== undefined && Math.abs(ny) > 1e-8) {
+      const axis = target.roofAxis;
+      const slope = -(axis === 0 ? nx : nz) / ny;
+      const across = (p[axis === 0 ? 0 : 2] + slope * p[1]) / Math.sqrt(1 + slope * slope);
+      target.uvs.push(p[axis === 0 ? 2 : 0] / 1.4, across / 1.4);
+    } else if (Math.abs(ny) >= Math.max(Math.abs(nx), Math.abs(nz)))
+      target.uvs.push(p[0] / 2.8, p[2] / 2.8);
+    else if (Math.abs(nx) > Math.abs(nz)) target.uvs.push(p[2] / 2.8, p[1] / 2.8);
+    else target.uvs.push(p[0] / 2.8, p[1] / 2.8);
+  }
   const shade = new THREE.Color(color);
   for (let i = 0; i < 3; i++) target.colors.push(shade.r, shade.g, shade.b);
 }
@@ -327,6 +352,7 @@ function geometryFrom(target: Bucket, frame?: Frame): THREE.BufferGeometry {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(target.positions, 3));
   geometry.setAttribute("color", new THREE.Float32BufferAttribute(target.colors, 3));
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(target.uvs, 2));
   if (frame)
     geometry.applyMatrix4(
       new THREE.Matrix4().set(
@@ -356,26 +382,36 @@ function geometryFrom(target: Bucket, frame?: Frame): THREE.BufferGeometry {
 function appendGeometry(target: Bucket, geometry: THREE.BufferGeometry) {
   target.positions.push(...geometry.getAttribute("position").array);
   target.colors.push(...geometry.getAttribute("color").array);
+  target.uvs.push(...geometry.getAttribute("uv").array);
   geometry.dispose();
 }
 
 /** Static construction, called once per renderer revision. No geometry work in gestures. */
-export function buildArchitecture(entities: readonly MapEntity[]): MapArchitecture {
+export function buildArchitecture(
+  entities: readonly MapEntity[],
+  sharedSurfaces?: SurfaceMaterials,
+): MapArchitecture {
+  const surfaces = sharedSurfaces ?? createSurfaceMaterials();
   const group = new THREE.Group();
   group.name = "indumoveis-presentation-architecture";
   const roofs = new Map<string, THREE.Group>();
   const pickables: THREE.Mesh[] = [];
   const visualBounds = new Map<string, ArchitectureBounds>();
   const geometries = new Set<THREE.BufferGeometry>();
-  const material = new THREE.MeshLambertMaterial({ vertexColors: true });
   const pickMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
   const floors = bucket(),
     walls = bucket(),
-    structure = bucket();
-  function mesh(data: Bucket, frame?: Frame) {
+    structure = bucket(),
+    glazing = bucket(),
+    metal = bucket(),
+    accents = bucket();
+  function mesh(data: Bucket, family: SurfaceFamily, frame?: Frame) {
     const geometry = geometryFrom(data, frame);
     geometries.add(geometry);
-    return new THREE.Mesh(geometry, material);
+    const result = new THREE.Mesh(geometry, surfaces.materials[family]);
+    result.receiveShadow = true;
+    result.castShadow = true;
+    return result;
   }
   for (const entity of entities) {
     const definition = getArchitectureDefinition(entity);
@@ -384,7 +420,11 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
     const localFloor = bucket(),
       localWalls = bucket(),
       localStructure = bucket(),
-      roof = bucket(),
+      localGlass = bucket(),
+      localMetal = bucket(),
+      localAccent = bucket(),
+      roofWalls = bucket(),
+      roofGlass = bucket(),
       picking = bucket();
     const { polygon } = frame;
     const span = Math.min(frame.width, frame.depth);
@@ -399,6 +439,7 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
     // its underside instead of competing with it on the same facade plane.
     const wallTop = definition.eaveHeight - definition.roofThickness;
     const axis: 0 | 1 = frame.width <= frame.depth ? 0 : 1;
+    const roof = bucket(axis);
     const min = Math.min(...polygon.map((p) => p[axis]));
     const extent = axis === 0 ? frame.width : frame.depth;
     const segments = roofSegments(definition.profile);
@@ -410,8 +451,8 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
             (segment.end - segment.start));
 
     // Contact, raised slab and perimeter plinth all remain inside the footprint.
-    polygonSurface(localFloor, polygon, () => 0.085, "#8a8077");
-    polygonSurface(localFloor, inner, () => foundationTop, "#ded6c9");
+    polygonSurface(localFloor, polygon, () => 0.085, "#8d9495");
+    polygonSurface(localFloor, inner, () => foundationTop, "#ffffff");
     const localAccesses = (entity.accesses ?? []).map((access) => {
       const delta: Point = [access[0] - frame.origin[0], access[1] - frame.origin[1]];
       const point: Point = [
@@ -480,9 +521,9 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
             iq,
             foundationTop,
             wallTop,
-            bay % 2 ? "#e6e0d7" : "#f0ebe2",
+            bay % 2 ? "#f0f3f2" : "#ffffff",
           );
-          wallPrism(localStructure, p, q, ip, iq, 0.09, foundationTop, "#87706e");
+          wallPrism(localStructure, p, q, ip, iq, 0.09, foundationTop, "#a5abad");
           const trimWidth = Math.min(definition.wallThickness / length, (to - from) * 0.18);
           wallPrism(
             localStructure,
@@ -496,7 +537,7 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
             ),
             foundationTop,
             wallTop,
-            "#b1a39b",
+            "#ffffff",
           );
         }
       }
@@ -513,7 +554,7 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
           iq,
           openingTop,
           wallTop,
-          "#e6e0d7",
+          "#f0f3f2",
         );
         // Dark back at a real recess, with jambs and lintel revealing wall thickness.
         const rp = interpolate(
@@ -523,21 +564,21 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
         );
         const rq = interpolate(structuralInner[i], structuralInner[(i + 1) % polygon.length], end);
         quad(
-          localStructure,
+          localGlass,
           [rp[0], foundationTop, rp[1]],
           [rq[0], foundationTop, rq[1]],
           [rq[0], openingTop, rq[1]],
           [rp[0], openingTop, rp[1]],
-          "#493e48",
+          "#ffffff",
           [b[1] - a[1], 0, a[0] - b[0]],
         );
         quad(
-          localStructure,
+          localAccent,
           [p[0], foundationTop, p[1]],
           [q[0], foundationTop, q[1]],
           [rq[0], foundationTop, rq[1]],
           [rp[0], foundationTop, rp[1]],
-          "#705164",
+          "#ffffff",
           [0, 1, 0],
         );
         quad(
@@ -546,7 +587,7 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
           [rp[0], foundationTop, rp[1]],
           [rp[0], openingTop, rp[1]],
           [p[0], openingTop, p[1]],
-          "#b1a39b",
+          "#dce2e2",
           [b[0] - a[0], 0, b[1] - a[1]],
         );
         quad(
@@ -555,8 +596,21 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
           [q[0], openingTop, q[1]],
           [rq[0], openingTop, rq[1]],
           [rq[0], foundationTop, rq[1]],
-          "#b1a39b",
+          "#dce2e2",
           [a[0] - b[0], 0, a[1] - b[1]],
+        );
+        // A small exposed-metal lintel belongs to the already modelled recess;
+        // it sits behind the facade and creates no new opening or footprint.
+        const mp = interpolate(rp, p, 0.04),
+          mq = interpolate(rq, q, 0.04);
+        quad(
+          localMetal,
+          [mp[0], openingTop - definition.wallThickness * 0.5, mp[1]],
+          [mq[0], openingTop - definition.wallThickness * 0.5, mq[1]],
+          [mq[0], openingTop, mq[1]],
+          [mp[0], openingTop, mp[1]],
+          "#ffffff",
+          [b[1] - a[1], 0, a[0] - b[0]],
         );
       }
     }
@@ -570,8 +624,8 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
       );
       if (clipped.length < 3) continue;
       const height = (p: Point) => roofHeight(segment, p);
-      polygonSurface(roof, clipped, height, index % 2 ? "#bcb9b0" : "#d1cdc3");
-      polygonSurface(roof, clipped, (p) => height(p) - definition.roofThickness, "#918d86", false);
+      polygonSurface(roof, clipped, height, index % 2 ? "#edf2f5" : "#ffffff");
+      polygonSurface(roof, clipped, (p) => height(p) - definition.roofThickness, "#aab2b9", false);
       // A simple closed silhouette, without facade detail, follows the actual
       // pitches. A box capped at ridge height could select air above an eave.
       polygonSurface(picking, clipped, height, "#ffffff");
@@ -601,15 +655,15 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
             [b[0], height(b), b[1]],
             [b[0], height(b) - definition.roofThickness, b[1]],
             [a[0], height(a) - definition.roofThickness, a[1]],
-            "#797b77",
+            "#a3adb6",
           );
           quad(
-            roof,
+            roofWalls,
             [a[0], definition.eaveHeight - definition.roofThickness, a[1]],
             [b[0], definition.eaveHeight - definition.roofThickness, b[1]],
             [b[0], height(b) - definition.roofThickness, b[1]],
             [a[0], height(a) - definition.roofThickness, a[1]],
-            "#c8c0b5",
+            "#f0f3f2",
             [b[1] - a[1], 0, a[0] - b[0]],
           );
         }
@@ -633,20 +687,20 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
             "#ffffff",
           );
           quad(
-            roof,
+            roofGlass,
             [a[0], low, a[1]],
             [b[0], low, b[1]],
             [b[0], high, b[1]],
             [a[0], high, a[1]],
-            "#6c7777",
+            "#ffffff",
           );
           quad(
-            roof,
+            roofGlass,
             [a[0], low, a[1]],
             [a[0], high, a[1]],
             [b[0], high, b[1]],
             [b[0], low, b[1]],
-            "#6c7777",
+            "#ffffff",
           );
         }
       }
@@ -660,9 +714,14 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
     appendGeometry(floors, geometryFrom(localFloor, frame));
     appendGeometry(walls, geometryFrom(localWalls, frame));
     appendGeometry(structure, geometryFrom(localStructure, frame));
+    appendGeometry(glazing, geometryFrom(localGlass, frame));
+    appendGeometry(metal, geometryFrom(localMetal, frame));
+    appendGeometry(accents, geometryFrom(localAccent, frame));
     const roofGroup = new THREE.Group();
     roofGroup.name = `${entity.id}:roof:${definition.profile}:estimated`;
-    roofGroup.add(mesh(roof, frame));
+    roofGroup.add(mesh(roof, "paintedSheet", frame));
+    if (roofWalls.positions.length) roofGroup.add(mesh(roofWalls, "paintedWall", frame));
+    if (roofGlass.positions.length) roofGroup.add(mesh(roofGlass, "glass", frame));
     roofs.set(entity.id, roofGroup);
     group.add(roofGroup);
     visualBounds.set(entity.id, {
@@ -674,13 +733,16 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
       roofProfile: definition.profile,
     });
   }
-  for (const [name, data] of [
-    ["floors-contact", floors],
-    ["walls", walls],
-    ["structure-recesses", structure],
+  for (const [name, data, family] of [
+    ["floors-contact", floors, "concrete"],
+    ["walls", walls, "paintedWall"],
+    ["structure-recesses", structure, "concrete"],
+    ["entry-glazing", glazing, "glass"],
+    ["entry-lintels", metal, "exposedMetal"],
+    ["entry-thresholds", accents, "warmAccent"],
   ] as const) {
     if (!data.positions.length) continue;
-    const layer = mesh(data);
+    const layer = mesh(data, family);
     layer.name = name;
     group.add(layer);
   }
@@ -689,9 +751,10 @@ export function buildArchitecture(entities: readonly MapEntity[]): MapArchitectu
     roofs,
     pickables,
     visualBounds,
+    textureBytes: sharedSurfaces ? 0 : surfaces.textureBytes,
     dispose() {
       for (const geometry of geometries) geometry.dispose();
-      material.dispose();
+      if (!sharedSurfaces) surfaces.dispose();
       pickMaterial.dispose();
       group.clear();
     },

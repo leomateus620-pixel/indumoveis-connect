@@ -22,6 +22,7 @@ import {
   Box,
   Map as MapIcon,
   MoreHorizontal,
+  Check,
 } from "lucide-react";
 import { ENTITIES } from "./data/territory";
 import type { Point } from "./data/territory";
@@ -105,6 +106,7 @@ export function CommercialMapWorkspace({
   const [gesture, setGesture] = useState<MapGesture>("move");
   const [menu, setMenu] = useState<"search" | "settings" | "help" | "legend" | "more" | null>(null);
   const menuOrigin = useRef<HTMLButtonElement | null>(null);
+  const [menuRight, setMenuRight] = useState(12);
   const [retainedMenu, setRetainedMenu] = useState<typeof menu>(null);
   const displayedMenu = menu ?? retainedMenu;
   useEffect(() => {
@@ -192,6 +194,12 @@ export function CommercialMapWorkspace({
     }
     if (document.activeElement instanceof HTMLButtonElement)
       menuOrigin.current = document.activeElement;
+    const bounds = stage.current?.getBoundingClientRect();
+    const trigger = menuOrigin.current?.getBoundingClientRect();
+    if (bounds && trigger) {
+      const width = Math.min(360, bounds.width - 24);
+      setMenuRight(Math.max(12, Math.min(bounds.right - trigger.right, bounds.width - width - 12)));
+    }
     setMenu(next);
   };
   const chooseView = (next: MapView) => {
@@ -237,8 +245,15 @@ export function CommercialMapWorkspace({
       const p = panel.current?.getBoundingClientRect(),
         s = canvas.getBoundingClientRect();
       setLandscapeLayout(s.width >= 620 && s.height < 400);
-      setCompactHeader(el.clientWidth < 1080);
-      const sidePanel = !!p && p.width < s.width * 0.55 && p.height > s.height * 0.45;
+      setCompactHeader(el.clientWidth < (inspectedId ? 1280 : 1220));
+      // Classify the actual side sheet by its horizontal placement. A compact
+      // desktop sheet still occupies the right edge, even when content is short.
+      const sidePanel = !!p && p.width < s.width * 0.55 && p.left > s.left + s.width * 0.45;
+      const trigger = menuOrigin.current?.getBoundingClientRect();
+      if (trigger) {
+        const width = Math.min(360, s.width - 24);
+        setMenuRight(Math.max(12, Math.min(s.right - trigger.right, s.width - width - 12)));
+      }
       const next = {
         right: p && sidePanel ? p.width + 24 : 0,
         bottom: p && !sidePanel ? p.height + 16 : 0,
@@ -257,7 +272,7 @@ export function CommercialMapWorkspace({
       window.visualViewport?.removeEventListener("resize", update);
       window.removeEventListener("resize", update);
     };
-  }, [expanded, selection.panelId, selection.expanded]);
+  }, [expanded, inspectedId, selection.panelId, selection.expanded]);
   const fail = useCallback((reason: string) => {
     console.warn("[Indumóveis map]", reason);
     lastTarget.current = map.current?.getTarget() ?? lightMap.current?.getTarget();
@@ -381,16 +396,23 @@ export function CommercialMapWorkspace({
     initialFocus: lastTarget.current,
     onManualOrientation: () => setOrientationFree(true),
   };
-  const tool = (label: string, icon: React.ReactNode, action: () => void, active = false) => (
+  const tool = (
+    label: string,
+    icon: React.ReactNode,
+    action: () => void,
+    active?: boolean,
+    visibleLabel?: string,
+  ) => (
     <button
       type="button"
-      className="im-map-button"
+      className={`im-map-button ${visibleLabel ? "im-map-button-labeled" : ""}`}
       aria-label={label}
       title={label}
       aria-pressed={active}
       onClick={action}
     >
       {icon}
+      {visibleLabel && <span className="im-map-button-label">{visibleLabel}</span>}
       <span className="im-map-tooltip" aria-hidden="true">
         {label}
       </span>
@@ -467,8 +489,14 @@ export function CommercialMapWorkspace({
         role="group"
         aria-label="Gesto de navegação"
       >
-        {tool("Mover mapa", <Move />, () => setGesture("move"), gesture === "move")}
-        {tool("Girar mapa", <RotateCw />, () => setGesture("rotate"), gesture === "rotate")}
+        {tool("Mover mapa", <Move />, () => setGesture("move"), gesture === "move", "Mover")}
+        {tool(
+          "Girar mapa",
+          <RotateCw />,
+          () => setGesture("rotate"),
+          gesture === "rotate",
+          "Girar",
+        )}
       </div>
     ));
   const headerActions = (
@@ -519,6 +547,7 @@ export function CommercialMapWorkspace({
           "--im-menu-close": `${MOTION.menuClose}ms`,
           "--im-tooltip": `${MOTION.tooltip}ms`,
           "--im-expand": `${MOTION.panelExpand}ms`,
+          "--im-menu-right": `${menuRight}px`,
         } as React.CSSProperties
       }
     >
@@ -580,26 +609,31 @@ export function CommercialMapWorkspace({
             />
           </div>
         )}
-        <div className="im-map-caption">
-          <span className="im-map-dot" />
-          {representation === "ready"
-            ? "Maquete do parque"
-            : representation === "preparing"
-              ? "Planta disponível · preparando 3D"
-              : representation === "recovering"
-                ? "Planta disponível · recuperando 3D"
-                : "Visualização leve ativada"}
-          <span className="im-map-orientation">
-            {representation === "ready"
-              ? orientationFree
-                ? "Orientação livre"
-                : view === "top"
-                  ? "Preset superior"
-                  : view === "front"
-                    ? "Preset oblíquo"
-                    : "Perspectiva 3D"
-              : "Consulta superior em 2D"}
-          </span>
+        <div
+          className={`im-map-caption ${representation === "ready" ? "im-map-live" : ""}`}
+          role="status"
+          aria-live="polite"
+        >
+          {representation === "ready" ? (
+            orientationFree ? (
+              "Orientação livre"
+            ) : view === "top" ? (
+              "Vista superior"
+            ) : view === "front" ? (
+              "Vista oblíqua"
+            ) : (
+              "Perspectiva 3D"
+            )
+          ) : (
+            <>
+              <span className={`im-map-dot ${representation !== "2d" ? "is-busy" : ""}`} />
+              {representation === "preparing"
+                ? "Planta disponível · preparando 3D"
+                : representation === "recovering"
+                  ? "Planta disponível · recuperando 3D"
+                  : "Planta 2D"}
+            </>
+          )}
         </div>
         {(notice || commercialState === "unavailable") && (
           <div className="im-map-notice" role="status">
@@ -689,6 +723,7 @@ export function CommercialMapWorkspace({
                         <button
                           className="im-map-result"
                           key={result.id}
+                          aria-pressed={selection.id === result.id}
                           onClick={(e) => select(result.id, e.detail === 0)}
                           onKeyDown={(e) => {
                             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
@@ -709,8 +744,26 @@ export function CommercialMapWorkspace({
                             }
                           }}
                         >
-                          <span>{result.label}</span>
-                          <small>{result.location}</small>
+                          <span className="im-map-result-icon" aria-hidden="true">
+                            {result.kind === "pavilion" ? (
+                              <Box />
+                            ) : result.kind === "lot" ? (
+                              <Scan />
+                            ) : (
+                              <MapIcon />
+                            )}
+                          </span>
+                          <span className="im-map-result-copy">
+                            <strong>{result.label}</strong>
+                            <small>{result.location}</small>
+                          </span>
+                          {selection.id === result.id ? (
+                            <Check className="im-map-result-check" aria-hidden="true" />
+                          ) : statuses[result.id] ? (
+                            <span className="im-map-result-status">
+                              {SPACE_STATUS[statuses[result.id]]?.label ?? "Não confirmada"}
+                            </span>
+                          ) : null}
                         </button>
                       ))
                     ) : (
@@ -801,25 +854,32 @@ export function CommercialMapWorkspace({
             aria-hidden={selection.phase === "closing"}
           >
             <div inert={selection.phase === "closing"}>
-              <div className="im-map-detail-top">
-                <span>
-                  {entity.kind === "pavilion"
-                    ? "Pavilhão"
-                    : entity.kind === "lot"
-                      ? "Lote externo"
-                      : "Referência do parque"}
-                </span>
-                <button
-                  ref={closeButton}
-                  className="im-map-button"
-                  aria-label="Fechar ficha"
-                  onClick={close}
-                >
-                  <X />
-                </button>
+              <div className="im-map-detail-heading">
+                <div className="im-map-detail-top">
+                  <span className="im-map-detail-kind">
+                    {entity.kind === "pavilion" ? (
+                      <Box aria-hidden="true" />
+                    ) : (
+                      <MapIcon aria-hidden="true" />
+                    )}
+                    {entity.kind === "pavilion"
+                      ? "Pavilhão"
+                      : entity.kind === "lot"
+                        ? "Lote externo"
+                        : "Referência do parque"}
+                  </span>
+                  <button
+                    ref={closeButton}
+                    className="im-map-button"
+                    aria-label="Fechar ficha"
+                    onClick={close}
+                  >
+                    <X />
+                  </button>
+                </div>
+                <h2>{entity.label}</h2>
+                <p className="im-map-location">{entity.location}</p>
               </div>
-              <h2>{entity.label}</h2>
-              <p className="im-map-location">{entity.location}</p>
               <div className="im-map-detail-summary">
                 {entity.declaredAreaM2 != null ? (
                   <>
@@ -846,7 +906,7 @@ export function CommercialMapWorkspace({
                 <div>
                   <dl>
                     <dt>Situação comercial</dt>
-                    <dd>
+                    <dd className={`im-map-commercial-status ${status ? "is-confirmed" : ""}`}>
                       {status
                         ? (SPACE_STATUS[status]?.label ?? "Não confirmada")
                         : "Não confirmada"}

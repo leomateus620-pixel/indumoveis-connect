@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-15T22:29:20.943Z",
+  "generatedAt": "2026-10-16T04:19:26.965Z",
   "kind": "static production artifacts; not observed network transfer",
-  "renderer": "MapRenderer-BGI3RIOg.js",
-  "map": "mapa-D6Vlvl8n.js",
+  "renderer": "MapRenderer-BeVQLkfg.js",
+  "map": "mapa-Bmp08JUH.js",
   "featureAssets": [
     {
-      "file": "MapRenderer-BGI3RIOg.js",
-      "bytes": 592668,
-      "gzipBytes": 150386
+      "file": "MapRenderer-BeVQLkfg.js",
+      "bytes": 620170,
+      "gzipBytes": 160082
     },
     {
       "file": "arrow-left-SIv40yGi.js",
@@ -20,19 +20,24 @@
       "gzipBytes": 154
     },
     {
-      "file": "mapa-BtQDEtkP.css",
-      "bytes": 12042,
-      "gzipBytes": 3060
+      "file": "check-CK8NSaXX.js",
+      "bytes": 112,
+      "gzipBytes": 129
     },
     {
-      "file": "mapa-D6Vlvl8n.js",
-      "bytes": 30134,
-      "gzipBytes": 10578
+      "file": "geometry-DwjDPlC9.js",
+      "bytes": 17319,
+      "gzipBytes": 6825
     },
     {
-      "file": "motion-Uq2x47eA.js",
-      "bytes": 13730,
-      "gzipBytes": 5205
+      "file": "mapa-Bmp08JUH.js",
+      "bytes": 34552,
+      "gzipBytes": 11786
+    },
+    {
+      "file": "mapa-CbaO1JQB.css",
+      "bytes": 16877,
+      "gzipBytes": 4172
     },
     {
       "file": "plus-qJlAf3c6.js",
@@ -45,55 +50,57 @@
       "gzipBytes": 188
     }
   ],
-  "compressedBytes": 169866,
+  "compressedBytes": 183631,
   "budgetBytes": 3145728,
   "financeStaticFiles": [
-    "financeiro-CMhTV4Kb.js",
+    "financeiro-jFoJnH1y.js",
     "jsx-runtime-Cltr0gcK.js",
     "useNavigate-D0meCJtU.js",
     "useRouter-CwjitLz4.js",
     "api-BWuYnCNd.js",
     "dist-DNT1aoys.js",
-    "index-a20krArs.js",
+    "index-BaS9Q6Al.js",
     "Match-Cef8KxBo.js",
     "matchContext-D7fiU5TJ.js",
     "useSelector-DXalI5tR.js",
     "preload-helper-G9SI6NCt.js",
     "link-D4iki_Ag.js",
-    "shared-Cu-V3U1W.js",
     "ui-BJL8rGNo.js",
+    "shared-CZe3NDGq.js",
+    "check-CK8NSaXX.js",
     "x-DbmYfe5W.js",
     "dialog-DXii7mUD.js",
     "dist-CdiqmoSJ.js",
     "dist-B_UHoaee.js",
     "sheet-CLbDTauR.js",
-    "AttachedDocuments-KThyC1-3.js",
-    "UploadDialog-Blqko57A.js",
+    "AttachedDocuments-OcxQkWvG.js",
+    "UploadDialog-DdO6sJut.js",
     "plus-qJlAf3c6.js",
     "tabs-C2f73EGB.js",
     "journey-C1hNQu8H.js"
   ],
   "documentsStaticFiles": [
-    "documentos-BcsIwLFV.js",
+    "documentos-Dj-BULpq.js",
     "jsx-runtime-Cltr0gcK.js",
     "useNavigate-D0meCJtU.js",
     "useRouter-CwjitLz4.js",
     "api-BWuYnCNd.js",
     "dist-DNT1aoys.js",
-    "index-a20krArs.js",
+    "index-BaS9Q6Al.js",
     "Match-Cef8KxBo.js",
     "matchContext-D7fiU5TJ.js",
     "useSelector-DXalI5tR.js",
     "preload-helper-G9SI6NCt.js",
     "link-D4iki_Ag.js",
-    "shared-Cu-V3U1W.js",
+    "chevron-left--zuy-NNa.js",
     "ui-BJL8rGNo.js",
+    "shared-CZe3NDGq.js",
+    "check-CK8NSaXX.js",
     "x-DbmYfe5W.js",
     "dialog-DXii7mUD.js",
     "dist-CdiqmoSJ.js",
     "dist-B_UHoaee.js",
-    "chevron-left--zuy-NNa.js",
-    "UploadDialog-Blqko57A.js",
+    "UploadDialog-DdO6sJut.js",
     "sheet-CLbDTauR.js",
     "plus-qJlAf3c6.js",
     "tabs-C2f73EGB.js"

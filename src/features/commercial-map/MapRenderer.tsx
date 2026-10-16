@@ -1,7 +1,19 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { ENTITIES, MAP_BOUNDS, TREES, type MapEntity, type Point } from "./data/territory";
+import { createReflectionEnvironment } from "./reflectionEnvironment";
+import { createSurfaceMaterials } from "./surfaceMaterials";
+import { createVegetation } from "./vegetation";
+import { VISUAL_THEME as PALETTE, COMMERCIAL_STATUS_COLORS } from "./visualTheme";
+import {
+  STREET_LABEL,
+  isWalkway,
+  projectedTextMetrics,
+  streetLabelCorridor,
+  streetLabelPresentation,
+  streetLabelVisible,
+} from "./labelPolicy";
+import { ENTITIES, MAP_BOUNDS, type MapEntity, type Point } from "./data/territory";
 import {
   framingDistance,
   framingBoxDistance,
@@ -9,7 +21,6 @@ import {
   isClick,
   MOVEMENT,
   nextAdaptiveQuality,
-  QUALITY,
   resolvePixelRatio,
   readableLabelSize,
   shouldUseLightFallback,
@@ -48,6 +59,11 @@ type Diagnostic = {
   textures: number;
   programs: number;
   textureBytes: number;
+  environmentBytes: number;
+  environmentPeakBytes: number;
+  ambientFrames: number;
+  optionalFailures: string[];
+  labels: { id: string; scale: number; visible: boolean; textHeightPx: number }[];
   dpr: number;
   buffer: [number, number];
   tier: QualityTier;
@@ -80,21 +96,27 @@ declare global {
   }
 }
 
-const PALETTE = {
-  background: "#f3f0eb",
-  ground: "#e4dfd3",
-  road: "#c7c3be",
-  walk: "#ddd6cb",
-  landscape: "#b8c5a3",
-  lot: "#e5ddcf",
-  lotEdge: "#766354",
-  plum: "#623d54",
-  wall: "#f7f1e8",
-  roof: "#e7dfd2",
-  support: "#c2b3a2",
-  text: "#352831",
-};
 const ENTITY_BY_ID = new Map(ENTITIES.map((entity) => [entity.id, entity]));
+const STREET_CORRIDORS = new Map(
+  ENTITIES.filter((entity) => entity.kind === "road").map((entity) => [
+    entity.id,
+    streetLabelCorridor(entity, ENTITIES),
+  ]),
+);
+function isGroundReference(entity: MapEntity) {
+  return (
+    entity.kind === "road" || (entity.kind === "support" && !getArchitectureDefinition(entity))
+  );
+}
+const GROUND_REFERENCE_CORRIDORS = new Map(
+  ENTITIES.filter((entity) => isGroundReference(entity) && entity.kind !== "road").map((entity) => {
+    const box = boundsOf(entity).box;
+    return [
+      entity.id,
+      { length: Math.max(0, box.width - 0.64), width: Math.max(0, box.depth - 0.64) },
+    ];
+  }),
+);
 const PAVILION_LABELS: Record<string, string> = {
   "indumoveis:pavilion:1": "P1 · Mostra",
   "indumoveis:pavilion:3": "P3",
@@ -161,17 +183,7 @@ function boundsOf(entity?: MapEntity) {
 }
 
 function statusColor(status?: string) {
-  return (
-    (
-      {
-        disponivel: "#b8d6c5",
-        em_negociacao: "#b9ccdf",
-        reservado: "#e2c69e",
-        vendido: "#9b7c91",
-        bloqueado: "#b6b2b5",
-      } as Record<string, string>
-    )[status?.toLowerCase() ?? ""] ?? PALETTE.lot
-  );
+  return COMMERCIAL_STATUS_COLORS[status?.toLowerCase() ?? ""] ?? PALETTE.lot;
 }
 
 /** A single browser-only WebGL context. Its lifetime is independent of selection,
@@ -321,6 +333,13 @@ function initializeMapRuntime(
     frame = 0,
     scheduled = 0,
     optionalTask = 0;
+  let environmentTask = 0,
+    ambientTimer = 0;
+  let environmentTarget: THREE.WebGLRenderTarget | null = null;
+  let environmentAttempted = false;
+  let vegetation: ReturnType<typeof createVegetation> | null = null;
+  let ambientDisabled = false;
+  let ambientSlowFrames = 0;
   type CameraAction = "focus" | "view" | "wheel" | "zoom" | "rotate";
   let transition: {
     from: Pose;
@@ -370,6 +389,11 @@ function initializeMapRuntime(
     priority: number;
     vertical: boolean;
     textWidth: number;
+    textHeight: number;
+    visible: boolean;
+    scale: number;
+    textHeightPx: number;
+    drawn: boolean;
     rect: { x: number; y: number; w: number; h: number };
   }[] = [];
   const raycaster = new THREE.Raycaster();
@@ -396,6 +420,11 @@ function initializeMapRuntime(
     textures: 0,
     programs: 0,
     textureBytes: 4 * 1024 * 1024,
+    environmentBytes: 0,
+    environmentPeakBytes: 0,
+    ambientFrames: 0,
+    optionalFailures: [],
+    labels: [],
     dpr: 1,
     buffer: [0, 0],
     tier,
@@ -462,11 +491,21 @@ function initializeMapRuntime(
   function matte(color: string) {
     return track(new THREE.MeshLambertMaterial({ color }));
   }
+  const presentationParams = new URLSearchParams(window.location.search);
+  const surfaces = createSurfaceMaterials({
+    maps: !(diag.enabled && presentationParams.get("mapSurfaceMaps") === "off"),
+  });
+  surfaces.setQuality(tier);
+  diag.textureBytes += surfaces.textureBytes;
+  rollback.push(() => surfaces.dispose());
   const groundMaterial = matte(PALETTE.ground);
-  scene.add(new THREE.HemisphereLight("#fffaf2", "#b3aaa1", 0.95));
-  const sunlight = new THREE.DirectionalLight("#fff8ec", 1.5);
+  scene.add(new THREE.HemisphereLight("#edf4ff", "#b8bca8", 1.55));
+  const sunlight = new THREE.DirectionalLight("#fff1dc", 2.15);
   sunlight.position.set(-70, 140, 70);
   scene.add(sunlight);
+  const fill = new THREE.DirectionalLight("#dbe8f5", 0.55);
+  fill.position.set(80, 60, -110);
+  scene.add(fill);
   const ground = new THREE.Mesh(
     track(
       polygonGeometry(
@@ -486,7 +525,7 @@ function initializeMapRuntime(
   // Each static ground category is one draw call, independent of lot count.
   const lotRanges = new Map<string, [number, number]>();
   let lotGeometry: THREE.BufferGeometry | null = null;
-  const pavement = createPavement(ENTITIES);
+  const pavement = createPavement(ENTITIES, surfaces);
   scene.add(pavement.group);
   pavement.resources.forEach(track);
   diag.textureBytes += pavement.textureBytes;
@@ -550,7 +589,7 @@ function initializeMapRuntime(
     }
   }
 
-  const architecture = buildArchitecture(ENTITIES);
+  const architecture = buildArchitecture(ENTITIES, surfaces);
   scene.add(architecture.group);
   pickables.push(...architecture.pickables);
   rollback.push(() => architecture.dispose());
@@ -567,6 +606,29 @@ function initializeMapRuntime(
   );
   selectedLine.renderOrder = 5;
   scene.add(selectedLine);
+  const selectionFillGeometry = track(new THREE.BufferGeometry());
+  const selectionFillPositions = new Float32Array(
+    Math.max(...ENTITIES.map((entity) => entity.polygon.length - 2)) * 9,
+  );
+  selectionFillGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(selectionFillPositions, 3),
+  );
+  selectionFillGeometry.setDrawRange(0, 0);
+  const selectionFill = new THREE.Mesh(
+    selectionFillGeometry,
+    track(
+      new THREE.MeshBasicMaterial({
+        color: PALETTE.plum,
+        transparent: true,
+        opacity: 0.12,
+        depthWrite: false,
+      }),
+    ),
+  );
+  selectionFill.renderOrder = 4;
+  selectionFill.frustumCulled = false;
+  scene.add(selectionFill);
 
   // One small canvas atlas and one mesh, with CPU collision/priority only when a
   // draw is already needed. No per-label DOM nodes or individual text textures.
@@ -593,19 +655,43 @@ function initializeMapRuntime(
       col = index % 4;
     if (row * cellHeight >= 1024) return;
     atlas.font = `${entity.kind === "lot" ? 600 : 700} ${entity.kind === "lot" ? 22 : 19}px sans-serif`;
-    const measured = Math.min(240, atlas.measureText(text).width + 16);
-    atlas.fillStyle = "rgba(253,250,246,0.94)";
-    atlas.fillRect(
-      col * cellWidth + (cellWidth - measured) / 2,
-      row * cellHeight + 3,
-      measured,
-      34,
+    const metrics = atlas.measureText(text);
+    const street = entity.kind === "road";
+    const groundReference = isGroundReference(entity);
+    const glyphHeight = Math.ceil(
+      metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
     );
-    atlas.fillStyle = PALETTE.text;
+    const measured = Math.min(240, metrics.width + (groundReference ? 4 : 14));
+    const glyphBand = groundReference ? glyphHeight + 2 : 30;
+    if (!groundReference) {
+      atlas.fillStyle = entity.kind === "lot" ? "rgba(251,250,245,0.78)" : "rgba(251,250,245,0.96)";
+      atlas.beginPath();
+      atlas.roundRect(
+        col * cellWidth + (cellWidth - measured) / 2,
+        row * cellHeight + 6,
+        measured,
+        30,
+        5,
+      );
+      atlas.fill();
+    }
+    atlas.fillStyle = street && !isWalkway(entity) ? PALETTE.roadText : PALETTE.text;
     atlas.textAlign = "center";
     atlas.textBaseline = "middle";
+    if (groundReference) {
+      atlas.strokeStyle = !street || isWalkway(entity) ? "#f5f3ec" : PALETTE.roadHalo;
+      atlas.lineWidth = 1.3;
+      atlas.lineJoin = "round";
+      atlas.strokeText(text, col * cellWidth + cellWidth / 2, row * cellHeight + 21, 230);
+    }
     atlas.fillText(text, col * cellWidth + cellWidth / 2, row * cellHeight + 21, 230);
-    const size = entity.kind === "lot" ? 1.8 : entity.kind === "pavilion" ? 7 : 6;
+    const size = groundReference
+      ? (STREET_LABEL.baseTextHeight * cellHeight) / glyphBand
+      : entity.kind === "lot"
+        ? 1.8
+        : entity.kind === "pavilion"
+          ? 7
+          : 4.8;
     const entityBounds = boundsOf(entity).box;
     const vertical = entity.kind === "road" && entityBounds.depth > entityBounds.width * 2.5;
     const labelWidth = (size * cellWidth) / cellHeight;
@@ -640,6 +726,11 @@ function initializeMapRuntime(
       vertex,
       vertical,
       textWidth: measured / cellWidth,
+      textHeight: glyphBand / cellHeight,
+      visible: false,
+      scale: 1,
+      textHeightPx: 0,
+      drawn: false,
       rect: { x: 0, y: 0, w: 0, h: 0 },
       priority:
         entity.kind === "pavilion"
@@ -690,6 +781,7 @@ function initializeMapRuntime(
     }
     let count = 0;
     for (const label of sortedLabels) {
+      label.drawn = false;
       const { entity, vertex } = label;
       const building = !!getArchitectureDefinition(entity);
       const y = building ? architectureVisualHeight(entity) + 0.6 : 0.23;
@@ -718,14 +810,16 @@ function initializeMapRuntime(
           : Math.hypot(m[2], m[6]);
       const minText =
         entity.kind === "lot" ? (selected ? 12 : 0) : entity.kind === "pavilion" ? 12 : 10;
-      const labelHeight = readableLabelSize(
-        label.size,
-        worldUnitsPerPixel,
-        projectedAxis,
-        (entity.kind === "lot" ? 22 : 19) / cellHeight,
-        minText,
-      );
-      const labelWidth = (labelHeight * cellWidth) / cellHeight;
+      let labelHeight = isGroundReference(entity)
+        ? label.size
+        : readableLabelSize(
+            label.size,
+            worldUnitsPerPixel,
+            projectedAxis,
+            (entity.kind === "lot" ? 22 : 19) / cellHeight,
+            minText,
+          );
+      let labelWidth = (labelHeight * cellWidth) / cellHeight;
       const projectedHeight = (labelHeight / worldUnitsPerPixel) * projectedAxis;
       if (entity.kind === "lot" && !selected && (projectedHeight * 22) / cellHeight < 9) continue;
       const [anchorX, anchorY] = entity.anchor;
@@ -738,6 +832,61 @@ function initializeMapRuntime(
       const uy = building ? m[5] : 0;
       const uz = building ? m[6] : label.vertical ? 0 : -1;
       const sign = building || rx * m[0] + rz * m[2] >= 0 ? 1 : -1;
+      const projectText = (w: number, h: number) => {
+        const corners: { x: number; y: number }[] = [];
+        for (let corner = 0; corner < 4; corner++) {
+          const ox = ((corner === 0 || corner === 3 ? -1 : 1) * w * label.textWidth) / 2;
+          const oz = ((corner < 2 ? 1 : -1) * h * label.textHeight) / 2;
+          projection
+            .set(
+              anchorX + (rx * ox + ux * oz) * sign,
+              y + (ry * ox + uy * oz) * sign,
+              anchorY + (rz * ox + uz * oz) * sign,
+            )
+            .project(camera);
+          corners.push({
+            x: ((projection.x + 1) * width) / 2,
+            y: ((1 - projection.y) * height) / 2,
+          });
+        }
+        return corners;
+      };
+      if (isGroundReference(entity)) {
+        const wasVisible = label.visible;
+        const natural = projectedTextMetrics(projectText(labelWidth, labelHeight));
+        const corridor =
+          STREET_CORRIDORS.get(entity.id) ?? GROUND_REFERENCE_CORRIDORS.get(entity.id)!;
+        const presentation = streetLabelPresentation({
+          naturalTextHeightPx: natural.height,
+          naturalTextWidthPx: natural.width,
+          worldTextWidth: labelWidth * label.textWidth,
+          worldTextHeight: labelHeight * label.textHeight,
+          corridorLength: corridor.length,
+          corridorWidth: corridor.width,
+          wasVisible,
+          selected,
+        });
+        label.scale = presentation.scale;
+        labelHeight *= presentation.scale;
+        labelWidth *= presentation.scale;
+        // Perspective division is not uniform across a ground rectangle. Reproject
+        // the actual shrunken glyph band, then conservatively enforce the cap.
+        for (let pass = 0; pass < 3; pass++) {
+          const actual = projectedTextMetrics(projectText(labelWidth, labelHeight));
+          label.textHeightPx = actual.height;
+          if (actual.height <= STREET_LABEL.maxTextPixels) break;
+          const correction = (STREET_LABEL.maxTextPixels / actual.height) * 0.998;
+          labelHeight *= correction;
+          labelWidth *= correction;
+          label.scale *= correction;
+        }
+        // Depth changes across a long, ground-anchored word. The final glyph
+        // can be much smaller than the initial linear estimate after capping.
+        // Hysteresis must use that final projected size, never the old estimate.
+        label.textHeightPx = projectedTextMetrics(projectText(labelWidth, labelHeight)).height;
+        label.visible = streetLabelVisible(label.textHeightPx, wasVisible);
+        if (!label.visible) continue;
+      }
       for (let corner = 0; corner < 4; corner++) {
         const ox = (((corner === 0 || corner === 3 ? -1 : 1) * labelWidth) / 2) * sign;
         const oz = (((corner < 2 ? 1 : -1) * labelHeight) / 2) * sign;
@@ -756,7 +905,7 @@ function initializeMapRuntime(
       // Project the actual atlas background, not the mostly transparent cell.
       for (let corner = 0; corner < 4; corner++) {
         const ox = ((corner === 0 || corner === 3 ? -1 : 1) * labelWidth * label.textWidth) / 2;
-        const oz = ((corner < 2 ? 1 : -1) * labelHeight * 34) / cellHeight / 2;
+        const oz = ((corner < 2 ? 1 : -1) * labelHeight * label.textHeight) / 2;
         projection
           .set(
             anchorX + (rx * ox + ux * oz) * sign,
@@ -788,6 +937,7 @@ function initializeMapRuntime(
         }
       if (collides) continue;
       collisionRects.push(rect);
+      label.drawn = true;
       labelIndices[count++] = vertex;
       labelIndices[count++] = vertex + 2;
       labelIndices[count++] = vertex + 1;
@@ -798,45 +948,86 @@ function initializeMapRuntime(
     labelsGeometry.setDrawRange(0, count);
     labelsGeometry.index!.needsUpdate = true;
     labelsGeometry.getAttribute("position").needsUpdate = true;
+    if (diag.enabled)
+      diag.labels = labels
+        .filter((label) => isGroundReference(label.entity))
+        .map((label) => ({
+          id: label.entity.id,
+          scale: label.scale,
+          visible: label.drawn,
+          textHeightPx: label.textHeightPx,
+        }));
   }
 
-  let treeTrunks: THREE.InstancedMesh | null = null,
-    treeCrowns: THREE.InstancedMesh | null = null;
   function addTrees() {
+    optionalTask = 0;
     if (disposed || failed) return;
-    if (document.hidden || activePointers.size || transition) {
+    if (document.hidden) return;
+    if (activePointers.size || transition) {
       optionalTask = window.setTimeout(addTrees, 100);
       return;
     }
-    treeTrunks = new THREE.InstancedMesh(
-      track(new THREE.CylinderGeometry(0.12, 0.17, 1.1, 5)),
-      matte("#8d7865"),
-      TREES.length,
-    );
-    treeCrowns = new THREE.InstancedMesh(
-      track(new THREE.IcosahedronGeometry(1, 0)),
-      matte("#8c9c73"),
-      TREES.length,
-    );
-    const matrix = new THREE.Matrix4(),
-      rotation = new THREE.Quaternion(),
-      scale = new THREE.Vector3();
-    for (let i = 0; i < TREES.length; i++) {
-      const point = TREES[i];
-      const size = 0.8 + (i % 4) * 0.13;
-      matrix.compose(scratch.set(point[0], 0.5, point[1]), rotation, scale.set(1, 1, 1));
-      treeTrunks.setMatrixAt(i, matrix);
-      matrix.compose(
-        scratch.set(point[0], 1.5, point[1]),
-        rotation,
-        scale.set(size, size * 0.8, size),
-      );
-      treeCrowns.setMatrixAt(i, matrix);
+    try {
+      vegetation = createVegetation();
+      scene.add(vegetation.group);
+      diag.textureBytes += vegetation.textureBytes;
+      rollback.push(() => vegetation?.dispose());
+    } catch {
+      ambientDisabled = true;
+      diag.optionalFailures.push("vegetation-preparation");
     }
-    treeTrunks.instanceMatrix.needsUpdate = treeCrowns.instanceMatrix.needsUpdate = true;
-    treeTrunks.count = treeCrowns.count = Math.floor(TREES.length * QUALITY[tier].trees);
-    scene.add(treeTrunks, treeCrowns);
     invalidate();
+  }
+
+  // Deferred optional reflection: first navigation already works with local
+  // albedo + direct daylight. No remote asset or probe per building/frame.
+  function prepareEnvironment() {
+    environmentTask = 0;
+    if (disposed || failed || tier === "light" || environmentAttempted) return;
+    if (document.hidden) return;
+    if (activePointers.size || transition) {
+      environmentTask = window.setTimeout(prepareEnvironment, 250);
+      return;
+    }
+    environmentAttempted = true;
+    try {
+      const environment = createReflectionEnvironment(renderer, {
+        fail: diag.enabled && presentationParams.get("mapEnvironment") === "fail",
+      });
+      environmentTarget = environment.target;
+      // Packed CubeUV LODs use the actual RGBA half-float target dimensions.
+      // Source and scratch targets are already disposed; no depth target.
+      diag.environmentBytes = environment.textureBytes;
+      diag.environmentPeakBytes = environment.peakTextureBytes;
+      diag.textureBytes += diag.environmentBytes;
+      scene.environment = environmentTarget.texture;
+      rollback.push(() => environmentTarget?.dispose());
+    } catch {
+      // Direct sun + sky fill and all semantic materials remain valid.
+      environmentTarget?.dispose();
+      environmentTarget = null;
+      diag.optionalFailures.push("environment-preparation");
+    }
+    invalidate();
+  }
+
+  function scheduleAmbient() {
+    window.clearTimeout(ambientTimer);
+    if (
+      disposed ||
+      failed ||
+      document.hidden ||
+      reduceMotion.matches ||
+      tier !== "detailed" ||
+      ambientDisabled ||
+      !vegetation
+    )
+      return;
+    ambientTimer = window.setTimeout(() => {
+      ambientTimer = 0;
+      // Decorative cadence never enters the active-navigation sample window.
+      invalidate();
+    }, 1000 / 24);
   }
 
   function pose(): Pose {
@@ -1034,6 +1225,12 @@ function initializeMapRuntime(
       }
     }
     if (!transition) clampTarget();
+    const navigationActive = activePointers.size > 0 || !!transition || now - lastActivity < 240;
+    vegetation?.animate(
+      now / 1000,
+      tier === "detailed" && !reduceMotion.matches && !ambientDisabled,
+    );
+    surfaces.updateDetail(camera.position.distanceTo(controls.target));
     camera.near = Math.max(
       0.05,
       Math.min(camera.position.distanceTo(controls.target) / 280, camera.position.y * 0.2),
@@ -1064,9 +1261,13 @@ function initializeMapRuntime(
       diag.lastSelectedId = props().selectedId;
       diag.selectionDrawAt = performance.now();
     }
-    const active = activePointers.size > 0 || !!transition || now - lastActivity < 240;
+    const active = navigationActive;
+    if (!active && tier === "detailed" && !reduceMotion.matches && !ambientDisabled)
+      diag.ambientFrames++;
     if (active && lastFrame) {
       const delta = now - lastFrame;
+      ambientSlowFrames = delta > 50 ? ambientSlowFrames + 1 : 0;
+      if (ambientSlowFrames >= 8) ambientDisabled = true;
       if (props().quality === "auto") adaptiveSamples.push(delta);
       else adaptiveSamples.length = 0;
       if (diag.enabled) {
@@ -1078,6 +1279,7 @@ function initializeMapRuntime(
           adaptiveSamples.reduce((sum, value) => sum + value, 0) / adaptiveSamples.length;
         const sorted = [...adaptiveSamples].sort((a, b) => a - b);
         const p95 = sorted[Math.ceil(sorted.length * 0.95) - 1];
+        if (p95 > 35) ambientDisabled = true;
         slowWindows = mean > 33 || p95 > 50 ? slowWindows + 1 : 0;
         fastWindows = mean < 18 && p95 < 22 ? fastWindows + 1 : 0;
         diag.slowFrameWindows = slowWindows;
@@ -1114,6 +1316,7 @@ function initializeMapRuntime(
       performance.mark("indumoveis-map:controls-ready");
       props().onReady();
       optionalTask = window.setTimeout(addTrees, 0);
+      if (tier !== "light") environmentTask = window.setTimeout(prepareEnvironment, 350);
     }
     if (
       pendingTier &&
@@ -1125,7 +1328,10 @@ function initializeMapRuntime(
       pendingTier = null;
     }
     if (transition || !ready || active || pendingTier) invalidate();
-    else diag.cameraState = "idle";
+    else {
+      diag.cameraState = "idle";
+      scheduleAmbient();
+    }
   }
   function applyQuality(next: QualityTier) {
     tier = next;
@@ -1134,8 +1340,11 @@ function initializeMapRuntime(
     slowWindows = fastWindows = 0;
     adaptiveSamples.length = 0;
     diag.slowFrameWindows = 0;
-    if (treeCrowns && treeTrunks)
-      treeCrowns.count = treeTrunks.count = Math.floor(TREES.length * QUALITY[tier].trees);
+    surfaces.setQuality(tier);
+    scene.environment = tier === "light" ? null : (environmentTarget?.texture ?? null);
+    if (tier !== "light" && !environmentAttempted && !environmentTask)
+      environmentTask = window.setTimeout(prepareEnvironment, 350);
+    window.clearTimeout(ambientTimer);
     resizeBuffer();
   }
   function resizeBuffer() {
@@ -1191,6 +1400,8 @@ function initializeMapRuntime(
     if (initial) {
       lastActivity = performance.now();
       invalidate();
+    } else if (event.pointerType === "mouse") {
+      canvas.style.cursor = pick(event.clientX, event.clientY) ? "pointer" : "grab";
     }
   }
   function pointerUp(event: PointerEvent) {
@@ -1285,10 +1496,17 @@ function initializeMapRuntime(
   function onVisibility() {
     cancelPointers();
     if (document.hidden) {
+      window.clearTimeout(ambientTimer);
+      window.clearTimeout(optionalTask);
+      window.clearTimeout(environmentTask);
+      optionalTask = environmentTask = 0;
       if (scheduled) cancelAnimationFrame(scheduled);
       scheduled = 0;
     } else {
       lastFrame = 0;
+      if (ready && !vegetation && !ambientDisabled) optionalTask = window.setTimeout(addTrees, 0);
+      if (ready && tier !== "light" && !environmentAttempted)
+        environmentTask = window.setTimeout(prepareEnvironment, 350);
       invalidate();
     }
   }
@@ -1316,6 +1534,7 @@ function initializeMapRuntime(
   canvas.addEventListener("webglcontextlost", contextLost);
   window.addEventListener("blur", cancelPointers);
   document.addEventListener("visibilitychange", onVisibility);
+  reduceMotion.addEventListener("change", invalidate);
   controls.addEventListener("change", controlsChanged);
   function removeListeners() {
     controls.removeEventListener("change", controlsChanged);
@@ -1328,8 +1547,11 @@ function initializeMapRuntime(
     canvas.removeEventListener("webglcontextlost", contextLost);
     window.removeEventListener("blur", cancelPointers);
     document.removeEventListener("visibilitychange", onVisibility);
+    reduceMotion.removeEventListener("change", invalidate);
     if (scheduled) cancelAnimationFrame(scheduled);
     window.clearTimeout(optionalTask);
+    window.clearTimeout(environmentTask);
+    window.clearTimeout(ambientTimer);
   }
   rollback.push(removeListeners);
   const observer = new ResizeObserver((entries) => {
@@ -1465,15 +1687,21 @@ function initializeMapRuntime(
     selectedGeometry.getAttribute("position").needsUpdate = true;
     selectedGeometry.setDrawRange(0, selection.length / 3);
     selectedGeometry.computeBoundingSphere();
+    if (selected && !getArchitectureDefinition(selected)) {
+      const surface = polygonGeometry(selected.polygon, 0.13);
+      const positions = surface.getAttribute("position").array;
+      selectionFillPositions.set(positions);
+      selectionFillGeometry.getAttribute("position").needsUpdate = true;
+      selectionFillGeometry.setDrawRange(0, positions.length / 3);
+      surface.dispose();
+    } else selectionFillGeometry.setDrawRange(0, 0);
     if (lotGeometry) {
       const colors = lotGeometry.getAttribute("color") as THREE.BufferAttribute;
       for (const [id, [start, count]] of lotRanges) {
         const color = new THREE.Color(
-          id === state.selectedId
-            ? "#c5a7b8"
-            : state.highlightedIds.includes(id)
-              ? "#d5c69c"
-              : statusColor(state.statuses[id]),
+          state.highlightedIds.includes(id) && !state.statuses[id]
+            ? "#d5c69c"
+            : statusColor(state.statuses[id]),
         );
         for (let i = start; i < start + count; i++) colors.setXYZ(i, color.r, color.g, color.b);
       }
@@ -1563,8 +1791,10 @@ function initializeMapRuntime(
       window.clearTimeout(optionalTask);
       removeListeners();
       controls.dispose();
-      treeTrunks?.dispose();
-      treeCrowns?.dispose();
+      vegetation?.dispose();
+      scene.environment = null;
+      environmentTarget?.dispose();
+      surfaces.dispose();
       for (const resource of resources) resource.dispose();
       architecture.dispose();
       scene.clear();

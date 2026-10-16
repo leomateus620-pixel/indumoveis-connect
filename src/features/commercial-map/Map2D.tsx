@@ -4,6 +4,13 @@ import type { MapEntity, Point } from "./data/territory";
 import type { MapHandle, MapRendererProps } from "./types";
 import { MOTION } from "./motion";
 import { pointInPolygon } from "./geometry";
+import {
+  isWalkway,
+  STREET_LABEL,
+  streetLabelCorridor,
+  streetLabelPresentation,
+} from "./labelPolicy";
+import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
 
 const fullWidth = MAP_BOUNDS.maxX - MAP_BOUNDS.minX;
 const fullHeight = MAP_BOUNDS.maxY - MAP_BOUNDS.minY;
@@ -18,13 +25,17 @@ const base: Box = {
   width: fullWidth * 1.07,
   height: fullHeight * 1.07,
 };
-const colors: Record<string, string> = {
-  disponivel: "#b8d6c5",
-  em_negociacao: "#b9ccdf",
-  reservado: "#e2c69e",
-  vendido: "#9b7c91",
-  bloqueado: "#b6b2b5",
-};
+const roads = ENTITIES.filter((entity) => entity.kind === "road");
+const roadCorridors = new Map(
+  roads.map((entity) => [entity.id, streetLabelCorridor(entity, roads)]),
+);
+function entityColor(entity: MapEntity) {
+  if (entity.kind === "road") return isWalkway(entity) ? VISUAL_THEME.walk : VISUAL_THEME.road;
+  if (entity.kind === "lot") return VISUAL_THEME.lot;
+  if (entity.kind === "pavilion") return VISUAL_THEME.wall;
+  if (entity.kind === "landscape") return VISUAL_THEME.landscape;
+  return VISUAL_THEME.support;
+}
 function sceneLabel(entity: MapEntity) {
   if (entity.kind === "lot")
     return (entity.numbers ?? []).map((n) => String(n).padStart(2, "0")).join(" / ");
@@ -37,9 +48,7 @@ function sceneLabel(entity: MapEntity) {
 }
 function labelRotation(entity: MapEntity) {
   if (entity.kind !== "road") return undefined;
-  const xs = entity.polygon.map((p) => p[0]),
-    ys = entity.polygon.map((p) => p[1]);
-  return Math.max(...ys) - Math.min(...ys) > (Math.max(...xs) - Math.min(...xs)) * 2.5
+  return roadCorridors.get(entity.id)?.vertical
     ? `rotate(-90 ${entity.anchor[0]} ${entity.anchor[1]})`
     : undefined;
 }
@@ -51,6 +60,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
   const exterior = useRef<Box | null>(null);
   const animation = useRef<number | null>(null);
   const labels = useRef<{ node: SVGTextElement; entity: MapEntity }[]>([]);
+  const streetState = useRef(new Map<string, { scale: number; visible: boolean }>());
   const current = useRef(props);
   current.current = props;
   const pointers = useRef(new Map<number, Point>());
@@ -75,6 +85,38 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     svg.current?.classList.toggle("im-map-near", b.width < fullWidth * 0.7);
     if (!rect?.width) return;
     svg.current?.style.setProperty("--im-label-unit", `${b.width / rect.width}px`);
+    const pixelsPerUnit = rect.width / b.width;
+    // Street text starts at one authored world size, never at a minimum screen
+    // size. Only the glyph band is measured; no full-cell/white-plate collision.
+    for (const { node, entity } of labels.current) {
+      if (entity.kind !== "road") continue;
+      const previous = streetState.current.get(entity.id);
+      const oldScale = previous?.scale || 1;
+      const glyph = node.getBBox?.();
+      const worldTextWidth =
+        (glyph?.width
+          ? glyph.width / oldScale
+          : (node.textContent?.length ?? 0) * STREET_LABEL.baseTextHeight * 0.55) + 0.06;
+      const worldTextHeight =
+        (glyph?.height ? glyph.height / oldScale : STREET_LABEL.baseTextHeight * 0.75) + 0.06;
+      const corridor = roadCorridors.get(entity.id)!;
+      const presentation = streetLabelPresentation({
+        naturalTextWidthPx: worldTextWidth * pixelsPerUnit,
+        naturalTextHeightPx: worldTextHeight * pixelsPerUnit,
+        worldTextWidth,
+        worldTextHeight,
+        corridorLength: corridor.length,
+        corridorWidth: corridor.width,
+        wasVisible: previous?.visible ?? false,
+        selected: entity.id === current.current.selectedId,
+      });
+      // A zero corridor hides the text but leaves a measurable nonzero font.
+      const scale = presentation.scale || 1;
+      node.style.fontSize = `${STREET_LABEL.baseTextHeight * scale}px`;
+      node.style.strokeWidth = `${Math.min(0.06 * scale, 1.3 / pixelsPerUnit)}px`;
+      node.style.opacity = String(presentation.opacity);
+      streetState.current.set(entity.id, { scale, visible: presentation.visible });
+    }
     // Read every label before changing visibility. Pan/zoom never updates React state.
     const measured = labels.current.map((label) => ({
       ...label,
@@ -97,6 +139,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           pointInPolygon([right, bottom], entity.polygon));
       const visible =
         !!node.textContent &&
+        (entity.kind !== "road" || streetState.current.get(entity.id)?.visible) &&
         (entity.kind !== "lot" || near || selected) &&
         fits &&
         bounds.right > rect.left &&
@@ -409,7 +452,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
         y={base.y - fullHeight}
         width={fullWidth * 4}
         height={fullHeight * 4}
-        fill="#eeece5"
+        fill={VISUAL_THEME.background}
       />
       {ENTITIES.map((entity) => (
         <g
@@ -419,21 +462,31 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
         >
           <polygon
             points={entity.polygon.map((p) => p.join(",")).join(" ")}
-            style={
-              entity.kind === "lot" && props.statuses[entity.id]
-                ? { fill: colors[props.statuses[entity.id]] }
-                : undefined
-            }
+            style={{
+              fill:
+                (entity.kind === "lot" && COMMERCIAL_STATUS_COLORS[props.statuses[entity.id]]) ||
+                entityColor(entity),
+            }}
           />
           {entity.kind === "pavilion" && (
             <polygon
               className="im-map-roof"
               points={entity.polygon.map((p) => p.join(",")).join(" ")}
-              style={{ display: props.inspectedId === entity.id ? "none" : undefined }}
+              style={{
+                display: props.inspectedId === entity.id ? "none" : undefined,
+                fill: VISUAL_THEME.roof,
+              }}
+            />
+          )}
+          {props.selectedId === entity.id && (
+            <polygon
+              points={entity.polygon.map((p) => p.join(",")).join(" ")}
+              pointerEvents="none"
+              style={{ fill: VISUAL_THEME.plum, fillOpacity: 0.09, stroke: "none" }}
             />
           )}
           {entity.accesses?.map((p, i) => (
-            <circle key={i} cx={p[0]} cy={p[1]} r={fullWidth * 0.0022} fill="#69475f" />
+            <circle key={i} cx={p[0]} cy={p[1]} r={fullWidth * 0.0022} fill={VISUAL_THEME.plum} />
           ))}
         </g>
       ))}
@@ -443,7 +496,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           cx={p[0]}
           cy={p[1]}
           r={fullWidth * 0.004}
-          fill={i % 2 ? "#8d9c79" : "#9ca789"}
+          fill={VISUAL_THEME.foliage[i % VISUAL_THEME.foliage.length]}
           pointerEvents="none"
         />
       ))}
@@ -461,6 +514,18 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
               dominantBaseline="central"
               className={entity.kind === "lot" ? "im-lot-number" : ""}
               transform={labelRotation(entity)}
+              style={
+                entity.kind === "road"
+                  ? {
+                      fontSize: STREET_LABEL.baseTextHeight,
+                      fontWeight: 500,
+                      fill: isWalkway(entity) ? VISUAL_THEME.text : VISUAL_THEME.roadText,
+                      stroke: isWalkway(entity) ? VISUAL_THEME.walk : VISUAL_THEME.roadHalo,
+                      strokeWidth: 0.06,
+                      visibility: "hidden",
+                    }
+                  : undefined
+              }
             >
               {sceneLabel(entity)}
             </text>

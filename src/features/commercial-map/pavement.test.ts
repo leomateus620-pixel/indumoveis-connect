@@ -125,17 +125,21 @@ describe("derived park pavement", () => {
     expect(JSON.stringify(ENTITIES)).toBe(before);
   });
 
-  it("batches pavement in three meshes with upward normals and one small shared aggregate texture", () => {
+  it("batches pavement in three semantic meshes with upward normals and bounded shared surface maps", () => {
     const pavement = createPavement(ENTITIES);
     expect(pavement.group.children).toHaveLength(3);
-    expect(pavement.resources.filter((resource) => "isTexture" in resource)).toHaveLength(1);
-    expect(pavement.textureBytes).toBeLessThan(24 * 1024);
+    expect(pavement.resources.filter((resource) => "isTexture" in resource)).toHaveLength(4);
+    expect(pavement.textureBytes).toBeLessThan(0.5 * 1024 * 1024);
     expect(PAVEMENT.paintElevation).toBeGreaterThan(PAVEMENT.asphaltElevation);
     expect(PAVEMENT.junctionTolerance).toBeLessThan(0.03);
     for (const mesh of pavement.group.children) {
       const geometry = (mesh as import("three").Mesh).geometry;
       const positions = geometry.getAttribute("position");
       const normals = geometry.getAttribute("normal");
+      expect(geometry.getAttribute("uv").count).toBe(positions.count);
+      const color = geometry.getAttribute("color");
+      expect(color.count).toBe(positions.count);
+      expect(Array.from(color.array).every((channel) => channel === 1)).toBe(true);
       expect(positions.count).toBeGreaterThan(0);
       for (let i = 0; i < normals.count; i++) expect(normals.getY(i)).toBeCloseTo(1, 6);
       expect(mesh.userData.entityId).toBeUndefined();
