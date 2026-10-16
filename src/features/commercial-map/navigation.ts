@@ -45,7 +45,7 @@ export function initialQuality(memory?: number, cores?: number): QualityTier {
 }
 
 export function viewDirection(view: MapView): readonly [number, number, number] {
-  if (view === "top") return [0, 1, 0.001];
+  if (view === "top") return [0, 1, 0.055];
   if (view === "front") return [0.05, 0.56, 0.827];
   return [-0.27, 0.82, 0.505];
 }
@@ -59,7 +59,7 @@ export function framingDistance(
   fov = 38,
 ) {
   const freeWidth = Math.max(width * 0.25, width - insets.right - 32);
-  const freeHeight = Math.max(height * 0.25, height - insets.bottom - 52);
+  const freeHeight = Math.max(height * 0.25, height - insets.bottom - 24);
   const halfVertical = (fov * Math.PI) / 360;
   const halfHorizontal = Math.atan((Math.tan(halfVertical) * width) / Math.max(height, 1));
   const vertical = Math.atan((Math.tan(halfVertical) * freeHeight) / Math.max(height, 1));
@@ -76,8 +76,9 @@ export function framingBoxDistance(
   insets: MapInsets,
   view: MapView,
   fov = 38,
+  direction?: readonly [number, number, number],
 ) {
-  const raw = viewDirection(view),
+  const raw = direction ?? viewDirection(view),
     length = Math.hypot(...raw);
   const [dx, dy, dz] = raw.map((value) => value / length);
   const rightLength = Math.hypot(dx, dz);
@@ -87,7 +88,7 @@ export function framingBoxDistance(
     uy = dz * rx - dx * rz,
     uz = -dy * rx;
   const freeWidth = Math.max(viewportWidth * 0.25, viewportWidth - insets.right - 32);
-  const freeHeight = Math.max(viewportHeight * 0.25, viewportHeight - insets.bottom - 52);
+  const freeHeight = Math.max(viewportHeight * 0.25, viewportHeight - insets.bottom - 24);
   const tanVertical = Math.tan((fov * Math.PI) / 360);
   const tanHorizontalFree = (tanVertical * freeWidth) / Math.max(viewportHeight, 1);
   const tanVerticalFree = (tanVertical * freeHeight) / Math.max(viewportHeight, 1);

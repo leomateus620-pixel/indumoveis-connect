@@ -21,6 +21,9 @@ export interface MapRendererProps {
   selectedId: string | null;
   inspectedId: string | null;
   view: MapView;
+  /** Reapply a preset after manual orbit without inventing a fourth view button. */
+  viewRevision?: number;
+  onManualOrientation?(): void;
   quality: MapQuality;
   gesture: MapGesture;
   insets: MapInsets;

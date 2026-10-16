@@ -5,6 +5,7 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 
 const directory = path.resolve(".output/public/assets");
+const output = path.resolve(process.argv[2] ?? "docs/validation/commercial-map/bundle.json");
 const files = await readdir(directory);
 const modules = new Map(
   await Promise.all(
@@ -69,9 +70,6 @@ const result = {
   documentsStaticFiles: [...documents],
   engineIsolated: true,
 };
-await mkdir("docs/validation/commercial-map", { recursive: true });
-await writeFile(
-  "docs/validation/commercial-map/bundle.json",
-  `${JSON.stringify(result, null, 2)}\n`,
-);
+await mkdir(path.dirname(output), { recursive: true });
+await writeFile(output, `${JSON.stringify(result, null, 2)}\n`);
 console.log(JSON.stringify({ renderer, featureGzipBytes: compressedBytes, engineIsolated: true }));

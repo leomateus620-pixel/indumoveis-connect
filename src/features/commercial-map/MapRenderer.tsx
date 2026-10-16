@@ -18,6 +18,12 @@ import {
   type QualityTier,
 } from "./navigation";
 import type { MapHandle, MapRendererProps, MapView } from "./types";
+import { createPavement } from "./pavement";
+import {
+  buildArchitecture,
+  getArchitectureDefinition,
+  architectureVisualHeight,
+} from "./architecture";
 
 type Pose = { position: THREE.Vector3; target: THREE.Vector3 };
 type Runtime = MapHandle & { update(): void; dispose(): void };
@@ -47,6 +53,11 @@ type Diagnostic = {
   tier: QualityTier;
   cameraState: "idle" | "manual" | "transition";
   target: Point;
+  position: [number, number, number];
+  distance: number;
+  polar: number;
+  azimuth: number;
+  inspectedId: string | null;
   readyAt?: number;
   frameIntervals: number[];
   renderDurations: number[];
@@ -56,9 +67,11 @@ type Diagnostic = {
   sampledFrameWindows: number;
   selectionDrawAt?: number;
   lastSelectedId?: string | null;
-  project(id: string): { x: number; y: number } | null;
+  project(id: string, heightFraction?: number): { x: number; y: number } | null;
   resetSamples(): void;
   loseContext(): void;
+  /** Deterministic lab captures only; never used by product controls. */
+  setReferencePose(position: [number, number, number], target: Point): void;
 };
 
 declare global {
@@ -120,41 +133,6 @@ function polygonGeometry(polygon: Point[], height: number) {
   return geometry;
 }
 
-function wallGeometry(polygon: Point[], bottom: number, top: number) {
-  const positions: number[] = [];
-  const signed = polygon.reduce((sum, p, i) => {
-    const n = polygon[(i + 1) % polygon.length];
-    return sum + p[0] * n[1] - n[0] * p[1];
-  }, 0);
-  for (let i = 0; i < polygon.length; i++) {
-    const a = polygon[i],
-      b = polygon[(i + 1) % polygon.length];
-    const corners =
-      signed > 0
-        ? [
-            [a[0], bottom, a[1]],
-            [b[0], top, b[1]],
-            [b[0], bottom, b[1]],
-            [a[0], bottom, a[1]],
-            [a[0], top, a[1]],
-            [b[0], top, b[1]],
-          ]
-        : [
-            [a[0], bottom, a[1]],
-            [b[0], bottom, b[1]],
-            [b[0], top, b[1]],
-            [a[0], bottom, a[1]],
-            [b[0], top, b[1]],
-            [a[0], top, a[1]],
-          ];
-    for (const p of corners) positions.push(...p);
-  }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
 function edges(polygon: Point[], height: number) {
   return polygon.flatMap((p, i) => {
     const next = polygon[(i + 1) % polygon.length];
@@ -173,8 +151,12 @@ function boundsOf(entity?: MapEntity) {
     maxY = Math.max(...points.map((p) => p[1]));
   return {
     center: [(minX + maxX) / 2, (minY + maxY) / 2] as Point,
-    radius: Math.hypot(maxX - minX, maxY - minY, entity?.height ?? 0) / 2,
-    box: { width: maxX - minX, depth: maxY - minY, height: entity?.height ?? 0 },
+    radius: Math.hypot(maxX - minX, maxY - minY, entity ? architectureVisualHeight(entity) : 0) / 2,
+    box: {
+      width: maxX - minX,
+      depth: maxY - minY,
+      height: entity ? architectureVisualHeight(entity) : 0,
+    },
   };
 }
 
@@ -235,6 +217,7 @@ const MapRenderer = forwardRef<MapHandle, MapRendererProps>(function MapRenderer
     props.selectedId,
     props.inspectedId,
     props.view,
+    props.viewRevision,
     props.quality,
     props.gesture,
     props.insets.right,
@@ -321,7 +304,7 @@ function initializeMapRuntime(
   controls.panSpeed = 0.85;
   controls.zoomSpeed = 0.8;
   controls.minPolarAngle = 0.001;
-  controls.maxPolarAngle = Math.PI * 0.4;
+  controls.maxPolarAngle = Math.PI * 0.46;
   controls.minDistance = 5;
   controls.maxDistance = DIAGONAL * 6;
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
@@ -338,10 +321,20 @@ function initializeMapRuntime(
     frame = 0,
     scheduled = 0,
     optionalTask = 0;
-  let transition: { from: Pose; to: Pose; start: number; duration: number } | null = null;
+  type CameraAction = "focus" | "view" | "wheel" | "zoom" | "rotate";
+  let transition: {
+    from: Pose;
+    to: Pose;
+    start: number;
+    duration: number;
+    kind: CameraAction;
+  } | null = null;
   let exteriorPose: Pose | null = null;
+  let focusedBuilding: MapEntity | undefined;
+  let inspectionInterruptedTarget: Point | null = null;
   let previousInspected = props().inspectedId;
   let previousView = props().view;
+  let previousViewRevision = props().viewRevision;
   let previousQuality = props().quality;
   let previousSelection = props().selectedId;
   let previousInsetRight = props().insets.right,
@@ -358,13 +351,15 @@ function initializeMapRuntime(
     { x: number; y: number; touch: boolean; candidate: string | null }
   >();
   let clickCancelled = false;
+  let manualPolar = 0,
+    manualAzimuth = 0,
+    manualOrientationReported = false;
   const resources = new Set<THREE.BufferGeometry | THREE.Material | THREE.Texture>();
   rollback.push(() => {
     for (const resource of resources) resource.dispose();
     scene.clear();
   });
   const pickables: THREE.Mesh[] = [];
-  const shells = new Map<string, THREE.Group>();
   const labels: {
     entity: MapEntity;
     text: string;
@@ -406,15 +401,26 @@ function initializeMapRuntime(
     tier,
     cameraState: "idle",
     target: [...CENTER],
+    position: [0, 0, 0],
+    distance: 0,
+    polar: 0,
+    azimuth: 0,
+    inspectedId: null,
     frameIntervals: [],
     renderDurations: [],
     contextLosses: 0,
     slowFrameWindows: 0,
     sampledFrameWindows: 0,
-    project(id) {
+    project(id, heightFraction = 1) {
       const entity = ENTITY_BY_ID.get(id);
       if (!entity) return null;
-      projection.set(entity.anchor[0], 0.2, entity.anchor[1]).project(camera);
+      projection
+        .set(
+          entity.anchor[0],
+          architectureVisualHeight(entity) * heightFraction + 0.2,
+          entity.anchor[1],
+        )
+        .project(camera);
       return { x: ((projection.x + 1) * width) / 2, y: ((1 - projection.y) * height) / 2 };
     },
     resetSamples() {
@@ -425,6 +431,16 @@ function initializeMapRuntime(
     loseContext() {
       context.getExtension("WEBGL_lose_context")?.loseContext();
     },
+    setReferencePose(position, target) {
+      if (!diag.enabled || !position.every(Number.isFinite) || !target.every(Number.isFinite))
+        return;
+      cancelTransition();
+      applyPose({
+        position: new THREE.Vector3(...position),
+        target: new THREE.Vector3(target[0], 0, target[1]),
+      });
+      invalidate();
+    },
   };
   window.__indumoveisMap = diag;
   rollback.push(() => {
@@ -432,6 +448,8 @@ function initializeMapRuntime(
     diag.activeContexts = diag.contextCount = diag.activeLoops = 0;
     diag.project = () => null;
     diag.loseContext = () => {};
+    diag.setReferencePose = () => {};
+    diag.resetSamples = () => {};
   });
 
   function track<T extends THREE.BufferGeometry | THREE.Material | THREE.Texture>(value: T): T {
@@ -444,10 +462,6 @@ function initializeMapRuntime(
   function matte(color: string) {
     return track(new THREE.MeshLambertMaterial({ color }));
   }
-  const wallMaterial = matte(PALETTE.wall),
-    roofMaterial = matte(PALETTE.roof),
-    trimMaterial = matte(PALETTE.plum),
-    floorMaterial = matte("#f3eade");
   const groundMaterial = matte(PALETTE.ground);
   scene.add(new THREE.HemisphereLight("#fffaf2", "#b3aaa1", 0.95));
   const sunlight = new THREE.DirectionalLight("#fff8ec", 1.5);
@@ -472,12 +486,28 @@ function initializeMapRuntime(
   // Each static ground category is one draw call, independent of lot count.
   const lotRanges = new Map<string, [number, number]>();
   let lotGeometry: THREE.BufferGeometry | null = null;
-  for (const kind of ["landscape", "road", "lot", "support"] as const) {
+  const pavement = createPavement(ENTITIES);
+  scene.add(pavement.group);
+  pavement.resources.forEach(track);
+  diag.textureBytes += pavement.textureBytes;
+  // Picking remains attached to the original surfaces despite network batching.
+  for (const entity of ENTITIES.filter((entry) => entry.kind === "road")) {
+    const pickMesh = new THREE.Mesh(
+      track(polygonGeometry(entity.polygon, -0.02)),
+      basic("#ffffff"),
+    );
+    pickMesh.userData.entityId = entity.id;
+    pickMesh.updateMatrixWorld();
+    pickables.push(pickMesh);
+  }
+  for (const kind of ["landscape", "lot", "support"] as const) {
     const positions: number[] = [],
       colors: number[] = [],
       borderPositions: number[] = [];
-    for (const entity of ENTITIES.filter((entry) => entry.kind === kind)) {
-      const elevation = kind === "landscape" ? -0.08 : kind === "road" ? -0.025 : 0.05;
+    for (const entity of ENTITIES.filter(
+      (entry) => entry.kind === kind && !(kind === "support" && getArchitectureDefinition(entry)),
+    )) {
+      const elevation = kind === "landscape" ? -0.08 : 0.05;
       const geometry = polygonGeometry(entity.polygon, elevation);
       const data = geometry.getAttribute("position").array;
       const start = positions.length / 3;
@@ -485,11 +515,9 @@ function initializeMapRuntime(
       const color = new THREE.Color(
         kind === "lot"
           ? statusColor(props().statuses[entity.id])
-          : kind === "road"
-            ? PALETTE.road
-            : kind === "landscape"
-              ? PALETTE.landscape
-              : PALETTE.support,
+          : kind === "landscape"
+            ? PALETTE.landscape
+            : PALETTE.support,
       );
       for (let i = 0; i < data.length / 3; i++) colors.push(color.r, color.g, color.b);
       if (kind === "lot") lotRanges.set(entity.id, [start, data.length / 3]);
@@ -522,70 +550,10 @@ function initializeMapRuntime(
     }
   }
 
-  const architectureEdges: number[] = [];
-  const accessPositions: number[] = [];
-  for (const entity of ENTITIES.filter((entry) => entry.kind === "pavilion")) {
-    const h = entity.height ?? 3.2;
-    const floor = new THREE.Mesh(track(polygonGeometry(entity.polygon, 0.08)), floorMaterial);
-    const plinth = new THREE.Mesh(track(wallGeometry(entity.polygon, 0.08, 0.4)), trimMaterial);
-    const shell = new THREE.Group();
-    shell.add(new THREE.Mesh(track(wallGeometry(entity.polygon, 0.4, h)), wallMaterial));
-    shell.add(new THREE.Mesh(track(polygonGeometry(entity.polygon, h + 0.02)), roofMaterial));
-    const parapet = track(wallGeometry(entity.polygon, h, h + 0.16));
-    shell.add(new THREE.Mesh(parapet, trimMaterial));
-    scene.add(floor, plinth, shell);
-    shells.set(entity.id, shell);
-    architectureEdges.push(...edges(entity.polygon, 0.1));
-    const pick = new THREE.Mesh(track(polygonGeometry(entity.polygon, h + 0.2)), basic("#ffffff"));
-    pick.userData.entityId = entity.id;
-    pick.updateMatrixWorld();
-    pickables.push(pick);
-    // Confirmed entry anchors are drawn as plum threshold strips on the floor.
-    for (const access of entity.accesses ?? []) {
-      const nearest = entity.polygon.reduce(
-        (best, p, i) => {
-          const q = entity.polygon[(i + 1) % entity.polygon.length];
-          const dx = q[0] - p[0],
-            dy = q[1] - p[1];
-          const length = Math.hypot(dx, dy);
-          const t = Math.max(
-            0,
-            Math.min(1, ((access[0] - p[0]) * dx + (access[1] - p[1]) * dy) / (length * length)),
-          );
-          const distance = Math.hypot(access[0] - p[0] - dx * t, access[1] - p[1] - dy * t);
-          return distance < best.distance ? { distance, dx: dx / length, dy: dy / length } : best;
-        },
-        { distance: Infinity, dx: 1, dy: 0 },
-      );
-      const half = 1.1;
-      const a: Point = [access[0] - nearest.dx * half, access[1] - nearest.dy * half];
-      const b: Point = [access[0] + nearest.dx * half, access[1] + nearest.dy * half];
-      const nx = -nearest.dy * 0.6,
-        ny = nearest.dx * 0.6;
-      const geometry = polygonGeometry(
-        [
-          [a[0] - nx, a[1] - ny],
-          [b[0] - nx, b[1] - ny],
-          [b[0] + nx, b[1] + ny],
-          [a[0] + nx, a[1] + ny],
-        ],
-        0.13,
-      );
-      accessPositions.push(...geometry.getAttribute("position").array);
-      geometry.dispose();
-    }
-  }
-  const architecture = track(new THREE.BufferGeometry());
-  architecture.setAttribute("position", new THREE.Float32BufferAttribute(architectureEdges, 3));
-  scene.add(
-    new THREE.LineSegments(
-      architecture,
-      track(new THREE.LineBasicMaterial({ color: PALETTE.plum })),
-    ),
-  );
-  const accesses = track(new THREE.BufferGeometry());
-  accesses.setAttribute("position", new THREE.Float32BufferAttribute(accessPositions, 3));
-  scene.add(new THREE.Mesh(accesses, basic(PALETTE.plum)));
+  const architecture = buildArchitecture(ENTITIES);
+  scene.add(architecture.group);
+  pickables.push(...architecture.pickables);
+  rollback.push(() => architecture.dispose());
 
   const selectedGeometry = track(new THREE.BufferGeometry());
   const selectionPositions = new Float32Array(
@@ -641,7 +609,7 @@ function initializeMapRuntime(
     const entityBounds = boundsOf(entity).box;
     const vertical = entity.kind === "road" && entityBounds.depth > entityBounds.width * 2.5;
     const labelWidth = (size * cellWidth) / cellHeight;
-    const y = entity.kind === "pavilion" ? (entity.height ?? 3.2) + 0.23 : 0.23;
+    const y = getArchitectureDefinition(entity) ? architectureVisualHeight(entity) + 0.6 : 0.23;
     const [x, z] = entity.anchor;
     const vertex = labelPositions.length / 3;
     labelPositions.push(
@@ -723,10 +691,8 @@ function initializeMapRuntime(
     let count = 0;
     for (const label of sortedLabels) {
       const { entity, vertex } = label;
-      const y =
-        entity.kind === "pavilion" && state.inspectedId !== entity.id
-          ? (entity.height ?? 3.2) + 0.23
-          : 0.23;
+      const building = !!getArchitectureDefinition(entity);
+      const y = building ? architectureVisualHeight(entity) + 0.6 : 0.23;
       const positions = labelsGeometry.getAttribute("position") as THREE.BufferAttribute;
       projection.set(entity.anchor[0], y, entity.anchor[1]).project(camera);
       if (
@@ -745,7 +711,11 @@ function initializeMapRuntime(
       const worldUnitsPerPixel =
         (2 * Math.max(distance, 1) * Math.tan((camera.fov * Math.PI) / 360)) / height;
       const m = camera.matrixWorld.elements;
-      const projectedAxis = label.vertical ? Math.hypot(m[0], m[4]) : Math.hypot(m[2], m[6]);
+      const projectedAxis = building
+        ? 1
+        : label.vertical
+          ? Math.hypot(m[0], m[4])
+          : Math.hypot(m[2], m[6]);
       const minText =
         entity.kind === "lot" ? (selected ? 12 : 0) : entity.kind === "pavilion" ? 12 : 10;
       const labelHeight = readableLabelSize(
@@ -759,16 +729,24 @@ function initializeMapRuntime(
       const projectedHeight = (labelHeight / worldUnitsPerPixel) * projectedAxis;
       if (entity.kind === "lot" && !selected && (projectedHeight * 22) / cellHeight < 9) continue;
       const [anchorX, anchorY] = entity.anchor;
-      if (label.vertical) {
-        positions.setXYZ(vertex, anchorX + labelHeight / 2, y, anchorY - labelWidth / 2);
-        positions.setXYZ(vertex + 1, anchorX + labelHeight / 2, y, anchorY + labelWidth / 2);
-        positions.setXYZ(vertex + 2, anchorX - labelHeight / 2, y, anchorY + labelWidth / 2);
-        positions.setXYZ(vertex + 3, anchorX - labelHeight / 2, y, anchorY - labelWidth / 2);
-      } else {
-        positions.setXYZ(vertex, anchorX - labelWidth / 2, y, anchorY - labelHeight / 2);
-        positions.setXYZ(vertex + 1, anchorX + labelWidth / 2, y, anchorY - labelHeight / 2);
-        positions.setXYZ(vertex + 2, anchorX + labelWidth / 2, y, anchorY + labelHeight / 2);
-        positions.setXYZ(vertex + 3, anchorX - labelWidth / 2, y, anchorY + labelHeight / 2);
+      // Buildings share the same atlas but face the camera above the ridge.
+      // Ground labels keep the plant axis; flip 180 degrees when viewed backwards.
+      const rx = building ? m[0] : label.vertical ? 0 : 1;
+      const ry = building ? m[1] : 0;
+      const rz = building ? m[2] : label.vertical ? 1 : 0;
+      const ux = building ? m[4] : label.vertical ? 1 : 0;
+      const uy = building ? m[5] : 0;
+      const uz = building ? m[6] : label.vertical ? 0 : -1;
+      const sign = building || rx * m[0] + rz * m[2] >= 0 ? 1 : -1;
+      for (let corner = 0; corner < 4; corner++) {
+        const ox = (((corner === 0 || corner === 3 ? -1 : 1) * labelWidth) / 2) * sign;
+        const oz = (((corner < 2 ? 1 : -1) * labelHeight) / 2) * sign;
+        positions.setXYZ(
+          vertex + corner,
+          anchorX + rx * ox + ux * oz,
+          y + ry * ox + uy * oz,
+          anchorY + rz * ox + uz * oz,
+        );
       }
       const rect = label.rect;
       let minX = Infinity,
@@ -778,9 +756,13 @@ function initializeMapRuntime(
       // Project the actual atlas background, not the mostly transparent cell.
       for (let corner = 0; corner < 4; corner++) {
         const ox = ((corner === 0 || corner === 3 ? -1 : 1) * labelWidth * label.textWidth) / 2;
-        const oz = ((corner < 2 ? -1 : 1) * labelHeight * 34) / cellHeight / 2;
+        const oz = ((corner < 2 ? 1 : -1) * labelHeight * 34) / cellHeight / 2;
         projection
-          .set(anchorX + (label.vertical ? -oz : ox), y, anchorY + (label.vertical ? ox : oz))
+          .set(
+            anchorX + (rx * ox + ux * oz) * sign,
+            y + (ry * ox + uy * oz) * sign,
+            anchorY + (rz * ox + uz * oz) * sign,
+          )
           .project(camera);
         const sx = ((projection.x + 1) * width) / 2,
           sy = ((1 - projection.y) * height) / 2;
@@ -866,7 +848,10 @@ function initializeMapRuntime(
     camera.lookAt(controls.target);
     controls.update();
   }
-  function animate(to: Pose, duration: number) {
+  function animate(to: Pose, duration: number, kind: CameraAction = "focus") {
+    // A header command can arrive from a second finger while the first is
+    // dragging. End that pointer session before the automatic owner takes over.
+    if (activePointers.size) cancelPointers();
     if (
       transition &&
       transition.to.position.distanceToSquared(to.position) < 0.001 &&
@@ -884,7 +869,10 @@ function initializeMapRuntime(
       to,
       start: performance.now(),
       duration: reduceMotion.matches ? 0 : duration,
+      kind,
     };
+    controls.minDistance = 0.1;
+    controls.maxDistance = DIAGONAL * 6;
     diag.cameraState = "transition";
     invalidate();
   }
@@ -893,23 +881,37 @@ function initializeMapRuntime(
     radius: number,
     view: MapView,
     box?: { width: number; depth: number; height: number },
+    currentDirection?: THREE.Vector3,
   ) {
     const distance = Math.min(
       DIAGONAL * 6,
       Math.max(
         6,
         box
-          ? framingBoxDistance(box, width, height, props().insets, view)
+          ? framingBoxDistance(
+              box,
+              width,
+              height,
+              props().insets,
+              view,
+              camera.fov,
+              currentDirection?.toArray(),
+            )
           : framingDistance(radius, width, height, props().insets),
       ),
     );
-    const direction = new THREE.Vector3(...viewDirection(view)).normalize();
+    const direction = currentDirection ?? new THREE.Vector3(...viewDirection(view)).normalize();
     const target = new THREE.Vector3(center[0], 0, center[1]);
     const position = target.clone().addScaledVector(direction, distance);
     // Shift the visual center to the center of the free region. The same delta
     // moves camera and target, preserving the orbit direction and useful scale.
     const screenRight = new THREE.Vector3().crossVectors(up, direction).normalize();
     const screenUp = new THREE.Vector3().crossVectors(direction, screenRight).normalize();
+    // Pan on the ground while preserving the required screen displacement.
+    // A vertical world shift would put the orbit target below the terrain and
+    // be undone by its safety clamp at the end of a mobile-panel transition.
+    const groundProjection = Math.max(0.01, screenUp.x ** 2 + screenUp.z ** 2);
+    screenUp.set(screenUp.x / groundProjection, 0, screenUp.z / groundProjection);
     const worldPerPixel =
       (distance * 2 * Math.tan((camera.fov * Math.PI) / 360)) / Math.max(1, height);
     const shift = screenRight
@@ -921,26 +923,47 @@ function initializeMapRuntime(
   }
   function focus(id?: string) {
     const entity = id ? ENTITY_BY_ID.get(id) : undefined;
+    focusedBuilding = entity && getArchitectureDefinition(entity) ? entity : undefined;
     const bounds = boundsOf(entity);
     animate(
       freeRegionPose(
         bounds.center,
         Math.max(bounds.radius, 3),
-        props().inspectedId ? "top" : props().view,
+        props().view,
         entity ? undefined : bounds.box,
+        ready
+          ? new THREE.Vector3().subVectors(camera.position, controls.target).normalize()
+          : undefined,
       ),
       entity ? MOVEMENT.focusNearMs : MOVEMENT.focusFarMs,
     );
   }
   function clampTarget() {
-    const minX = MAP_BOUNDS.minX,
-      maxX = MAP_BOUNDS.maxX;
-    const minY = MAP_BOUNDS.minY,
-      maxY = MAP_BOUNDS.maxY;
+    const inspected = props().inspectedId ? ENTITY_BY_ID.get(props().inspectedId!) : undefined;
+    const b = boundsOf(inspected);
+    // A contextual margin keeps navigation recoverable without a hard wall at
+    // the cadastral outline. Inspection retains useful room around its building.
+    const margin = inspected ? Math.max(b.box.width, b.box.depth) * 0.65 : DIAGONAL * 0.22;
+    const minX = inspected ? b.center[0] - b.box.width / 2 - margin : MAP_BOUNDS.minX - margin,
+      maxX = inspected ? b.center[0] + b.box.width / 2 + margin : MAP_BOUNDS.maxX + margin;
+    const minY = inspected ? b.center[1] - b.box.depth / 2 - margin : MAP_BOUNDS.minY - margin,
+      maxY = inspected ? b.center[1] + b.box.depth / 2 + margin : MAP_BOUNDS.maxY + margin;
     scratch.set(
-      Math.max(minX, Math.min(maxX, controls.target.x)),
+      Math.max(
+        inspectionInterruptedTarget ? Math.min(minX, inspectionInterruptedTarget[0]) : minX,
+        Math.min(
+          inspectionInterruptedTarget ? Math.max(maxX, inspectionInterruptedTarget[0]) : maxX,
+          controls.target.x,
+        ),
+      ),
       0,
-      Math.max(minY, Math.min(maxY, controls.target.z)),
+      Math.max(
+        inspectionInterruptedTarget ? Math.min(minY, inspectionInterruptedTarget[1]) : minY,
+        Math.min(
+          inspectionInterruptedTarget ? Math.max(maxY, inspectionInterruptedTarget[1]) : maxY,
+          controls.target.z,
+        ),
+      ),
     );
     scratch2.subVectors(scratch, controls.target);
     if (scratch2.lengthSq() > 0) {
@@ -983,17 +1006,34 @@ function initializeMapRuntime(
         ? Math.min(1, (now - transition.start) / transition.duration)
         : 1;
       const t = smoothStep(progress);
-      camera.position.lerpVectors(transition.from.position, transition.to.position, t);
       controls.target.lerpVectors(transition.from.target, transition.to.target, t);
+      // Interpolate orbit coordinates, not a chord through the building/ground
+      // when presets cross opposite sides of the target.
+      const from = new THREE.Spherical().setFromVector3(
+        scratch.subVectors(transition.from.position, transition.from.target),
+      );
+      const to = new THREE.Spherical().setFromVector3(
+        scratch.subVectors(transition.to.position, transition.to.target),
+      );
+      const angle = Math.atan2(Math.sin(to.theta - from.theta), Math.cos(to.theta - from.theta));
+      scratch.setFromSpherical(
+        new THREE.Spherical(
+          THREE.MathUtils.lerp(from.radius, to.radius, t),
+          THREE.MathUtils.lerp(from.phi, to.phi, t),
+          from.theta + angle * t,
+        ),
+      );
+      camera.position.copy(controls.target).add(scratch);
       camera.lookAt(controls.target);
       controls.update();
       if (progress === 1) {
         transition = null;
+        navigationLimits();
         diag.cameraState = "idle";
         if (pendingVisibilityCheck) keepSelectionVisible();
       }
     }
-    clampTarget();
+    if (!transition) clampTarget();
     camera.near = Math.max(
       0.05,
       Math.min(camera.position.distanceTo(controls.target) / 280, camera.position.y * 0.2),
@@ -1015,6 +1055,11 @@ function initializeMapRuntime(
     diag.programs = renderer.info.programs?.length ?? 0;
     diag.target[0] = controls.target.x;
     diag.target[1] = controls.target.z;
+    camera.position.toArray(diag.position);
+    diag.distance = camera.position.distanceTo(controls.target);
+    diag.polar = controls.getPolarAngle();
+    diag.azimuth = controls.getAzimuthalAngle();
+    diag.inspectedId = props().inspectedId;
     if (diag.lastSelectedId !== props().selectedId) {
       diag.lastSelectedId = props().selectedId;
       diag.selectionDrawAt = performance.now();
@@ -1116,12 +1161,20 @@ function initializeMapRuntime(
     );
   }
   function cancelTransition() {
+    if (transition && props().inspectedId)
+      inspectionInterruptedTarget = [controls.target.x, controls.target.z];
     transition = null;
+    navigationLimits();
     lastActivity = performance.now();
     diag.cameraState = "manual";
   }
   function pointerDown(event: PointerEvent) {
     cancelTransition();
+    if (!activePointers.size) {
+      manualPolar = controls.getPolarAngle();
+      manualAzimuth = controls.getAzimuthalAngle();
+      manualOrientationReported = false;
+    }
     activePointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
@@ -1132,7 +1185,9 @@ function initializeMapRuntime(
   }
   function pointerMove(event: PointerEvent) {
     const initial = activePointers.get(event.pointerId);
-    if (initial && !isClick(initial, event.clientX, event.clientY)) clickCancelled = true;
+    if (initial && !isClick(initial, event.clientX, event.clientY)) {
+      clickCancelled = true;
+    }
     if (initial) {
       lastActivity = performance.now();
       invalidate();
@@ -1186,7 +1241,10 @@ function initializeMapRuntime(
     // normalized trackpad/line deltas without a queue or a long inertial tail.
     event.preventDefault();
     event.stopImmediatePropagation();
-    const base = transition?.to ?? pose();
+    // Only a previous wheel destination may accumulate wheel input. A preset
+    // or focus animation is interrupted at its visible pose.
+    if (activePointers.size) return;
+    const base = transition?.kind === "wheel" ? transition.to : pose();
     const rect = canvas.getBoundingClientRect();
     pointer.set(
       ((event.clientX - rect.left) / rect.width) * 2 - 1,
@@ -1198,8 +1256,8 @@ function initializeMapRuntime(
     const delta = Math.max(-120, Math.min(120, event.deltaY * unit));
     const distance = base.position.distanceTo(base.target);
     const nextDistance = Math.max(
-      controls.minDistance,
-      Math.min(controls.maxDistance, distance * Math.exp(delta * 0.0015)),
+      distanceLimits().min,
+      Math.min(distanceLimits().max, distance * Math.exp(delta * 0.0015)),
     );
     const ratio = nextDistance / distance;
     const anchor = anchored ?? base.target;
@@ -1208,9 +1266,19 @@ function initializeMapRuntime(
       target: base.target.clone().sub(anchor).multiplyScalar(ratio).add(anchor),
     };
     lastActivity = performance.now();
-    animate(next, MOVEMENT.wheelMs);
+    animate(next, MOVEMENT.wheelMs, "wheel");
   }
   function controlsChanged() {
+    if (
+      activePointers.size &&
+      !transition &&
+      !manualOrientationReported &&
+      (Math.abs(controls.getPolarAngle() - manualPolar) > 0.0001 ||
+        Math.abs(controls.getAzimuthalAngle() - manualAzimuth) > 0.0001)
+    ) {
+      manualOrientationReported = true;
+      props().onManualOrientation?.();
+    }
     lastActivity = performance.now();
     invalidate();
   }
@@ -1292,55 +1360,87 @@ function initializeMapRuntime(
       return;
     }
     pendingVisibilityCheck = false;
-    projection.set(selected.anchor[0], 0, selected.anchor[1]).project(camera);
-    const px = ((projection.x + 1) * width) / 2,
-      py = ((1 - projection.y) * height) / 2;
-    if (
-      px < 28 ||
-      px > width - props().insets.right - 28 ||
-      py < 44 ||
-      py > height - props().insets.bottom - 28
-    )
-      focus(selected.id);
+    const points = getArchitectureDefinition(selected)
+      ? selected.polygon.flatMap(([x, z]) => [
+          new THREE.Vector3(x, 0, z),
+          new THREE.Vector3(x, architectureVisualHeight(selected) + 0.6, z),
+        ])
+      : [new THREE.Vector3(selected.anchor[0], 0, selected.anchor[1])];
+    const hidden = points.some((point) => {
+      point.project(camera);
+      const px = ((point.x + 1) * width) / 2,
+        py = ((1 - point.y) * height) / 2;
+      return (
+        point.z > 1 ||
+        point.z < -1 ||
+        px < 28 ||
+        px > width - props().insets.right - 28 ||
+        py < 16 ||
+        py > height - props().insets.bottom - 28
+      );
+    });
+    if (hidden) focus(selected.id);
+  }
+  function distanceLimits() {
+    const inspected = props().inspectedId ? ENTITY_BY_ID.get(props().inspectedId!) : undefined;
+    const b = boundsOf(inspected);
+    const limits = {
+      min: inspected
+        ? Math.max(3, Math.min(b.box.width, b.box.depth) * 0.22)
+        : focusedBuilding
+          ? Math.max(5, boundsOf(focusedBuilding).radius * 1.1)
+          : 5,
+      max: inspected ? Math.max(b.radius * 9, 70) : DIAGONAL * 6,
+    };
+    // An interrupted flight may be outside the new building range. All inputs
+    // share that visible boundary and converge back to the contextual limits
+    // instead of snapping or allowing extra travel away from the building.
+    const current = camera.position.distanceTo(controls.target);
+    return { min: Math.min(limits.min, current || limits.min), max: Math.max(limits.max, current) };
+  }
+  function navigationLimits() {
+    const limits = distanceLimits();
+    controls.minDistance = limits.min;
+    controls.maxDistance = limits.max;
   }
   function update() {
     const state = props();
-    controls.mouseButtons.LEFT =
-      state.view === "top" || state.gesture === "move" ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
+    controls.mouseButtons.LEFT = state.gesture === "move" ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
     controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
-    controls.touches.ONE =
-      state.view === "top" || state.gesture === "move" ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE;
-    controls.touches.TWO =
-      state.view === "top" || state.gesture === "rotate"
-        ? THREE.TOUCH.DOLLY_PAN
-        : THREE.TOUCH.DOLLY_ROTATE;
-    controls.enableRotate = state.view !== "top" && !state.inspectedId;
-    for (const [id, shell] of shells) shell.visible = state.inspectedId !== id;
+    controls.touches.ONE = state.gesture === "move" ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE;
+    controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
+    controls.enableRotate = true;
+    if (!transition) navigationLimits();
+    for (const [id, roof] of architecture.roofs) roof.visible = state.inspectedId !== id;
     const inspectionChanged = state.inspectedId !== previousInspected;
     if (inspectionChanged) {
+      inspectionInterruptedTarget = null;
       if (state.inspectedId) {
         if (!previousInspected) exteriorPose = pose();
         focus(state.inspectedId);
       } else if (exteriorPose) {
-        animate(exteriorPose, MOVEMENT.viewMs);
+        animate(exteriorPose, MOVEMENT.viewMs, "view");
         exteriorPose = null;
       }
       previousInspected = state.inspectedId;
     }
-    if (!inspectionChanged && !state.inspectedId && state.view !== previousView) {
+    if (
+      !inspectionChanged &&
+      (state.view !== previousView || state.viewRevision !== previousViewRevision)
+    ) {
       const distance = camera.position.distanceTo(controls.target);
-      const direction = new THREE.Vector3(
-        ...viewDirection(state.inspectedId ? "top" : state.view),
-      ).normalize();
+      const direction = new THREE.Vector3(...viewDirection(state.view)).normalize();
       animate(
         {
           position: controls.target.clone().addScaledVector(direction, distance),
           target: controls.target.clone(),
         },
         MOVEMENT.viewMs,
+        "view",
       );
     }
     previousView = state.view;
+    previousViewRevision = state.viewRevision;
     if (state.quality !== previousQuality) {
       pendingTier =
         state.quality === "auto"
@@ -1355,8 +1455,8 @@ function initializeMapRuntime(
     const selection = selected
       ? edges(
           selected.polygon,
-          selected.kind === "pavilion" && state.inspectedId !== selected.id
-            ? (selected.height ?? 3.2) + 0.25
+          getArchitectureDefinition(selected) && state.inspectedId !== selected.id
+            ? architectureVisualHeight(selected) + 0.3
             : 0.2,
         )
       : [];
@@ -1392,7 +1492,7 @@ function initializeMapRuntime(
   const overview = freeRegionPose(CENTER, DIAGONAL / 2, props().view, {
     width: WIDTH,
     depth: DEPTH,
-    height: 4.1,
+    height: Math.max(...ENTITIES.map(architectureVisualHeight)),
   });
   if (props().initialFocus) {
     const focusTarget = props().initialFocus!;
@@ -1408,22 +1508,32 @@ function initializeMapRuntime(
   return {
     focus,
     zoom(factor) {
-      const base = transition?.to;
+      const base = transition?.kind === "zoom" ? transition.to : undefined;
       const next = base ? { position: base.position.clone(), target: base.target.clone() } : pose();
       scratch.subVectors(next.position, next.target);
       scratch.setLength(
         Math.max(
-          controls.minDistance,
-          Math.min(controls.maxDistance, scratch.length() / Math.max(0.1, factor)),
+          distanceLimits().min,
+          Math.min(distanceLimits().max, scratch.length() / Math.max(0.1, factor)),
         ),
       );
       next.position.copy(next.target).add(scratch);
-      animate(next, MOVEMENT.zoomMs);
+      animate(next, MOVEMENT.zoomMs, "zoom");
     },
     pan(dx, dy) {
       cancelTransition();
       const range = camera.position.distanceTo(controls.target) * 0.08;
-      scratch.set(dx * range, 0, dy * range);
+      // Ground projections of screen right/down stay intuitive after any orbit.
+      const m = camera.matrixWorld.elements;
+      scratch
+        .set(m[0], 0, m[2])
+        .normalize()
+        .multiplyScalar(dx * range);
+      scratch2
+        .set(camera.position.x - controls.target.x, 0, camera.position.z - controls.target.z)
+        .normalize()
+        .multiplyScalar(dy * range);
+      scratch.add(scratch2);
       camera.position.add(scratch);
       controls.target.add(scratch);
       controls.update();
@@ -1432,11 +1542,12 @@ function initializeMapRuntime(
     },
     rotate(direction) {
       if (!controls.enableRotate) return;
-      const base = transition?.to;
+      props().onManualOrientation?.();
+      const base = transition?.kind === "rotate" ? transition.to : undefined;
       const next = base ? { position: base.position.clone(), target: base.target.clone() } : pose();
       scratch.subVectors(next.position, next.target).applyAxisAngle(up, (direction * Math.PI) / 8);
       next.position.copy(next.target).add(scratch);
-      animate(next, MOVEMENT.zoomMs);
+      animate(next, MOVEMENT.zoomMs, "rotate");
     },
     getTarget: () => [controls.target.x, controls.target.z],
     restoreOverview: () => focus(),
@@ -1455,6 +1566,7 @@ function initializeMapRuntime(
       treeTrunks?.dispose();
       treeCrowns?.dispose();
       for (const resource of resources) resource.dispose();
+      architecture.dispose();
       scene.clear();
       renderer.dispose();
       renderer.forceContextLoss();
@@ -1462,6 +1574,7 @@ function initializeMapRuntime(
       // Retain only a resource-free terminal count for cleanup assertions.
       diag.project = () => null;
       diag.loseContext = () => {};
+      diag.setReferencePose = () => {};
       diag.resetSamples = () => {};
       performance.mark("indumoveis-map:renderer-disposed");
     },

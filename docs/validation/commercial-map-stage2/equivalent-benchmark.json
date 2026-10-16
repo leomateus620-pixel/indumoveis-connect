@@ -1,0 +1,48 @@
+[
+  {
+    "name": "30s active navigation light",
+    "positionError": 0.0,
+    "targetError": 0.0,
+    "fpsBefore": 59.880239520962,
+    "fpsAfter": 59.88023952095874,
+    "p95BeforeMs": 16.799999999999727,
+    "p95AfterMs": 16.799999999999272,
+    "stallsBefore": 0,
+    "stallsAfter": 0,
+    "viewport": [
+      1366,
+      768
+    ],
+    "bufferBefore": [
+      1294,
+      664
+    ],
+    "bufferAfter": [
+      1294,
+      664
+    ]
+  },
+  {
+    "name": "30s active navigation balanced",
+    "positionError": 0.0,
+    "targetError": 0.0,
+    "fpsBefore": 59.880239520968516,
+    "fpsAfter": 59.880239520968516,
+    "p95BeforeMs": 16.80000000000291,
+    "p95AfterMs": 16.80000000000291,
+    "stallsBefore": 0,
+    "stallsAfter": 0,
+    "viewport": [
+      1366,
+      768
+    ],
+    "bufferBefore": [
+      1294,
+      664
+    ],
+    "bufferAfter": [
+      1294,
+      664
+    ]
+  }
+]

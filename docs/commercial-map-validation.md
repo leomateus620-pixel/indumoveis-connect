@@ -1,5 +1,13 @@
 # Mapa Comercial Indumóveis — validação
 
+## Etapa 2 — apresentação e navegação 3D
+
+O relatório atual está em [validação da etapa 2](commercial-map-stage2-validation.md), com diagnóstico, conservação territorial, verificação técnica e resultados da nova cena. Os contratos vigentes estão em [operação](commercial-map-interaction.md), [arquitetura estimada](commercial-map-architecture.md) e [pavimentação](commercial-map-pavement.md).
+
+## Resultados históricos da etapa 1
+
+O conteúdo abaixo registra a implementação inicial e suas medições históricas. Não certifica o desempenho, a arquitetura nem a posição dos controles após a etapa 2. Em particular, 44 draw calls e as contagens antigas de triângulos pertencem à cena simples anterior.
+
 Implementação local em branch própria, sem migração, publicação, alteração comercial ou escrita no projeto FenaSoja. A rota `/mapa` mantém autenticação, permissões e links `space`, `deal` e `status`. O laboratório usa autenticação e REST interceptados, com edição de teste e zero espaços cadastrados; não comprova a operação autenticada do banco de produção.
 
 ## Entrega e fidelidade

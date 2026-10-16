@@ -2,6 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { stripTypeScriptTypes } from "node:module";
+import { createHash } from "node:crypto";
 
 const output = path.resolve(process.argv[2] ?? "artifacts.local/commercial-map-source-audit");
 const input = await fs.readFile("src/features/commercial-map/data/territory.ts", "utf8");
@@ -9,6 +10,36 @@ const data = await import(
   `data:text/javascript;base64,${Buffer.from(stripTypeScriptTypes(input)).toString("base64")}`
 );
 const { ENTITIES, TREES, MAP_BOUNDS } = data;
+const protectedTerritory = {
+  MAP_BOUNDS,
+  TREES,
+  entities: ENTITIES.map(
+    ({ id, kind, polygon, anchor, numbers, accesses, declaredAreaM2, label, location }) => ({
+      id,
+      kind,
+      polygon,
+      anchor,
+      numbers,
+      accesses,
+      declaredAreaM2,
+      label,
+      location,
+    }),
+  ),
+};
+const signature = {
+  algorithm: "sha256",
+  sourceSha256: createHash("sha256").update(input.replaceAll("\r\n", "\n")).digest("hex"),
+  protectedSha256: createHash("sha256").update(JSON.stringify(protectedTerritory)).digest("hex"),
+  envelopes: ENTITIES.filter((e) => e.kind === "lot").length,
+  numbers: ENTITIES.filter((e) => e.kind === "lot").flatMap((e) => e.numbers ?? []).length,
+};
+if (process.argv[3]) {
+  const baseline = JSON.parse(await fs.readFile(process.argv[3], "utf8"));
+  if (baseline.protectedSha256 !== signature.protectedSha256)
+    throw new Error("Protected territory changed");
+  signature.matchesBaseline = true;
+}
 const escape = (s) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll('"', "&quot;");
 const palette = {
   landscape: "#d2dcc6",
@@ -46,6 +77,7 @@ const controls = [
   },
 ];
 await fs.mkdir(output, { recursive: true });
+await fs.writeFile(path.join(output, "signature.json"), JSON.stringify(signature, null, 2) + "\n");
 await fs.writeFile(path.join(output, "territory.svg"), svg);
 await fs.writeFile(
   path.join(output, "territory.json"),

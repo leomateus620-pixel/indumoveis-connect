@@ -1,0 +1,29 @@
+--- a/src/features/commercial-map/MapRenderer.tsx
++++ b/src/features/commercial-map/MapRenderer.tsx
+@@ -49,0 +50,4 @@
++  position: [number, number, number];
++  distance: number;
++  polar: number;
++  azimuth: number;
+@@ -61,0 +66 @@
++  setReferencePose(position: [number, number, number], target: Point): void;
+@@ -408,0 +414,4 @@
++    position: camera.position.toArray(),
++    distance: camera.position.distanceTo(controls.target),
++    polar: controls.getPolarAngle(),
++    azimuth: controls.getAzimuthalAngle(),
+@@ -426,0 +436,9 @@
++    },
++    setReferencePose(position, target) {
++      if (!diag.enabled) return;
++      cancelTransition();
++      applyPose({
++        position: new THREE.Vector3(...position),
++        target: new THREE.Vector3(target[0], 0, target[1]),
++      });
++      invalidate();
+@@ -1017,0 +1036,4 @@
++    camera.position.toArray(diag.position);
++    diag.distance = camera.position.distanceTo(controls.target);
++    diag.polar = controls.getPolarAngle();
++    diag.azimuth = controls.getAzimuthalAngle();

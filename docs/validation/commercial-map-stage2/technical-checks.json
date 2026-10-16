@@ -1,0 +1,30 @@
+{
+  "tests": {
+    "command": "npm test",
+    "files": 12,
+    "passed": 61,
+    "failed": 0
+  },
+  "typescript": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exitCode": 0
+  },
+  "scopedLint": {
+    "command": "node node_modules/eslint/bin/eslint.js src/features/commercial-map scripts/commercial-map-validation.mjs scripts/commercial-map-source-audit.mjs scripts/commercial-map-bundle-audit.mjs scripts/serve-commercial-map-build.mjs",
+    "exitCode": 0
+  },
+  "productionBuild": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "warnings": [
+      "existing vite-tsconfig-paths recommendation",
+      "renderer lazy chunk exceeds 500kB notice"
+    ]
+  },
+  "scope": {
+    "protectedTerritoryChanged": false,
+    "libRoutesSupabaseChanged": false,
+    "productionPublished": false,
+    "fenasojaModified": false
+  }
+}
