@@ -508,6 +508,7 @@ async function runStage2Checks() {
       const references = [];
       const captures = [
         { name: "overview", view: "3D" },
+        { name: "top", view: "Superior" },
         { name: "P1", view: "Oblíqua", query: "Pavilhão 1", label: pavilionCases[0][1] },
         { name: "P12", view: "Oblíqua", query: "Pavilhão 12", label: pavilionCases[2][1] },
         { name: "P8-P13-P3", view: "Oblíqua", query: "Pavilhão 8", label: pavilionCases[3][1] },
@@ -522,9 +523,23 @@ async function runStage2Checks() {
       // Fix only the evidence viewport. Source geometry, scene materials and camera remain real.
       await page.addStyleTag({
         content:
-          ".im-map-workspace{position:fixed!important;inset:0 auto auto 0!important;width:1200px!important;height:656px!important}.im-map-header{height:56px!important;min-height:56px!important}",
+          ".im-map-workspace{position:fixed!important;inset:0 auto auto 0!important;width:1200px!important;height:656px!important}",
       });
       await page.setViewportSize({ width: 1280, height: 760 });
+      const fitReferenceCanvas = async () => {
+        await page.evaluate(() => new Promise(requestAnimationFrame));
+        await page.evaluate(() => {
+          const header = document.querySelector(".im-map-header").getBoundingClientRect();
+          document
+            .querySelector(".im-map-workspace")
+            .style.setProperty("height", `${header.height + 600}px`, "important");
+        });
+        await page.evaluate(() => new Promise(requestAnimationFrame));
+        await settledPose(page);
+      };
+      // Let a genuine two-row toolbar retain its natural height. The comparable
+      // scene remains exactly 1200×600, without placing controls over the Canvas.
+      await fitReferenceCanvas();
       const previous = process.env.MAP_REFERENCE_POSES
         ? JSON.parse(await readFile(process.env.MAP_REFERENCE_POSES, "utf8"))
         : [];
@@ -581,6 +596,7 @@ async function runStage2Checks() {
           }
         } else await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
         await settledPose(page);
+        await fitReferenceCanvas();
         const reference = previous.find((row) => row.name === capture.name);
         const applied =
           reference &&
@@ -611,6 +627,474 @@ async function runStage2Checks() {
         note: "Compare viewport, requested preset and recorded pose. MAP_REFERENCE_POSES applies a recorded baseline only when diagnostic pose setter is available; unmatched poses are not certified equivalent.",
       };
     }),
+  );
+}
+
+async function runStage3Checks() {
+  await runCheck("S31 street labels three distances and inclinations selected and unselected", () =>
+    mapScenario(async (page) => {
+      const { ENTITIES } = await sourceTerritory();
+      const street = ENTITIES.find((entity) => entity.id === "indumoveis:road:argentina");
+      assert(street, "Canonical Argentina street is missing");
+      const samples = [];
+      const instance = (await diagnose(page)).instance;
+      for (const selected of [false, true]) {
+        if (selected) {
+          await selectResult(page, "Rua Argentina", "Rua Argentina");
+          await page.waitForFunction(
+            (id) => window.__indumoveisMap?.lastSelectedId === id,
+            street.id,
+          );
+        }
+        for (const distance of [10, 38, 150])
+          for (const polar of [0.08, 0.8, 1.4]) {
+            const position = [
+              street.anchor[0],
+              Math.cos(polar) * distance,
+              street.anchor[1] + Math.sin(polar) * distance,
+            ];
+            await page.evaluate(
+              ({ position, target }) => window.__indumoveisMap.setReferencePose(position, target),
+              { position, target: street.anchor },
+            );
+            const pose = await settledPose(page);
+            assert.equal(pose.instance, instance, "Street capture remounted the renderer");
+            assert(
+              poseError(pose.position, position) < 0.02 &&
+                poseError(pose.target, street.anchor) < 0.02,
+              "Street reference pose was clamped or moved during capture",
+            );
+            const streets = pose.labels?.filter((label) => label.id.includes(":road:"));
+            assert(
+              pose.labels?.every((label) => label.scale <= 1.000001 && label.textHeightPx <= 13.01),
+              "A ground support reference escaped the fixed-world glyph cap",
+            );
+            assert(streets?.length >= 8, "Actual street label diagnostic is unavailable");
+            assert(
+              streets.every((label) => label.scale <= 1.000001 && label.scale >= 0),
+              "Street text enlarged beyond its authored world size",
+            );
+            assert(
+              streets.every((label) => label.textHeightPx <= 13.01),
+              "Street glyph + halo exceeded 13 CSS pixels",
+            );
+            const label = streets.find((entry) => entry.id === street.id);
+            assert(label, "Argentina label is absent from diagnostic");
+            if (distance === 150)
+              assert.equal(label.visible, false, "Distant street was enlarged to stay visible");
+            const name = `S31-street-${selected ? "selected" : "plain"}-d${distance}-p${polar}`;
+            await snapshot(page, name);
+            samples.push({
+              selected,
+              distance,
+              polar,
+              label,
+              streets,
+              actualPosition: pose.position,
+              actualTarget: pose.target,
+              image: `${name}-workspace.png`,
+            });
+          }
+      }
+      assert(
+        samples.some((sample) => sample.label.visible),
+        "The street policy hid Argentina in every useful close-up",
+      );
+      return {
+        samples,
+        note: "Real projected glyph + halo geometry in CSS pixels, not atlas cell size. Exact poses use the laboratory diagnostic setter. Captures require visual reading; numeric bounds alone do not approve art direction.",
+      };
+    }),
+  );
+  await runCheck(
+    "S32 detailed idle canopy cadence excludes navigation samples and resumes gesture",
+    () =>
+      mapScenario(async (page) => {
+        await setProfile(page, "detailed");
+        await page.waitForFunction(() => window.__indumoveisMap?.tier === "detailed");
+        await page.waitForTimeout(1100);
+        const before = await settledPose(page);
+        const began = performance.now();
+        await page.waitForTimeout(3200);
+        const after = await diagnose(page);
+        const durationMs = performance.now() - began;
+        const ambientFrames = after.ambientFrames - before.ambientFrames;
+        assert(ambientFrames > 0, "Detailed profile has no optional canopy movement on this host");
+        assert(
+          ambientFrames <= Math.ceil((durationMs / 1000) * 25) + 3,
+          "Idle decoration exceeded the capped 24Hz cadence",
+        );
+        assert.equal(
+          after.frameIntervals.length,
+          before.frameIntervals.length,
+          "Idle decoration polluted navigation frame intervals",
+        );
+        assert.equal(
+          after.sampledFrameWindows,
+          before.sampledFrameWindows,
+          "Idle decoration advanced adaptive navigation windows",
+        );
+        assert.equal(
+          after.slowFrameWindows,
+          before.slowFrameWindows,
+          "Idle decoration produced a slow navigation window",
+        );
+        assert.equal(after.instance, before.instance);
+        assert.equal(after.tier, "detailed");
+        assert.equal(
+          await page.locator(".im-map-stage").getAttribute("data-representation"),
+          "ready",
+        );
+        await chooseGesture(page, "Girar");
+        await dragCanvas(page, 145, 25, { steps: 20 });
+        const navigated = await settledPose(page);
+        assert(
+          Math.abs(angularDelta(navigated.azimuth, after.azimuth)) > 0.05,
+          "Canopy cadence prevented immediate camera navigation",
+        );
+        assert(
+          navigated.frameIntervals.length > after.frameIntervals.length,
+          "Real navigation failed to resume frame sampling",
+        );
+        await snapshot(page, "S32-detailed-canopy-after-navigation");
+        return {
+          durationMs,
+          ambientFrames,
+          actualIdleHz: ambientFrames / (durationMs / 1000),
+          before,
+          after,
+          navigated,
+          note: "Detailed quality is manually selected; idle frameIntervals also remain unchanged independently of adaptive AUTO eligibility.",
+        };
+      }),
+  );
+  await runCheck("S33 reduced motion detailed profile keeps canopy static", () =>
+    mapScenario(
+      async (page) => {
+        await setProfile(page, "detailed");
+        await page.waitForTimeout(1100);
+        const before = await settledPose(page);
+        await page.waitForTimeout(1250);
+        const after = await diagnose(page);
+        assert.equal(
+          after.ambientFrames,
+          before.ambientFrames,
+          "Reduced-motion preference still animates the canopy",
+        );
+        assert.equal(after.frames, before.frames, "Reduced-motion scene redraws while idle");
+        assert.equal(after.instance, before.instance);
+        await snapshot(page, "S33-reduced-motion-static-canopy");
+        return { before, after };
+      },
+      { reducedMotion: true },
+    ),
+  );
+  await runCheck("S34 independent 2D street glyph caps during zoom and selection", async () => {
+    const context = await newContext({ viewport: { width: 390, height: 844 }, chunkFailure: true });
+    const page = await context.newPage();
+    await openMap(page);
+    assert.equal(await settleRepresentation(page), "2d");
+    const samples = [];
+    const readLabels = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll(".im-map-svg .im-map-road text")].map((text) => {
+          const matrix = text.getScreenCTM();
+          const bbox = text.getBBox();
+          const style = getComputedStyle(text);
+          const scale = Math.hypot(matrix.a, matrix.b);
+          return {
+            text: text.textContent,
+            worldFont: parseFloat(style.fontSize),
+            visible: style.visibility !== "hidden" && Number(style.opacity) > 0,
+            textHeightPx: (bbox.height + parseFloat(style.strokeWidth)) * scale,
+          };
+        }),
+      );
+    for (let zoom = 0; zoom < 15; zoom++) {
+      if (zoom) await page.getByRole("button", { name: "Aproximar", exact: true }).click();
+      const labels = await readLabels();
+      assert(
+        labels.every((label) => label.worldFont <= 0.780001),
+        "SVG street font enlarged beyond its authored world size",
+      );
+      assert(
+        labels.filter((label) => label.visible).every((label) => label.textHeightPx <= 13.01),
+        "SVG visible glyph + halo exceeds the street cap",
+      );
+      samples.push({ zoom, labels });
+      if (zoom === 10) {
+        await page.mouse.move(386, 840);
+        await page.evaluate(() => document.activeElement?.blur());
+        await snapshot(page, "S34-fallback-readable-streets");
+      }
+    }
+    assert(
+      samples.some((sample) => sample.labels.some((label) => label.visible)),
+      "The SVG cap matrix never reached a readable street distance",
+    );
+    await snapshot(page, "S34-fallback-close-streets");
+    await selectResult(page, "Rua Argentina", "Rua Argentina");
+    await page.waitForTimeout(450);
+    const selected = await readLabels();
+    assert(selected.every((label) => label.worldFont <= 0.780001));
+    assert(selected.filter((label) => label.visible).every((label) => label.textHeightPx <= 13.01));
+    await snapshot(page, "S34-fallback-selected-street");
+    const contexts = await page.evaluate(() => window.__MAP_LAB__.contexts());
+    assert.equal(contexts.created, 0, "Independent SVG imported/created the engine");
+    await context.close();
+    return { samples, selected, contexts };
+  });
+  await runCheck(
+    "S35 local material appearance survives environment failure and maps disabled",
+    async () => {
+      const results = [];
+      for (const query of ["", "mapEnvironment=fail", "mapSurfaceMaps=off"]) {
+        const context = await newContext();
+        const page = await context.newPage();
+        await openMap(page, query);
+        assert.equal(await settleRepresentation(page), "ready");
+        await setProfile(page, "balanced");
+        await page.waitForTimeout(1000);
+        const pose = await settledPose(page);
+        assert.equal(pose.activeContexts, 1);
+        assert.equal(
+          await page.locator(".im-map-stage").getAttribute("data-representation"),
+          "ready",
+        );
+        if (query === "mapEnvironment=fail")
+          assert.equal(pose.environmentBytes, 0, "Forced environment failure still owns a target");
+        else assert(pose.environmentBytes > 0, "Balanced local environment failed unexpectedly");
+        await snapshot(
+          page,
+          query === "mapEnvironment=fail"
+            ? "S35-environment-failure"
+            : query
+              ? "S35-surface-maps-off"
+              : "S35-material-baseline",
+        );
+        results.push({ query, diagnostics: pose });
+        await context.close();
+      }
+      assert(
+        results.find((row) => !row.query).diagnostics.textureBytes >
+          results.find((row) => row.query === "mapSurfaceMaps=off").diagnostics.textureBytes,
+        "Disabling surface maps did not reduce resident texture accounting",
+      );
+      return {
+        results,
+        note: "Diagnostic-only faults leave the actual local material colours and light active. Captures verify appearance; no remote environment or texture request is involved.",
+      };
+    },
+  );
+  await runCheck("S36 balanced reflected metal and glass two real camera orientations", () =>
+    mapScenario(async (page) => {
+      await setProfile(page, "balanced");
+      await page.waitForFunction(() => window.__indumoveisMap?.environmentBytes > 0);
+      const captures = [];
+      for (const [number, label] of [pavilionCases[0], pavilionCases[3]]) {
+        await selectResult(page, `Pavilhão ${number}`, label);
+        await closeDetail(page);
+        await chooseView(page, "Oblíqua");
+        await chooseGesture(page, "Girar");
+        const before = await settledPose(page);
+        await snapshot(page, `S36-reflection-P${number}-before-orbit`);
+        await dragCanvas(page, 180, -15, { steps: 16 });
+        const after = await settledPose(page);
+        await snapshot(page, `S36-reflection-P${number}-after-orbit`);
+        assert.equal(before.instance, after.instance);
+        assert(after.environmentBytes > 0, "Orbit discarded the shared reflection target");
+        assert(Math.abs(angularDelta(after.azimuth, before.azimuth)) > 0.1);
+        captures.push({ number, before, after });
+      }
+      const reference = await settledPose(page);
+      const profiles = [];
+      for (const quality of ["light", "balanced", "detailed"]) {
+        await setProfile(page, quality);
+        await page.waitForFunction((tier) => window.__indumoveisMap?.tier === tier, quality);
+        if (quality !== "light")
+          await page.waitForFunction(() => window.__indumoveisMap?.environmentBytes > 0);
+        await page.evaluate(
+          (pose) => window.__indumoveisMap.setReferencePose(pose.position, pose.target),
+          reference,
+        );
+        const pose = await settledPose(page);
+        assert.equal(pose.instance, reference.instance, "Quality switch recreated the context");
+        assert(poseError(pose.position, reference.position) < 0.001);
+        assert(poseError(pose.target, reference.target) < 0.001);
+        await snapshot(page, `S36-profile-${quality}-same-camera`);
+        profiles.push({ quality, pose });
+      }
+      return {
+        captures,
+        profiles,
+        note: "Same shared local PMREM, two real viewing directions for Mostra and an industrial pavilion. Highlight change and absence of artificial shine require reading the paired captures.",
+      };
+    }),
+  );
+  await runCheck(
+    "S37 toolbar tactile states and mobile search detail visual evidence",
+    async () => {
+      const captures = [];
+      for (const viewport of [
+        { width: 1366, height: 768 },
+        { width: 390, height: 844 },
+      ]) {
+        await mapScenario(
+          async (page) => {
+            const name = viewport.width < 600 ? "mobile" : "desktop";
+            const search = page.getByRole("button", {
+              name: "Buscar lote, pavilhão ou via",
+              exact: true,
+            });
+            await page.mouse.move(viewport.width - 4, viewport.height - 4);
+            await page.evaluate(() => document.activeElement?.blur());
+            await snapshot(page, `S37-${name}-normal`);
+            await search.hover();
+            await page.waitForTimeout(600);
+            await snapshot(page, `S37-${name}-hover`);
+            await search.focus();
+            await page.keyboard.press("Shift+Tab");
+            await page.keyboard.press("Tab");
+            assert.equal(
+              await page.evaluate(() => document.activeElement?.getAttribute("aria-label")),
+              "Buscar lote, pavilhão ou via",
+            );
+            await snapshot(page, `S37-${name}-keyboard-focus`);
+            await chooseView(page, "Superior");
+            await chooseGesture(page, "Mover");
+            await settledPose(page);
+            await snapshot(page, `S37-${name}-active-modes`);
+            const zoom = await page
+              .getByRole("button", { name: "Aproximar", exact: true })
+              .boundingBox();
+            await page.mouse.move(zoom.x + zoom.width / 2, zoom.y + zoom.height / 2);
+            await page.mouse.down();
+            await snapshot(page, `S37-${name}-pressed`);
+            await page.mouse.up();
+            await search.click();
+            await page
+              .getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true })
+              .fill("09");
+            await page.locator(".im-map-result").first().waitFor();
+            await snapshot(page, `S37-${name}-search`);
+            await page.locator(".im-map-result").first().click();
+            await page.getByRole("heading", { name: "Lotes 09 / 10", exact: true }).waitFor();
+            await settledPose(page);
+            await snapshot(page, `S37-${name}-detail`);
+            const geometry = await geometryState(page);
+            assert.equal(geometry.below44.length, 0);
+            assert.equal(geometry.outsideHeader.length, 0);
+            captures.push({ viewport, geometry, diagnostics: await diagnose(page) });
+          },
+          { viewport },
+        );
+      }
+      return {
+        captures,
+        note: "Chromium pointer/keyboard and mobile viewport emulation; no physical phone claim.",
+      };
+    },
+  );
+  await runCheck(
+    "S38 twenty quality switches preserve pose resource plateau and hidden detailed pause",
+    () =>
+      mapScenario(async (page) => {
+        await setProfile(page, "detailed");
+        await page.waitForFunction(() => window.__indumoveisMap?.environmentBytes > 0);
+        await page.waitForTimeout(1100);
+        const reference = await settledPose(page);
+        const contexts = await page.evaluate(() => window.__MAP_LAB__.contexts());
+        const warmByTier = new Map();
+        const switches = [];
+        for (let index = 0; index < 20; index++) {
+          const quality = ["light", "balanced", "detailed"][index % 3];
+          await setProfile(page, quality);
+          await page.waitForFunction((tier) => window.__indumoveisMap?.tier === tier, quality);
+          await page.waitForTimeout(300);
+          const pose = await settledPose(page);
+          const currentContexts = await page.evaluate(() => window.__MAP_LAB__.contexts());
+          assert.equal(pose.instance, reference.instance, "Profile switch recreated the renderer");
+          assert.deepEqual(currentContexts, contexts, "Profile switch created or lost a context");
+          assert(
+            poseError(pose.position, reference.position) < 0.001,
+            "Profile switch moved the camera",
+          );
+          assert(
+            poseError(pose.target, reference.target) < 0.001,
+            "Profile switch lost spatial reference",
+          );
+          const resources = {
+            geometries: pose.geometries,
+            textures: pose.textures,
+            programs: pose.programs,
+            triangles: pose.triangles,
+            textureBytes: pose.textureBytes,
+          };
+          if (index < 3) warmByTier.set(quality, resources);
+          else
+            assert.deepEqual(
+              resources,
+              warmByTier.get(quality),
+              `Resource residency failed to plateau after warming ${quality}`,
+            );
+          switches.push({
+            index,
+            quality,
+            resources,
+            position: pose.position,
+            target: pose.target,
+          });
+        }
+        await setProfile(page, "detailed");
+        await page.waitForTimeout(500);
+        const beforeHidden = await settledPose(page);
+        assert(await page.evaluate(() => !document.hidden));
+        await page.evaluate(() => {
+          Object.defineProperty(document, "hidden", { configurable: true, value: true });
+          Object.defineProperty(document, "visibilityState", {
+            configurable: true,
+            value: "hidden",
+          });
+          document.dispatchEvent(new Event("visibilitychange"));
+        });
+        const hidden = await diagnose(page);
+        await page.waitForTimeout(450);
+        const paused = await diagnose(page);
+        assert.equal(paused.frames, hidden.frames, "Hidden detailed scene kept drawing");
+        assert.equal(
+          paused.ambientFrames,
+          hidden.ambientFrames,
+          "Hidden canopy timer kept drawing",
+        );
+        await page.evaluate(() => {
+          delete document.hidden;
+          delete document.visibilityState;
+          document.dispatchEvent(new Event("visibilitychange"));
+        });
+        await page.waitForFunction(
+          (frame) => window.__indumoveisMap?.ambientFrames > frame,
+          paused.ambientFrames,
+          { timeout: 3000 },
+        );
+        const resumed = await settledPose(page);
+        assert.equal(resumed.instance, reference.instance);
+        assert.equal(resumed.slowFrameWindows, beforeHidden.slowFrameWindows);
+        assert(poseError(resumed.position, reference.position) < 0.001);
+        const geometry = await geometryState(page);
+        assert.equal(geometry.below44.length, 0);
+        assert.equal(geometry.outsideHeader.length, 0);
+        await snapshot(page, "S38-quality-cycles-detailed-resumed");
+        return {
+          switches,
+          contexts,
+          beforeHidden,
+          hidden,
+          paused,
+          resumed,
+          geometry,
+          note: "Hidden document state is explicitly simulated in headless Chromium. Detailed is manual; S32 checks decoration against navigation samples independently of AUTO eligibility, not a fictitious AUTO-detailed mode.",
+        };
+      }),
   );
 }
 
@@ -870,9 +1354,12 @@ async function newContext({
   return context;
 }
 
-async function openMap(page) {
+async function openMap(page, diagnosticParameters = "") {
   const started = performance.now();
-  await page.goto(`${baseURL}/mapa?mapDiagnostics=1`, { waitUntil: "domcontentloaded" });
+  await page.goto(
+    `${baseURL}/mapa?mapDiagnostics=1${diagnosticParameters ? `&${diagnosticParameters}` : ""}`,
+    { waitUntil: "domcontentloaded" },
+  );
   await page.getByRole("heading", { name: "Mapa Comercial", exact: true }).waitFor();
   await page.locator(".im-map-svg, canvas").first().waitFor({ state: "visible" });
   await page.getByRole("button", { name: "Aproximar", exact: true }).waitFor({ state: "visible" });
@@ -896,6 +1383,9 @@ async function diagnose(page) {
 }
 
 async function snapshot(page, name) {
+  // Opening/closing menus and the detail surface take up to 220ms. Capture the
+  // completed product state, preserving the exact camera/viewport/profile.
+  await page.waitForTimeout(250);
   await page.screenshot({ path: path.join(artifactDir, `${name}.png`), fullPage: true });
   await page
     .locator(".im-map-workspace")
@@ -1288,6 +1778,7 @@ try {
   }
   if (mode === "full") {
     await runStage2Checks();
+    await runStage3Checks();
     for (const scenario of [
       { name: "medium", cpu: 1, viewport: { width: 1366, height: 768 }, targetMs: 3000 },
       { name: "weak-cpu4", cpu: 4, viewport: { width: 390, height: 844 }, targetMs: 5000 },
@@ -1567,6 +2058,7 @@ try {
       navigate30Seconds(page, "light", { nearLot70: true }),
     );
     for (const target of [
+      { name: "bosque-P1", query: "Pavilhão 1", label: pavilionCases[0][1] },
       { name: "pavilions8-13-3", query: "Pavilhão 8", label: pavilionCases[3][1] },
       { name: "B7", query: "Estrutura B7", label: "Estrutura B7" },
       { name: "asphalt-crossing", query: "01", label: "Lote 01" },

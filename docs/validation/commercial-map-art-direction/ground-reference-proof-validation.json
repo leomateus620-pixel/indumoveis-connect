@@ -1,0 +1,1883 @@
+{
+  "generatedAt": "2026-10-16T04:19:16.854Z",
+  "baseURL": "http://127.0.0.1:4180",
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [
+      "/assets/MapRenderer-BeVQLkfg.js"
+    ],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "browser": "153.0.8010.12"
+  },
+  "mode": "full",
+  "layouts": [
+    {
+      "viewport": "360x800",
+      "usefulMs": 1396.9210999999998,
+      "scrollWidth": 360,
+      "viewportWidth": 360,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 847.6999999992549
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 1080.5
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 1318.4000000003725
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 1318.4000000003725
+        }
+      ]
+    },
+    {
+      "viewport": "390x844",
+      "usefulMs": 621.2467999999999,
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 419.7999999988824
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 519.8999999985099
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 632.0999999996275
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 632.1999999992549
+        }
+      ]
+    },
+    {
+      "viewport": "844x390",
+      "usefulMs": 685.3920000000003,
+      "scrollWidth": 844,
+      "viewportWidth": 844,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 413.19999999925494
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 540.6999999992549
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 641.3999999985099
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 641.3999999985099
+        }
+      ]
+    },
+    {
+      "viewport": "768x1024",
+      "usefulMs": 653.2709000000004,
+      "scrollWidth": 768,
+      "viewportWidth": 768,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 416.59999999962747
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 525.9000000003725
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 636.1999999992549
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 636.1999999992549
+        }
+      ]
+    },
+    {
+      "viewport": "1366x768",
+      "usefulMs": 432.2632000000003,
+      "scrollWidth": 1366,
+      "viewportWidth": 1366,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 438
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 550.3000000007451
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 656.8000000007451
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 656.8000000007451
+        }
+      ]
+    },
+    {
+      "viewport": "1920x1080",
+      "usefulMs": 679.2254000000003,
+      "scrollWidth": 1920,
+      "viewportWidth": 1920,
+      "canvases": 1,
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "marks": [
+        {
+          "name": "indumoveis-map:renderer-start",
+          "startTime": 452.30000000074506
+        },
+        {
+          "name": "indumoveis-map:essential-prepared",
+          "startTime": 555.7000000011176
+        },
+        {
+          "name": "indumoveis-map:first-valid-draw",
+          "startTime": 660.5
+        },
+        {
+          "name": "indumoveis-map:controls-ready",
+          "startTime": 660.5
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "S31 street labels three distances and inclinations selected and unselected",
+      "passed": true,
+      "detail": {
+        "samples": [
+          {
+            "selected": false,
+            "distance": 10,
+            "polar": 0.08,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 0.17178643641790944,
+              "visible": true,
+              "textHeightPx": 12.999871630378323
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 0.17178643641790944,
+                "visible": true,
+                "textHeightPx": 12.999871630378323
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.191227984088214
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0876273606587037
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.65779311314329
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.5975486123292725
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.091973523070426
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.722874455928764
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.5221524013792047
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.238580200682374
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0925504792233918
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.2542179260715964
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              9.968017063026194,
+              66.51164693969174
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d10-p0.08-workspace.png"
+          },
+          {
+            "selected": false,
+            "distance": 10,
+            "polar": 0.8,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 0.2516262720989767,
+              "visible": true,
+              "textHeightPx": 12.990155610397778
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 0.2516262720989767,
+                "visible": true,
+                "textHeightPx": 12.990155610397778
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.191227984088214
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0876273606587037
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.65779311314329
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.5975486123292725
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.091973523070426
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.722874455928764
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.5221524013792047
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.238580200682374
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0925504792233918
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.2542179260715964
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              6.967067093471654,
+              72.88606090899523
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d10-p0.8-workspace.png"
+          },
+          {
+            "selected": false,
+            "distance": 10,
+            "polar": 1.4,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": true,
+              "textHeightPx": 11.005340719710091
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": true,
+                "textHeightPx": 11.005340719710091
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.2734430602528732
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.4259813097407914
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.65779311314329
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.5975486123292725
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.091973523070426
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.722874455928764
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.5221524013792047
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.238580200682374
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0925504792233918
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.2542179260715964
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              1.69967142900241,
+              75.5669972998846
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d10-p1.4-workspace.png"
+          },
+          {
+            "selected": false,
+            "distance": 38,
+            "polar": 0.08,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 0.6640069360618212,
+              "visible": true,
+              "textHeightPx": 12.999995051192625
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 0.6640069360618212,
+                "visible": true,
+                "textHeightPx": 12.999995051192625
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.2734430602528732
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.4259813097407914
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.65779311314329
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.5975486123292725
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.091973523070426
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.722874455928764
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.5221524013792047
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.238580200682374
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0925504792233918
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.2542179260715964
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              37.878464839499536,
+              68.7492583708286
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d38-p0.08-workspace.png"
+          },
+          {
+            "selected": false,
+            "distance": 38,
+            "polar": 0.8,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 0.9559563617267237,
+              "visible": true,
+              "textHeightPx": 12.999938777719592
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 0.9559563617267237,
+                "visible": true,
+                "textHeightPx": 12.999938777719592
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 7.231148489305924
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.4259813097407914
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 9.45626770082451
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.5975486123292725
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.091973523070426
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.722874455928764
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.5221524013792047
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.238580200682374
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0925504792233918
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.2542179260715964
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              26.474854955192285,
+              92.97203145418187
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d38-p0.8-workspace.png"
+          },
+          {
+            "selected": false,
+            "distance": 38,
+            "polar": 1.4,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": false,
+              "textHeightPx": 3.2070549299924096
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 3.2070549299924096
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4092897516794096
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.7481222708756263
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.998073394843321
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.5975486123292725
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.091973523070426
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.722874455928764
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.5221524013792047
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.11226378148109
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0925504792233918
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.2542179260715964
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              6.458751430209158,
+              103.15958973956148
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d38-p1.4-workspace.png"
+          },
+          {
+            "selected": false,
+            "distance": 150,
+            "polar": 0.08,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": false,
+              "textHeightPx": 4.937551181370736
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.937551181370736
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.835937316504641
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.727255769563428
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.893069830090689
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 1.3159740510563818
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.93291573818347
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 5.093081010279832
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 5.10109455918746
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.798868206013253
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.883625964691429
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.993854182345716
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              149.5202559453929,
+              77.699704095376
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d150-p0.08-workspace.png"
+          },
+          {
+            "selected": false,
+            "distance": 150,
+            "polar": 0.8,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": false,
+              "textHeightPx": 3.445607753715535
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 3.445607753715535
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.8801138767105385
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.4031826980864537
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.317509973429725
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 1.1791948840142872
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.236843922509571
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.637794248284706
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.713410157037401
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.704520669262706
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.036732974278219
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.925979722188177
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              104.5060064020748,
+              173.31591363492842
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d150-p0.8-workspace.png"
+          },
+          {
+            "selected": false,
+            "distance": 150,
+            "polar": 1.4,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": false,
+              "textHeightPx": 0.833491773239075
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.833491773239075
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6542303425276258
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.515988885010529
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.391490749866073
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.6091964215523394
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4833145442358182
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.2688170833343975
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.2991851766342393
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6019742874773328
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.5771322427390693
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0887400461401135
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              25.495071435036156,
+              213.52995949826902
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-plain-d150-p1.4-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 10,
+            "polar": 0.08,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 0.17178643641790944,
+              "visible": true,
+              "textHeightPx": 12.999871630378323
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 0.17178643641790944,
+                "visible": true,
+                "textHeightPx": 12.999871630378323
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6547431086638085
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.5162881237162651
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.3919140530826075
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.6092932857277621
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4833912206413566
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.270719524007518
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.301172402665145
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6024013936724373
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.5771105794641673
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0892847853543013
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              9.968017063026194,
+              66.51164693969174
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d10-p0.08-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 10,
+            "polar": 0.8,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 0.2516262720989767,
+              "visible": true,
+              "textHeightPx": 12.990155610397778
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 0.2516262720989767,
+                "visible": true,
+                "textHeightPx": 12.990155610397778
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6547431086638085
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.5162881237162651
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.3919140530826075
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.6092932857277621
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4833912206413566
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.270719524007518
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.301172402665145
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6024013936724373
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.5771105794641673
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0892847853543013
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              6.967067093471654,
+              72.88606090899523
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d10-p0.8-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 10,
+            "polar": 1.4,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": true,
+              "textHeightPx": 11.005340719710091
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": true,
+                "textHeightPx": 11.005340719710091
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.2734430602528732
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.4259813097407914
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.3919140530826075
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.6092932857277621
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4833912206413566
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.270719524007518
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.301172402665145
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6024013936724373
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.5771105794641673
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0892847853543013
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              1.69967142900241,
+              75.5669972998846
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d10-p1.4-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 38,
+            "polar": 0.08,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 0.6640069360618212,
+              "visible": true,
+              "textHeightPx": 12.999995051192625
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 0.6640069360618212,
+                "visible": true,
+                "textHeightPx": 12.999995051192625
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.2734430602528732
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.4259813097407914
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.3919140530826075
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.6092932857277621
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4833912206413566
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.270719524007518
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.301172402665145
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6024013936724373
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.5771105794641673
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0892847853543013
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              37.878464839499536,
+              68.7492583708286
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d38-p0.08-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 38,
+            "polar": 0.8,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 0.9559563617267237,
+              "visible": true,
+              "textHeightPx": 12.999938777719592
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 0.9559563617267237,
+                "visible": true,
+                "textHeightPx": 12.999938777719592
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 7.231148489305924
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.4259813097407914
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 9.45626770082451
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.6092932857277621
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4833912206413566
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.270719524007518
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.301172402665145
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6024013936724373
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.5771105794641673
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0892847853543013
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              26.474854955192285,
+              92.97203145418187
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d38-p0.8-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 38,
+            "polar": 1.4,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": false,
+              "textHeightPx": 3.2070549299924096
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 3.2070549299924096
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4092897516794096
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.7481222708756263
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.998073394843321
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.6092932857277621
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4833912206413566
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.270719524007518
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.301172402665145
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.11226378148109
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.5771105794641673
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0892847853543013
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              6.458751430209158,
+              103.15958973956148
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d38-p1.4-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 150,
+            "polar": 0.08,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": false,
+              "textHeightPx": 4.937551181370736
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.937551181370736
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.835937316504641
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.727255769563428
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.893069830090689
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 1.3159740510563818
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.93291573818347
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 5.093081010279832
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 5.10109455918746
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.798868206013253
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.883625964691429
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.993854182345716
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              149.5202559453929,
+              77.699704095376
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d150-p0.08-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 150,
+            "polar": 0.8,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": false,
+              "textHeightPx": 3.445607753715535
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 3.445607753715535
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.8801138767105385
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.4031826980864537
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.317509973429725
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 1.1791948840142872
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.236843922509571
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.637794248284706
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.713410157037401
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.704520669262706
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.036732974278219
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 4.925979722188177
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              104.5060064020748,
+              173.31591363492842
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d150-p0.8-workspace.png"
+          },
+          {
+            "selected": true,
+            "distance": 150,
+            "polar": 1.4,
+            "label": {
+              "id": "indumoveis:road:argentina",
+              "scale": 1,
+              "visible": false,
+              "textHeightPx": 0.833491773239075
+            },
+            "streets": [
+              {
+                "id": "indumoveis:road:argentina",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.833491773239075
+              },
+              {
+                "id": "indumoveis:road:uruguai",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6542303425276258
+              },
+              {
+                "id": "indumoveis:road:brasil",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.515988885010529
+              },
+              {
+                "id": "indumoveis:road:mercosul",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.391490749866073
+              },
+              {
+                "id": "indumoveis:road:brasilia",
+                "scale": 0.2680673679412505,
+                "visible": false,
+                "textHeightPx": 0.6091964215523394
+              },
+              {
+                "id": "indumoveis:road:la-paz",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.4833145442358182
+              },
+              {
+                "id": "indumoveis:road:benvenuto",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.2688170833343975
+              },
+              {
+                "id": "indumoveis:road:imigrantes",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.2991851766342393
+              },
+              {
+                "id": "indumoveis:road:arvoredo",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 0.6019742874773328
+              },
+              {
+                "id": "indumoveis:road:east-walk-upper",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 1.5771322427390693
+              },
+              {
+                "id": "indumoveis:road:east-walk-lower",
+                "scale": 1,
+                "visible": false,
+                "textHeightPx": 2.0887400461401135
+              }
+            ],
+            "actualPosition": [
+              106.93299999999999,
+              25.495071435036156,
+              213.52995949826902
+            ],
+            "actualTarget": [
+              106.93299999999999,
+              65.7125
+            ],
+            "image": "S31-street-selected-d150-p1.4-workspace.png"
+          }
+        ],
+        "note": "Real projected glyph + halo geometry in CSS pixels, not atlas cell size. Exact poses use the laboratory diagnostic setter. Captures require visual reading; numeric bounds alone do not approve art direction."
+      }
+    }
+  ],
+  "openings": [],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4180/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "unexpectedRequests": [],
+  "summary": {
+    "usefulMedianMs": 653.2709000000004,
+    "usefulWorstMs": 1396.9210999999998,
+    "passedChecks": 1,
+    "failedChecks": 0
+  }
+}

@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import { Map2D } from "./Map2D";
 import { ENTITIES } from "./data/territory";
 import type { MapHandle, MapRendererProps } from "./types";
+import { STREET_LABEL } from "./labelPolicy";
+import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
 
 const props: MapRendererProps = {
   selectedId: null,
@@ -26,6 +28,22 @@ describe("engine-independent territorial fallback", () => {
     expect(html).not.toContain("<canvas");
     for (const item of ENTITIES.filter((e) => e.kind === "lot" || e.kind === "pavilion"))
       expect(html).toContain(item.id);
+  });
+  it("gives streets fixed world text with no plaque and keeps selection separate from status", () => {
+    const lot = ENTITIES.find((entity) => entity.kind === "lot")!;
+    const { container } = render(
+      <Map2D {...props} selectedId={lot.id} statuses={{ [lot.id]: "disponivel" }} />,
+    );
+    const streetText = container.querySelector<SVGTextElement>(".im-map-labels .im-map-road text")!;
+    expect(streetText.style.fontSize).toBe(`${STREET_LABEL.baseTextHeight}px`);
+    expect(streetText.style.fill).toBe(VISUAL_THEME.roadText);
+    expect(streetText.parentElement?.querySelector("rect")).toBeNull();
+    const lotPolygons = container.querySelectorAll<SVGPolygonElement>(
+      `[data-entity="${lot.id}"] polygon`,
+    );
+    expect(lotPolygons[0].style.fill).toBe(COMMERCIAL_STATUS_COLORS.disponivel);
+    expect(lotPolygons[1].style.fill).toBe(VISUAL_THEME.plum);
+    expect(lotPolygons[1].style.fillOpacity).toBe("0.09");
   });
   it("keeps the same SVG and target when selection closes and preserves external pose after inspection", () => {
     const matchMedia = window.matchMedia;

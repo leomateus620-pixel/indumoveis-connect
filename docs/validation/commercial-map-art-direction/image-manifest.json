@@ -1,0 +1,132 @@
+[
+  {
+    "name": "overview",
+    "before": "artifacts.local\\art-direction\\before\\reference-overview-canvas.png",
+    "after": "artifacts.local\\art-direction\\final\\reference-overview-canvas.png",
+    "sourceSize": [
+      1200,
+      600
+    ],
+    "comparison": "comparison-overview.png"
+  },
+  {
+    "name": "top",
+    "before": "artifacts.local\\art-direction\\before\\reference-top-canvas.png",
+    "after": "artifacts.local\\art-direction\\final\\reference-top-canvas.png",
+    "sourceSize": [
+      1200,
+      600
+    ],
+    "comparison": "comparison-top.png"
+  },
+  {
+    "name": "P1",
+    "before": "artifacts.local\\art-direction\\before\\reference-P1-canvas.png",
+    "after": "artifacts.local\\art-direction\\final\\reference-P1-canvas.png",
+    "sourceSize": [
+      1200,
+      600
+    ],
+    "comparison": "comparison-P1.png"
+  },
+  {
+    "name": "P12",
+    "before": "artifacts.local\\art-direction\\before\\reference-P12-canvas.png",
+    "after": "artifacts.local\\art-direction\\final\\reference-P12-canvas.png",
+    "sourceSize": [
+      1200,
+      600
+    ],
+    "comparison": "comparison-P12.png"
+  },
+  {
+    "name": "P8-P13-P3",
+    "before": "artifacts.local\\art-direction\\before\\reference-P8-P13-P3-canvas.png",
+    "after": "artifacts.local\\art-direction\\final\\reference-P8-P13-P3-canvas.png",
+    "sourceSize": [
+      1200,
+      600
+    ],
+    "comparison": "comparison-P8-P13-P3.png"
+  },
+  {
+    "name": "B7",
+    "before": "artifacts.local\\art-direction\\before\\reference-B7-canvas.png",
+    "after": "artifacts.local\\art-direction\\final\\reference-B7-canvas.png",
+    "sourceSize": [
+      1200,
+      600
+    ],
+    "comparison": "comparison-B7.png"
+  },
+  {
+    "name": "Argentina-crossing",
+    "before": "artifacts.local\\art-direction\\before\\reference-Argentina-crossing-canvas.png",
+    "after": "artifacts.local\\art-direction\\final\\reference-Argentina-crossing-canvas.png",
+    "sourceSize": [
+      1200,
+      600
+    ],
+    "comparison": "comparison-Argentina-crossing.png"
+  },
+  {
+    "name": "interface-1366x768",
+    "before": "artifacts.local\\art-direction\\before-ui\\ready-1366x768-workspace.png",
+    "after": "artifacts.local\\art-direction\\final\\ready-1366x768-workspace.png",
+    "sourceSize": [
+      1294,
+      720
+    ],
+    "comparison": "comparison-interface-1366x768.png"
+  },
+  {
+    "name": "selection-1366x768",
+    "before": "artifacts.local\\art-direction\\before-ui\\lot-1366x768-workspace.png",
+    "after": "artifacts.local\\art-direction\\final\\lot-1366x768-workspace.png",
+    "sourceSize": [
+      1294,
+      720
+    ],
+    "comparison": "comparison-selection-1366x768.png"
+  },
+  {
+    "name": "interface-390x844",
+    "before": "artifacts.local\\art-direction\\before-ui\\ready-390x844-workspace.png",
+    "after": "artifacts.local\\art-direction\\final\\ready-390x844-workspace.png",
+    "sourceSize": [
+      390,
+      796
+    ],
+    "comparison": "comparison-interface-390x844.png"
+  },
+  {
+    "name": "selection-390x844",
+    "before": "artifacts.local\\art-direction\\before-ui\\lot-390x844-workspace.png",
+    "after": "artifacts.local\\art-direction\\final\\lot-390x844-workspace.png",
+    "sourceSize": [
+      390,
+      796
+    ],
+    "comparison": "comparison-selection-390x844.png"
+  },
+  {
+    "name": "interface-844x390",
+    "before": "artifacts.local\\art-direction\\before-ui\\ready-844x390-workspace.png",
+    "after": "artifacts.local\\art-direction\\final\\ready-844x390-workspace.png",
+    "sourceSize": [
+      772,
+      342
+    ],
+    "comparison": "comparison-interface-844x390.png"
+  },
+  {
+    "name": "selection-844x390",
+    "before": "artifacts.local\\art-direction\\before-ui\\lot-844x390-workspace.png",
+    "after": "artifacts.local\\art-direction\\final\\lot-844x390-workspace.png",
+    "sourceSize": [
+      772,
+      342
+    ],
+    "comparison": "comparison-selection-844x390.png"
+  }
+]

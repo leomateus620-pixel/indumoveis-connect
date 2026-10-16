@@ -111,8 +111,8 @@ export function smoothStep(progress: number) {
   return t * t * (3 - 2 * t);
 }
 
-/** World anchored labels may grow only within a finite local envelope. This
- * preserves a useful text size without camera-facing DOM labels or new textures. */
+/** Building/lot labels may grow within their finite local envelope. Streets
+ * use streetLabelPresentation instead: their authored world size never grows. */
 export function readableLabelSize(
   baseSize: number,
   worldUnitsPerPixel: number,

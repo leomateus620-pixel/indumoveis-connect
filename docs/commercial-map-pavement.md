@@ -7,10 +7,13 @@ consulta e picking continuam associados às entidades territoriais originais.
 
 O código anterior coloria igualmente ruas e passeios e desenhava o contorno de
 cada polígono isolado. A revisão separa o asfalto da Calçada do Arvoredo e dos
-dois passeios do setor leste. O asfalto usa Lambert fosco neutro escuro e uma
-única textura determinística de agregado, 64 × 64 RGBA, com contraste baixo,
-mipmaps e repetição em coordenadas do desenho. Não há shader personalizado,
-reflexo, iluminação adicional ou linha central.
+dois passeios do setor leste. A direção de arte usa asfalto PBR grafite levemente
+azulado, alta rugosidade e agregado discreto; passeios usam concreto mineral
+claro, e a borda mantém pintura branco-quente fosca. Albedo e relevo/rugosidade
+minerais determinísticos de 128 × 128 RGBA são compartilhados com a biblioteca
+arquitetônica, com mipmaps, repetição em coordenadas do desenho e filtragem
+trilinear. Albedo é sRGB; dados são lineares. Não há aparência molhada, shader
+personalizado, iluminação por via, geometria de agregado ou linha central.
 
 ## Rede e acabamento lateral
 
@@ -45,15 +48,21 @@ Todas as medidas são proporções de apresentação na escala esquemática; nen
 −0,025; passeios usam −0,018 e tinta −0,012. O pequeno deslocamento coerente
 evita z-fighting e não cria obstáculo/colisão. Lotes e prédios mantêm seus níveis.
 
-O conjunto usa três draw calls: asfalto, passeios e pintura. Há uma textura
-compartilhada (~21,4 KiB com mipmaps), também no perfil Leve. Os recursos são
-retornados ao dono do renderer para descarte no mesmo ciclo de vida da cena.
+O conjunto continua usando três draw calls: asfalto, passeios e pintura. Todas
+as superfícies recebem UVs. A biblioteca compartilhada com arquitetura tem
+quatro mapas de 128 × 128 RGBA8, **349.528 bytes incluindo mipmaps**, contados uma
+única vez pelo dono do renderer. Não se somam novamente na pavimentação. O Leve
+mantém agregado e acabamento, reduzindo o relevo e removendo reflexo opcional.
+Na distância, o relevo se reduz até zero para evitar sujeira/cintilação. Os
+recursos geométricos são retornados ao dono do renderer para descarte no mesmo
+ciclo de vida; materiais e mapas compartilhados têm um único dono explícito.
 
 ## Verificação
 
 `pavement.test.ts` cobre a área exata da união e ausência de sobreposição em
 cruzamento, aberturas de T/cross e de acessos, lacunas de traçado, separação dos
-passeios, imutabilidade da fonte, normals para cima, três batches e orçamento da
-textura. A inspeção visual no navegador e as métricas do frame completo estão
+passeios, imutabilidade da fonte, normals para cima, UVs, três batches e orçamento
+dos mapas. Os testes da biblioteca cobrem espaço de cor, determinismo, qualidade,
+redução de relevo e descarte compartilhado. A inspeção visual no navegador e as métricas do frame completo estão
 registradas na validação geral da etapa 2; testes geométricos isolados não
 certificam fluidez ou apresentação física na tela.

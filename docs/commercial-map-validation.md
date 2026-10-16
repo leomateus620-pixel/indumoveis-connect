@@ -1,5 +1,9 @@
 # Mapa Comercial Indumóveis — validação
 
+## Direção de arte — materiais, ambiente e operação
+
+O relatório vigente desta evolução está em [validação da direção de arte](commercial-map-art-direction-validation.md), acompanhado da [linguagem visual e tokens](commercial-map-art-direction.md). Os relatórios abaixo preservam evidência histórica das etapas anteriores e não substituem a medição da cena atual.
+
 ## Etapa 2 — apresentação e navegação 3D
 
 O relatório atual está em [validação da etapa 2](commercial-map-stage2-validation.md), com diagnóstico, conservação territorial, verificação técnica e resultados da nova cena. Os contratos vigentes estão em [operação](commercial-map-interaction.md), [arquitetura estimada](commercial-map-architecture.md) e [pavimentação](commercial-map-pavement.md).
