@@ -99,3 +99,5 @@ Seleção (n=30): mediana DOM 0.8 ms; p95 DOM 1.9 ms; p95 até draw submetido 14
 Ruas: 18 poses reais, glifo/halo máximo 13.000 px CSS. Brisa ociosa: 19.92 Hz por 3.21 s, sem avanço das amostras/janelas adaptativas de navegação. Movimento reduzido e ocultação suspendem a decoração.
 
 Os dados completos estão em [validation.json.gz](validation/commercial-map-art-direction/validation.json.gz), com [resumo extraído](validation/commercial-map-art-direction/summary.json), [manifesto das imagens](validation/commercial-map-art-direction/image-manifest.json) e [Design QA](../design-qa.md). Os erros de rede de fontes bloqueadas e das falhas injetadas são esperados; a lista de erros JS/hidratação não tratados é a do JSON.
+
+Capturas complementares: [materiais sem mapas opcionais](validation/commercial-map-art-direction/S35-surface-maps-off-workspace.png), [referência local dos materiais](validation/commercial-map-art-direction/S35-material-baseline-workspace.png) e [ruas legíveis no SVG próximo](validation/commercial-map-art-direction/S34-fallback-readable-streets-workspace.png).
