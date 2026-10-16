@@ -4,7 +4,7 @@
  * The default software renderer is explicitly not a physical GPU benchmark.
  */
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
+import { createRequire, stripTypeScriptTypes } from "node:module";
 import { access, readFile, readdir, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
@@ -21,6 +21,599 @@ const bundle = path.join(
   "playwright",
 );
 let playwright;
+const pavilionCases = [
+  ["1", "Pavilhão 1 · Mostra Arq & Design"],
+  ["14", "Pavilhão 14 · SINDUSCOM"],
+  ["12", "Pavilhão 12 · Móveis e seriados"],
+  ["8", "Pavilhão 8 · Fornecedores e construção civil"],
+  ["13", "Pavilhão 13 · Salão de Imóveis"],
+  ["3", "Pavilhão 3 · Comércio e mobiliário"],
+];
+const poseError = (a, b) => Math.hypot(...a.map((value, i) => value - b[i]));
+const angularDelta = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
+async function settledPose(page) {
+  // Allow the requested React prop to reach the existing renderer, then wait for its owner.
+  await page.waitForTimeout(60);
+  await cameraIdle(page);
+  return diagnose(page);
+}
+async function dragCanvas(page, dx = 100, dy = 30, { button = "left", steps = 12 } = {}) {
+  const stage = await page.locator(".im-map-stage").boundingBox();
+  const x = stage.x + stage.width * 0.36,
+    y = stage.y + stage.height * 0.49;
+  await page.mouse.move(x, y);
+  await page.mouse.down({ button });
+  await page.mouse.move(x + dx, y + dy, { steps });
+  await page.mouse.up({ button });
+}
+async function mapScenario(task, options = {}) {
+  const context = await newContext(options);
+  const page = await context.newPage();
+  const usefulMs = await openMap(page);
+  assert.equal(
+    await settleRepresentation(page),
+    "ready",
+    "Compatible laboratory did not present 3D",
+  );
+  await setProfile(page, "light");
+  await settledPose(page);
+  const detail = await task(page, { context, usefulMs });
+  await context.close();
+  return detail;
+}
+let territoryData;
+async function sourceTerritory() {
+  if (!territoryData) {
+    const source = await readFile("src/features/commercial-map/data/territory.ts", "utf8");
+    territoryData = import(
+      `data:text/javascript;base64,${Buffer.from(stripTypeScriptTypes(source)).toString("base64")}`
+    );
+  }
+  return territoryData;
+}
+async function panToArgentinaCrossing(page) {
+  const { ENTITIES } = await sourceTerritory();
+  const rects = ["argentina", "mercosul"].map((id) => {
+    const entity = ENTITIES.find((entry) => entry.id === `indumoveis:road:${id}`);
+    return {
+      minX: Math.min(...entity.polygon.map((p) => p[0])),
+      maxX: Math.max(...entity.polygon.map((p) => p[0])),
+      minZ: Math.min(...entity.polygon.map((p) => p[1])),
+      maxZ: Math.max(...entity.polygon.map((p) => p[1])),
+    };
+  });
+  const target = [
+    (Math.max(...rects.map((r) => r.minX)) + Math.min(...rects.map((r) => r.maxX))) / 2,
+    (Math.max(...rects.map((r) => r.minZ)) + Math.min(...rects.map((r) => r.maxZ))) / 2,
+  ];
+  const pose = await settledPose(page),
+    range = pose.distance * 0.08;
+  const dx = target[0] - pose.target[0],
+    dz = target[1] - pose.target[1];
+  const horizontal = Math.round(
+    (dx * Math.cos(pose.azimuth) - dz * Math.sin(pose.azimuth)) / range,
+  );
+  const vertical = Math.round((dx * Math.sin(pose.azimuth) + dz * Math.cos(pose.azimuth)) / range);
+  assert(Math.abs(horizontal) + Math.abs(vertical) < 30, "Crossing focus was not already close");
+  await openAuxiliary(page, "Ajuda de navegação");
+  for (const [steps, negative, positive] of [
+    [horizontal, "esquerda", "direita"],
+    [vertical, "cima", "baixo"],
+  ])
+    for (let i = 0; i < Math.abs(steps); i++)
+      await page
+        .getByRole("button", { name: `Mover para ${steps < 0 ? negative : positive}`, exact: true })
+        .click();
+  await page.getByRole("button", { name: "Fechar menu", exact: true }).click();
+  const result = await settledPose(page);
+  assert(
+    poseError(result.target, target) <= range * 1.5,
+    "Close reference missed the real crossing",
+  );
+  return { target, actual: result.target, horizontal, vertical };
+}
+async function runStage2Checks() {
+  await runCheck("N01 stable initial perspective is real WebGL", () =>
+    mapScenario(async (page) => {
+      const pose = await settledPose(page);
+      assert(pose.position.every(Number.isFinite) && pose.distance > 0);
+      assert(
+        pose.polar > 0.15 && pose.polar < 1.44,
+        "Initial stable view is effectively vertical or unsafe",
+      );
+      assert.equal(
+        await page.locator(".im-map-svg").count(),
+        0,
+        "SVG remains the chosen representation",
+      );
+      assert.equal((await page.evaluate(() => window.__MAP_LAB__.contexts())).active, 1);
+      await snapshot(page, "N01-perspective");
+      return pose;
+    }),
+  );
+  await runCheck("N02 Superior Girar real drag leaves vertical preset", () =>
+    mapScenario(async (page) => {
+      await chooseView(page, "Superior");
+      const before = await settledPose(page);
+      await snapshot(page, "N02-before-top-drag");
+      await chooseGesture(page, "Girar");
+      await dragCanvas(page, 110, -85);
+      const after = await settledPose(page);
+      await snapshot(page, "N02-after-top-drag");
+      await writeFile(
+        path.join(artifactDir, "N02-poses.json"),
+        JSON.stringify({ before, after }, null, 2),
+      );
+      assert(
+        Math.abs(angularDelta(after.azimuth, before.azimuth)) > 0.05,
+        "Top preset blocked real orbit",
+      );
+      assert(Math.abs(after.polar - before.polar) > 0.05, "Top preset blocked real inclination");
+      assert.equal(await page.locator('.im-map-views button[aria-pressed="true"]').count(), 0);
+      assert.match(await page.locator(".im-map-caption").innerText(), /Orientação livre/);
+      assert.equal(after.instance, before.instance);
+      await snapshot(page, "N02-top-manual-orbit");
+      return { before, after };
+    }),
+  );
+  await runCheck("N03 presets preserve selected identity target and distance", () =>
+    mapScenario(async (page) => {
+      await selectResult(page, "70", "Lote 70");
+      const before = await settledPose(page),
+        samples = [];
+      for (const view of ["Superior", "Oblíqua", "3D"]) {
+        await chooseView(page, view);
+        const pose = await settledPose(page);
+        assert.equal(pose.lastSelectedId, "indumoveis:external:lot:70");
+        assert(await page.getByRole("heading", { name: "Lote 70", exact: true }).isVisible());
+        assert(poseError(pose.target, before.target) < 0.2, `${view} reset the selected target`);
+        assert(
+          Math.abs(pose.distance / before.distance - 1) < 0.03,
+          `${view} reset perceived scale`,
+        );
+        samples.push({ view, pose });
+      }
+      return { before, samples };
+    }),
+  );
+  await runCheck("N04 full pavilion orbit has safe inclination without azimuth wall", () =>
+    mapScenario(async (page) => {
+      await selectResult(page, "Pavilhão 1", pavilionCases[0][1]);
+      await closeDetail(page);
+      await chooseView(page, "Oblíqua");
+      await chooseGesture(page, "Girar");
+      let previous = await settledPose(page),
+        unwrapped = 0;
+      const samples = [previous];
+      for (let i = 0; i < 12 && Math.abs(unwrapped) < Math.PI * 2 + 0.15; i++) {
+        await dragCanvas(page, 250, i % 2 ? -8 : 8);
+        const current = await settledPose(page);
+        unwrapped += angularDelta(current.azimuth, previous.azimuth);
+        assert(current.polar > 0 && current.polar < Math.PI / 2, "Orbit flipped or crossed ground");
+        assert(current.position[1] > 0 && current.distance > 0);
+        samples.push(current);
+        previous = current;
+      }
+      assert(Math.abs(unwrapped) >= Math.PI * 2, `Orbit stopped at ${unwrapped} radians`);
+      await snapshot(page, "N04-complete-orbit");
+      return { unwrappedRadians: unwrapped, samples };
+    }),
+  );
+  await runCheck("N05 each pavilion inspection orbits zooms and restores exterior pose", () =>
+    mapScenario(async (page) => {
+      const results = [];
+      for (const [number, label] of pavilionCases) {
+        await chooseView(page, "Oblíqua");
+        await selectResult(page, `Pavilhão ${number}`, label);
+        const exterior = await settledPose(page);
+        await page.getByRole("button", { name: "Inspecionar sem cobertura", exact: true }).click();
+        const entered = await settledPose(page);
+        assert.equal(entered.inspectedId, `indumoveis:pavilion:${number}`);
+        await closeDetail(page);
+        await chooseGesture(page, "Girar");
+        const beforeOrbit = await settledPose(page);
+        await dragCanvas(page, 100, 15);
+        const orbited = await settledPose(page);
+        assert(Math.abs(angularDelta(orbited.azimuth, beforeOrbit.azimuth)) > 0.05);
+        await page.getByRole("button", { name: "Aproximar", exact: true }).click();
+        const zoomed = await settledPose(page);
+        assert(zoomed.distance < orbited.distance, "Inspection zoom is locked");
+        await snapshot(page, `N05-inspection-P${number}`);
+        await page.getByRole("button", { name: "Voltar ao parque", exact: true }).click();
+        const restored = await settledPose(page);
+        assert.equal(restored.inspectedId, null);
+        assert.equal(restored.instance, exterior.instance, "Inspection recreated Canvas");
+        assert(
+          poseError(restored.position, exterior.position) < 0.2,
+          `P${number} exterior camera was lost`,
+        );
+        assert(
+          poseError(restored.target, exterior.target) < 0.2,
+          `P${number} exterior target was lost`,
+        );
+        results.push({ number, exterior, entered, orbited, zoomed, restored });
+      }
+      return results;
+    }),
+  );
+  await runCheck("N06 pointer interrupts preset at visible pose without snap back", () =>
+    mapScenario(async (page) => {
+      await chooseGesture(page, "Girar");
+      await chooseView(page, "Superior");
+      await dragCanvas(page, 125, 48, { steps: 4 });
+      const claimed = await settledPose(page);
+      await page.waitForTimeout(520);
+      const later = await diagnose(page);
+      assert(
+        poseError(claimed.position, later.position) < 0.05,
+        "Cancelled preset resumed after gesture",
+      );
+      assert(poseError(claimed.target, later.target) < 0.05);
+      assert.equal(later.cameraState, "idle");
+      assert.match(await page.locator(".im-map-caption").innerText(), /Orientação livre/);
+      return { claimed, later };
+    }),
+  );
+  await runCheck("N07 wheel buttons pinch share limits and cancellation has no jump", () =>
+    mapScenario(
+      async (page, { context }) => {
+        const box = await page.locator("canvas").boundingBox();
+        const x = box.x + box.width * 0.5,
+          y = box.y + box.height * 0.5;
+        const wheelToLimit = async (direction) => {
+          await page.mouse.move(x, y);
+          // Input normalization intentionally caps each event: exercise sustained real input.
+          for (let i = 0; i < 60; i++) await page.mouse.wheel(0, direction * 120);
+          const limit = await settledPose(page);
+          await page.mouse.wheel(0, direction * 120);
+          const repeated = await settledPose(page);
+          assert(
+            Math.abs(repeated.distance - limit.distance) < 0.05,
+            "Wheel did not reach a stable limit",
+          );
+          return repeated;
+        };
+        const wheelMin = await wheelToLimit(-1);
+        await page.getByRole("button", { name: "Aproximar", exact: true }).click();
+        const buttonMin = await settledPose(page);
+        assert(
+          Math.abs(buttonMin.distance - wheelMin.distance) < 0.05,
+          "Button and wheel minimum differ",
+        );
+        const wheelMax = await wheelToLimit(1);
+        await page.getByRole("button", { name: "Afastar", exact: true }).click();
+        const buttonMax = await settledPose(page);
+        assert(
+          Math.abs(buttonMax.distance - wheelMax.distance) < 0.05,
+          "Button and wheel maximum differ",
+        );
+        assert(wheelMax.distance > wheelMin.distance * 2);
+        await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+        const beforeTouch = await settledPose(page);
+        const cdp = await context.newCDPSession(page);
+        const touches = (half) => [
+          { x: x - half, y, id: 0 },
+          { x: x + half, y, id: 1 },
+        ];
+        await cdp.send("Input.dispatchTouchEvent", {
+          type: "touchStart",
+          touchPoints: [{ x: x - 25, y, id: 0 }],
+        });
+        await cdp.send("Input.dispatchTouchEvent", {
+          type: "touchStart",
+          touchPoints: touches(25),
+        });
+        const secondEntered = await diagnose(page);
+        assert(
+          poseError(secondEntered.position, beforeTouch.position) < 0.1,
+          "Second finger entry jumped",
+        );
+        for (let i = 1; i <= 10; i++)
+          await cdp.send("Input.dispatchTouchEvent", {
+            type: "touchMove",
+            touchPoints: touches(25 + i * 5),
+          });
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchCancel", touchPoints: [] });
+        const pinched = await settledPose(page);
+        assert(pinched.distance < beforeTouch.distance * 0.85, "Real CDP pinch did not zoom");
+        assert(
+          pinched.distance >= wheelMin.distance - 0.05 &&
+            pinched.distance <= wheelMax.distance + 0.05,
+        );
+        await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+        await page.waitForTimeout(300);
+        const afterCancel = await diagnose(page);
+        assert(
+          poseError(afterCancel.position, pinched.position) < 0.05,
+          "Cancelled pinch retained movement",
+        );
+        assert.equal(await page.locator(".im-map-detail").count(), 0);
+        return {
+          wheelMin,
+          buttonMin,
+          wheelMax,
+          buttonMax,
+          beforeTouch,
+          secondEntered,
+          pinched,
+          afterCancel,
+          note: "Synthetic Chromium CDP touch, not physical trackpad/touch certification.",
+        };
+      },
+      { viewport: { width: 390, height: 844 } },
+    ),
+  );
+  await runCheck("N08 pan buttons follow screen axes after orbit", () =>
+    mapScenario(async (page) => {
+      await chooseGesture(page, "Girar");
+      await dragCanvas(page, 200, 22);
+      const before = await settledPose(page);
+      await openAuxiliary(page, "Ajuda de navegação");
+      await page.getByRole("button", { name: "Mover para direita", exact: true }).click();
+      const right = await settledPose(page);
+      const expectedRight = [Math.cos(before.azimuth), -Math.sin(before.azimuth)];
+      const delta = right.target.map((value, i) => value - before.target[i]);
+      const dot = delta[0] * expectedRight[0] + delta[1] * expectedRight[1];
+      const perpendicular = Math.abs(delta[0] * expectedRight[1] - delta[1] * expectedRight[0]);
+      assert(
+        dot > 0 && perpendicular < Math.hypot(...delta) * 0.05,
+        "Pan is tied to territorial rather than screen axes",
+      );
+      await page.getByRole("button", { name: "Mover para esquerda", exact: true }).click();
+      const back = await settledPose(page);
+      assert(poseError(back.target, before.target) < 0.2);
+      return { before, right, back, screenRightDot: dot, perpendicular };
+    }),
+  );
+  await runCheck("N09 selection survives orientation sidebar and panel resize", () =>
+    mapScenario(async (page) => {
+      await selectResult(page, "70", "Lote 70");
+      const before = await settledPose(page);
+      await chooseView(page, "Oblíqua");
+      await page.getByRole("button", { name: "Expandir menu", exact: true }).click();
+      const expanded = await settledPose(page);
+      const point = await projectedPoint(page, "indumoveis:external:lot:70");
+      const stage = await page.locator(".im-map-stage").boundingBox();
+      const panel = await page.locator(".im-map-detail").boundingBox();
+      assert(point.x >= stage.x && point.y >= stage.y && point.y < stage.y + stage.height);
+      assert(point.x < panel.x - 4, "Selected lot is hidden behind the side panel");
+      assert.equal(expanded.lastSelectedId, before.lastSelectedId);
+      assert.equal(expanded.instance, before.instance);
+      await page.getByRole("button", { name: "Recolher menu", exact: true }).click();
+      await snapshot(page, "N09-selected-sidebar");
+      return { before, expanded, point, stage, panel };
+    }),
+  );
+  await runCheck("N10 oblique facade picking identifies pavilion and B7 volume", () =>
+    mapScenario(async (page) => {
+      const results = [];
+      for (const item of [
+        { query: "Pavilhão 1", label: pavilionCases[0][1], id: "indumoveis:pavilion:1" },
+        { query: "Estrutura B7", label: "Estrutura B7", id: "indumoveis:support:b7" },
+      ]) {
+        await selectResult(page, item.query, item.label);
+        await closeDetail(page);
+        await chooseView(page, "Oblíqua");
+        const before = await settledPose(page);
+        const point = await projectedPoint(page, item.id, 0.4);
+        await page.mouse.click(point.x, point.y);
+        await page
+          .getByRole("heading", { name: item.label, exact: true })
+          .waitFor({ timeout: 4000 });
+        const after = await settledPose(page);
+        assert.equal(after.lastSelectedId, item.id, "Facade ray picked another entity");
+        await snapshot(page, `N10-facade-${item.id.split(":").at(-1)}`);
+        results.push({ item, point, before, after });
+        await closeDetail(page);
+      }
+      return results;
+    }),
+  );
+  await runCheck("N11 header popovers do not click through or block remaining canvas", () =>
+    mapScenario(async (page) => {
+      const before = await settledPose(page);
+      const search = await page
+        .getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true })
+        .boundingBox();
+      await page.mouse.move(search.x + 22, search.y + 22);
+      await page.mouse.wheel(0, -400);
+      const toolbarWheel = await settledPose(page);
+      assert(
+        poseError(toolbarWheel.position, before.position) < 0.05,
+        "Header wheel leaked to camera",
+      );
+      await openAuxiliary(page, "Legenda");
+      await page.locator(".im-map-popover p").first().click();
+      assert.equal(
+        await page.locator(".im-map-detail").count(),
+        0,
+        "Legend click selected underlying entity",
+      );
+      await dragCanvas(page, 90, 20);
+      const dragged = await settledPose(page);
+      assert(
+        poseError(dragged.position, toolbarWheel.position) > 0.5,
+        "Popover overlay blocked the remaining Canvas",
+      );
+      await page.keyboard.press("Escape");
+      const focus = await page.evaluate(() => document.activeElement.getAttribute("aria-label"));
+      assert(
+        ["Legenda", "Mais ações do mapa"].includes(focus),
+        "Escape lost the upper trigger focus",
+      );
+      return { before, toolbarWheel, dragged, focus, layout: await geometryState(page) };
+    }),
+  );
+  await runCheck("N11b header zoom takes ownership from a held touch", () =>
+    mapScenario(
+      async (page, { context }) => {
+        await chooseGesture(page, "Mover");
+        const before = await settledPose(page);
+        const canvas = await page.locator("canvas").boundingBox();
+        const x = canvas.x + canvas.width * 0.35,
+          y = canvas.y + canvas.height * 0.48;
+        const cdp = await context.newCDPSession(page);
+        const sendTouch = (type, touchPoints) =>
+          cdp.send("Input.dispatchTouchEvent", { type, touchPoints });
+        await sendTouch("touchStart", [{ x, y, id: 3 }]);
+        const zoom = await page
+          .getByRole("button", { name: "Aproximar", exact: true })
+          .boundingBox();
+        // A second input source activates the real upper control while the touch is held.
+        await page.mouse.click(zoom.x + zoom.width / 2, zoom.y + zoom.height / 2);
+        for (let step = 1; step <= 8; step++)
+          await sendTouch("touchMove", [{ x: x + step * 7, y: y + step * 2, id: 3 }]);
+        const commanded = await settledPose(page);
+        assert(
+          Math.abs(commanded.distance / before.distance - 1 / 1.2) < 0.002,
+          "Held touch corrupted the header zoom destination",
+        );
+        await sendTouch("touchEnd", []);
+        const released = await settledPose(page);
+        assert(
+          poseError(released.position, commanded.position) < 0.05,
+          "Old touch release applied accumulated motion",
+        );
+        assert(poseError(released.target, commanded.target) < 0.05);
+        assert.equal(released.instance, before.instance);
+        assert.equal(
+          await page.locator(".im-map-detail").count(),
+          0,
+          "Cancelled held touch selected a lot",
+        );
+        await sendTouch("touchStart", [{ x, y, id: 9 }]);
+        for (let step = 1; step <= 6; step++)
+          await sendTouch("touchMove", [{ x: x + step * 8, y: y + step * 3, id: 9 }]);
+        await sendTouch("touchEnd", []);
+        const freshGesture = await settledPose(page);
+        assert(
+          poseError(freshGesture.target, released.target) > 0.1,
+          "New touch remained locked after header command",
+        );
+        assert.equal(freshGesture.instance, before.instance);
+        await snapshot(page, "N11b-held-touch-header-zoom");
+        return {
+          before,
+          commanded,
+          released,
+          freshGesture,
+          note: "Real upper button via Chromium mouse input while a synthetic CDP touch stays held; old touch moves and a fresh gesture verify camera ownership. No physical-device claim.",
+        };
+      },
+      { viewport: { width: 768, height: 1024 } },
+    ),
+  );
+  await runCheck("stage2 architectural reference captures", () =>
+    mapScenario(async (page) => {
+      const references = [];
+      const captures = [
+        { name: "overview", view: "3D" },
+        { name: "P1", view: "Oblíqua", query: "Pavilhão 1", label: pavilionCases[0][1] },
+        { name: "P12", view: "Oblíqua", query: "Pavilhão 12", label: pavilionCases[2][1] },
+        { name: "P8-P13-P3", view: "Oblíqua", query: "Pavilhão 8", label: pavilionCases[3][1] },
+        { name: "B7", view: "Oblíqua", query: "Estrutura B7", label: "Estrutura B7" },
+        {
+          name: "Argentina-crossing",
+          view: "3D",
+          query: "01",
+          label: "Lote 01",
+        },
+      ];
+      // Fix only the evidence viewport. Source geometry, scene materials and camera remain real.
+      await page.addStyleTag({
+        content:
+          ".im-map-workspace{position:fixed!important;inset:0 auto auto 0!important;width:1200px!important;height:656px!important}.im-map-header{height:56px!important;min-height:56px!important}",
+      });
+      await page.setViewportSize({ width: 1280, height: 760 });
+      const previous = process.env.MAP_REFERENCE_POSES
+        ? JSON.parse(await readFile(process.env.MAP_REFERENCE_POSES, "utf8"))
+        : [];
+      const territorySource = await readFile(
+        "src/features/commercial-map/data/territory.ts",
+        "utf8",
+      );
+      // Evidence framing derives its group centre from the three protected source rectangles.
+      const groupRects = [8, 13, 3].map((number) => {
+        const match = territorySource.match(
+          new RegExp(`"pavilion:${number}",\\s*"pavilion",[\\s\\S]*?rect\\(([^)]+)\\)`),
+        );
+        assert(match, `Reference group footprint ${number} is no longer a source rectangle`);
+        const coordinates = match[1].split(",").map((value) => Number(value.trim()) / 10);
+        assert(coordinates.length === 4 && coordinates.every(Number.isFinite));
+        return coordinates;
+      });
+      const groupCentre = [
+        (Math.min(...groupRects.map((rect) => rect[0])) +
+          Math.max(...groupRects.map((rect) => rect[2]))) /
+          2,
+        (Math.min(...groupRects.map((rect) => rect[1])) +
+          Math.max(...groupRects.map((rect) => rect[3]))) /
+          2,
+      ];
+      for (const capture of captures) {
+        await chooseView(page, capture.view);
+        await settledPose(page);
+        if (capture.query) {
+          await selectResult(page, capture.query, capture.label);
+          await closeDetail(page);
+          if (capture.name === "Argentina-crossing" && !process.env.MAP_REFERENCE_POSES) {
+            await panToArgentinaCrossing(page);
+          }
+          if (capture.name === "P8-P13-P3") {
+            for (let i = 0; i < 2; i++)
+              await page.getByRole("button", { name: "Afastar", exact: true }).click();
+            const groupPose = await settledPose(page);
+            const dx = groupCentre[0] - groupPose.target[0],
+              dz = groupCentre[1] - groupPose.target[1];
+            await page.evaluate(
+              ({ position, target }) => {
+                window.__indumoveisMap?.setReferencePose?.(position, target);
+              },
+              {
+                position: [
+                  groupPose.position[0] + dx,
+                  groupPose.position[1],
+                  groupPose.position[2] + dz,
+                ],
+                target: groupCentre,
+              },
+            );
+          }
+        } else await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+        await settledPose(page);
+        const reference = previous.find((row) => row.name === capture.name);
+        const applied =
+          reference &&
+          (await page.evaluate((pose) => {
+            if (!window.__indumoveisMap?.setReferencePose) return false;
+            window.__indumoveisMap.setReferencePose(pose.position, pose.target);
+            return true;
+          }, reference.pose));
+        await page.mouse.move(1275, 750);
+        const pose = await settledPose(page);
+        await snapshot(page, `reference-${capture.name}`);
+        const canvas = await page.locator("canvas").boundingBox();
+        assert(
+          Math.abs(canvas.width - 1200) < 1 && Math.abs(canvas.height - 600) < 1,
+          "Paired reference Canvas dimensions differ",
+        );
+        await page
+          .locator("canvas")
+          .screenshot({ path: path.join(artifactDir, `reference-${capture.name}-canvas.png`) });
+        references.push({ ...capture, pose, canvas, baselinePoseApplied: !!applied });
+      }
+      await writeFile(
+        path.join(artifactDir, "reference-poses.json"),
+        `${JSON.stringify(references, null, 2)}\n`,
+      );
+      return {
+        references,
+        note: "Compare viewport, requested preset and recorded pose. MAP_REFERENCE_POSES applies a recorded baseline only when diagnostic pose setter is available; unmatched poses are not certified equivalent.",
+      };
+    }),
+  );
+}
+
 try {
   playwright = require(process.env.PLAYWRIGHT_MODULE ?? "playwright");
 } catch {
@@ -290,8 +883,15 @@ async function diagnose(page) {
   return page.evaluate(() => {
     const value = window.__indumoveisMap;
     if (!value) return null;
-    const { project, resetSamples, loseContext, ...data } = value;
-    return data;
+    const { project, resetSamples, loseContext, setReferencePose, ...data } = value;
+    return {
+      ...data,
+      position: value.position,
+      distance: value.distance,
+      polar: value.polar,
+      azimuth: value.azimuth,
+      inspectedId: value.inspectedId,
+    };
   });
 }
 
@@ -339,17 +939,19 @@ async function geometryState(page) {
     const shellHeader = document.querySelector(".im-map-workspace").getBoundingClientRect();
     const rectangles = [
       ...document.querySelectorAll(
-        ".im-map-stage > .im-map-controls,.im-map-stage > .im-map-secondary,.im-map-stage > .im-map-caption,.im-map-stage > .im-map-notice",
+        ".im-map-stage > .im-map-caption,.im-map-stage > .im-map-notice",
       ),
     ]
       .map((el) => el.getBoundingClientRect())
       .filter((rect) => rect.width && rect.height);
     const occupiedArea = rectangles.reduce((sum, rect) => sum + rect.width * rect.height, 0);
-    const controls = [...document.querySelectorAll(".im-map-workspace button")]
+    const controls = [...document.querySelectorAll(".im-map-header button,.im-map-header select")]
       .map((el) => ({
         label: el.getAttribute("aria-label") ?? el.textContent.trim(),
         width: el.getBoundingClientRect().width,
         height: el.getBoundingClientRect().height,
+        x: el.getBoundingClientRect().x,
+        y: el.getBoundingClientRect().y,
       }))
       .filter((rect) => rect.width && rect.height);
     return {
@@ -358,6 +960,10 @@ async function geometryState(page) {
         (stage.width * stage.height - occupiedArea) / (shellHeader.width * shellHeader.height),
       controls,
       below44: controls.filter((rect) => rect.width < 43.5 || rect.height < 43.5),
+      outsideHeader: controls.filter((rect) => rect.y + rect.height > stage.y + 1),
+      legacyDocks: document.querySelectorAll(
+        ".im-map-stage > .im-map-controls,.im-map-stage > .im-map-secondary",
+      ).length,
     };
   });
 }
@@ -369,10 +975,34 @@ async function settleRepresentation(page) {
   return page.locator(".im-map-stage").getAttribute("data-representation");
 }
 
+/** One visible presentation per container width: desktop buttons or compact header select. */
+async function chooseView(page, name) {
+  const compact = page.getByRole("combobox", { name: "Vista do mapa", exact: true });
+  if (await compact.isVisible()) await compact.selectOption({ label: name });
+  else await page.getByRole("button", { name, exact: true }).click();
+}
+
+async function chooseGesture(page, name) {
+  const compact = page.getByRole("combobox", { name: "Gesto de navegação", exact: true });
+  if (await compact.isVisible()) await compact.selectOption({ label: name });
+  else await page.getByRole("button", { name: `${name} mapa`, exact: true }).click();
+}
+
+/** Auxiliary actions move into the same top-header menu in narrow containers. */
+async function openAuxiliary(page, name) {
+  const direct = page.getByRole("button", { name, exact: true });
+  if (await direct.isVisible()) return direct.click();
+  await page.getByRole("button", { name: "Mais ações do mapa", exact: true }).click();
+  await direct.click();
+}
+
 async function selectResult(page, query, expected) {
   await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
   await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill(query);
-  const result = page.locator(".im-map-result").filter({ hasText: expected }).first();
+  const result = page
+    .locator(".im-map-result")
+    .filter({ has: page.getByText(expected, { exact: true }) })
+    .first();
   await result.waitFor();
   const started = await page.evaluate(() => performance.now());
   await result.click();
@@ -427,16 +1057,19 @@ async function cameraIdle(page) {
   );
 }
 
-async function projectedPoint(page, id) {
+async function projectedPoint(page, id, heightFraction) {
   await cameraIdle(page);
-  const point = await page.evaluate((entityId) => window.__indumoveisMap?.project(entityId), id);
+  const point = await page.evaluate(
+    ([entityId, fraction]) => window.__indumoveisMap?.project(entityId, fraction),
+    [id, heightFraction],
+  );
   const canvas = await page.locator("canvas").boundingBox();
   assert(point && canvas, "Projection unavailable");
   return { x: canvas.x + point.x, y: canvas.y + point.y };
 }
 
 async function setProfile(page, quality) {
-  await page.getByRole("button", { name: "Opções de visualização", exact: true }).click();
+  await openAuxiliary(page, "Opções de visualização");
   await page
     .getByRole("combobox", { name: "Qualidade gráfica", exact: true })
     .selectOption(quality);
@@ -456,24 +1089,69 @@ async function throttle(page, cpuRate = 1) {
   return cdp;
 }
 
-async function navigate30Seconds(page, quality, { nearLot70 = false } = {}) {
+async function navigate30Seconds(page, quality, { nearLot70 = false, target } = {}) {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
   await page.bringToFront();
   assert(!(await page.evaluate(() => document.hidden)), "Benchmark page is hidden");
-  await page.getByRole("button", { name: "3D", exact: true }).click();
-  if (nearLot70) {
-    await selectResult(page, "70", "Lote 70");
+  await chooseView(page, "3D");
+  await settledPose(page);
+  if (nearLot70 || target) {
+    await selectResult(page, target?.query ?? "70", target?.label ?? "Lote 70");
     await closeDetail(page);
+    if (target?.name === "asphalt-crossing") await panToArgentinaCrossing(page);
   } else await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
   await setProfile(page, quality);
   await cameraIdle(page);
   await page.waitForFunction((tier) => window.__indumoveisMap?.tier === tier, quality, {
     timeout: 5000,
   });
+  if (process.env.MAP_BENCH_POSES && !target && !nearLot70) {
+    const baseline = JSON.parse(await readFile(process.env.MAP_BENCH_POSES, "utf8"));
+    const requested = baseline.checks.find((row) => row.name === `30s active navigation ${quality}`)
+      ?.detail.startPose;
+    assert(requested, "Equivalent benchmark start pose is missing");
+    await page.evaluate(
+      (pose) => window.__indumoveisMap.setReferencePose(pose.position, pose.target),
+      requested,
+    );
+    await settledPose(page);
+  }
+  const initial = await diagnose(page);
+  const startPose = {
+    position: initial.position,
+    target: initial.target,
+    distance: initial.distance,
+    polar: initial.polar,
+    azimuth: initial.azimuth,
+  };
   await page.evaluate(() => window.__indumoveisMap?.resetSamples());
   const stage = await page.locator(".im-map-stage").boundingBox();
   const start = performance.now();
+  const peakBudget = {
+    drawCalls: 0,
+    triangles: 0,
+    textures: 0,
+    textureBytes: 0,
+    dpr: 0,
+    bufferPixels: 0,
+  };
+  const sampleBudget = async () => {
+    const sample = await page.evaluate(() => {
+      const value = window.__indumoveisMap;
+      return {
+        drawCalls: value.drawCalls,
+        triangles: value.triangles,
+        textures: value.textures,
+        textureBytes: value.textureBytes,
+        dpr: value.dpr,
+        bufferPixels: value.buffer[0] * value.buffer[1],
+      };
+    });
+    for (const key of Object.keys(peakBudget))
+      peakBudget[key] = Math.max(peakBudget[key], sample[key]);
+  };
+  await sampleBudget();
   let round = 0;
   while (performance.now() - start < 30000) {
     const x = stage.x + stage.width * 0.42,
@@ -483,16 +1161,32 @@ async function navigate30Seconds(page, quality, { nearLot70 = false } = {}) {
     await page.mouse.move(x + (round % 2 ? -1 : 1) * 90, y + 24, { steps: 24 });
     await page.mouse.up();
     await page.mouse.wheel(0, round % 2 ? -90 : 90);
+    await sampleBudget();
     round++;
   }
   const diagnostics = await diagnose(page);
+  await sampleBudget();
   const intervals = diagnostics?.frameIntervals ?? [];
   const p50 = percentile(intervals, 0.5),
     p95 = percentile(intervals, 0.95);
   const medianFps = p50 ? 1000 / p50 : null;
   const stallsAbove200Ms = intervals.filter((value) => value > 200).length;
+  const budget = {
+    drawCalls: quality === "light" ? 80 : 150,
+    triangles: quality === "light" ? 80000 : 200000,
+    textureBytes: (quality === "light" ? 16 : 32) * 1024 * 1024,
+    dpr: quality === "light" ? 1 : 1.5,
+    bufferPixels: quality === "light" ? 1000000 : 2000000,
+  };
+  const budgetAccepted =
+    peakBudget.drawCalls <= budget.drawCalls &&
+    peakBudget.triangles <= budget.triangles &&
+    peakBudget.textureBytes <= budget.textureBytes &&
+    peakBudget.dpr <= budget.dpr + 0.001 &&
+    peakBudget.bufferPixels <= budget.bufferPixels;
   return {
     quality,
+    startPose,
     durationMs: performance.now() - start,
     rounds: round,
     samples: intervals.length,
@@ -500,15 +1194,21 @@ async function navigate30Seconds(page, quality, { nearLot70 = false } = {}) {
     p95IntervalMs: p95,
     stallsAbove200Ms,
     targetFps: quality === "light" ? 30 : 50,
+    budget,
+    peakBudget,
+    budgetAccepted,
     accepted:
       medianFps >= (quality === "light" ? 30 : 50) &&
       (quality !== "light" || p95 <= 50) &&
-      stallsAbove200Ms === 0,
+      stallsAbove200Ms === 0 &&
+      budgetAccepted,
     diagnostics,
     rendererInfo: await page.evaluate(() => window.__MAP_LAB__.rendererInfo()),
-    referenceView: nearLot70
-      ? "Visible foreground page, perspective, focus lot70 then close detail without camera reset; same scene after interaction cycles."
-      : "Visible foreground page, perspective, whole-park reframe before each profile; same scene after interaction cycles.",
+    referenceView: target
+      ? `Perspective, focus ${target.label}, close detail without camera reset${target.name === "asphalt-crossing" ? ", then help pan buttons to the source Argentina/Mercosul crossing" : ""}.`
+      : nearLot70
+        ? "Visible foreground page, perspective, focus lot70 then close detail without camera reset; same scene after interaction cycles."
+        : "Visible foreground page, perspective, whole-park reframe before each profile; same scene after interaction cycles.",
     note: "Renderer submitted-frame timing during continuous scripted input; not input-to-photon or physical-device GPU validation.",
   };
 }
@@ -542,6 +1242,8 @@ try {
           0,
           "Some visible controls are smaller than 44px",
         );
+        assert.equal(initialLayout.outsideHeader.length, 0, "Navigation escaped the top header");
+        assert.equal(initialLayout.legacyDocks, 0, "A bottom control dock is still mounted");
         await snapshot(page, `ready-${width}x${height}`);
         await selectResult(page, "9", "Lotes 09 / 10");
         await snapshot(page, `lot-${width}x${height}`);
@@ -568,10 +1270,10 @@ try {
           "Closing the panel left inspection mode",
         );
         await page.getByRole("button", { name: "Voltar ao parque", exact: true }).click();
-        await page.getByRole("button", { name: "Superior", exact: true }).click();
         if (representation === "ready") {
-          await page.getByRole("button", { name: "Oblíqua", exact: true }).click();
-          await page.getByRole("button", { name: "3D", exact: true }).click();
+          await chooseView(page, "Superior");
+          await chooseView(page, "Oblíqua");
+          await chooseView(page, "3D");
         }
         await page.getByRole("button", { name: "Tela cheia", exact: true }).click();
         await page.getByRole("button", { name: "Sair da tela cheia", exact: true }).waitFor();
@@ -585,6 +1287,7 @@ try {
     await context.close();
   }
   if (mode === "full") {
+    await runStage2Checks();
     for (const scenario of [
       { name: "medium", cpu: 1, viewport: { width: 1366, height: 768 }, targetMs: 3000 },
       { name: "weak-cpu4", cpu: 4, viewport: { width: 390, height: 844 }, targetMs: 5000 },
@@ -595,8 +1298,10 @@ try {
           const context = await newContext({ viewport: scenario.viewport });
           const page = await context.newPage();
           await throttle(page, scenario.cpu);
+          const coldStarted = performance.now();
           const usefulMs = await openMap(page);
           const representation = await settleRepresentation(page);
+          const ready3DMs = representation === "ready" ? performance.now() - coldStarted : null;
           const details = await page.evaluate(() => ({
             marks: performance
               .getEntriesByType("mark")
@@ -615,7 +1320,7 @@ try {
                 duration: entry.duration,
               })),
           }));
-          samples.push({ state: "cold", usefulMs, representation, ...details });
+          samples.push({ state: "cold", usefulMs, ready3DMs, representation, ...details });
           // SPA reentry retains downloaded/evaluated chunks, without assuming HTTP cache under interception.
           await navigateModule(page, "/financeiro");
           await page.locator(".im-map-stage").waitFor({ state: "detached" });
@@ -624,9 +1329,11 @@ try {
           await page.locator(".im-map-svg, canvas").first().waitFor({ state: "visible" });
           const warmUsefulMs = performance.now() - started;
           const warmRepresentation = await settleRepresentation(page);
+          const warm3DMs = warmRepresentation === "ready" ? performance.now() - started : null;
           samples.push({
             state: "warm-SPA-reentry",
             usefulMs: warmUsefulMs,
+            ready3DMs: warm3DMs,
             representation: warmRepresentation,
           });
           await context.close();
@@ -640,6 +1347,11 @@ try {
               0.5,
             ),
             worstMs: Math.max(...rows.map((row) => row.usefulMs)),
+            median3DMs: percentile(rows.map((row) => row.ready3DMs).filter(Number.isFinite), 0.5),
+            worst3DMs: rows.some((row) => row.ready3DMs != null)
+              ? Math.max(...rows.map((row) => row.ready3DMs ?? 0))
+              : null,
+            ready3DCount: rows.filter((row) => row.ready3DMs != null).length,
             passed: rows.every((row) => row.usefulMs <= scenario.targetMs),
           };
         };
@@ -706,25 +1418,35 @@ try {
       };
     });
     await runCheck("20 view cycles and pavilion inspection/return cycles", async () => {
-      const before = await diagnose(page);
-      for (let i = 0; i < 20; i++) {
-        for (const name of ["Superior", "Oblíqua", "3D"])
-          await page.getByRole("button", { name, exact: true }).click();
+      const cycle = async () => {
+        for (const name of ["Superior", "Oblíqua", "3D"]) await chooseView(page, name);
         await selectResult(page, "Pavilhão 3", "Pavilhão 3 · Comércio e mobiliário");
         await page.getByRole("button", { name: "Inspecionar sem cobertura", exact: true }).click();
+        await settledPose(page);
         await page.getByRole("button", { name: "Voltar ao parque", exact: true }).click();
+        await settledPose(page);
         await closeDetail(page);
-      }
+      };
+      // Compile every exterior/inspection material and finish optional scene work once.
+      await cycle();
+      const before = await diagnose(page);
+      for (let i = 0; i < 20; i++) await cycle();
       const after = await diagnose(page);
       if (before && after)
         assert.equal(after.instance, before.instance, "View/inspection cycles recreated renderer");
       assert.equal(await page.locator("canvas").count(), 1);
-      return { cycles: 20, before, after };
+      for (const resource of ["geometries", "textures", "programs"])
+        assert.equal(
+          after[resource],
+          before[resource],
+          `${resource} grew after warmed view/inspection cycles`,
+        );
+      return { warmupCycles: 1, measuredCycles: 20, before, after };
     });
     await runCheck(
       "real canvas picking, drag rejection, cancellation and manual interruption",
       async () => {
-        await page.getByRole("button", { name: "Superior", exact: true }).click();
+        await chooseView(page, "Superior");
         await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
         let point = await projectedPoint(page, "indumoveis:pavilion:1");
         await page.mouse.click(point.x, point.y);
@@ -844,6 +1566,15 @@ try {
     await runCheck("30s active navigation light near lot70", () =>
       navigate30Seconds(page, "light", { nearLot70: true }),
     );
+    for (const target of [
+      { name: "pavilions8-13-3", query: "Pavilhão 8", label: pavilionCases[3][1] },
+      { name: "B7", query: "Estrutura B7", label: "Estrutura B7" },
+      { name: "asphalt-crossing", query: "01", label: "Lote 01" },
+    ])
+      for (const quality of ["light", "balanced"])
+        await runCheck(`30s active navigation ${quality} ${target.name}`, () =>
+          navigate30Seconds(page, quality, { target }),
+        );
     await runCheck("10 exits/reentries clean up own WebGL context", async () => {
       const samples = [];
       for (let i = 0; i < 10; i++) {
@@ -955,6 +1686,10 @@ try {
               steps: 2,
             });
         }
+        // Laboratory hold crosses the preparation deadline without releasing the useful SVG gesture.
+        const heldStarted = performance.now();
+        await page.waitForTimeout(5000);
+        const heldGestureMs = performance.now() - heldStarted;
         assert.equal(
           await page.locator('.im-map-stage[data-representation="preparing"]').count(),
           1,
@@ -980,7 +1715,8 @@ try {
           expected,
           actualTarget: actual.target,
           contexts,
-          note: "Laboratory RAF gate steps the first three actual renderer draws while real pointer input pans the visible SVG. No additional WebGL context or mocked renderer.",
+          heldGestureMs,
+          note: "Laboratory RAF gate steps the first three actual renderer draws while real pointer input pans the visible SVG, then holds the pointer for at least 5s. This laboratory-only wait proves the preparation watchdog excludes an active fallback gesture. No additional WebGL context or mocked renderer.",
         };
       },
     );

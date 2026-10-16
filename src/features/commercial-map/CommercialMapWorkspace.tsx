@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Box,
   Map as MapIcon,
+  MoreHorizontal,
 } from "lucide-react";
 import { ENTITIES } from "./data/territory";
 import type { Point } from "./data/territory";
@@ -96,10 +97,14 @@ export function CommercialMapWorkspace({
     expanded: false,
   });
   const [view, setView] = useState<MapView>("perspective");
+  const [viewRevision, setViewRevision] = useState(0);
+  const [orientationFree, setOrientationFree] = useState(false);
   const externalView = useRef<MapView>("perspective");
+  const externalOrientationFree = useRef(false);
   const [quality, setQuality] = useState<MapQuality>("auto");
   const [gesture, setGesture] = useState<MapGesture>("move");
-  const [menu, setMenu] = useState<"search" | "settings" | "help" | "legend" | null>(null);
+  const [menu, setMenu] = useState<"search" | "settings" | "help" | "legend" | "more" | null>(null);
+  const menuOrigin = useRef<HTMLButtonElement | null>(null);
   const [retainedMenu, setRetainedMenu] = useState<typeof menu>(null);
   const displayedMenu = menu ?? retainedMenu;
   useEffect(() => {
@@ -134,6 +139,7 @@ export function CommercialMapWorkspace({
   const canPresent = useCallback(() => !lightGesture.current, []);
   const [insets, setInsets] = useState<MapInsets>({ right: 0, bottom: 0 });
   const [landscapeLayout, setLandscapeLayout] = useState(false);
+  const [compactHeader, setCompactHeader] = useState(false);
   const entity = ENTITIES.find((e) => e.id === selection.panelId);
   const results = useMemo(() => searchEntities(ENTITIES, query, location), [query, location]);
   const locations = useMemo(
@@ -175,13 +181,23 @@ export function CommercialMapWorkspace({
         );
     returnTo?.focus({ preventScroll: true });
   }, [onCloseExternal]);
-  const dismissMenu = () => {
-    workspace.current
-      ?.querySelector<HTMLButtonElement>(
-        `button[aria-label="${menu === "search" ? "Buscar lote, pavilhão ou via" : menu === "settings" ? "Opções de visualização" : menu === "help" ? "Ajuda de navegação" : "Legenda"}"]`,
-      )
-      ?.focus({ preventScroll: true });
+  const dismissMenu = useCallback(() => {
+    menuOrigin.current?.focus({ preventScroll: true });
     setMenu(null);
+  }, []);
+  const toggleMenu = (next: NonNullable<typeof menu>) => {
+    if (menu === next) {
+      dismissMenu();
+      return;
+    }
+    if (document.activeElement instanceof HTMLButtonElement)
+      menuOrigin.current = document.activeElement;
+    setMenu(next);
+  };
+  const chooseView = (next: MapView) => {
+    setView(next);
+    setViewRevision((revision) => revision + 1);
+    setOrientationFree(false);
   };
   useEffect(() => {
     if (externalSelection) select(externalSelection);
@@ -221,6 +237,7 @@ export function CommercialMapWorkspace({
       const p = panel.current?.getBoundingClientRect(),
         s = canvas.getBoundingClientRect();
       setLandscapeLayout(s.width >= 620 && s.height < 400);
+      setCompactHeader(el.clientWidth < 1080);
       const sidePanel = !!p && p.width < s.width * 0.55 && p.height > s.height * 0.45;
       const next = {
         right: p && sidePanel ? p.width + 24 : 0,
@@ -278,24 +295,35 @@ export function CommercialMapWorkspace({
   }, [attempt, fail, engineWanted]);
   useEffect(() => {
     if (representation !== "preparing" && representation !== "recovering") return;
-    const timer = setTimeout(() => {
+    let elapsed = 0,
+      last = performance.now();
+    const resumeClock = () => {
+      last = performance.now();
+    };
+    const timer = setInterval(() => {
+      const now = performance.now();
+      // Waiting for an already usable SVG gesture or a hidden tab is not a
+      // renderer failure. Charge only visible, unblocked preparation time.
+      if (!document.hidden && !lightGesture.current) elapsed += now - last;
+      last = now;
+      if (elapsed < 4500) return;
+      clearInterval(timer);
       setEngineWanted(false);
       setRenderer(null);
       setRepresentation("2d");
-    }, 4500);
-    return () => clearTimeout(timer);
+    }, 250);
+    document.addEventListener("visibilitychange", resumeClock);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", resumeClock);
+    };
   }, [representation, attempt]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (menu) {
         e.preventDefault();
-        setMenu(null);
-        workspace.current
-          ?.querySelector<HTMLButtonElement>(
-            `button[aria-label="${menu === "search" ? "Buscar lote, pavilhão ou via" : menu === "settings" ? "Opções de visualização" : menu === "help" ? "Ajuda de navegação" : "Legenda"}"]`,
-          )
-          ?.focus({ preventScroll: true });
+        dismissMenu();
       } else if (selection.id) {
         e.preventDefault();
         close();
@@ -303,7 +331,7 @@ export function CommercialMapWorkspace({
     };
     document.addEventListener("keydown", key);
     return () => document.removeEventListener("keydown", key);
-  }, [menu, selection.id, close]);
+  }, [menu, selection.id, close, dismissMenu]);
   useEffect(() => {
     const change = () => {
       if (!document.fullscreenElement) setExpanded(false);
@@ -341,6 +369,7 @@ export function CommercialMapWorkspace({
     selectedId: selection.id,
     inspectedId,
     view,
+    viewRevision,
     quality,
     gesture,
     insets,
@@ -350,6 +379,7 @@ export function CommercialMapWorkspace({
     statuses,
     highlightedIds,
     initialFocus: lastTarget.current,
+    onManualOrientation: () => setOrientationFree(true),
   };
   const tool = (label: string, icon: React.ReactNode, action: () => void, active = false) => (
     <button
@@ -367,7 +397,25 @@ export function CommercialMapWorkspace({
     </button>
   );
   const status = entity ? statuses[entity.id] : undefined;
-  const viewControls = (
+  const viewControls = compactHeader ? (
+    <select
+      className="im-map-view-select"
+      aria-label="Vista do mapa"
+      disabled={representation !== "ready"}
+      value={representation !== "ready" ? "2d" : orientationFree ? "free" : view}
+      onChange={(event) => chooseView(event.target.value as MapView)}
+    >
+      {representation !== "ready" && <option value="2d">Planta 2D</option>}
+      {orientationFree && (
+        <option value="free" disabled>
+          Vista livre
+        </option>
+      )}
+      <option value="perspective">3D</option>
+      <option value="top">Superior</option>
+      <option value="front">Oblíqua</option>
+    </select>
+  ) : (
     <div className="im-map-control-group im-map-views" role="group" aria-label="Vistas do mapa">
       {(
         [
@@ -378,19 +426,90 @@ export function CommercialMapWorkspace({
       ).map(([value, label]) => (
         <button
           key={value}
-          aria-pressed={(representation !== "ready" ? "top" : view) === value}
-          disabled={(representation !== "ready" || !!inspectedId) && value !== "top"}
-          onClick={() => setView(value)}
+          type="button"
+          aria-pressed={representation === "ready" && !orientationFree && view === value}
+          disabled={representation !== "ready"}
+          onClick={() => chooseView(value)}
         >
           {label}
         </button>
       ))}
     </div>
   );
+  const navigationControls = (
+    <div
+      className="im-map-control-group im-map-navigation"
+      role="group"
+      aria-label="Navegação do mapa"
+    >
+      {tool("Aproximar", <Plus />, () => handle()?.zoom(1.2))}
+      {tool("Afastar", <Minus />, () => handle()?.zoom(1 / 1.2))}
+      {tool(inspectedId ? "Reenquadrar pavilhão" : "Reenquadrar parque", <Scan />, () =>
+        inspectedId ? handle()?.focus(inspectedId) : handle()?.restoreOverview(),
+      )}
+    </div>
+  );
+  const gestureControls =
+    representation === "ready" &&
+    (compactHeader ? (
+      <select
+        className="im-map-gesture-select"
+        aria-label="Gesto de navegação"
+        value={gesture}
+        onChange={(event) => setGesture(event.target.value as MapGesture)}
+      >
+        <option value="move">Mover</option>
+        <option value="rotate">Girar</option>
+      </select>
+    ) : (
+      <div
+        className="im-map-control-group im-map-gestures"
+        role="group"
+        aria-label="Gesto de navegação"
+      >
+        {tool("Mover mapa", <Move />, () => setGesture("move"), gesture === "move")}
+        {tool("Girar mapa", <RotateCw />, () => setGesture("rotate"), gesture === "rotate")}
+      </div>
+    ));
+  const headerActions = (
+    <div className="im-map-header-actions">
+      {tool(
+        "Buscar lote, pavilhão ou via",
+        <Search />,
+        () => toggleMenu("search"),
+        menu === "search",
+      )}
+      {compactHeader ? (
+        tool(
+          "Mais ações do mapa",
+          <MoreHorizontal />,
+          () => toggleMenu("more"),
+          menu === "more" || menu === "settings" || menu === "help" || menu === "legend",
+        )
+      ) : (
+        <>
+          {tool(
+            "Opções de visualização",
+            <Settings2 />,
+            () => toggleMenu("settings"),
+            menu === "settings",
+          )}
+          {tool("Legenda", <Layers />, () => toggleMenu("legend"), menu === "legend")}
+          {tool("Ajuda de navegação", <HelpCircle />, () => toggleMenu("help"), menu === "help")}
+        </>
+      )}
+      {tool(
+        expanded ? "Sair da tela cheia" : "Tela cheia",
+        expanded ? <Minimize /> : <Maximize />,
+        () => void fullscreen(),
+        expanded,
+      )}
+    </div>
+  );
   return (
     <div
       ref={workspace}
-      className={`im-map-workspace ${expanded ? "is-expanded" : ""}`}
+      className={`im-map-workspace ${expanded ? "is-expanded" : ""} ${compactHeader ? "has-compact-header" : ""} ${landscapeLayout ? "is-landscape" : ""}`}
       style={
         {
           "--im-open": `${MOTION.panelOpen}ms`,
@@ -405,27 +524,30 @@ export function CommercialMapWorkspace({
     >
       <header className="im-map-header">
         <h1>Mapa Comercial</h1>
-        {landscapeLayout && <div className="im-map-header-views">{viewControls}</div>}
-        <div className="im-map-header-actions">
-          {tool(
-            "Buscar lote, pavilhão ou via",
-            <Search />,
-            () => setMenu(menu === "search" ? null : "search"),
-            menu === "search",
-          )}
-          {tool(
-            "Opções de visualização",
-            <Settings2 />,
-            () => setMenu(menu === "settings" ? null : "settings"),
-            menu === "settings",
-          )}
-          {tool(
-            expanded ? "Sair da tela cheia" : "Tela cheia",
-            expanded ? <Minimize /> : <Maximize />,
-            () => void fullscreen(),
-            expanded,
-          )}
+        {inspectedId && (
+          <button
+            className="im-map-button im-map-return"
+            aria-label="Voltar ao parque"
+            title="Voltar ao parque"
+            onClick={() => {
+              setInspectedId(null);
+              setView(externalView.current);
+              setOrientationFree(externalOrientationFree.current);
+            }}
+          >
+            <ArrowLeft size={18} />
+            <span className="im-map-tooltip" aria-hidden="true">
+              Voltar ao parque
+            </span>
+          </button>
+        )}
+        {compactHeader && !landscapeLayout && headerActions}
+        <div className="im-map-header-tools">
+          {viewControls}
+          {navigationControls}
+          {gestureControls}
         </div>
+        {(!compactHeader || landscapeLayout) && headerActions}
       </header>
       <div ref={stage} className="im-map-stage" data-representation={representation}>
         {representation !== "ready" && (
@@ -467,7 +589,17 @@ export function CommercialMapWorkspace({
               : representation === "recovering"
                 ? "Planta disponível · recuperando 3D"
                 : "Visualização leve ativada"}
-          <span className="im-map-orientation">Orientação da planta</span>
+          <span className="im-map-orientation">
+            {representation === "ready"
+              ? orientationFree
+                ? "Orientação livre"
+                : view === "top"
+                  ? "Preset superior"
+                  : view === "front"
+                    ? "Preset oblíquo"
+                    : "Perspectiva 3D"
+              : "Consulta superior em 2D"}
+          </span>
         </div>
         {(notice || commercialState === "unavailable") && (
           <div className="im-map-notice" role="status">
@@ -485,7 +617,9 @@ export function CommercialMapWorkspace({
                   ? "Opções de visualização"
                   : displayedMenu === "help"
                     ? "Ajuda de navegação"
-                    : "Legenda"
+                    : displayedMenu === "more"
+                      ? "Mais ações do mapa"
+                      : "Legenda"
             }
           >
             <div inert={!menu}>
@@ -497,11 +631,28 @@ export function CommercialMapWorkspace({
                       ? "Visualização"
                       : displayedMenu === "help"
                         ? "Como navegar"
-                        : "Legenda"}
+                        : displayedMenu === "more"
+                          ? "Ações do mapa"
+                          : "Legenda"}
                 </strong>
                 {tool("Fechar menu", <X />, dismissMenu)}
               </div>
-              {displayedMenu === "search" ? (
+              {displayedMenu === "more" ? (
+                <div className="im-map-more-actions">
+                  <button className="im-map-action" onClick={() => setMenu("settings")}>
+                    <Settings2 />
+                    Opções de visualização
+                  </button>
+                  <button className="im-map-action" onClick={() => setMenu("legend")}>
+                    <Layers />
+                    Legenda
+                  </button>
+                  <button className="im-map-action" onClick={() => setMenu("help")}>
+                    <HelpCircle />
+                    Ajuda de navegação
+                  </button>
+                </div>
+              ) : displayedMenu === "search" ? (
                 <>
                   <label className="im-map-search">
                     <Search size={18} />
@@ -591,8 +742,14 @@ export function CommercialMapWorkspace({
               ) : displayedMenu === "help" ? (
                 <>
                   <p>
-                    Arraste para mover. Use + / −, roda ou pinça para aproximar. Em 3D, escolha
-                    Girar para orbitar; botão secundário desloca.
+                    3D, Superior e Oblíqua orientam a mesma cena. Em todas elas, Mover desloca e
+                    Girar orbita com um dedo ou arrasto esquerdo. O botão secundário desloca. Uma
+                    órbita manual ativa a orientação livre; escolher um preset conserva o alvo.
+                  </p>
+                  <p>
+                    Use + / −, roda ou pinça para aproximar. Dois dedos combinam pinça e
+                    deslocamento. Na planta de compatibilidade 2D, arraste para mover; a órbita fica
+                    disponível no 3D.
                   </p>
                   <p>
                     Toque em uma área para consultar. A busca também permite selecionar pelo
@@ -634,48 +791,6 @@ export function CommercialMapWorkspace({
               )}
             </div>
           </section>
-        )}
-        <div className={`im-map-controls ${selection.panelId ? "has-detail" : ""}`}>
-          {!landscapeLayout && viewControls}
-          <div className="im-map-control-group">
-            {tool("Aproximar", <Plus />, () => handle()?.zoom(1.2))}
-            {tool("Afastar", <Minus />, () => handle()?.zoom(1 / 1.2))}
-            {tool(inspectedId ? "Reenquadrar pavilhão" : "Reenquadrar parque", <Scan />, () =>
-              inspectedId ? handle()?.focus(inspectedId) : handle()?.restoreOverview(),
-            )}
-          </div>
-          {representation === "ready" && (
-            <div className="im-map-control-group im-map-gestures">
-              {tool("Mover mapa", <Move />, () => setGesture("move"), gesture === "move")}
-              {tool("Girar mapa", <RotateCw />, () => setGesture("rotate"), gesture === "rotate")}
-            </div>
-          )}
-        </div>
-        <div className="im-map-secondary">
-          {tool(
-            "Legenda",
-            <Layers />,
-            () => setMenu(menu === "legend" ? null : "legend"),
-            menu === "legend",
-          )}
-          {tool(
-            "Ajuda de navegação",
-            <HelpCircle />,
-            () => setMenu(menu === "help" ? null : "help"),
-            menu === "help",
-          )}
-        </div>
-        {inspectedId && (
-          <button
-            className="im-map-return"
-            onClick={() => {
-              setInspectedId(null);
-              setView(externalView.current);
-            }}
-          >
-            <ArrowLeft size={18} />
-            Voltar ao parque
-          </button>
         )}
         {entity && (
           <aside
@@ -752,9 +867,11 @@ export function CommercialMapWorkspace({
                       <button
                         className="im-map-action im-map-action-primary"
                         onClick={() => {
-                          if (!inspectedId) externalView.current = view;
+                          if (!inspectedId) {
+                            externalView.current = view;
+                            externalOrientationFree.current = orientationFree;
+                          }
                           setInspectedId(entity.id);
-                          setView("top");
                         }}
                       >
                         <Box size={18} />

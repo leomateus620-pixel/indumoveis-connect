@@ -6,7 +6,7 @@ import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 
-const output = path.resolve(".output");
+const output = path.resolve(process.argv[3] ?? ".output");
 const publicRoot = path.join(output, "public");
 const application = (await import(pathToFileURL(path.join(output, "server", "index.mjs")).href))
   .default;

@@ -1,0 +1,95 @@
+{
+  "tolerance": 1e-06,
+  "pairs": [
+    {
+      "name": "overview",
+      "positionError": 0.0,
+      "targetError": 0.0,
+      "distanceBefore": 276.5857240678826,
+      "distanceAfter": 276.5857240678826,
+      "drawCallsBefore": 44,
+      "drawCallsAfter": 28,
+      "trianglesBefore": 780,
+      "trianglesAfter": 7636,
+      "canvas": [
+        1200,
+        600
+      ]
+    },
+    {
+      "name": "P1",
+      "positionError": 0.0,
+      "targetError": 0.0,
+      "distanceBefore": 54.59548059701337,
+      "distanceAfter": 54.59548059701337,
+      "drawCallsBefore": 29,
+      "drawCallsAfter": 20,
+      "trianglesBefore": 690,
+      "trianglesAfter": 7372,
+      "canvas": [
+        1200,
+        600
+      ]
+    },
+    {
+      "name": "P12",
+      "positionError": 0.0,
+      "targetError": 0.0,
+      "distanceBefore": 58.31368943721185,
+      "distanceAfter": 58.31368943721185,
+      "drawCallsBefore": 43,
+      "drawCallsAfter": 24,
+      "trianglesBefore": 786,
+      "trianglesAfter": 7562,
+      "canvas": [
+        1200,
+        600
+      ]
+    },
+    {
+      "name": "P8-P13-P3",
+      "positionError": 0.0,
+      "targetError": 0.0,
+      "distanceBefore": 53.73047427186202,
+      "distanceAfter": 53.73047427186202,
+      "drawCallsBefore": 36,
+      "drawCallsAfter": 24,
+      "trianglesBefore": 406,
+      "trianglesAfter": 7228,
+      "canvas": [
+        1200,
+        600
+      ]
+    },
+    {
+      "name": "B7",
+      "positionError": 0.0,
+      "targetError": 0.0,
+      "distanceBefore": 24.4177148219936,
+      "distanceAfter": 24.4177148219936,
+      "drawCallsBefore": 21,
+      "drawCallsAfter": 18,
+      "trianglesBefore": 328,
+      "trianglesAfter": 7000,
+      "canvas": [
+        1200,
+        600
+      ]
+    },
+    {
+      "name": "Argentina-crossing",
+      "positionError": 0.0,
+      "targetError": 0.0,
+      "distanceBefore": 16.92241215789027,
+      "distanceAfter": 16.92241215789027,
+      "drawCallsBefore": 21,
+      "drawCallsAfter": 15,
+      "trianglesBefore": 292,
+      "trianglesAfter": 6868,
+      "canvas": [
+        1200,
+        600
+      ]
+    }
+  ]
+}

@@ -2,6 +2,8 @@
 
 Revisão territorial `2026-10-15`. A geometria canônica está em `src/features/commercial-map/data/territory.ts`; 2D e 3D recebem os mesmos IDs, polígonos e âncoras. Não há raster de planta, marca de expositor, dado FenaSoja remoto ou informação comercial embutida.
 
+Na etapa 2, a revisão territorial permanece a mesma. A [arquitetura de apresentação](commercial-map-architecture.md) registra os seis perfis estimados consultados no código FenaSoja, sua adaptação aos footprints Indumóveis e as pendências de elevação real; não é uma nova fonte cadastral. As imagens WhatsApp mostram a maquete anterior, sem certificar fachadas/coberturas reais. A [validação atual](commercial-map-stage2-validation.md) compara a assinatura dos atributos protegidos antes/depois, separando modelos derivados dos dados territoriais.
+
 ## Conferência dos documentos
 
 Todos os seis PDFs locais foram renderizados integralmente em PNG com Poppler e conferidos visualmente, incluindo títulos, portas e numeração. A ordem dos anexos não foi utilizada. O Markdown adicional foi lido integralmente antes da implementação. A captura do sistema serve apenas para localizar a rota, sem inferência de metragem.

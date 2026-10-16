@@ -1,0 +1,46 @@
+{
+  "fullChecks": {
+    "usefulMedianMs": 528.011199999999,
+    "usefulWorstMs": 751.8507,
+    "passedChecks": 49,
+    "failedChecks": 0
+  },
+  "finalChecks": {
+    "usefulMedianMs": 430.3134000000009,
+    "usefulWorstMs": 1304.6223999999997,
+    "passedChecks": 33,
+    "failedChecks": 0
+  },
+  "handoffChecks": {
+    "usefulMedianMs": 437.4492,
+    "usefulWorstMs": 566.8738000000003,
+    "passedChecks": 7,
+    "failedChecks": 0
+  },
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [
+      "/assets/MapRenderer-ig4CjP-3.js"
+    ],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "browser": "153.0.8010.12",
+    "actualGL": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Intel)",
+      "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  },
+  "sourceInvariant": "c6d2ecb439fc39dd9ac449267472d99cf62b6e6fe50e9b7b7eed8668c70bb88b",
+  "benchmarkScenarios": 9,
+  "stallsAbove200Ms": 0,
+  "minimumMedianFps": 59.880239520962,
+  "maximumP95IntervalMs": 16.80000000000291
+}

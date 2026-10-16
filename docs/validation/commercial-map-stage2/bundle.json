@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-10-16T02:28:25.431Z",
+  "kind": "static production artifacts; not observed network transfer",
+  "renderer": "MapRenderer-ig4CjP-3.js",
+  "map": "mapa-DDgwgcL_.js",
+  "featureAssets": [
+    {
+      "file": "MapRenderer-ig4CjP-3.js",
+      "bytes": 607334,
+      "gzipBytes": 156059
+    },
+    {
+      "file": "arrow-left-SIv40yGi.js",
+      "bytes": 153,
+      "gzipBytes": 155
+    },
+    {
+      "file": "arrow-right-DT3zZg9A.js",
+      "bytes": 153,
+      "gzipBytes": 154
+    },
+    {
+      "file": "geometry-BVZHXnES.js",
+      "bytes": 14329,
+      "gzipBytes": 5515
+    },
+    {
+      "file": "mapa-DDgwgcL_.js",
+      "bytes": 32204,
+      "gzipBytes": 11113
+    },
+    {
+      "file": "mapa-DTWp_8f4.css",
+      "bytes": 12083,
+      "gzipBytes": 3079
+    },
+    {
+      "file": "plus-qJlAf3c6.js",
+      "bytes": 141,
+      "gzipBytes": 140
+    },
+    {
+      "file": "settings-2-Bm2p1MNT.js",
+      "bytes": 240,
+      "gzipBytes": 188
+    }
+  ],
+  "compressedBytes": 176403,
+  "budgetBytes": 3145728,
+  "financeStaticFiles": [
+    "financeiro-Do10gqDj.js",
+    "jsx-runtime-Cltr0gcK.js",
+    "useNavigate-D0meCJtU.js",
+    "useRouter-CwjitLz4.js",
+    "api-BWuYnCNd.js",
+    "dist-DNT1aoys.js",
+    "index-DmnVcH_v.js",
+    "Match-Cef8KxBo.js",
+    "matchContext-D7fiU5TJ.js",
+    "useSelector-DXalI5tR.js",
+    "preload-helper-G9SI6NCt.js",
+    "link-D4iki_Ag.js",
+    "shared-Cu-V3U1W.js",
+    "ui-BJL8rGNo.js",
+    "x-DbmYfe5W.js",
+    "dialog-DXii7mUD.js",
+    "dist-CdiqmoSJ.js",
+    "dist-B_UHoaee.js",
+    "sheet-CLbDTauR.js",
+    "AttachedDocuments-KThyC1-3.js",
+    "UploadDialog-Blqko57A.js",
+    "plus-qJlAf3c6.js",
+    "tabs-C2f73EGB.js",
+    "journey-C1hNQu8H.js"
+  ],
+  "documentsStaticFiles": [
+    "documentos-BRdQbcCb.js",
+    "jsx-runtime-Cltr0gcK.js",
+    "useNavigate-D0meCJtU.js",
+    "useRouter-CwjitLz4.js",
+    "api-BWuYnCNd.js",
+    "dist-DNT1aoys.js",
+    "index-DmnVcH_v.js",
+    "Match-Cef8KxBo.js",
+    "matchContext-D7fiU5TJ.js",
+    "useSelector-DXalI5tR.js",
+    "preload-helper-G9SI6NCt.js",
+    "link-D4iki_Ag.js",
+    "shared-Cu-V3U1W.js",
+    "ui-BJL8rGNo.js",
+    "x-DbmYfe5W.js",
+    "dialog-DXii7mUD.js",
+    "dist-CdiqmoSJ.js",
+    "dist-B_UHoaee.js",
+    "chevron-left--zuy-NNa.js",
+    "UploadDialog-Blqko57A.js",
+    "sheet-CLbDTauR.js",
+    "plus-qJlAf3c6.js",
+    "tabs-C2f73EGB.js"
+  ],
+  "engineIsolated": true
+}

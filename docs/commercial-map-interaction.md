@@ -2,6 +2,8 @@
 
 A rota autenticada `/mapa` mantém os parâmetros `space`, `deal` e `status`. A base territorial local abre com zero espaços comerciais. A geometria é compartilhada entre SVG e Three.js; sua procedência, escala esquemática e inventário estão em [fontes](commercial-map-sources.md).
 
+As coberturas e fachadas derivadas, as classificações dos apoios e os limites de fidelidade estão em [arquitetura de apresentação estimada](commercial-map-architecture.md). Os acabamentos das vias e sua topologia visual estão em [pavimentação](commercial-map-pavement.md). Essas geometrias não alteram footprints nem áreas comerciais.
+
 ## Responsabilidades e estados
 
 - `data/territory.ts` e `geometry.ts`: implantação versionada, sem status comercial, empresas, preços ou dependência do outro projeto.
@@ -14,13 +16,17 @@ Não há associações cadastrais publicadas sem evidência. `mapSpaceAssociatio
 
 ## Gestos e câmera
 
-Mouse com ponteiro preciso inicia em Girar: arrastar orbita na perspectiva, botão secundário desloca e roda aproxima. Ponteiro de toque inicia em Mover: um dedo desloca, dois dedos combinam pinça e rotação na perspectiva. O controle explícito Mover/Girar permanece disponível. Superior desloca diretamente; o fallback 2D não oferece órbita.
+Mouse com ponteiro preciso inicia em Girar: arrastar orbita, botão secundário desloca e roda aproxima. Ponteiro de toque inicia em Mover: um dedo desloca; em Girar, um dedo orbita. Dois dedos combinam pinça e deslocamento nos três presets. O controle explícito Mover/Girar permanece disponível. O fallback 2D oferece pan e zoom, sem órbita.
+
+3D, Superior e Oblíqua são orientações da mesma câmera perspectiva e conservam alvo, seleção e escala percebida; selecionar um preset não reenquadra o parque inteiro. Superior começa próximo da vertical e permite sair dela com Girar. Uma órbita manual apresenta “Orientação livre” e retira a indicação de preset exato. O mesmo preset pode ser reaplicado depois do gesto. A inspeção mantém a navegação tridimensional; voltar restaura a pose e a indicação de orientação externas.
+
+Vistas, zoom, reenquadramento, Mover/Girar, busca, opções, legenda, ajuda e tela cheia ficam no cabeçalho, fora da área de renderização. O retorno da inspeção também está nessa região. Em contêiner estreito, vistas e gesto usam seletores e as ações auxiliares ficam em Mais ações do mapa. Não existe dock inferior. A ordem de Tab acompanha as linhas visíveis; Esc/fechar menu devolvem foco ao acionador superior, inclusive ao abrir uma opção pelo menu compacto. Popovers abrem abaixo do cabeçalho e preservam a área restante de arrasto.
 
 Os botões +/− usam fator 1,2. Ajuda recolhível oferece deslocamento e rotação por botões. A busca aceita número com ou sem zero, acentos e localização; resultados são percorridos com Tab e setas. `9` e `09` resolvem o mesmo envelope 09 / 10; 35, 36, 49 e 50 não são uma faixa contínua.
 
 O limiar de arrasto é 6 px CSS para mouse e 10 px para toque. Pinça, cancelamento, perda de captura, blur e ocultação anulam a intenção de clique. Um novo gesto interrompe a transição na pose visível. Não há rotação automática, física ou inércia contínua. Limites de alvo, distância e inclinação mantêm o recorte recuperável.
 
-Foco considera a região livre após ficha, safe areas e controles. Resize observa o contêiner real, inclusive a sidebar. A câmera se ajusta ao item selecionado apenas se ele ficar escondido. Fechar ficha conserva a vista e a inspeção. “Voltar ao parque” restaura a pose e vista externas salvas; reenquadrar durante inspeção mantém o pavilhão.
+Foco considera a região livre após ficha e safe areas; o cabeçalho participa do fluxo e reduz a altura real do Canvas, sem reserva inferior para controles. Resize observa o contêiner real, inclusive a sidebar. A câmera se ajusta ao item selecionado apenas se ele ficar escondido. Fechar ficha conserva a vista e a inspeção. “Voltar ao parque” restaura a pose e vista externas salvas; reenquadrar durante inspeção mantém o pavilhão.
 
 ## Movimento e camadas
 
@@ -38,7 +44,7 @@ São três perfis, com indicação automática conservadora quando faltam sinais
 
 O renderer desenha sob demanda, pausa em aba oculta e descarta recursos/listeners/RAF ao sair. Árvores usam instancing; números e referências usam um atlas pequeno compartilhado. Sem sombras dinâmicas, pós-processamento, modelos externos ou raster de PDF no caminho inicial.
 
-Chunk indisponível, inicialização, timeout ou contexto perdido têm destino finito: uma recuperação automática, depois 2D. A preparação tem limite de 4,5 s com SVG já funcional. Nova tentativa manual está em Opções. Tela cheia usa a API disponível e mantém expansão interna com saída clara se ela falhar.
+Chunk indisponível, inicialização, timeout ou contexto perdido têm destino finito: uma recuperação automática, depois 2D. A preparação tem limite de 4,5 s de tempo visível e sem gesto ativo do SVG, que já permite consulta. O relógio pausa durante o gesto ou com a aba oculta e retoma quando a preparação pode prosseguir; consultar a planta por mais tempo não provoca fallback indevido. Um comando do cabeçalho cancela o gesto anterior e assume a câmera; o próximo gesto começa sem deltas acumulados. Nova tentativa manual está em Opções. Tela cheia usa a API disponível e mantém expansão interna com saída clara se ela falhar.
 
 ## Reprodução
 
