@@ -257,6 +257,15 @@ function AuthorizedShell({
   toggle: () => void;
 }) {
   const { data: edition } = useEdition();
+  const pending = useRouterState({ select: (s) => s.status === "pending" });
+  const pathKey = current.to;
+  useEffect(() => {
+    // Warm the 3D map chunk in idle time so opening the map is instant.
+    const run = () => void import("@/features/commercial-map/MapRenderer").catch(() => {});
+    const w = window as Window & { requestIdleCallback?: (cb: () => void) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(run);
+    else setTimeout(run, 2000);
+  }, []);
   return (
     <div className="internal-app flex min-h-dvh w-full bg-workspace">
       <aside
@@ -313,8 +322,11 @@ function AuthorizedShell({
             )}
           </span>
         </div>
-        <main className="min-w-0 flex-1">
-          <Outlet />
+        <main className="relative min-w-0 flex-1" aria-busy={pending || undefined}>
+          {pending && <div className="route-progress" role="progressbar" aria-label="Carregando" />}
+          <div key={pathKey} className={cn("route-enter", pending && "route-pending")}>
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

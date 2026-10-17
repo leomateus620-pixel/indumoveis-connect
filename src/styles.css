@@ -168,3 +168,20 @@
 .docs-surface { background: color-mix(in oklch, var(--brand-taupe) 6%, var(--card)); }
 .docs-nav-item[aria-current="true"] { color: var(--brand-plum); border-color: var(--brand-red); background: var(--plum-soft); }
 .docs-row[aria-selected="true"] { background: var(--plum-soft); box-shadow: inset 3px 0 0 var(--brand-red); }
+
+/* Route transitions in the internal workspace */
+.route-progress {
+  position: absolute; inset: 0 0 auto 0; height: 2px; z-index: 50; overflow: hidden;
+  background: color-mix(in oklab, var(--primary) 18%, transparent);
+}
+.route-progress::after {
+  content: ""; position: absolute; inset: 0; width: 40%; background: var(--primary);
+  animation: route-progress 900ms ease-in-out infinite;
+}
+@keyframes route-progress { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.route-enter { animation: route-enter 180ms ease-out; }
+@keyframes route-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.route-pending { opacity: 0.6; transition: opacity 150ms; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .route-enter, .route-progress::after { animation: none; }
+}
