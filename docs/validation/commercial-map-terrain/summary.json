@@ -1,0 +1,489 @@
+{
+  "baselineCommit": "0936587",
+  "visualBaselineCommit": "8e2be3557225ef967d443b2fb4e73ef0269a5f11",
+  "conditions": {
+    "os": "darwin 25.6.0",
+    "cpu": "Apple M5",
+    "logicalCores": 10,
+    "systemMemoryGiB": 16,
+    "renderer": "Chromium software ANGLE/SwiftShader",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": ["/assets/MapRenderer-D_Jq6AZa.js"],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "browser": "155.0.8059.80",
+    "note": "Same local host, browser executable, CSS viewport/DPR, scripted gestures and intercepted local data before/after. Submitted frames, not input-to-photon. No physical mobile device."
+  },
+  "rawReports": {
+    "before-geometry": "before-geometry.json.gz",
+    "baseline-main-bench": "baseline-main-bench.json.gz",
+    "baseline-main-openings": "baseline-main-openings.json.gz",
+    "final-bench": "final-bench.json.gz",
+    "final-openings": "final-openings.json.gz",
+    "initial-software-opening-anomaly": "initial-software-opening-anomaly.json.gz",
+    "final-functional": "final-functional.json.gz",
+    "final-lighting": "final-lighting.json.gz",
+    "hardware-functional": "hardware-functional.json.gz"
+  },
+  "checks": {
+    "before-geometry": {
+      "summary": {
+        "passed": 9,
+        "failed": 0
+      },
+      "unhandledErrors": []
+    },
+    "baseline-main-bench": {
+      "summary": {
+        "passed": 6,
+        "failed": 0
+      },
+      "unhandledErrors": []
+    },
+    "baseline-main-openings": {
+      "summary": {
+        "passed": 10,
+        "failed": 0
+      },
+      "unhandledErrors": []
+    },
+    "final-bench": {
+      "summary": {
+        "passed": 6,
+        "failed": 0
+      },
+      "unhandledErrors": []
+    },
+    "final-openings": {
+      "summary": {
+        "passed": 10,
+        "failed": 0
+      },
+      "unhandledErrors": []
+    },
+    "initial-software-opening-anomaly": {
+      "summary": {
+        "passed": 5,
+        "failed": 1
+      },
+      "unhandledErrors": []
+    },
+    "final-functional": {
+      "summary": {
+        "passed": 11,
+        "failed": 0
+      },
+      "unhandledErrors": []
+    },
+    "final-lighting": {
+      "summary": {
+        "passed": 4,
+        "failed": 0
+      },
+      "unhandledErrors": []
+    },
+    "hardware-functional": {
+      "summary": {
+        "passed": 2,
+        "failed": 0
+      },
+      "unhandledErrors": []
+    }
+  },
+  "navigation": {
+    "envelope": {
+      "minDistance": 15.39192072002968,
+      "maxDistance": 373.3907274916415,
+      "fitDistance": 276.58572406788255,
+      "minPolarAngle": 0.003,
+      "maxPolarAngle": 1.382300767579509,
+      "cameraClearance": 6.5535611,
+      "targetBounds": {
+        "minX": -3.6799999999999997,
+        "minY": -0.6799999999999997,
+        "maxX": 194.68,
+        "maxY": 110.68
+      },
+      "terrainBounds": {
+        "minX": -3470.6418828669143,
+        "minY": -3467.6418828669143,
+        "maxX": 3661.6418828669143,
+        "maxY": 3577.6418828669143
+      },
+      "groundReach": 3251.22329693185,
+      "farPlane": 2280.257399841276,
+      "horizonFade": {
+        "center": [95.5, 55],
+        "start": 729.3988996798323,
+        "end": 1533.475944857993
+      },
+      "groundTangent": 0.3443276132896652,
+      "protectedRegionCount": 97
+    },
+    "minimumReached": 15.39192072002968,
+    "maximumReached": 373.3907274916414,
+    "transformsUnchanged": true
+  },
+  "openings": [
+    {
+      "viewportWidth": 1366,
+      "state": "cold",
+      "samplesPerBuild": 5,
+      "before": {
+        "usefulMs": {
+          "medianMs": 867.5997080000016,
+          "worstMs": 3722.037458
+        },
+        "ready3DMs": {
+          "medianMs": 991.4885000000013,
+          "worstMs": 4344.627334000001
+        },
+        "environmentReadyMs": {
+          "medianMs": 2247.2655830000003,
+          "worstMs": 4488.3283329999995
+        }
+      },
+      "after": {
+        "usefulMs": {
+          "medianMs": 457.64037499999904,
+          "worstMs": 2345.5233749999998
+        },
+        "ready3DMs": {
+          "medianMs": 1156.5907499999994,
+          "worstMs": 4890.214667
+        },
+        "environmentReadyMs": {
+          "medianMs": 2082.775583999999,
+          "worstMs": 5048.286042000001
+        },
+        "environmentPrepareMs": {
+          "medianMs": 274.70000000298023,
+          "worstMs": 357.6000000089407
+        },
+        "terrainPreparationMs": {
+          "medianMs": 26.200000002980232,
+          "worstMs": 26.299999997019768
+        },
+        "skyPreparationMs": {
+          "medianMs": 38.69999998807907,
+          "worstMs": 40.20000000298023
+        },
+        "essentialProgramsPreparationMs": {
+          "medianMs": 68.70000000298023,
+          "worstMs": 148.40000000596046
+        }
+      }
+    },
+    {
+      "viewportWidth": 1366,
+      "state": "warm",
+      "samplesPerBuild": 5,
+      "before": {
+        "usefulMs": {
+          "medianMs": 753.6674169999997,
+          "worstMs": 976.3352909999994
+        },
+        "ready3DMs": {
+          "medianMs": 880.458458000001,
+          "worstMs": 1003.4819580000003
+        },
+        "environmentReadyMs": {
+          "medianMs": 1489.4290840000003,
+          "worstMs": 1605.6235410000008
+        }
+      },
+      "after": {
+        "usefulMs": {
+          "medianMs": 339.80920799999876,
+          "worstMs": 358.458499999997
+        },
+        "ready3DMs": {
+          "medianMs": 1022.9164579999997,
+          "worstMs": 1080.396084
+        },
+        "environmentReadyMs": {
+          "medianMs": 1856.4147089999997,
+          "worstMs": 1884.0330830000003
+        },
+        "environmentPrepareMs": {
+          "medianMs": 110.40000000596046,
+          "worstMs": 457.79999999701977
+        },
+        "terrainPreparationMs": {
+          "medianMs": 0.09999999403953552,
+          "worstMs": 0.10000000894069672
+        },
+        "skyPreparationMs": {
+          "medianMs": 0.09999999403953552,
+          "worstMs": 0.09999999403953552
+        },
+        "essentialProgramsPreparationMs": {
+          "medianMs": 26.200000002980232,
+          "worstMs": 29
+        }
+      }
+    },
+    {
+      "viewportWidth": 390,
+      "state": "cold",
+      "samplesPerBuild": 5,
+      "before": {
+        "usefulMs": {
+          "medianMs": 715.0375419999982,
+          "worstMs": 1305.0242089999992
+        },
+        "ready3DMs": {
+          "medianMs": 827.5741669999989,
+          "worstMs": 1394.4492919999975
+        },
+        "environmentReadyMs": {
+          "medianMs": 1963.3347499999982,
+          "worstMs": 2378.1791669999984
+        }
+      },
+      "after": {
+        "usefulMs": {
+          "medianMs": 248.0994159999973,
+          "worstMs": 627.5675840000004
+        },
+        "ready3DMs": {
+          "medianMs": 939.3474169999972,
+          "worstMs": 1420.9592499999999
+        },
+        "environmentReadyMs": {
+          "medianMs": 1662.889584000004,
+          "worstMs": 2280.6559579999994
+        },
+        "environmentPrepareMs": {
+          "medianMs": 202.5,
+          "worstMs": 325
+        },
+        "terrainPreparationMs": {
+          "medianMs": 26.5,
+          "worstMs": 27.400000005960464
+        },
+        "skyPreparationMs": {
+          "medianMs": 39.69999998807907,
+          "worstMs": 39.79999999701977
+        },
+        "essentialProgramsPreparationMs": {
+          "medianMs": 61.29999999701977,
+          "worstMs": 75.70000000298023
+        }
+      }
+    },
+    {
+      "viewportWidth": 390,
+      "state": "warm",
+      "samplesPerBuild": 5,
+      "before": {
+        "usefulMs": {
+          "medianMs": 1491.8537910000014,
+          "worstMs": 1511.1814169999998
+        },
+        "ready3DMs": {
+          "medianMs": 1618.1260409999995,
+          "worstMs": 1643.2207080000044
+        },
+        "environmentReadyMs": {
+          "medianMs": 2357.483250000001,
+          "worstMs": 2391.497374999999
+        }
+      },
+      "after": {
+        "usefulMs": {
+          "medianMs": 1295.7184579999957,
+          "worstMs": 1305.4494169999962
+        },
+        "ready3DMs": {
+          "medianMs": 2034.7690839999996,
+          "worstMs": 2088.132249999995
+        },
+        "environmentReadyMs": {
+          "medianMs": 2793.985833999999,
+          "worstMs": 2807.939124999997
+        },
+        "environmentPrepareMs": {
+          "medianMs": 388.29999999701977,
+          "worstMs": 410
+        },
+        "terrainPreparationMs": {
+          "medianMs": 0,
+          "worstMs": 0.09999999403953552
+        },
+        "skyPreparationMs": {
+          "medianMs": 0,
+          "worstMs": 0
+        },
+        "essentialProgramsPreparationMs": {
+          "medianMs": 25.200000002980232,
+          "worstMs": 26.80000001192093
+        }
+      }
+    }
+  ],
+  "benchmarks": [
+    {
+      "profile": "light",
+      "repetitions": 3,
+      "durationMsPerRepetition": 15000,
+      "before": {
+        "p50Ms": 16.69999999999709,
+        "p95Ms": 33.30000000000291,
+        "allP95Ms": [33.29999999999927, 33.30000000000291, 33.30000000000291],
+        "stallsAbove200Ms": 0,
+        "peakBudget": {
+          "drawCalls": 49,
+          "triangles": 12498,
+          "textures": 8,
+          "textureBytes": 5253806
+        },
+        "samples": 2591
+      },
+      "after": {
+        "p50Ms": 33.30000000000018,
+        "p95Ms": 33.400000000001455,
+        "allP95Ms": [33.400000000001455, 33.400000000001455, 33.400000000001455],
+        "stallsAbove200Ms": 0,
+        "peakBudget": {
+          "drawCalls": 51,
+          "triangles": 12842,
+          "textures": 10,
+          "textureBytes": 9983322
+        },
+        "samples": 1521
+      },
+      "p95ChangePercent": 0.30030030029590815
+    },
+    {
+      "profile": "balanced",
+      "repetitions": 3,
+      "durationMsPerRepetition": 15000,
+      "before": {
+        "p50Ms": 33.30000000000291,
+        "p95Ms": 33.40000000000873,
+        "allP95Ms": [33.400000000001455, 33.40000000000873, 33.40000000000873],
+        "stallsAbove200Ms": 0,
+        "peakBudget": {
+          "drawCalls": 49,
+          "triangles": 12498,
+          "textures": 8,
+          "textureBytes": 5253806
+        },
+        "samples": 1690
+      },
+      "after": {
+        "p50Ms": 33.30000000000291,
+        "p95Ms": 33.40000000000873,
+        "allP95Ms": [33.40000000000873, 33.40000000000873, 33.40000000000873],
+        "stallsAbove200Ms": 0,
+        "peakBudget": {
+          "drawCalls": 51,
+          "triangles": 12842,
+          "textures": 10,
+          "textureBytes": 9983322
+        },
+        "samples": 1465
+      },
+      "p95ChangePercent": 0.0
+    }
+  ],
+  "initialSoftwareAnomaly": {
+    "passed": 5,
+    "failed": 1
+  },
+  "pairedCaptures": [
+    {
+      "name": "overview",
+      "pose": {
+        "position": [203.1920718208355, 153.51644994350087, 188.17326031783034],
+        "target": [95.5, 55],
+        "distance": 230,
+        "polar": 0.84,
+        "azimuth": 0.68
+      },
+      "samePose": true,
+      "canvas": {
+        "x": 0,
+        "y": 107,
+        "width": 1200,
+        "height": 600
+      }
+    },
+    {
+      "name": "low-oblique",
+      "pose": {
+        "position": [224.38854332092563, 104.32710792788279, 214.38506188477572],
+        "target": [95.5, 55],
+        "distance": 230.00000000000003,
+        "polar": 1.1,
+        "azimuth": 0.6800000000000002
+      },
+      "samePose": true,
+      "canvas": {
+        "x": 0,
+        "y": 107,
+        "width": 1200,
+        "height": 600
+      }
+    },
+    {
+      "name": "perimeter",
+      "pose": {
+        "position": [45.48173979168082, 24.43068975748311, 106.56456763239574],
+        "target": [24, 80],
+        "distance": 42.00000000000001,
+        "polar": 0.9500000000000001,
+        "azimuth": 0.6800000000000002
+      },
+      "samePose": true,
+      "canvas": {
+        "x": 0,
+        "y": 107,
+        "width": 1200,
+        "height": 600
+      }
+    },
+    {
+      "name": "near",
+      "pose": {
+        "position": [167.2775008228374, 14.329508373883005, 85.67728589946695],
+        "target": [160.42783500000002, 77.20691000000001],
+        "distance": 18.000000000000004,
+        "polar": 0.6500000000000004,
+        "azimuth": 0.6799999999999998
+      },
+      "samePose": true,
+      "canvas": {
+        "x": 0,
+        "y": 107,
+        "width": 1200,
+        "height": 600
+      }
+    },
+    {
+      "name": "far",
+      "pose": {
+        "position": [212.55659980525598, 166.86570646032703, 199.75354382372862],
+        "target": [95.5, 55],
+        "distance": 250,
+        "polar": 0.84,
+        "azimuth": 0.68
+      },
+      "samePose": true,
+      "canvas": {
+        "x": 0,
+        "y": 107,
+        "width": 1200,
+        "height": 600
+      }
+    }
+  ],
+  "hardwareRenderer": {
+    "vendor": "WebKit",
+    "renderer": "WebKit WebGL",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "unmaskedVendor": "Google Inc. (Apple)",
+    "unmaskedRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)"
+  }
+}

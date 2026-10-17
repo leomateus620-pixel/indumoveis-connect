@@ -18,7 +18,10 @@ vi.mock("three", async (importOriginal) => {
     fromEquirectangular(source: import("three").Texture) {
       source.addEventListener("dispose", () => preparation.sourceDisposals++);
       const image = source.image as { data: Uint8Array; width: number; height: number };
-      preparation.sourcePoles = [image.data[0], image.data[(image.height - 1) * image.width * 4]];
+      preparation.sourcePoles = [
+        image.data[2],
+        image.data[(image.height - 1) * image.width * 4 + 2],
+      ];
       const make = () => {
         const target = new actual.WebGLRenderTarget(336, 256, {
           depthBuffer: false,
@@ -84,7 +87,7 @@ describe("deferred reflection environment ownership", () => {
     const environment = createReflectionEnvironment(renderer);
     expect(environment.target).toBe(preparation.targets[0].target);
     expect(environment.textureBytes).toBe(336 * 256 * 8);
-    expect(environment.peakTextureBytes).toBe(256 * 128 * 4 + 2 * 336 * 256 * 8);
+    expect(environment.peakTextureBytes).toBe(512 * 256 * 4 + 2 * 336 * 256 * 8);
     expect(preparation.targets.map((record) => record.disposals)).toEqual([0, 1]);
     expect(preparation.sourceDisposals).toBe(1);
     expect(preparation.sourcePoles[1]).toBeGreaterThan(preparation.sourcePoles[0] + 20);

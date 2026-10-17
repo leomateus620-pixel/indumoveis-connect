@@ -32,6 +32,7 @@ export interface SurfaceMaterials {
   setQuality(tier: SurfaceQuality): void;
   /** Presentation camera distance: fades surface relief before it can shimmer. */
   updateDetail(distance: number): void;
+  setEnvironment(texture: THREE.Texture | null): void;
   dispose(): void;
 }
 
@@ -145,12 +146,19 @@ export function createSurfaceMaterials(options: { maps?: boolean } = {}): Surfac
   }
   function setQuality(tier: SurfaceQuality) {
     quality = tier;
+    const reflection: Record<SurfaceFamily, number> = {
+      paintedWall: 0.13,
+      concrete: 0.09,
+      asphalt: 0.06,
+      whitePaint: 0.1,
+      paintedSheet: 0.35,
+      exposedMetal: 0.48,
+      glass: 0.72,
+      warmAccent: 0.14,
+    };
     for (const [family, material] of Object.entries(materials))
       material.envMapIntensity =
-        tier === "light"
-          ? 0
-          : (family === "glass" || family === "exposedMetal" ? 0.75 : 0.3) *
-            (tier === "detailed" ? 1.1 : 1);
+        reflection[family as SurfaceFamily] * (tier === "light" ? 0.65 : 1);
     updateDetail(lastDistance);
   }
   setQuality(quality);
@@ -160,6 +168,13 @@ export function createSurfaceMaterials(options: { maps?: boolean } = {}): Surfac
     textureBytes: textures.length * Math.ceil((MAP_SIZE * MAP_SIZE * 4 * 4) / 3),
     setQuality,
     updateDetail,
+    setEnvironment(texture) {
+      for (const material of Object.values(materials)) {
+        if (material.envMap === texture) continue;
+        material.envMap = texture;
+        material.needsUpdate = true;
+      }
+    },
     dispose() {
       for (const material of Object.values(materials)) material.dispose();
       for (const texture of textures) texture.dispose();

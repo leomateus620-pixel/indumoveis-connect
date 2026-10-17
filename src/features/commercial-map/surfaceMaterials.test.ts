@@ -6,6 +6,25 @@ import { createPavement } from "./pavement";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 
 describe("renderer-owned semantic surface materials", () => {
+  it("binds the shared daylight explicitly so per-family intensities survive renderer scene defaults", () => {
+    const surfaces = createSurfaceMaterials({ maps: false });
+    const environment = new THREE.Texture();
+    const textureDisposed = vi.fn();
+    environment.addEventListener("dispose", textureDisposed);
+    surfaces.setEnvironment(environment);
+    const version = surfaces.materials.glass.version;
+    surfaces.setEnvironment(environment);
+    expect(surfaces.materials.glass.version).toBe(version);
+    expect(surfaces.materials.glass.envMap).toBe(environment);
+    expect(surfaces.materials.glass.envMapIntensity).toBeGreaterThan(
+      surfaces.materials.asphalt.envMapIntensity,
+    );
+    surfaces.setEnvironment(null);
+    expect(surfaces.materials.glass.envMap).toBeNull();
+    surfaces.dispose();
+    expect(textureDisposed).not.toHaveBeenCalled();
+    environment.dispose();
+  });
   it("keeps semantic local materials usable when optional surface maps are unavailable", () => {
     const surfaces = createSurfaceMaterials({ maps: false });
     try {
@@ -17,7 +36,8 @@ describe("renderer-owned semantic surface materials", () => {
         expect(material.bumpMap).toBeNull();
         expect(material.roughnessMap).toBeNull();
         expect(material.color.getHex()).toBeGreaterThan(0);
-        expect(material.envMapIntensity).toBe(0);
+        expect(material.envMapIntensity).toBeGreaterThan(0);
+        expect(material.envMapIntensity).toBeLessThan(0.5);
       }
       expect(surfaces.materials.paintedSheet).not.toBe(surfaces.materials.paintedWall);
       expect(surfaces.materials.paintedSheet.color.getHex()).not.toBe(
@@ -82,7 +102,7 @@ describe("renderer-owned semantic surface materials", () => {
     }
   });
 
-  it("removes optional reflections in light and fades relief with distance without recreating resources", () => {
+  it("retains moderate daylight reflections in light and fades relief without recreating resources", () => {
     const surfaces = createSurfaceMaterials();
     try {
       const material = surfaces.materials.paintedSheet;
@@ -95,7 +115,8 @@ describe("renderer-owned semantic surface materials", () => {
       expect(material.bumpScale).toBe(0);
       surfaces.setQuality("light");
       surfaces.updateDetail(20);
-      expect(material.envMapIntensity).toBe(0);
+      expect(material.envMapIntensity).toBeGreaterThan(0);
+      expect(material.envMapIntensity).toBeLessThan(surfaces.materials.glass.envMapIntensity);
       expect(material.bumpScale).toBeGreaterThan(0);
       expect(surfaces.materials.paintedSheet).toBe(material);
       expect(material.map).toBe(map);
