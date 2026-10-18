@@ -4,6 +4,9 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 import { createVegetation } from "./vegetation";
+import { createTerrain, TERRAIN } from "./terrain";
+import { DAYLIGHT, createDaylightSky, createDaylightBackground } from "./daylight";
+import { createSunShadows } from "./sunShadows";
 import { VISUAL_THEME as PALETTE, COMMERCIAL_STATUS_COLORS } from "./visualTheme";
 import {
   STREET_LABEL,
@@ -26,6 +29,11 @@ import {
   shouldUseLightFallback,
   smoothStep,
   viewDirection,
+  NAVIGATION,
+  smallestSelectableSpan,
+  createNavigationEnvelope,
+  constrainNavigationPose,
+  minimumNavigationDistance,
   type QualityTier,
 } from "./navigation";
 import type { MapHandle, MapRendererProps, MapView } from "./types";
@@ -61,6 +69,19 @@ type Diagnostic = {
   textureBytes: number;
   environmentBytes: number;
   environmentPeakBytes: number;
+  environmentPrepareMs: number;
+  essentialProgramsPreparationMs: number;
+  environmentReadyAt?: number;
+  skyPreparationMs: number;
+  terrainPreparationMs: number;
+  skyReadyAt?: number;
+  daylight: {
+    sunDirection: readonly number[];
+    skyDetail: string;
+    skyBytes: number;
+    environmentPreparations: number;
+    shadowDraws: number;
+  };
   ambientFrames: number;
   optionalFailures: string[];
   labels: { id: string; scale: number; visible: boolean; textHeightPx: number }[];
@@ -88,6 +109,15 @@ type Diagnostic = {
   loseContext(): void;
   /** Deterministic lab captures only; never used by product controls. */
   setReferencePose(position: [number, number, number], target: Point): void;
+  transforms(): { name: string; matrix: number[] }[];
+  pickAt(x: number, y: number): string | null;
+  navigation: ReturnType<typeof createNavigationEnvelope> | null;
+  terrain: {
+    bounds: ReturnType<typeof createNavigationEnvelope>["terrainBounds"];
+    textureBytes: number;
+    pickable: boolean;
+    mapsReady: boolean;
+  } | null;
 };
 
 declare global {
@@ -132,6 +162,12 @@ const CENTER: Point = [
   (MAP_BOUNDS.minX + MAP_BOUNDS.maxX) / 2,
   (MAP_BOUNDS.minY + MAP_BOUNDS.maxY) / 2,
 ];
+const COMMERCIAL_HEIGHT = Math.max(...ENTITIES.map(architectureVisualHeight));
+// Drawing coordinates, never metres: use the short dimension of real selectable lots.
+const SMALLEST_LOT_SPAN = smallestSelectableSpan(
+  ENTITIES.filter((entity) => entity.kind === "lot").map((entity) => entity.polygon),
+);
+const COMMERCIAL_POLYGONS = ENTITIES.map((entity) => entity.polygon);
 
 function polygonGeometry(polygon: Point[], height: number) {
   const triangles = THREE.ShapeUtils.triangulateShape(
@@ -301,11 +337,22 @@ function initializeMapRuntime(
   host.appendChild(canvas);
   renderer.setClearColor(PALETTE.background);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1;
   renderer.shadowMap.enabled = false;
   renderer.info.autoReset = true;
   const scene = new THREE.Scene();
+  const commercialGroup = new THREE.Group();
+  commercialGroup.name = "indumoveis-commercial-fixed";
+  scene.add(commercialGroup);
   scene.background = new THREE.Color(PALETTE.background);
-  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, DIAGONAL * 15);
+  let sky = createDaylightSky({ detail: "simple" });
+  rollback.push(() => sky.dispose());
+  const daylightBackground = createDaylightBackground(sky.texture);
+  scene.background = new THREE.Color(DAYLIGHT.sky.horizon);
+  scene.add(daylightBackground.mesh);
+  rollback.push(() => daylightBackground.dispose());
+  const camera = new THREE.PerspectiveCamera(NAVIGATION.fovDegrees, 1, 0.1, DIAGONAL * 15);
   const controls = new OrbitControls(camera, canvas);
   rollback.push(() => controls.dispose());
   controls.enableDamping = false; // direct gesture mapping, independent of RAF cadence
@@ -315,10 +362,6 @@ function initializeMapRuntime(
   controls.rotateSpeed = 0.6;
   controls.panSpeed = 0.85;
   controls.zoomSpeed = 0.8;
-  controls.minPolarAngle = 0.001;
-  controls.maxPolarAngle = Math.PI * 0.46;
-  controls.minDistance = 5;
-  controls.maxDistance = DIAGONAL * 6;
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
   let tier =
     props().quality === "auto"
@@ -329,6 +372,7 @@ function initializeMapRuntime(
     height = Math.max(1, host.clientHeight);
   let disposed = false,
     failed = false,
+    essentialProgramsReady = false,
     ready = false,
     frame = 0,
     scheduled = 0,
@@ -336,6 +380,7 @@ function initializeMapRuntime(
   let environmentTask = 0,
     ambientTimer = 0;
   let environmentTarget: THREE.WebGLRenderTarget | null = null;
+  let environmentResource: ReturnType<typeof createReflectionEnvironment> | null = null;
   let environmentAttempted = false;
   let vegetation: ReturnType<typeof createVegetation> | null = null;
   let ambientDisabled = false;
@@ -349,8 +394,6 @@ function initializeMapRuntime(
     kind: CameraAction;
   } | null = null;
   let exteriorPose: Pose | null = null;
-  let focusedBuilding: MapEntity | undefined;
-  let inspectionInterruptedTarget: Point | null = null;
   let previousInspected = props().inspectedId;
   let previousView = props().view;
   let previousViewRevision = props().viewRevision;
@@ -422,6 +465,17 @@ function initializeMapRuntime(
     textureBytes: 4 * 1024 * 1024,
     environmentBytes: 0,
     environmentPeakBytes: 0,
+    environmentPrepareMs: 0,
+    essentialProgramsPreparationMs: 0,
+    skyPreparationMs: 0,
+    terrainPreparationMs: 0,
+    daylight: {
+      sunDirection: DAYLIGHT.sunDirection,
+      skyDetail: "simple",
+      skyBytes: sky.textureBytes,
+      environmentPreparations: 0,
+      shadowDraws: 1,
+    },
     ambientFrames: 0,
     optionalFailures: [],
     labels: [],
@@ -440,6 +494,21 @@ function initializeMapRuntime(
     contextLosses: 0,
     slowFrameWindows: 0,
     sampledFrameWindows: 0,
+    navigation: null,
+    terrain: null,
+    transforms() {
+      if (!diag.enabled || disposed) return [];
+      commercialGroup.updateMatrixWorld(true);
+      return [commercialGroup, ...commercialGroup.children].map((object, index) => ({
+        name: object.name || `commercial-${index}`,
+        matrix: object.matrixWorld.toArray(),
+      }));
+    },
+    pickAt(x, y) {
+      if (!diag.enabled || disposed) return null;
+      const rect = canvas.getBoundingClientRect();
+      return pick(rect.left + x, rect.top + y);
+    },
     project(id, heightFraction = 1) {
       const entity = ENTITY_BY_ID.get(id);
       if (!entity) return null;
@@ -479,6 +548,8 @@ function initializeMapRuntime(
     diag.loseContext = () => {};
     diag.setReferencePose = () => {};
     diag.resetSamples = () => {};
+    diag.transforms = () => [];
+    diag.pickAt = () => null;
   });
 
   function track<T extends THREE.BufferGeometry | THREE.Material | THREE.Texture>(value: T): T {
@@ -488,9 +559,6 @@ function initializeMapRuntime(
   function basic(color: string) {
     return track(new THREE.MeshBasicMaterial({ color }));
   }
-  function matte(color: string) {
-    return track(new THREE.MeshLambertMaterial({ color }));
-  }
   const presentationParams = new URLSearchParams(window.location.search);
   const surfaces = createSurfaceMaterials({
     maps: !(diag.enabled && presentationParams.get("mapSurfaceMaps") === "off"),
@@ -498,35 +566,52 @@ function initializeMapRuntime(
   surfaces.setQuality(tier);
   diag.textureBytes += surfaces.textureBytes;
   rollback.push(() => surfaces.dispose());
-  const groundMaterial = matte(PALETTE.ground);
-  scene.add(new THREE.HemisphereLight("#edf4ff", "#b8bca8", 1.55));
-  const sunlight = new THREE.DirectionalLight("#fff1dc", 2.15);
-  sunlight.position.set(-70, 140, 70);
+  scene.add(
+    new THREE.HemisphereLight(
+      DAYLIGHT.hemisphere.sky,
+      DAYLIGHT.hemisphere.ground,
+      DAYLIGHT.hemisphere.intensity,
+    ),
+  );
+  const sunlight = new THREE.DirectionalLight(DAYLIGHT.sunlight.color, DAYLIGHT.sunlight.intensity);
+  sunlight.position.set(...DAYLIGHT.sunDirection).multiplyScalar(180);
   scene.add(sunlight);
-  const fill = new THREE.DirectionalLight("#dbe8f5", 0.55);
+  const fill = new THREE.DirectionalLight(DAYLIGHT.fill.color, DAYLIGHT.fill.intensity);
   fill.position.set(80, 60, -110);
   scene.add(fill);
-  const ground = new THREE.Mesh(
-    track(
-      polygonGeometry(
-        [
-          [MAP_BOUNDS.minX - 9, MAP_BOUNDS.minY - 9],
-          [MAP_BOUNDS.maxX + 9, MAP_BOUNDS.minY - 9],
-          [MAP_BOUNDS.maxX + 9, MAP_BOUNDS.maxY + 9],
-          [MAP_BOUNDS.minX - 9, MAP_BOUNDS.maxY + 9],
-        ],
-        -0.15,
-      ),
-    ),
-    groundMaterial,
-  );
-  scene.add(ground);
+  let envelope = createNavigationEnvelope({
+    bounds: MAP_BOUNDS,
+    smallestSelectableSpan: SMALLEST_LOT_SPAN,
+    maxStructureHeight: COMMERCIAL_HEIGHT,
+    width,
+    height,
+    insets: props().insets,
+    protectedPolygons: COMMERCIAL_POLYGONS,
+    fov: camera.fov,
+  });
+  const terrain = createTerrain(ENTITIES, {
+    extent: envelope.terrainBounds,
+    quality: tier,
+    deferMaps: true,
+    maps: !(diag.enabled && presentationParams.get("mapTerrainMaps") === "off"),
+  });
+  scene.add(terrain.group);
+  terrain.setAtmosphere(envelope.horizonFade, DAYLIGHT.sky.horizon);
+  rollback.push(() => terrain.dispose());
+  diag.textureBytes += terrain.textureBytes;
+  diag.terrain = {
+    bounds: envelope.terrainBounds,
+    textureBytes: terrain.textureBytes,
+    pickable: false,
+    mapsReady: false,
+  };
+  diag.navigation = envelope;
 
   // Each static ground category is one draw call, independent of lot count.
   const lotRanges = new Map<string, [number, number]>();
   let lotGeometry: THREE.BufferGeometry | null = null;
   const pavement = createPavement(ENTITIES, surfaces);
-  scene.add(pavement.group);
+  commercialGroup.add(pavement.group);
   pavement.resources.forEach(track);
   diag.textureBytes += pavement.textureBytes;
   // Picking remains attached to the original surfaces despite network batching.
@@ -573,12 +658,12 @@ function initializeMapRuntime(
     geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
     geometry.computeVertexNormals();
     const material = track(new THREE.MeshLambertMaterial({ vertexColors: true }));
-    scene.add(new THREE.Mesh(geometry, material));
+    commercialGroup.add(new THREE.Mesh(geometry, material));
     if (kind === "lot") lotGeometry = geometry;
     if (borderPositions.length) {
       const border = track(new THREE.BufferGeometry());
       border.setAttribute("position", new THREE.Float32BufferAttribute(borderPositions, 3));
-      scene.add(
+      commercialGroup.add(
         new THREE.LineSegments(
           border,
           track(
@@ -590,9 +675,13 @@ function initializeMapRuntime(
   }
 
   const architecture = buildArchitecture(ENTITIES, surfaces);
-  scene.add(architecture.group);
+  commercialGroup.add(architecture.group);
   pickables.push(...architecture.pickables);
   rollback.push(() => architecture.dispose());
+  const sunShadows = createSunShadows(ENTITIES);
+  commercialGroup.add(sunShadows.mesh);
+  rollback.push(() => sunShadows.dispose());
+  diag.textureBytes += sky.textureBytes;
 
   const selectedGeometry = track(new THREE.BufferGeometry());
   const selectionPositions = new Float32Array(
@@ -605,7 +694,7 @@ function initializeMapRuntime(
     track(new THREE.LineBasicMaterial({ color: "#4d1e3e", linewidth: 2 })),
   );
   selectedLine.renderOrder = 5;
-  scene.add(selectedLine);
+  commercialGroup.add(selectedLine);
   const selectionFillGeometry = track(new THREE.BufferGeometry());
   const selectionFillPositions = new Float32Array(
     Math.max(...ENTITIES.map((entity) => entity.polygon.length - 2)) * 9,
@@ -628,7 +717,7 @@ function initializeMapRuntime(
   );
   selectionFill.renderOrder = 4;
   selectionFill.frustumCulled = false;
-  scene.add(selectionFill);
+  commercialGroup.add(selectionFill);
 
   // One small canvas atlas and one mesh, with CPU collision/priority only when a
   // draw is already needed. No per-label DOM nodes or individual text textures.
@@ -764,7 +853,7 @@ function initializeMapRuntime(
   );
   labelsMesh.renderOrder = 3;
   labelsMesh.frustumCulled = false;
-  scene.add(labelsMesh);
+  commercialGroup.add(labelsMesh);
   const collisionRects: { x: number; y: number; w: number; h: number }[] = [];
   const sortedLabels = [...labels];
   let labelSelection: string | null | undefined;
@@ -969,7 +1058,7 @@ function initializeMapRuntime(
     }
     try {
       vegetation = createVegetation();
-      scene.add(vegetation.group);
+      commercialGroup.add(vegetation.group);
       diag.textureBytes += vegetation.textureBytes;
       rollback.push(() => vegetation?.dispose());
     } catch {
@@ -981,33 +1070,84 @@ function initializeMapRuntime(
 
   // Deferred optional reflection: first navigation already works with local
   // albedo + direct daylight. No remote asset or probe per building/frame.
-  function prepareEnvironment() {
+  async function prepareEnvironment() {
     environmentTask = 0;
-    if (disposed || failed || tier === "light" || environmentAttempted) return;
+    if (disposed || failed || environmentAttempted) return;
     if (document.hidden) return;
     if (activePointers.size || transition) {
       environmentTask = window.setTimeout(prepareEnvironment, 250);
       return;
     }
     environmentAttempted = true;
+    const terrainBegin = performance.now();
+    const terrainBytesBefore = terrain.textureBytes;
+    try {
+      terrain.prepareMaps();
+    } catch {
+      diag.optionalFailures.push("terrain-preparation");
+    }
+    diag.terrainPreparationMs = performance.now() - terrainBegin;
+    diag.textureBytes += terrain.textureBytes - terrainBytesBefore;
+    if (diag.terrain) {
+      diag.terrain.textureBytes = terrain.textureBytes;
+      diag.terrain.mapsReady = terrain.textures.length > 0;
+    }
+    const skyBegin = performance.now();
+    try {
+      const richerSky = createDaylightSky({
+        fail: diag.enabled && presentationParams.get("mapSky") === "fail",
+      });
+      daylightBackground.setTexture(richerSky.texture);
+      diag.textureBytes += richerSky.textureBytes - sky.textureBytes;
+      sky.dispose();
+      sky = richerSky;
+      if (sky.fallback) diag.optionalFailures.push("sky-preparation");
+    } catch {
+      // Keep the already-rendered simple sky even if both richer allocation
+      // and its optional fallback fail. Selection and local sun remain usable.
+      diag.optionalFailures.push("sky-preparation");
+    }
+    diag.skyPreparationMs = performance.now() - skyBegin;
+    diag.skyReadyAt = performance.now();
+    diag.daylight.skyDetail = sky.detail;
+    diag.daylight.skyBytes = sky.textureBytes;
+    const environmentBegin = performance.now();
+    diag.daylight.environmentPreparations++;
     try {
       const environment = createReflectionEnvironment(renderer, {
         fail: diag.enabled && presentationParams.get("mapEnvironment") === "fail",
       });
+      environmentResource = environment;
       environmentTarget = environment.target;
       // Packed CubeUV LODs use the actual RGBA half-float target dimensions.
       // Source and scratch targets are already disposed; no depth target.
       diag.environmentBytes = environment.textureBytes;
       diag.environmentPeakBytes = environment.peakTextureBytes;
       diag.textureBytes += diag.environmentBytes;
-      scene.environment = environmentTarget.texture;
-      rollback.push(() => environmentTarget?.dispose());
+      // r186 also applies scene.environment to Lambert and overrides each
+      // family's intensity. Explicit PBR maps keep semantic lots/trees diffuse
+      // and preserve the intended per-surface reflection strength.
+      surfaces.setEnvironment(environmentTarget.texture);
+      rollback.push(() => environment.dispose());
+      // Public API prepares this one environment/material variant before its
+      // first interaction. No shader compilation or filtering during gestures.
+      await renderer.compileAsync(scene, camera);
+      if (disposed) return;
     } catch {
+      if (disposed) return;
       // Direct sun + sky fill and all semantic materials remain valid.
-      environmentTarget?.dispose();
+      environmentResource?.dispose();
+      environmentResource = null;
       environmentTarget = null;
+      scene.environment = null;
+      surfaces.setEnvironment(null);
+      diag.textureBytes -= diag.environmentBytes;
+      diag.environmentBytes = 0;
       diag.optionalFailures.push("environment-preparation");
     }
+    diag.environmentPrepareMs = performance.now() - environmentBegin;
+    diag.environmentReadyAt = performance.now();
+    if (disposed) return;
     invalidate();
   }
 
@@ -1033,7 +1173,34 @@ function initializeMapRuntime(
   function pose(): Pose {
     return { position: camera.position.clone(), target: controls.target.clone() };
   }
+  function boundedPose(next: Pose): Pose {
+    const bounded = constrainNavigationPose(
+      { position: next.position.toArray(), target: next.target.toArray() },
+      envelope,
+    );
+    next.position.fromArray(bounded.position);
+    next.target.fromArray(bounded.target);
+    return next;
+  }
+  function constrainCamera() {
+    const bounded = boundedPose({ position: camera.position, target: controls.target });
+    camera.lookAt(bounded.target);
+    controls.minDistance = minimumNavigationDistance(
+      envelope,
+      Math.acos(
+        Math.min(
+          1,
+          Math.max(
+            -1,
+            (camera.position.y - controls.target.y) /
+              Math.max(0.001, camera.position.distanceTo(controls.target)),
+          ),
+        ),
+      ),
+    );
+  }
   function applyPose(next: Pose) {
+    boundedPose(next);
     camera.position.copy(next.position);
     controls.target.copy(next.target);
     camera.lookAt(controls.target);
@@ -1043,6 +1210,7 @@ function initializeMapRuntime(
     // A header command can arrive from a second finger while the first is
     // dragging. End that pointer session before the automatic owner takes over.
     if (activePointers.size) cancelPointers();
+    boundedPose(to);
     if (
       transition &&
       transition.to.position.distanceToSquared(to.position) < 0.001 &&
@@ -1062,8 +1230,7 @@ function initializeMapRuntime(
       duration: reduceMotion.matches ? 0 : duration,
       kind,
     };
-    controls.minDistance = 0.1;
-    controls.maxDistance = DIAGONAL * 6;
+    navigationLimits();
     diag.cameraState = "transition";
     invalidate();
   }
@@ -1075,9 +1242,9 @@ function initializeMapRuntime(
     currentDirection?: THREE.Vector3,
   ) {
     const distance = Math.min(
-      DIAGONAL * 6,
+      envelope.maxDistance,
       Math.max(
-        6,
+        envelope.minDistance,
         box
           ? framingBoxDistance(
               box,
@@ -1110,18 +1277,17 @@ function initializeMapRuntime(
       .addScaledVector(screenUp, (-props().insets.bottom * worldPerPixel) / 2);
     target.add(shift);
     position.add(shift);
-    return { position, target };
+    return boundedPose({ position, target });
   }
   function focus(id?: string) {
     const entity = id ? ENTITY_BY_ID.get(id) : undefined;
-    focusedBuilding = entity && getArchitectureDefinition(entity) ? entity : undefined;
     const bounds = boundsOf(entity);
     animate(
       freeRegionPose(
         bounds.center,
         Math.max(bounds.radius, 3),
         props().view,
-        entity ? undefined : bounds.box,
+        entity ? undefined : { ...bounds.box, height: COMMERCIAL_HEIGHT },
         ready
           ? new THREE.Vector3().subVectors(camera.position, controls.target).normalize()
           : undefined,
@@ -1130,37 +1296,7 @@ function initializeMapRuntime(
     );
   }
   function clampTarget() {
-    const inspected = props().inspectedId ? ENTITY_BY_ID.get(props().inspectedId!) : undefined;
-    const b = boundsOf(inspected);
-    // A contextual margin keeps navigation recoverable without a hard wall at
-    // the cadastral outline. Inspection retains useful room around its building.
-    const margin = inspected ? Math.max(b.box.width, b.box.depth) * 0.65 : DIAGONAL * 0.22;
-    const minX = inspected ? b.center[0] - b.box.width / 2 - margin : MAP_BOUNDS.minX - margin,
-      maxX = inspected ? b.center[0] + b.box.width / 2 + margin : MAP_BOUNDS.maxX + margin;
-    const minY = inspected ? b.center[1] - b.box.depth / 2 - margin : MAP_BOUNDS.minY - margin,
-      maxY = inspected ? b.center[1] + b.box.depth / 2 + margin : MAP_BOUNDS.maxY + margin;
-    scratch.set(
-      Math.max(
-        inspectionInterruptedTarget ? Math.min(minX, inspectionInterruptedTarget[0]) : minX,
-        Math.min(
-          inspectionInterruptedTarget ? Math.max(maxX, inspectionInterruptedTarget[0]) : maxX,
-          controls.target.x,
-        ),
-      ),
-      0,
-      Math.max(
-        inspectionInterruptedTarget ? Math.min(minY, inspectionInterruptedTarget[1]) : minY,
-        Math.min(
-          inspectionInterruptedTarget ? Math.max(maxY, inspectionInterruptedTarget[1]) : maxY,
-          controls.target.z,
-        ),
-      ),
-    );
-    scratch2.subVectors(scratch, controls.target);
-    if (scratch2.lengthSq() > 0) {
-      controls.target.add(scratch2);
-      camera.position.add(scratch2);
-    }
+    constrainCamera();
   }
   function invalidate() {
     if (!disposed && !failed && !document.hidden && !scheduled) {
@@ -1171,7 +1307,7 @@ function initializeMapRuntime(
   function draw(now: number) {
     scheduled = 0;
     diag.activeLoops = 0;
-    if (disposed || failed || document.hidden) return;
+    if (disposed || failed || document.hidden || !essentialProgramsReady) return;
     const begin = performance.now();
     if (!ready) {
       const live = props().readInitialTarget?.();
@@ -1224,13 +1360,24 @@ function initializeMapRuntime(
         if (pendingVisibilityCheck) keepSelectionVisible();
       }
     }
-    if (!transition) clampTarget();
+    // Constraints apply to every trajectory sample, including a flight rebased
+    // by the still-visible fallback and interrupted wheel/pinch transitions.
+    constrainCamera();
+    // Skip only when even the upper corner ground intersections lie before
+    // the far clip. A merely downward ray can still hit beyond that clip.
+    const polar = controls.getPolarAngle();
+    const topGroundDepth =
+      Math.cos(polar) - Math.sin(polar) * Math.tan((camera.fov * Math.PI) / 360);
+    daylightBackground.mesh.visible =
+      topGroundDepth <= 0 ||
+      (camera.position.y - TERRAIN.baseElevation) / topGroundDepth >= camera.far * 0.98;
     const navigationActive = activePointers.size > 0 || !!transition || now - lastActivity < 240;
     vegetation?.animate(
       now / 1000,
       tier === "detailed" && !reduceMotion.matches && !ambientDisabled,
     );
     surfaces.updateDetail(camera.position.distanceTo(controls.target));
+    terrain.updateDetail(camera.position.distanceTo(controls.target));
     camera.near = Math.max(
       0.05,
       Math.min(camera.position.distanceTo(controls.target) / 280, camera.position.y * 0.2),
@@ -1316,7 +1463,7 @@ function initializeMapRuntime(
       performance.mark("indumoveis-map:controls-ready");
       props().onReady();
       optionalTask = window.setTimeout(addTrees, 0);
-      if (tier !== "light") environmentTask = window.setTimeout(prepareEnvironment, 350);
+      environmentTask = window.setTimeout(prepareEnvironment, 350);
     }
     if (
       pendingTier &&
@@ -1341,8 +1488,8 @@ function initializeMapRuntime(
     adaptiveSamples.length = 0;
     diag.slowFrameWindows = 0;
     surfaces.setQuality(tier);
-    scene.environment = tier === "light" ? null : (environmentTarget?.texture ?? null);
-    if (tier !== "light" && !environmentAttempted && !environmentTask)
+    terrain.setQuality(tier);
+    if (!environmentAttempted && !environmentTask)
       environmentTask = window.setTimeout(prepareEnvironment, 350);
     window.clearTimeout(ambientTimer);
     resizeBuffer();
@@ -1370,8 +1517,6 @@ function initializeMapRuntime(
     );
   }
   function cancelTransition() {
-    if (transition && props().inspectedId)
-      inspectionInterruptedTarget = [controls.target.x, controls.target.z];
     transition = null;
     navigationLimits();
     lastActivity = performance.now();
@@ -1480,6 +1625,9 @@ function initializeMapRuntime(
     animate(next, MOVEMENT.wheelMs, "wheel");
   }
   function controlsChanged() {
+    // OrbitControls owns gestures; repair its target/position together before
+    // the frame, without another controller or a recentering animation.
+    constrainCamera();
     if (
       activePointers.size &&
       !transition &&
@@ -1505,7 +1653,7 @@ function initializeMapRuntime(
     } else {
       lastFrame = 0;
       if (ready && !vegetation && !ambientDisabled) optionalTask = window.setTimeout(addTrees, 0);
-      if (ready && tier !== "light" && !environmentAttempted)
+      if (ready && !environmentAttempted)
         environmentTask = window.setTimeout(prepareEnvironment, 350);
       invalidate();
     }
@@ -1562,6 +1710,16 @@ function initializeMapRuntime(
     width = Math.round(box.width);
     height = Math.round(box.height);
     if (width === oldWidth && height === oldHeight) return;
+    const fitRatio = camera.position.distanceTo(controls.target) / envelope.fitDistance;
+    cancelTransition();
+    refreshEnvelope();
+    if (!props().selectedId) {
+      scratch
+        .subVectors(camera.position, controls.target)
+        .setLength(envelope.fitDistance * fitRatio);
+      camera.position.copy(controls.target).add(scratch);
+    }
+    constrainCamera();
     resizeBuffer();
     // Preserve the target on sidebar/orientation changes; only move a selected
     // item if the new free region actually hides it.
@@ -1604,26 +1762,36 @@ function initializeMapRuntime(
     if (hidden) focus(selected.id);
   }
   function distanceLimits() {
-    const inspected = props().inspectedId ? ENTITY_BY_ID.get(props().inspectedId!) : undefined;
-    const b = boundsOf(inspected);
-    const limits = {
-      min: inspected
-        ? Math.max(3, Math.min(b.box.width, b.box.depth) * 0.22)
-        : focusedBuilding
-          ? Math.max(5, boundsOf(focusedBuilding).radius * 1.1)
-          : 5,
-      max: inspected ? Math.max(b.radius * 9, 70) : DIAGONAL * 6,
-    };
-    // An interrupted flight may be outside the new building range. All inputs
-    // share that visible boundary and converge back to the contextual limits
-    // instead of snapping or allowing extra travel away from the building.
-    const current = camera.position.distanceTo(controls.target);
-    return { min: Math.min(limits.min, current || limits.min), max: Math.max(limits.max, current) };
+    const distance = camera.position.distanceTo(controls.target);
+    const polar = distance
+      ? Math.acos(THREE.MathUtils.clamp((camera.position.y - controls.target.y) / distance, -1, 1))
+      : envelope.minPolarAngle;
+    return { min: minimumNavigationDistance(envelope, polar), max: envelope.maxDistance };
   }
   function navigationLimits() {
     const limits = distanceLimits();
     controls.minDistance = limits.min;
     controls.maxDistance = limits.max;
+    controls.minPolarAngle = envelope.minPolarAngle;
+    controls.maxPolarAngle = envelope.maxPolarAngle;
+    camera.far = envelope.farPlane;
+  }
+  function refreshEnvelope() {
+    envelope = createNavigationEnvelope({
+      bounds: MAP_BOUNDS,
+      smallestSelectableSpan: SMALLEST_LOT_SPAN,
+      maxStructureHeight: COMMERCIAL_HEIGHT,
+      width,
+      height,
+      insets: props().insets,
+      protectedPolygons: COMMERCIAL_POLYGONS,
+      fov: camera.fov,
+    });
+    navigationLimits();
+    terrain.setExtent(envelope.terrainBounds);
+    terrain.setAtmosphere(envelope.horizonFade, DAYLIGHT.sky.horizon);
+    diag.navigation = envelope;
+    if (diag.terrain) diag.terrain.bounds = envelope.terrainBounds;
   }
   function update() {
     const state = props();
@@ -1636,7 +1804,6 @@ function initializeMapRuntime(
     for (const [id, roof] of architecture.roofs) roof.visible = state.inspectedId !== id;
     const inspectionChanged = state.inspectedId !== previousInspected;
     if (inspectionChanged) {
-      inspectionInterruptedTarget = null;
       if (state.inspectedId) {
         if (!previousInspected) exteriorPose = pose();
         focus(state.inspectedId);
@@ -1708,8 +1875,15 @@ function initializeMapRuntime(
       colors.needsUpdate = true;
     }
     if (previousSelection !== state.selectedId) pendingVisibilityCheck = false;
-    if (state.insets.right !== previousInsetRight || state.insets.bottom !== previousInsetBottom)
+    if (state.insets.right !== previousInsetRight || state.insets.bottom !== previousInsetBottom) {
+      refreshEnvelope();
+      if (transition) {
+        boundedPose(transition.from);
+        boundedPose(transition.to);
+      }
+      constrainCamera();
       keepSelectionVisible();
+    }
     previousInsetRight = state.insets.right;
     previousInsetBottom = state.insets.bottom;
     previousSelection = state.selectedId;
@@ -1731,7 +1905,25 @@ function initializeMapRuntime(
   applyPose(overview);
   update();
   performance.mark("indumoveis-map:essential-prepared");
-  invalidate();
+  // Keep the already usable SVG/input thread available while the driver links
+  // essential programs. Compile against the scene's existing lights, excluding
+  // the optional sky/environment; presentation still requires three real draws.
+  void (async () => {
+    const started = performance.now();
+    try {
+      await renderer.compileAsync(commercialGroup, camera, scene);
+      if (disposed || failed) return;
+      await renderer.compileAsync(terrain.group, camera, scene);
+    } catch {
+      if (disposed || failed) return;
+      // A driver without asynchronous compilation can use the normal draw path.
+      diag.optionalFailures.push("essential-program-preparation");
+    }
+    if (disposed || failed) return;
+    diag.essentialProgramsPreparationMs = performance.now() - started;
+    essentialProgramsReady = true;
+    invalidate();
+  })();
 
   return {
     focus,
@@ -1792,8 +1984,12 @@ function initializeMapRuntime(
       removeListeners();
       controls.dispose();
       vegetation?.dispose();
+      terrain.dispose();
+      sunShadows.dispose();
+      daylightBackground.dispose();
+      sky.dispose();
       scene.environment = null;
-      environmentTarget?.dispose();
+      environmentResource?.dispose();
       surfaces.dispose();
       for (const resource of resources) resource.dispose();
       architecture.dispose();
@@ -1806,6 +2002,8 @@ function initializeMapRuntime(
       diag.loseContext = () => {};
       diag.setReferencePose = () => {};
       diag.resetSamples = () => {};
+      diag.transforms = () => [];
+      diag.pickAt = () => null;
       performance.mark("indumoveis-map:renderer-disposed");
     },
   };

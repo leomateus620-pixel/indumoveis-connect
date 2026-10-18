@@ -1,0 +1,207 @@
+[
+  {
+    "file": "comparison-overview.png",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/overview.png",
+    "sourceAfter": "after/overview.png",
+    "size": [1200, 1252],
+    "bytes": 245352,
+    "sha256": "bac98f72320078f0aa5b4c2322c0f68f81320a0602eb2d034baa5b773b43d854"
+  },
+  {
+    "file": "comparison-low-oblique.png",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/low-oblique.png",
+    "sourceAfter": "after/low-oblique.png",
+    "size": [1200, 1252],
+    "bytes": 215393,
+    "sha256": "82594d9e935f88a8f86d359a8297c9b8f634ad746e22e5f99cd3be0843c38ae7"
+  },
+  {
+    "file": "comparison-perimeter.png",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/perimeter.png",
+    "sourceAfter": "after/perimeter.png",
+    "size": [1200, 1252],
+    "bytes": 527207,
+    "sha256": "04ed194b81c8809526089caac5b151e716553eed22ef8dc5d05d9ae21cf9ec32"
+  },
+  {
+    "file": "comparison-near.png",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/near.png",
+    "sourceAfter": "after/near.png",
+    "size": [1200, 1252],
+    "bytes": 325573,
+    "sha256": "2afe495339aff2e2737796df9b63ed9c745e92394baf223ad520248e68633e3a"
+  },
+  {
+    "file": "comparison-far.png",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/far.png",
+    "sourceAfter": "after/far.png",
+    "size": [1200, 1252],
+    "bytes": 235612,
+    "sha256": "5399f19a7ff922563da9f5744a91c2ec24d881974a7ebe2cad4bdc526ec04935"
+  },
+  {
+    "file": "entry-1366.png",
+    "kind": "final-capture",
+    "source": "after/entry-1366.png",
+    "size": [1366, 768],
+    "bytes": 206736,
+    "sha256": "0f1cb0148793c39235807e885491ed45cb2fa9aa35fa63b2a997712be6adc06c"
+  },
+  {
+    "file": "entry-390.png",
+    "kind": "final-capture",
+    "source": "after/entry-390.png",
+    "size": [390, 844],
+    "bytes": 100049,
+    "sha256": "6b6568278ebcdd95242a41618ea2686e84396669781ba289406ea02043608d65"
+  },
+  {
+    "file": "mobile-fullscreen.png",
+    "kind": "final-capture",
+    "source": "after/mobile-fullscreen.png",
+    "size": [844, 390],
+    "bytes": 80455,
+    "sha256": "44e9be9c31cae2e9a31e9e4f401f9eb83b1de3033477957cb6eecaccb83a9862"
+  },
+  {
+    "file": "actual-minimum.png",
+    "kind": "final-capture",
+    "source": "after/actual-minimum.png",
+    "size": [1200, 600],
+    "bytes": 134299,
+    "sha256": "4df2aa3b07550261bd83b2e0d8b0b06c10b11691dfcc4799ee59c0e2c34679f9"
+  },
+  {
+    "file": "actual-maximum.png",
+    "kind": "final-capture",
+    "source": "after/actual-maximum.png",
+    "size": [1200, 600],
+    "bytes": 162972,
+    "sha256": "19573f046c0caa0ee3aef2f34f7e5fdfecd4a65d44403aa73cfc82945a31914f"
+  },
+  {
+    "file": "preparation-selection-handoff.png",
+    "kind": "final-capture",
+    "source": "after/preparation-selection-handoff.png",
+    "size": [1366, 768],
+    "bytes": 271032,
+    "sha256": "f2932a1fe3fbd2301e41ab06cebe613567fa767da99aca50fa3cdb9764058beb"
+  },
+  {
+    "file": "hardware-fullscreen.png",
+    "kind": "final-capture",
+    "source": "after-hardware/hardware-fullscreen.png",
+    "size": [1366, 768],
+    "bytes": 186855,
+    "sha256": "d677d1da1916af2d818649075cafc2e3cbec5f3f47f93d7610cfa03137c9afb3"
+  },
+  {
+    "file": "hardware-final.png",
+    "kind": "final-capture",
+    "source": "after-hardware/hardware-final.png",
+    "size": [1366, 768],
+    "bytes": 187445,
+    "sha256": "12fbe60c50fd9e167e70fe455bc5e56b6e2f598a5bd74feef9178fcbb0a7b6a5"
+  },
+  {
+    "file": "daylight-horizon-allowed.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-horizon-allowed.png",
+    "size": [1200, 600],
+    "bytes": 118172,
+    "sha256": "e0ae251e84ed43519c48d7846528d3af063ec4a0b25efe8c28adfa15b0465e39"
+  },
+  {
+    "file": "daylight-max-inclination-gesture.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-max-inclination-gesture.png",
+    "size": [1200, 600],
+    "bytes": 118172,
+    "sha256": "e0ae251e84ed43519c48d7846528d3af063ec4a0b25efe8c28adfa15b0465e39"
+  },
+  {
+    "file": "daylight-roof-P1-a.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-roof-P1-a.png",
+    "size": [1200, 600],
+    "bytes": 446128,
+    "sha256": "863cc97fdc1a77da9511f11214b7224ae97d6108b33d2d114b3f6a9fb8288f30"
+  },
+  {
+    "file": "daylight-roof-P1-b.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-roof-P1-b.png",
+    "size": [1200, 600],
+    "bytes": 368425,
+    "sha256": "d305707a9b1031d434b49a3db9fe1a639b2bd05f9f33422641b8e2507f4f48b4"
+  },
+  {
+    "file": "daylight-roof-P8-a.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-roof-P8-a.png",
+    "size": [1200, 600],
+    "bytes": 348343,
+    "sha256": "131cb06abddbbb962893a09ea22fdead03dcb6b632cae9260983e70914254fc7"
+  },
+  {
+    "file": "daylight-roof-P8-b.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-roof-P8-b.png",
+    "size": [1200, 600],
+    "bytes": 435255,
+    "sha256": "4e72078217f5bccede6eeb01efa3c089cdb916f77cd55953640c32d57f2bf9f5"
+  },
+  {
+    "file": "daylight-profile-light.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-profile-light.png",
+    "size": [1200, 600],
+    "bytes": 169207,
+    "sha256": "fd2c796fcffacdd956736a391113b8dfc3f0c557a59ebf2252f17bbccb3bfd45"
+  },
+  {
+    "file": "daylight-profile-balanced.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-profile-balanced.png",
+    "size": [1200, 600],
+    "bytes": 168310,
+    "sha256": "785eb1a0734ab238dae6556d9b0bbc40700d5cad338a52580e0279cb098b2be8"
+  },
+  {
+    "file": "daylight-profile-detailed.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-profile-detailed.png",
+    "size": [1200, 600],
+    "bytes": 168308,
+    "sha256": "d7189de3e9d23d91cd696631babbe1cd85d7a7fe8a9513fec7a2fa733fb12647"
+  },
+  {
+    "file": "daylight-sky-failure.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-sky-failure.png",
+    "size": [1200, 600],
+    "bytes": 162896,
+    "sha256": "4809dc90b37d792d258d486ecd7bb927dc53bb32c588fc22cb801475d5e8a191"
+  },
+  {
+    "file": "daylight-environment-failure.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-environment-failure.png",
+    "size": [1200, 600],
+    "bytes": 162280,
+    "sha256": "39e1e6bf04dae4b4de4fbef063e395a384d55609934c78b293c47f76477d013e"
+  },
+  {
+    "file": "daylight-all-maps-off.png",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-all-maps-off.png",
+    "size": [1200, 600],
+    "bytes": 53871,
+    "sha256": "12df2f35684da84c0e0fae8be6b193505d821ea1691019336d3a4bc415e7c023"
+  }
+]

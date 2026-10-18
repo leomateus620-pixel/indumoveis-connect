@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { createDaylightPixels, DAYLIGHT } from "./daylight";
 
 export interface ReflectionEnvironment {
   target: THREE.WebGLRenderTarget;
@@ -9,8 +10,8 @@ export interface ReflectionEnvironment {
   dispose(): void;
 }
 
-const SOURCE_WIDTH = 256;
-const SOURCE_HEIGHT = 128;
+const SOURCE_WIDTH = DAYLIGHT.environment.width;
+const SOURCE_HEIGHT = DAYLIGHT.environment.height;
 
 function ownFilteredEnvironment(
   target: THREE.WebGLRenderTarget,
@@ -30,40 +31,6 @@ function ownFilteredEnvironment(
       target.dispose();
     },
   };
-}
-
-/** A quiet local sky/ground with two broad light bands. No city, remote HDR,
- * specular sun point or texture dependency can gate the first useful frame. */
-function environmentPixels() {
-  const pixels = new Uint8Array(SOURCE_WIDTH * SOURCE_HEIGHT * 4);
-  const sky = [218, 231, 239];
-  const horizon = [224, 224, 211];
-  const ground = [144, 157, 143];
-  for (let y = 0; y < SOURCE_HEIGHT; y++) {
-    // DataTexture flipY=false: v=0 is the south pole in equirectUv(), so the
-    // upper/sky hemisphere belongs to the last rows of this typed array.
-    const elevation = -Math.cos(((y + 0.5) / SOURCE_HEIGHT) * Math.PI);
-    const skyMix = THREE.MathUtils.smoothstep(elevation, -0.12, 0.45);
-    const horizonMix = Math.exp(-(elevation * elevation) / 0.075);
-    for (let x = 0; x < SOURCE_WIDTH; x++) {
-      const azimuth = ((x + 0.5) / SOURCE_WIDTH) * Math.PI * 2;
-      const distance = (centre: number) =>
-        Math.atan2(Math.sin(azimuth - centre), Math.cos(azimuth - centre));
-      const upper = THREE.MathUtils.smoothstep(elevation, -0.05, 0.35);
-      const broadLight =
-        (Math.exp(-(distance(0.7) ** 2) / 0.3) * 0.38 +
-          Math.exp(-(distance(3.6) ** 2) / 0.55) * 0.23) *
-        upper;
-      const offset = (y * SOURCE_WIDTH + x) * 4;
-      for (let channel = 0; channel < 3; channel++) {
-        const base = ground[channel] + (sky[channel] - ground[channel]) * skyMix;
-        const ambient = base + (horizon[channel] - base) * horizonMix * 0.5;
-        pixels[offset + channel] = Math.round(ambient + (255 - ambient) * broadLight);
-      }
-      pixels[offset + 3] = 255;
-    }
-  }
-  return pixels;
 }
 
 /** One synchronous, deferred preparation with explicit ownership even if GPU
@@ -109,7 +76,7 @@ export function createReflectionEnvironment(
   };
   try {
     source = new THREE.DataTexture(
-      environmentPixels(),
+      createDaylightPixels(SOURCE_WIDTH, SOURCE_HEIGHT),
       SOURCE_WIDTH,
       SOURCE_HEIGHT,
       THREE.RGBAFormat,
@@ -148,7 +115,8 @@ export function createReflectionEnvironment(
   }
   if (failure || !output) throw failure ?? new Error("Reflection environment was not prepared");
   // RGBA16F, no depth/stencil, samples=0 and no ordinary mip chain in Three's
-  // equirectangular path. 256px source gives cubeSize64 / atlas336×256 in r186.
+  // equirectangular path. The shared 512px daylight source gives cubeSize128;
+  // count the actual atlas returned by this installed Three revision.
   const textureBytes = output.width * output.height * 8;
   const peakTextureBytes =
     SOURCE_WIDTH * SOURCE_HEIGHT * 4 +

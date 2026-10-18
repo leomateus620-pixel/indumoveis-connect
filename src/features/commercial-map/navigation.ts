@@ -1,5 +1,242 @@
 import type { MapInsets, MapView } from "./types";
 import { MOTION } from "./motion";
+import { pointInPolygon, polygonBounds, type Bounds } from "./geometry";
+import type { Point } from "./data/territory";
+
+/** All distances use the authored drawing units (10 PDF points), never metres.
+ * Camera/target constraints are independent of the much larger ambient ground. */
+export const NAVIGATION = {
+  fovDegrees: 38,
+  minPolarAngle: 0.003,
+  maxPolarAngle: Math.PI * 0.44,
+  // The useful close inspection remains the approved 25.2° elevation. Lower
+  // views can reveal the sky, while per-pose roof clearance moves them outward.
+  inspectionPolarAngle: Math.PI * 0.36,
+  maximumFitMultiplier: 1.35,
+  minimumSelectableSpans: 1.4,
+  roofClearanceSpans: 0.12,
+  targetMarginFraction: 0.08,
+  commercialWitnessNdc: 0.4,
+  terrainSafetyFraction: 0.06,
+  horizonFadeStartDistances: 1.4,
+  horizonFadeEndDistances: 3,
+} as const;
+
+export type NavigationPose = {
+  position: readonly [number, number, number];
+  target: readonly [number, number, number];
+};
+
+export type NavigationEnvelope = {
+  minDistance: number;
+  maxDistance: number;
+  fitDistance: number;
+  minPolarAngle: number;
+  maxPolarAngle: number;
+  cameraClearance: number;
+  targetBounds: Bounds;
+  terrainBounds: Bounds;
+  groundReach: number;
+  farPlane: number;
+  horizonFade: { center: Point; start: number; end: number };
+  groundTangent: number;
+  protectedRegions: readonly { polygon: readonly Point[]; bounds: Bounds }[];
+};
+
+/** Smallest short side of a real selectable polygon, not its declared m² area. */
+export function smallestSelectableSpan(
+  polygons: readonly (readonly (readonly [number, number])[])[],
+) {
+  let smallest = Infinity;
+  for (const polygon of polygons) {
+    if (!polygon.length) continue;
+    const xs = polygon.map(([x]) => x),
+      ys = polygon.map(([, y]) => y);
+    const span = Math.min(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    if (span > 0) smallest = Math.min(smallest, span);
+  }
+  if (!Number.isFinite(smallest)) throw new Error("Navigation requires selectable geometry");
+  return smallest;
+}
+
+/** Recompute only for viewport/inset changes. Fits commercial geometry and tall
+ * volumes; neither the ambient ground nor any optional texture affects zoom. */
+export function createNavigationEnvelope({
+  bounds,
+  smallestSelectableSpan: smallestSpan,
+  maxStructureHeight,
+  width,
+  height,
+  insets,
+  protectedPolygons = [],
+  fov = NAVIGATION.fovDegrees,
+}: {
+  bounds: Bounds;
+  smallestSelectableSpan: number;
+  maxStructureHeight: number;
+  width: number;
+  height: number;
+  insets: MapInsets;
+  protectedPolygons?: readonly (readonly Point[])[];
+  fov?: number;
+}): NavigationEnvelope {
+  const box = {
+    width: bounds.maxX - bounds.minX,
+    depth: bounds.maxY - bounds.minY,
+    height: maxStructureHeight,
+  };
+  const diagonal = Math.hypot(box.width, box.depth);
+  const halfFov = (fov * Math.PI) / 360;
+  const maxPolarAngle = NAVIGATION.maxPolarAngle;
+  // The short side of the smallest lot determines useful inspection detail.
+  // Lower inclinations apply a second per-pose radius floor below, retaining
+  // this close range for the ordinary overhead and oblique inspection views.
+  const cameraClearance = maxStructureHeight + smallestSpan * NAVIGATION.roofClearanceSpans;
+  const minDistance = Math.max(
+    smallestSpan * NAVIGATION.minimumSelectableSpans,
+    cameraClearance / Math.cos(NAVIGATION.inspectionPolarAngle),
+  );
+  const fitDistance = Math.max(
+    ...(["perspective", "top", "front"] as const).map((view) =>
+      framingBoxDistance(box, width, height, insets, view, fov),
+    ),
+  );
+  const maxDistance = Math.max(
+    cameraClearance / Math.cos(maxPolarAngle),
+    fitDistance * NAVIGATION.maximumFitMultiplier,
+  );
+  const margin = Math.min(box.width, box.depth) * NAVIGATION.targetMarginFraction;
+  const targetBounds = {
+    minX: bounds.minX - margin,
+    minY: bounds.minY - margin,
+    maxX: bounds.maxX + margin,
+    maxY: bounds.maxY + margin,
+  };
+  const tanVertical = Math.tan(halfFov);
+  const tanHorizontal = (tanVertical * Math.max(1, width)) / Math.max(1, height);
+  const horizonFade = {
+    center: [(bounds.minX + bounds.maxX) / 2, (bounds.minY + bounds.maxY) / 2] as Point,
+    start: maxDistance * NAVIGATION.horizonFadeStartDistances + diagonal,
+    end: maxDistance * NAVIGATION.horizonFadeEndDistances + diagonal * 2,
+  };
+  const farPlane = Math.max(diagonal * 8, horizonFade.end + maxDistance * 2);
+  // At the lowest view some rays cross the horizon; their mathematical ground
+  // intersection is unbounded. Bound the actually rendered far-clip frustum
+  // instead: its longest corner ray plus every possible camera/target offset.
+  // The world-anchored distant material reaches the sky's horizon colour well
+  // before this clip, preserving a continuous horizon without a giant board.
+  const groundReach = maxDistance + farPlane * Math.hypot(1, tanVertical, tanHorizontal);
+  const reach = groundReach * (1 + NAVIGATION.terrainSafetyFraction) + diagonal * 0.1;
+  const terrainBounds = {
+    minX: targetBounds.minX - reach,
+    minY: targetBounds.minY - reach,
+    maxX: targetBounds.maxX + reach,
+    maxY: targetBounds.maxY + reach,
+  };
+  return {
+    minDistance,
+    maxDistance,
+    fitDistance,
+    minPolarAngle: NAVIGATION.minPolarAngle,
+    maxPolarAngle,
+    cameraClearance,
+    targetBounds,
+    terrainBounds,
+    groundReach,
+    farPlane,
+    horizonFade,
+    groundTangent: Math.min(tanHorizontal, tanVertical),
+    protectedRegions: protectedPolygons.map((polygon) => ({
+      polygon,
+      bounds: polygonBounds(polygon),
+    })),
+  };
+}
+
+/** Use the same roof-safe floor before wheel/pinch anchor scaling and in the
+ * controls, so an already blocked zoom cannot continue drifting its target. */
+export function minimumNavigationDistance(envelope: NavigationEnvelope, polar: number) {
+  const boundedPolar = Math.max(envelope.minPolarAngle, Math.min(envelope.maxPolarAngle, polar));
+  return Math.max(envelope.minDistance, envelope.cameraClearance / Math.cos(boundedPolar));
+}
+
+/** Shared by manual gestures, commands, restore/resize, and each animation
+ * sample. A blocked pan component translates both target and camera equally,
+ * keeping the valid tangent motion, orbit angle and distance intact. */
+export function constrainNavigationPose(
+  pose: NavigationPose,
+  envelope: NavigationEnvelope,
+): NavigationPose {
+  const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+  const delta = pose.position.map((value, axis) => value - pose.target[axis]);
+  const originalDistance = Math.hypot(...delta);
+  const polar = clamp(
+    originalDistance ? Math.acos(clamp(delta[1] / originalDistance, -1, 1)) : 0,
+    envelope.minPolarAngle,
+    envelope.maxPolarAngle,
+  );
+  const distance = clamp(
+    originalDistance,
+    minimumNavigationDistance(envelope, polar),
+    envelope.maxDistance,
+  );
+  const azimuth = Math.atan2(delta[0], delta[2]);
+  const target: [number, number, number] = [
+    clamp(pose.target[0], envelope.targetBounds.minX, envelope.targetBounds.maxX),
+    0,
+    clamp(pose.target[2], envelope.targetBounds.minY, envelope.targetBounds.maxY),
+  ];
+  // A target box alone permits a close camera to show only a concave corner's
+  // ambient ground. Keep one real commercial surface within the central 40%
+  // of screen width/height. The conservative perspective bound also accounts
+  // for the ground witness being closer to the camera than the orbit target.
+  const point: Point = [target[0], target[2]];
+  let nearest: Point | undefined,
+    nearestDistanceSq = Infinity;
+  for (const region of envelope.protectedRegions) {
+    const { bounds, polygon } = region;
+    const boxDistanceSq =
+      Math.max(bounds.minX - point[0], 0, point[0] - bounds.maxX) ** 2 +
+      Math.max(bounds.minY - point[1], 0, point[1] - bounds.maxY) ** 2;
+    if (boxDistanceSq > nearestDistanceSq) continue;
+    if (!boxDistanceSq && pointInPolygon(point, polygon)) {
+      nearestDistanceSq = 0;
+      break;
+    }
+    for (let edge = 0; edge < polygon.length; edge++) {
+      const a = polygon[edge],
+        b = polygon[(edge + 1) % polygon.length];
+      const dx = b[0] - a[0],
+        dy = b[1] - a[1],
+        lengthSq = dx * dx + dy * dy;
+      const t = lengthSq
+        ? clamp(((point[0] - a[0]) * dx + (point[1] - a[1]) * dy) / lengthSq, 0, 1)
+        : 0;
+      const x = a[0] + dx * t,
+        y = a[1] + dy * t;
+      const distanceSq = (point[0] - x) ** 2 + (point[1] - y) ** 2;
+      if (distanceSq < nearestDistanceSq) {
+        nearestDistanceSq = distanceSq;
+        nearest = [x, y];
+      }
+    }
+  }
+  const tangent = envelope.groundTangent * NAVIGATION.commercialWitnessNdc;
+  const allowedMargin = (distance * tangent) / (1 + tangent);
+  if (nearest && nearestDistanceSq > allowedMargin ** 2) {
+    const ratio = allowedMargin / Math.sqrt(nearestDistanceSq);
+    target[0] = nearest[0] + (point[0] - nearest[0]) * ratio;
+    target[2] = nearest[1] + (point[1] - nearest[1]) * ratio;
+  }
+  return {
+    target,
+    position: [
+      target[0] + distance * Math.sin(polar) * Math.sin(azimuth),
+      target[1] + distance * Math.cos(polar),
+      target[2] + distance * Math.sin(polar) * Math.cos(azimuth),
+    ],
+  };
+}
 
 /** Sheet x increases right and sheet y increases down; world is (x, 0, y).
  * No north bearing is implied. These are local presentation coordinates. */

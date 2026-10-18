@@ -1,0 +1,21 @@
+{
+  "baselineCommit": "0936587",
+  "territoryUnchanged": true,
+  "territorySHA256": "db70a5cb1362b3cfdeadfea02bfc2b8f54c497ad9c36216907174226886eaa11",
+  "rendererBundles": [
+    {
+      "build": "main",
+      "file": "MapRenderer-Bz_72W-H.js",
+      "bytes": 622024,
+      "gzipBytes": 160646,
+      "sha256": "47fc62ba50366008d7cb24f06fbf3facbdf20a0819281026f6282239d2c85e36"
+    },
+    {
+      "build": "final",
+      "file": "MapRenderer-FjKZ31fU.js",
+      "bytes": 640721,
+      "gzipBytes": 166774,
+      "sha256": "788eb6b05f665d3aa3415395ef87369b9dc852582f04dcbdababd425eb08836b"
+    }
+  ]
+}
