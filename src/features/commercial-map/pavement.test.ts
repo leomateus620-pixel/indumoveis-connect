@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ENTITIES, type MapEntity, type Point } from "./data/territory";
-import { pointInPolygon, signedPolygonArea } from "./geometry";
+import { pointInPolygon, polygonBounds, signedPolygonArea } from "./geometry";
+import { createSurfaceMaterials } from "./surfaceMaterials";
 import {
   createPavement,
   derivePavement,
@@ -145,5 +146,58 @@ describe("derived park pavement", () => {
       expect(mesh.userData.entityId).toBeUndefined();
     }
     for (const resource of pavement.resources) resource.dispose();
+  });
+
+  it("opens only selected source south paint seams while preserving north paint, source topology and all pavement", () => {
+    const surfaces = createSurfaceMaterials({ maps: false });
+    const ids = new Set(["indumoveis:road:benvenuto", "indumoveis:road:imigrantes"]);
+    const before = JSON.stringify(ENTITIES);
+    const original = createPavement(ENTITIES, surfaces),
+      explicitDefault = createPavement(ENTITIES, surfaces, {});
+    const open = createPavement(ENTITIES, surfaces, { openSouthEdgesOf: ids });
+    const attributes = (model: typeof original, mesh: number) =>
+      (model.group.children[mesh] as import("three").Mesh).geometry.getAttribute("position");
+    expect(open.topology).toEqual(original.topology);
+    for (const mesh of [0, 1])
+      expect(Array.from(attributes(open, mesh).array)).toEqual(
+        Array.from(attributes(original, mesh).array),
+      );
+    expect(Array.from(attributes(explicitDefault, 2).array)).toEqual(
+      Array.from(attributes(original, 2).array),
+    );
+    const hasPaint = (model: typeof original, point: Point) => {
+      const positions = attributes(model, 2);
+      for (let i = 0; i < positions.count; i += 3) {
+        const triangle: Point[] = [0, 1, 2].map((j) => [
+          positions.getX(i + j),
+          positions.getZ(i + j),
+        ]);
+        if (pointInPolygon(point, triangle)) return true;
+      }
+      return false;
+    };
+    let omitted = 0;
+    for (const edge of original.topology.lateralEdges) {
+      const road = ENTITIES.find((entity) => entity.id === edge.sourceId)!,
+        south = polygonBounds(road.polygon).maxY;
+      const suppressed =
+        ids.has(edge.sourceId) &&
+        Math.abs(edge.a[1] - south) < 1e-7 &&
+        Math.abs(edge.b[1] - south) < 1e-7;
+      const point: Point = [
+        (edge.a[0] + edge.b[0]) / 2 + (edge.inward[0] * edge.width) / 2,
+        (edge.a[1] + edge.b[1]) / 2 + (edge.inward[1] * edge.width) / 2,
+      ];
+      expect(hasPaint(original, point)).toBe(true);
+      expect(hasPaint(open, point)).toBe(!suppressed);
+      if (suppressed) omitted++;
+    }
+    expect(omitted).toBeGreaterThan(1);
+    expect(attributes(open, 2).count).toBe(attributes(original, 2).count - omitted * 6);
+    expect(open.group.children).toHaveLength(3);
+    expect(JSON.stringify(ENTITIES)).toBe(before);
+    for (const model of [original, explicitDefault, open])
+      for (const resource of model.resources) resource.dispose();
+    surfaces.dispose();
   });
 });

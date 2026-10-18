@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { ENTITIES, MAP_BOUNDS } from "./data/territory";
+import { ENTITIES, MAP_BOUNDS, type Point } from "./data/territory";
 import { architectureVisualHeight } from "./architecture";
 import {
   createNavigationEnvelope,
   constrainNavigationPose,
   framingDistance,
   framingBoxDistance,
+  framingPointsDistance,
   readableLabelSize,
   shouldUseLightFallback,
   initialQuality,
@@ -85,7 +86,11 @@ const selectableSpan = smallestSelectableSpan(
   ),
 );
 const highestRoof = Math.max(...ENTITIES.map(architectureVisualHeight));
-const envelopeFor = (width: number, height: number) =>
+const envelopeFor = (
+  width: number,
+  height: number,
+  explorationPolygons?: readonly (readonly Point[])[],
+) =>
   createNavigationEnvelope({
     bounds: MAP_BOUNDS,
     smallestSelectableSpan: selectableSpan,
@@ -94,6 +99,7 @@ const envelopeFor = (width: number, height: number) =>
     height,
     insets: { right: 0, bottom: 0 },
     protectedPolygons: ENTITIES.map((entity) => entity.polygon),
+    explorationPolygons,
   });
 
 describe("commercial navigation envelope", () => {
@@ -164,12 +170,14 @@ describe("commercial navigation envelope", () => {
     let visibleGroundRays = 0,
       skyRays = 0,
       atmosphericRays = 0;
-    for (const [width, height] of [
-      [1440, 800],
-      [390, 844],
-      [2560, 700],
-    ]) {
-      const envelope = envelopeFor(width, height);
+    for (const [width, height, context] of [
+      [1440, 800, undefined],
+      [390, 844, undefined],
+      [2560, 700, undefined],
+      [390, 844, explorationPolygons],
+      [2560, 700, explorationPolygons],
+    ] as const) {
+      const envelope = envelopeFor(width, height, context);
       const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, envelope.farPlane);
       for (const tx of [envelope.targetBounds.minX, envelope.targetBounds.maxX])
         for (const tz of [envelope.targetBounds.minY, envelope.targetBounds.maxY])
@@ -257,7 +265,7 @@ describe("commercial navigation envelope", () => {
   it("blocks only forbidden pan components and keeps orbit offset stable", () => {
     const envelope = envelopeFor(1440, 800);
     // No silhouette clamp is needed for this independent box-wall invariant.
-    const boxEnvelope = { ...envelope, protectedRegions: [] };
+    const boxEnvelope = { ...envelope, navigationRegions: [] };
     const target: [number, number, number] = [envelope.targetBounds.maxX + 50, 0, 60];
     const offset = new THREE.Vector3(0, 50, 30);
     const position = offset
@@ -346,5 +354,296 @@ describe("commercial navigation envelope", () => {
       ).toBeLessThan(1e-8);
     }
     expect(JSON.stringify(ENTITIES)).toBe(before);
+  });
+});
+
+// Finite reference landmarks outside the commercial plant. These synthetic
+// shapes exercise separated context navigation without importing urban meshes
+// or extending the source commercial registry/picking/terrain-protection set.
+const sourceWidth = MAP_BOUNDS.maxX - MAP_BOUNDS.minX;
+const sourceDepth = MAP_BOUNDS.maxY - MAP_BOUNDS.minY;
+const westernLandmark: Point = [MAP_BOUNDS.minX - sourceWidth * 0.4, MAP_BOUNDS.maxY];
+const explorationPolygons: Point[][] = [
+  [
+    [westernLandmark[0] - 6, westernLandmark[1] - 6],
+    [westernLandmark[0] + 6, westernLandmark[1] - 6],
+    [westernLandmark[0] + 6, westernLandmark[1] + 6],
+    [westernLandmark[0] - 6, westernLandmark[1] + 6],
+  ],
+  [
+    [westernLandmark[0], MAP_BOUNDS.maxY - 2],
+    [MAP_BOUNDS.minX + 4, MAP_BOUNDS.maxY - 2],
+    [MAP_BOUNDS.minX + 4, MAP_BOUNDS.maxY + 2],
+    [westernLandmark[0], MAP_BOUNDS.maxY + 2],
+  ],
+  [
+    [MAP_BOUNDS.maxX, MAP_BOUNDS.maxY + sourceDepth * 0.6],
+    [MAP_BOUNDS.maxX + sourceWidth * 0.15, MAP_BOUNDS.maxY + sourceDepth * 0.6],
+    [MAP_BOUNDS.maxX + sourceWidth * 0.15, MAP_BOUNDS.maxY + sourceDepth],
+    [MAP_BOUNDS.maxX, MAP_BOUNDS.maxY + sourceDepth],
+  ],
+];
+
+describe("explicit context navigation", () => {
+  it("preserves all former limits without context, including an explicit empty option", () => {
+    for (const [width, height] of [
+      [1440, 800],
+      [390, 844],
+    ]) {
+      const original = envelopeFor(width, height);
+      expect(envelopeFor(width, height, [])).toEqual(original);
+      expect(original.commercialBounds).toEqual(MAP_BOUNDS);
+      expect(original.viewBounds).toEqual(MAP_BOUNDS);
+      expect(original.navigationRegions).toEqual(original.protectedRegions);
+      // Malformed optional context cannot make a finite camera unbounded.
+      expect(
+        envelopeFor(width, height, [
+          [],
+          [
+            [Infinity, 0],
+            [0, 0],
+            [0, 1],
+          ],
+        ]),
+      ).toEqual(original);
+    }
+  });
+
+  it("fits all actual commercial and context vertices in every preset, including portrait", () => {
+    for (const [width, height] of [
+      [1440, 800],
+      [390, 844],
+      [844, 390],
+    ]) {
+      const commercial = envelopeFor(width, height);
+      const envelope = envelopeFor(width, height, explorationPolygons);
+      expect(envelope.minDistance).toBe(commercial.minDistance);
+      expect(envelope.cameraClearance).toBe(commercial.cameraClearance);
+      expect(envelope.fitDistance).toBeGreaterThan(commercial.fitDistance);
+      expect(envelope.maxDistance).toBeGreaterThan(commercial.maxDistance);
+      expect(envelope.commercialBounds).toEqual(MAP_BOUNDS);
+      const center = new THREE.Vector3(envelope.viewCenter[0], 0, envelope.viewCenter[1]);
+      for (const view of ["top", "front", "perspective"] as const) {
+        const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, envelope.farPlane);
+        camera.position
+          .fromArray(viewDirection(view))
+          .normalize()
+          .multiplyScalar(envelope.fitDistance)
+          .add(center);
+        camera.lookAt(center);
+        camera.updateMatrixWorld();
+        for (const { polygon } of envelope.navigationRegions)
+          for (const [x, z] of polygon)
+            for (const y of [0, highestRoof]) {
+              const projected = new THREE.Vector3(x, y, z).project(camera);
+              expect(Math.abs(projected.x)).toBeLessThan(1);
+              expect(Math.abs(projected.y)).toBeLessThan(1);
+              expect(projected.z).toBeLessThan(1);
+            }
+      }
+    }
+  });
+
+  it("allows close inspection before the park without allowing empty-corner pan", () => {
+    for (const [width, height] of [
+      [1440, 800],
+      [390, 844],
+    ]) {
+      const envelope = envelopeFor(width, height, explorationPolygons);
+      const close = constrainNavigationPose(
+        {
+          target: [westernLandmark[0], 0, westernLandmark[1]],
+          position: [westernLandmark[0], envelope.minDistance, westernLandmark[1] + 0.01],
+        },
+        envelope,
+      );
+      expect(close.target[0]).toBe(westernLandmark[0]);
+      expect(close.target[2]).toBe(westernLandmark[1]);
+      expect(close.target[0]).toBeLessThan(MAP_BOUNDS.minX);
+      for (const distance of [envelope.minDistance, envelope.maxDistance]) {
+        const emptyCorner = [envelope.targetBounds.minX - 500, 0, envelope.targetBounds.maxY + 500];
+        const corrected = constrainNavigationPose(
+          {
+            target: emptyCorner as [number, number, number],
+            position: [emptyCorner[0], distance, emptyCorner[2] + 0.01],
+          },
+          envelope,
+        );
+        const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, envelope.farPlane);
+        camera.position.fromArray(corrected.position);
+        camera.lookAt(new THREE.Vector3(...corrected.target));
+        camera.updateMatrixWorld();
+        let nearestScreenPoint = Infinity;
+        for (const polygon of [...ENTITIES.map((entity) => entity.polygon), ...explorationPolygons])
+          for (let edge = 0; edge < polygon.length; edge++) {
+            const a = polygon[edge],
+              b = polygon[(edge + 1) % polygon.length];
+            for (let step = 0; step <= 80; step++) {
+              const projected = new THREE.Vector3(
+                a[0] + ((b[0] - a[0]) * step) / 80,
+                0,
+                a[1] + ((b[1] - a[1]) * step) / 80,
+              ).project(camera);
+              if (projected.z < 1)
+                nearestScreenPoint = Math.min(
+                  nearestScreenPoint,
+                  Math.max(Math.abs(projected.x), Math.abs(projected.y)),
+                );
+            }
+          }
+        expect(nearestScreenPoint).toBeLessThan(0.5);
+        expect(corrected.position[1]).toBeGreaterThan(highestRoof);
+        const repeated = constrainNavigationPose(corrected, envelope);
+        expect(new THREE.Vector3(...repeated.position).distanceTo(camera.position)).toBeLessThan(
+          1e-8,
+        );
+      }
+    }
+  });
+
+  it("keeps context separate from commercial protection and never changes source or optional polygons", () => {
+    const sourceBefore = JSON.stringify({ bounds: MAP_BOUNDS, entities: ENTITIES });
+    const contextBefore = JSON.stringify(explorationPolygons);
+    const original = envelopeFor(390, 844);
+    const envelope = envelopeFor(390, 844, explorationPolygons);
+    expect(envelope.protectedRegions).toEqual(original.protectedRegions);
+    expect(envelope.navigationRegions.length).toBe(ENTITIES.length + explorationPolygons.length);
+    expect(
+      envelope.protectedRegions.some((region) => region.polygon === explorationPolygons[0]),
+    ).toBe(false);
+    for (const target of [westernLandmark, envelope.viewCenter])
+      for (let step = 0; step <= 20; step++) {
+        const pose = constrainNavigationPose(
+          {
+            target: [target[0] - step * 30, -100, target[1] + step * 30],
+            position: [target[0] + step * 50, -100, target[1] - step * 50],
+          },
+          envelope,
+        );
+        const distance = new THREE.Vector3(...pose.position).distanceTo(
+          new THREE.Vector3(...pose.target),
+        );
+        expect(distance).toBeLessThanOrEqual(envelope.maxDistance + 1e-8);
+        expect(pose.position[1]).toBeGreaterThan(highestRoof);
+      }
+    expect(JSON.stringify({ bounds: MAP_BOUNDS, entities: ENTITIES })).toBe(sourceBefore);
+    expect(JSON.stringify(explorationPolygons)).toBe(contextBefore);
+    expect(envelope.terrainBounds.minX).toBeLessThan(
+      envelope.viewBounds.minX - envelope.groundReach,
+    );
+    expect(envelope.terrainBounds.maxY).toBeGreaterThan(
+      envelope.viewBounds.maxY + envelope.groundReach,
+    );
+  });
+});
+
+describe("world-vertex overview framing", () => {
+  const center: Point = [34, -21];
+  const footprint: Point[] = [
+    [-100, -85],
+    [100, -85],
+    [100, 85],
+    [60, 85],
+    [60, -45],
+    [-100, -45],
+  ];
+  const points = footprint.flatMap(([x, z]): [number, number, number][] => [
+    [x + center[0], 0, z + center[1]],
+    [x + center[0], 6, z + center[1]],
+  ]);
+
+  it("fits the actual L without reserving room for its empty bounding-box corner", () => {
+    const insets = { right: 0, bottom: 0 };
+    const distance = framingPointsDistance(points, center, 1440, 800, insets, "perspective");
+    const boxDistance = framingBoxDistance(
+      { width: 200, depth: 170, height: 6 },
+      1440,
+      800,
+      insets,
+      "perspective",
+    );
+    expect(distance).toBeLessThan(boxDistance * 0.95);
+    const camera = new THREE.PerspectiveCamera(38, 1440 / 800, 0.1, 2000);
+    camera.position
+      .fromArray(viewDirection("perspective"))
+      .normalize()
+      .multiplyScalar(distance)
+      .add(new THREE.Vector3(center[0], 0, center[1]));
+    camera.lookAt(center[0], 0, center[1]);
+    camera.updateMatrixWorld();
+    for (const point of points) {
+      const projected = new THREE.Vector3(...point).project(camera);
+      expect(Math.abs(projected.x)).toBeLessThan(1);
+      expect(Math.abs(projected.y)).toBeLessThan(1);
+      expect(projected.z).toBeLessThan(1);
+    }
+  });
+
+  it("keeps all real points inside the free aperture on portrait, ultrawide and a live orbit direction", () => {
+    for (const [width, height, insets] of [
+      [390, 844, { right: 0, bottom: 180 }],
+      [2560, 700, { right: 420, bottom: 0 }],
+      [1440, 800, { right: 360, bottom: 200 }],
+    ] as const)
+      for (const view of ["top", "front", "perspective"] as const)
+        for (const direction of [undefined, [-0.8, 0.46, -0.3] as const]) {
+          const distance = framingPointsDistance(
+            points,
+            center,
+            width,
+            height,
+            insets,
+            view,
+            38,
+            direction,
+          );
+          const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 5000);
+          camera.position
+            .fromArray(direction ?? viewDirection(view))
+            .normalize()
+            .multiplyScalar(distance)
+            .add(new THREE.Vector3(center[0], 0, center[1]));
+          camera.lookAt(center[0], 0, center[1]);
+          camera.updateMatrixWorld();
+          for (const point of points) {
+            const projected = new THREE.Vector3(...point).project(camera);
+            expect(Math.abs(projected.x)).toBeLessThan((width - insets.right) / width);
+            expect(Math.abs(projected.y)).toBeLessThan((height - insets.bottom) / height);
+            expect(projected.z).toBeLessThan(1);
+          }
+        }
+  });
+
+  it("includes roof height, is translation-invariant and leaves the source vertices unchanged", () => {
+    const roofPoints: [number, number, number][] = [
+      [0, 0, 0],
+      [1, 60, 1],
+      [-1, 0, -1],
+    ];
+    const before = JSON.stringify(roofPoints),
+      insets = { right: 0, bottom: 0 };
+    const distance = framingPointsDistance(roofPoints, [0, 0], 390, 844, insets, "top");
+    expect(distance).toBeGreaterThan(60);
+    expect(distance).toBeGreaterThan(
+      framingPointsDistance(
+        roofPoints.map(([x, , z]) => [x, 0, z]),
+        [0, 0],
+        390,
+        844,
+        insets,
+        "top",
+      ),
+    );
+    expect(
+      framingPointsDistance(
+        roofPoints.map(([x, y, z]) => [x + 412, y, z - 733]),
+        [412, -733],
+        390,
+        844,
+        insets,
+        "top",
+      ),
+    ).toBeCloseTo(distance, 12);
+    expect(JSON.stringify(roofPoints)).toBe(before);
   });
 });

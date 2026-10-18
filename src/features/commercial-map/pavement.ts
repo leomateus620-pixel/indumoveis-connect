@@ -294,19 +294,37 @@ function surfaceGeometry(polygons: readonly Point[][], elevation: number, textur
 
 /** Exactly three visible batches. Source-road selection/picking remains with the
  * renderer and its original entities; these derived meshes never own an ID. */
-export function createPavement(entities: readonly MapEntity[], sharedSurfaces?: SurfaceMaterials) {
+export function createPavement(
+  entities: readonly MapEntity[],
+  sharedSurfaces?: SurfaceMaterials,
+  options: { openSouthEdgesOf?: ReadonlySet<string> } = {},
+) {
   const surfaces = sharedSurfaces ?? createSurfaceMaterials();
   const topology = derivePavement(entities);
   const group = new THREE.Group();
   group.name = "indumoveis-derived-pavement";
   const resources: (THREE.BufferGeometry | THREE.Material | THREE.Texture)[] = [];
   if (!sharedSurfaces) resources.push(...surfaces.textures, ...Object.values(surfaces.materials));
-  const paint = topology.lateralEdges.map(({ a, b, inward, width }): Point[] => [
-    a,
-    b,
-    [b[0] + inward[0] * width, b[1] + inward[1] * width],
-    [a[0] + inward[0] * width, a[1] + inward[1] * width],
-  ]);
+  // An adjoining contextual carriageway makes these old source south sides
+  // interior seams. Omit only their paint; source topology and asphalt stay exact.
+  const southEdges = new Map(
+    entities
+      .filter((entity) => options.openSouthEdgesOf?.has(entity.id))
+      .map((entity) => [entity.id, polygonBounds(entity.polygon).maxY]),
+  );
+  const paint = topology.lateralEdges
+    .filter(({ sourceId, a, b }) => {
+      const south = southEdges.get(sourceId);
+      return (
+        south === undefined || Math.abs(a[1] - south) > EPSILON || Math.abs(b[1] - south) > EPSILON
+      );
+    })
+    .map(({ a, b, inward, width }): Point[] => [
+      a,
+      b,
+      [b[0] + inward[0] * width, b[1] + inward[1] * width],
+      [a[0] + inward[0] * width, a[1] + inward[1] * width],
+    ]);
   const batches = [
     {
       polygons: topology.asphaltCells,

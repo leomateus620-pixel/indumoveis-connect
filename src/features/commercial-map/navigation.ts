@@ -4,7 +4,7 @@ import { pointInPolygon, polygonBounds, type Bounds } from "./geometry";
 import type { Point } from "./data/territory";
 
 /** All distances use the authored drawing units (10 PDF points), never metres.
- * Camera/target constraints are independent of the much larger ambient ground. */
+ * Camera/target constraints use finite authored regions, never ambient ground. */
 export const NAVIGATION = {
   fovDegrees: 38,
   minPolarAngle: 0.003,
@@ -27,7 +27,14 @@ export type NavigationPose = {
   target: readonly [number, number, number];
 };
 
+type NavigationRegion = { polygon: readonly Point[]; bounds: Bounds };
+
 export type NavigationEnvelope = {
+  /** Source commercial extent; context never changes inventory or protection. */
+  commercialBounds: Bounds;
+  /** Finite commercial + explicitly supplied presentation context extent. */
+  viewBounds: Bounds;
+  viewCenter: Point;
   minDistance: number;
   maxDistance: number;
   fitDistance: number;
@@ -40,7 +47,10 @@ export type NavigationEnvelope = {
   farPlane: number;
   horizonFade: { center: Point; start: number; end: number };
   groundTangent: number;
-  protectedRegions: readonly { polygon: readonly Point[]; bounds: Bounds }[];
+  protectedRegions: readonly NavigationRegion[];
+  /** Visibility witnesses only; these regions do not enable commercial picking
+   * or become part of the protected terrain/implantation perimeter. */
+  navigationRegions: readonly NavigationRegion[];
 };
 
 /** Smallest short side of a real selectable polygon, not its declared m² area. */
@@ -59,8 +69,10 @@ export function smallestSelectableSpan(
   return smallest;
 }
 
-/** Recompute only for viewport/inset changes. Fits commercial geometry and tall
- * volumes; neither the ambient ground nor any optional texture affects zoom. */
+/** Recompute only for viewport/inset or authored-context changes. Fits commercial
+ * geometry plus optional finite context landmarks; ambient ground and textures
+ * never affect zoom. Context shares drawing units, without implying GIS scale.
+ * Selectable size and roof clearance remain derived from commercial geometry. */
 export function createNavigationEnvelope({
   bounds,
   smallestSelectableSpan: smallestSpan,
@@ -69,6 +81,7 @@ export function createNavigationEnvelope({
   height,
   insets,
   protectedPolygons = [],
+  explorationPolygons = [],
   fov = NAVIGATION.fovDegrees,
 }: {
   bounds: Bounds;
@@ -78,11 +91,38 @@ export function createNavigationEnvelope({
   height: number;
   insets: MapInsets;
   protectedPolygons?: readonly (readonly Point[])[];
+  /** Explicit roads/parcels/landmarks that may be explored, not a terrain box.
+   * Empty or non-finite polygons are ignored rather than unbounding the camera. */
+  explorationPolygons?: readonly (readonly Point[])[];
   fov?: number;
 }): NavigationEnvelope {
+  const commercialBounds = { ...bounds };
+  const protectedRegions = protectedPolygons.map((polygon) => ({
+    polygon,
+    bounds: polygonBounds(polygon),
+  }));
+  const explorationRegions = explorationPolygons
+    .filter(
+      (polygon) => polygon.length >= 3 && polygon.every((point) => point.every(Number.isFinite)),
+    )
+    .map((polygon) => ({ polygon, bounds: polygonBounds(polygon) }));
+  const navigationRegions = [...protectedRegions, ...explorationRegions];
+  const viewBounds = explorationRegions.reduce<Bounds>(
+    (combined, region) => ({
+      minX: Math.min(combined.minX, region.bounds.minX),
+      minY: Math.min(combined.minY, region.bounds.minY),
+      maxX: Math.max(combined.maxX, region.bounds.maxX),
+      maxY: Math.max(combined.maxY, region.bounds.maxY),
+    }),
+    { ...commercialBounds },
+  );
+  const viewCenter: Point = [
+    (viewBounds.minX + viewBounds.maxX) / 2,
+    (viewBounds.minY + viewBounds.maxY) / 2,
+  ];
   const box = {
-    width: bounds.maxX - bounds.minX,
-    depth: bounds.maxY - bounds.minY,
+    width: viewBounds.maxX - viewBounds.minX,
+    depth: viewBounds.maxY - viewBounds.minY,
     height: maxStructureHeight,
   };
   const diagonal = Math.hypot(box.width, box.depth);
@@ -96,9 +136,23 @@ export function createNavigationEnvelope({
     smallestSpan * NAVIGATION.minimumSelectableSpans,
     cameraClearance / Math.cos(NAVIGATION.inspectionPolarAngle),
   );
+  // Explicit context often forms an L around the park. Its empty AABB corners
+  // must not force an excessively distant overview. Source-only callers retain
+  // the previous box fit exactly; roofs remain conservatively included at every
+  // actual navigation vertex, including the lower contextual landmarks.
+  const fittingPoints: [number, number, number][] = explorationRegions.length
+    ? navigationRegions.flatMap(({ polygon }) =>
+        polygon.flatMap(([x, z]): [number, number, number][] => [
+          [x, 0, z],
+          [x, maxStructureHeight, z],
+        ]),
+      )
+    : [];
   const fitDistance = Math.max(
     ...(["perspective", "top", "front"] as const).map((view) =>
-      framingBoxDistance(box, width, height, insets, view, fov),
+      fittingPoints.length
+        ? framingPointsDistance(fittingPoints, viewCenter, width, height, insets, view, fov)
+        : framingBoxDistance(box, width, height, insets, view, fov),
     ),
   );
   const maxDistance = Math.max(
@@ -107,15 +161,15 @@ export function createNavigationEnvelope({
   );
   const margin = Math.min(box.width, box.depth) * NAVIGATION.targetMarginFraction;
   const targetBounds = {
-    minX: bounds.minX - margin,
-    minY: bounds.minY - margin,
-    maxX: bounds.maxX + margin,
-    maxY: bounds.maxY + margin,
+    minX: viewBounds.minX - margin,
+    minY: viewBounds.minY - margin,
+    maxX: viewBounds.maxX + margin,
+    maxY: viewBounds.maxY + margin,
   };
   const tanVertical = Math.tan(halfFov);
   const tanHorizontal = (tanVertical * Math.max(1, width)) / Math.max(1, height);
   const horizonFade = {
-    center: [(bounds.minX + bounds.maxX) / 2, (bounds.minY + bounds.maxY) / 2] as Point,
+    center: viewCenter,
     start: maxDistance * NAVIGATION.horizonFadeStartDistances + diagonal,
     end: maxDistance * NAVIGATION.horizonFadeEndDistances + diagonal * 2,
   };
@@ -134,6 +188,9 @@ export function createNavigationEnvelope({
     maxY: targetBounds.maxY + reach,
   };
   return {
+    commercialBounds,
+    viewBounds,
+    viewCenter,
     minDistance,
     maxDistance,
     fitDistance,
@@ -146,10 +203,8 @@ export function createNavigationEnvelope({
     farPlane,
     horizonFade,
     groundTangent: Math.min(tanHorizontal, tanVertical),
-    protectedRegions: protectedPolygons.map((polygon) => ({
-      polygon,
-      bounds: polygonBounds(polygon),
-    })),
+    protectedRegions,
+    navigationRegions,
   };
 }
 
@@ -187,13 +242,13 @@ export function constrainNavigationPose(
     clamp(pose.target[2], envelope.targetBounds.minY, envelope.targetBounds.maxY),
   ];
   // A target box alone permits a close camera to show only a concave corner's
-  // ambient ground. Keep one real commercial surface within the central 40%
+  // ambient ground. Keep one commercial or explicit context surface in the central 40%
   // of screen width/height. The conservative perspective bound also accounts
   // for the ground witness being closer to the camera than the orbit target.
   const point: Point = [target[0], target[2]];
   let nearest: Point | undefined,
     nearestDistanceSq = Infinity;
-  for (const region of envelope.protectedRegions) {
+  for (const region of envelope.navigationRegions) {
     const { bounds, polygon } = region;
     const boxDistanceSq =
       Math.max(bounds.minX - point[0], 0, point[0] - bounds.maxX) ** 2 +
@@ -340,6 +395,49 @@ export function framingBoxDistance(
           towardCamera + Math.abs(x * ux + y * uy + z * uz) / tanVerticalFree,
         );
       }
+  return distance * 1.06;
+}
+
+/** Exact perspective fit of authored world vertices relative to a ground-level
+ * center, in drawing units. Useful for a sparse/L-shaped context: absent AABB
+ * corners add no fictitious content. Includes the same free-panel margins and
+ * conservative padding as the established box fit, including a live direction. */
+export function framingPointsDistance(
+  points: readonly (readonly [number, number, number])[],
+  center: Point,
+  viewportWidth: number,
+  viewportHeight: number,
+  insets: MapInsets,
+  view: MapView,
+  fov = 38,
+  direction?: readonly [number, number, number],
+) {
+  const raw = direction && Math.hypot(...direction) > 0 ? direction : viewDirection(view);
+  const length = Math.hypot(...raw);
+  const [dx, dy, dz] = raw.map((value) => value / length);
+  const rightLength = Math.hypot(dx, dz);
+  const rx = rightLength ? dz / rightLength : 1,
+    rz = rightLength ? -dx / rightLength : 0;
+  const ux = dy * rz,
+    uy = dz * rx - dx * rz,
+    uz = -dy * rx;
+  const freeWidth = Math.max(viewportWidth * 0.25, viewportWidth - insets.right - 32);
+  const freeHeight = Math.max(viewportHeight * 0.25, viewportHeight - insets.bottom - 24);
+  const tanVertical = Math.tan((fov * Math.PI) / 360);
+  const tanHorizontalFree = (tanVertical * freeWidth) / Math.max(viewportHeight, 1);
+  const tanVerticalFree = (tanVertical * freeHeight) / Math.max(viewportHeight, 1);
+  let distance = 1;
+  for (const point of points) {
+    const x = point[0] - center[0],
+      y = point[1],
+      z = point[2] - center[1];
+    const towardCamera = x * dx + y * dy + z * dz;
+    distance = Math.max(
+      distance,
+      towardCamera + Math.abs(x * rx + z * rz) / tanHorizontalFree,
+      towardCamera + Math.abs(x * ux + y * uy + z * uz) / tanVerticalFree,
+    );
+  }
   return distance * 1.06;
 }
 

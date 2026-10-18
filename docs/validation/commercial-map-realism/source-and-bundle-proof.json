@@ -1,0 +1,216 @@
+{
+  "baselineCommit": "930088e5b56181bce295558694b8587a032896c6",
+  "mergedMainCommit": "f07adf4bbf9d800f8cf7f8b191edfb1f7c2801f4",
+  "baselineTreeMatchesMergedMain": true,
+  "sourceFiles": {
+    "src/features/commercial-map/data/territory.ts": {
+      "unchanged": true,
+      "sha256": "db70a5cb1362b3cfdeadfea02bfc2b8f54c497ad9c36216907174226886eaa11",
+      "bytes": 20544
+    },
+    "src/features/commercial-map/geometry.ts": {
+      "unchanged": true,
+      "sha256": "c695d1d5f9620e5283a510f8f02913ce9a0f2920c751eb575c5b27efdfe20d29",
+      "bytes": 4358
+    },
+    "src/features/commercial-map/architecture.ts": {
+      "unchanged": true,
+      "sha256": "0120768d16cd0e935d173a22f19b24ddfd584b554ce94178b6156b150e5c6dce",
+      "bytes": 26245
+    },
+    "src/features/commercial-map/pavement.ts": {
+      "unchanged": false,
+      "topologyDerivationUnchanged": true,
+      "beforeSha256": "c05121597f86822dcd9cf7c6bb1961de3afd6839cb75b5504fd2ba3eda0166fc",
+      "afterSha256": "da4b20129e306b00e58f7adc47c9191992a1777c2c45db875e8f6166eddbe17d",
+      "reason": "Optional openSouthEdgesOf omits only an interior paint seam where the authorized exterior avenue extension adjoins. Source polygons/asphalt/curb topology remain exact."
+    },
+    "src/features/commercial-map/navigation.ts": {
+      "unchanged": false,
+      "beforeSha256": "ee7fea021e31237f80f55db3cca6a8ad0e8d2633f8c0074fcc4df6dacd961b6c",
+      "afterSha256": "0f451110ad3dbceacfa4540fcc556e196b03aff4cbec43ddb5bf1cf52587b94f",
+      "reason": "Authorized finite context union extends fit/maxDistance/viewCenter/navigationRegions; commercial bounds, minDistance, clearance and protected source remain fixed."
+    }
+  },
+  "bundles": {
+    "before": {
+      "file": "MapRenderer-FjKZ31fU.js",
+      "sha256": "788eb6b05f665d3aa3415395ef87369b9dc852582f04dcbdababd425eb08836b",
+      "rawBytes": 640721,
+      "gzipBytes": 165275,
+      "optionalContextAssets": []
+    },
+    "urbanBefore": {
+      "file": "MapRenderer-BbhOfsib.js",
+      "sha256": "09e9bb6573e1d08b253a378ac841e580b16325e61098f3bab7017463330e613c",
+      "rawBytes": 507780,
+      "gzipBytes": 135883,
+      "optionalContextAssets": []
+    },
+    "after": {
+      "file": "MapRenderer-4N7Y9kMw.js",
+      "sha256": "5c7c3e9fd25d2172f6fe8097efa6b780f7fe9d875bf7afe48205f442e0c06f13",
+      "rawBytes": 99665,
+      "gzipBytes": 32635,
+      "optionalContextAssets": [
+        {
+          "file": "urbanContext-uzNvBM_0.js",
+          "sha256": "20eb108366004f80d58fa4b18a0da4a98deca53ac13596fd87e50c7adde62288",
+          "rawBytes": 33273,
+          "gzipBytes": 13177
+        }
+      ]
+    }
+  },
+  "pbrAssets": [
+    {
+      "file": "commercial-map/basis/basis_transcoder.js",
+      "bytes": 57529,
+      "sha256": "8478b5b6d6b74e7d3082b89f6417321d8d1dc0307f2b30d4484bb11b441696a1"
+    },
+    {
+      "file": "commercial-map/basis/basis_transcoder.wasm",
+      "bytes": 527333,
+      "sha256": "6cf17dc889352c42e9acf8897107978d127005fe3386c36a0e3845e27967630a"
+    },
+    {
+      "file": "commercial-map/pbr/surfaces-1024-albedo.ktx2",
+      "bytes": 165273,
+      "sha256": "cc7e5adf64f11c1efb8e84ef6553d366ccc627249e84142f4dfde440fcf4d4d2"
+    },
+    {
+      "file": "commercial-map/pbr/surfaces-1024-normal.ktx2",
+      "bytes": 279604,
+      "sha256": "dcb823ba22b0d5ebb7506fe9df6fe32e52664db8fbfa033b6a950b26428d0a18"
+    },
+    {
+      "file": "commercial-map/pbr/surfaces-1024-orm.ktx2",
+      "bytes": 158400,
+      "sha256": "df6b8c4885995210ae754097cf7306f05fa072623800e1666b7e53665b5cec9d"
+    },
+    {
+      "file": "commercial-map/pbr/surfaces-512-albedo.ktx2",
+      "bytes": 52299,
+      "sha256": "87a7ba1f0a56341fe3ebcbe80838a40049cea0a59d3517e09cf1d3a15a07abbf"
+    },
+    {
+      "file": "commercial-map/pbr/surfaces-512-normal.ktx2",
+      "bytes": 72658,
+      "sha256": "1f7f9b9961e9fa3faf26cb7b51f8e4c9ae1bc7efcfd5221bae761d410e74914f"
+    },
+    {
+      "file": "commercial-map/pbr/surfaces-512-orm.ktx2",
+      "bytes": 52297,
+      "sha256": "1d40c853eecb0a6e6625538fc2b14e89992f1326b3ce56eb6542a56e75e26c49"
+    }
+  ],
+  "streetmapReference": "streetmap-reference.json",
+  "implementationSourceSha256": {
+    "src/features/commercial-map/CommercialMapWorkspace.tsx": "d1e06422e4b50069f5bc76b688bc5529ef85d0d0c84aa5567b40c023c1533a43",
+    "src/features/commercial-map/Map2D.tsx": "b1c06bae17c3d53cea98ff1f1ed06aa1ce26f59028445e0365469640d0f6ebef",
+    "src/features/commercial-map/MapRenderer.tsx": "577b7d06c58fce092c6ab7ba7df73f8495e6f90f98b249166ba98c5fbab2475e",
+    "src/features/commercial-map/architecture.ts": "0120768d16cd0e935d173a22f19b24ddfd584b554ce94178b6156b150e5c6dce",
+    "src/features/commercial-map/commercial.ts": "0bd6541d00b45af79729daea6a10c34c769ae8bbefab2382a47cb68ec19b998c",
+    "src/features/commercial-map/contextPlanting.ts": "cdc814ef5f985949948b8d75f0608765e62aa4f232a63c9d7cefb729a9f5e402",
+    "src/features/commercial-map/data/territory.ts": "db70a5cb1362b3cfdeadfea02bfc2b8f54c497ad9c36216907174226886eaa11",
+    "src/features/commercial-map/daylight.ts": "4a61dcda8aab770cb75be9f923232ca5edaf1557fc34268b3e2dcde900661f3f",
+    "src/features/commercial-map/geometry.ts": "c695d1d5f9620e5283a510f8f02913ce9a0f2920c751eb575c5b27efdfe20d29",
+    "src/features/commercial-map/labelPolicy.ts": "987ae25d7e33fc3f7cf29aa28b30669d9d7024c73e8ba56ef746e4241e36d02f",
+    "src/features/commercial-map/lotGrass.ts": "dc330d952c908ad168886aac751d572ff7987ca64f268de97514ee719a749cae",
+    "src/features/commercial-map/motion.ts": "67ff20dcc6b0fc1d95e9f7291afe42bfbf78a6b43997c5d5260699ba38cdf814",
+    "src/features/commercial-map/navigation.ts": "0f451110ad3dbceacfa4540fcc556e196b03aff4cbec43ddb5bf1cf52587b94f",
+    "src/features/commercial-map/parkDetails.ts": "952841166a99dd7fca7da3429dd2899e92bb3454d6aad3a769a12ebc1a51b972",
+    "src/features/commercial-map/pavement.ts": "da4b20129e306b00e58f7adc47c9191992a1777c2c45db875e8f6166eddbe17d",
+    "src/features/commercial-map/pbrAtlas.ts": "f8c9e1b7fa0a9901d27db7e4d6ff2d010004af17d95f26c43404ea16cf12ca19",
+    "src/features/commercial-map/performanceBudget.ts": "6ff4b93c4554ca1b15e27c80e2485cf38207d67fc7df33470fb0c71f6d6aadb9",
+    "src/features/commercial-map/planting.ts": "2409d307acc085697a71d8766bdc49bd1c4b0cad2d31994e75f739df6f22f85b",
+    "src/features/commercial-map/reflectionEnvironment.ts": "21303a7d7a0f8829f3c6688c58f69f13b7488b2bd0e9f2558c6757c69575fe1f",
+    "src/features/commercial-map/roadGeometry.ts": "d1417be2d46761b488abb80ac658ddf2e07ac18b387ef93b0bba341b0c60eb4f",
+    "src/features/commercial-map/search.ts": "18d620eccd3a6b98659022c60c6d4134a08ce0d3165daa4b256de9e00b375d86",
+    "src/features/commercial-map/softwareMaterials.ts": "f6eeaa2c9bed2beddec4bece3ac6deeb6d0bf43c26596162230a16f8c7ee6d6f",
+    "src/features/commercial-map/solarShadows.ts": "d47e4a90fefa0211ec9aa3aa186012c8d19298eedfbb0b58e4c523ff7a17f0f6",
+    "src/features/commercial-map/sunShadows.ts": "e36207fa99e8a7cbf2aa9e2a7d8e4d5c2c67199f1d2c02d4b315946d36d3bfbd",
+    "src/features/commercial-map/surfaceMaterials.ts": "13afc89c85cab34af801afa9cfebb041f26dac45e9780755fb6ef5f53a12d5a2",
+    "src/features/commercial-map/terrain.ts": "1fde838ed8dcce759b9cbdb4a22af398610315eef6b77f405da85a051dbcb59c",
+    "src/features/commercial-map/types.ts": "9f1e72c828452b50828037c15ec71f506d0a7163bf1ef89c675b4933ab358ef8",
+    "src/features/commercial-map/urbanArchitecture.ts": "68d1612ecff5730961c9334a745c27eef7df5d1c6e6e2448633f4d7b91971d50",
+    "src/features/commercial-map/urbanContact.ts": "3ef92990c0a5cbefdaae876a1bc521c3802027607ba601d45fc7858a15383324",
+    "src/features/commercial-map/urbanContext.ts": "6573e43f1ca13568b7e8a398220e3839bc6ff2431526114e9b7a40546f13a6ed",
+    "src/features/commercial-map/urbanLandscape.ts": "61eb845391f960981366408ca7a71f4ece9e9c191d5e7a146d17f849133ab632",
+    "src/features/commercial-map/urbanLayout.ts": "0ee68ab5d2ca769f53afe907626b0e28839866ed522eb987cce3dd9f92c6a650",
+    "src/features/commercial-map/urbanReference.ts": "5cdf7b33a2479c12bb3038d7e51e1629a10d420c67db5413f683349ee52dfe9c",
+    "src/features/commercial-map/vegetation.ts": "8a32461798b3ef5ef021be0e7d06faafe71d97097ba07752d2e8a3e191f0ad8f",
+    "src/features/commercial-map/visualTheme.ts": "f9be780df10472522336ba90af01e607ee5efa2833dfe4f9c5fde07ab4591edd"
+  },
+  "staticCoreAudit": {
+    "kind": "static production artifacts; not observed network transfer",
+    "renderer": "MapRenderer-4N7Y9kMw.js",
+    "map": "mapa-BqTm-zi6.js",
+    "featureAssets": [
+      {
+        "file": "MapRenderer-4N7Y9kMw.js",
+        "bytes": 99665,
+        "gzipBytes": 32764
+      },
+      {
+        "file": "arrow-left-CuzzkZzf.js",
+        "bytes": 153,
+        "gzipBytes": 154
+      },
+      {
+        "file": "arrow-right-CERgpEEu.js",
+        "bytes": 153,
+        "gzipBytes": 153
+      },
+      {
+        "file": "check-DIJxRM82.js",
+        "bytes": 112,
+        "gzipBytes": 129
+      },
+      {
+        "file": "geometry-C2wzWMub.js",
+        "bytes": 14640,
+        "gzipBytes": 5697
+      },
+      {
+        "file": "mapa-BbeY1ea1.css",
+        "bytes": 17158,
+        "gzipBytes": 4236
+      },
+      {
+        "file": "mapa-BqTm-zi6.js",
+        "bytes": 35035,
+        "gzipBytes": 11978
+      },
+      {
+        "file": "motion-D6g14ubb.js",
+        "bytes": 2691,
+        "gzipBytes": 1220
+      },
+      {
+        "file": "parkDetails-BW8xT1Jh.js",
+        "bytes": 399287,
+        "gzipBytes": 101435
+      },
+      {
+        "file": "plus-DDlGF2SM.js",
+        "bytes": 141,
+        "gzipBytes": 140
+      },
+      {
+        "file": "settings-2-DnpKr7zf.js",
+        "bytes": 240,
+        "gzipBytes": 187
+      },
+      {
+        "file": "three.core-BXQT0X1S.js",
+        "bytes": 205049,
+        "gzipBytes": 56241
+      }
+    ],
+    "compressedBytes": 214334,
+    "budgetBytes": 3145728,
+    "engineIsolated": true,
+    "scope": "Core static dependency graph only; optional urban chunk is separately recorded above and is not included in this gzip sum."
+  }
+}

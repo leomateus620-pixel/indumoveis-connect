@@ -1,0 +1,48 @@
+{
+  "generator": "scripts/build-commercial-pbr.py",
+  "encoder": "Khronos toktx 4.4.2 / UASTC LDR + Zstandard12, 1 thread",
+  "families": [
+    "mineral",
+    "concrete",
+    "asphalt",
+    "paintedMetal",
+    "grass"
+  ],
+  "layout": {
+    "columns": 4,
+    "rows": 2,
+    "gutterFraction": 0.0625
+  },
+  "assets": [
+    {
+      "file": "surfaces-512-albedo.ktx2",
+      "bytes": 52299,
+      "sha256": "87a7ba1f0a56341fe3ebcbe80838a40049cea0a59d3517e09cf1d3a15a07abbf"
+    },
+    {
+      "file": "surfaces-512-normal.ktx2",
+      "bytes": 72658,
+      "sha256": "1f7f9b9961e9fa3faf26cb7b51f8e4c9ae1bc7efcfd5221bae761d410e74914f"
+    },
+    {
+      "file": "surfaces-512-orm.ktx2",
+      "bytes": 52297,
+      "sha256": "1d40c853eecb0a6e6625538fc2b14e89992f1326b3ce56eb6542a56e75e26c49"
+    },
+    {
+      "file": "surfaces-1024-albedo.ktx2",
+      "bytes": 165273,
+      "sha256": "cc7e5adf64f11c1efb8e84ef6553d366ccc627249e84142f4dfde440fcf4d4d2"
+    },
+    {
+      "file": "surfaces-1024-normal.ktx2",
+      "bytes": 279604,
+      "sha256": "dcb823ba22b0d5ebb7506fe9df6fe32e52664db8fbfa033b6a950b26428d0a18"
+    },
+    {
+      "file": "surfaces-1024-orm.ktx2",
+      "bytes": 158400,
+      "sha256": "df6b8c4885995210ae754097cf7306f05fa072623800e1666b7e53665b5cec9d"
+    }
+  ]
+}
