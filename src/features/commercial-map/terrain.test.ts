@@ -113,11 +113,13 @@ describe("continuous source-protected commercial map terrain", () => {
             6,
           );
           expect(normals.getY(i)).toBeCloseTo(1, 6);
-          expect(uv.getX(i)).toBe(positions.getX(i));
-          expect(uv.getY(i)).toBe(positions.getZ(i));
+          const tile = mesh.name === "external-soil" ? 1 : 2.8;
+          expect(uv.getX(i)).toBeCloseTo(positions.getX(i) / tile, 5);
+          expect(uv.getY(i)).toBeCloseTo(positions.getZ(i) / tile, 5);
         }
         expect(mesh.userData.entityId).toBeUndefined();
-        expect(mesh.castShadow || mesh.receiveShadow).toBe(false);
+        expect(mesh.castShadow).toBe(false);
+        expect(mesh.receiveShadow).toBe(mesh.name === "preserved-circulation-floor");
       }
       const protectedBefore = JSON.stringify(terrain.topology.protectedCells);
       terrain.setExtent({ minX: -2000, minY: -2000, maxX: 2200, maxY: 2200 });
@@ -131,6 +133,65 @@ describe("continuous source-protected commercial map terrain", () => {
       }
     } finally {
       terrain.dispose();
+    }
+  });
+
+  it("shares the gray PBR circulation material without taking ownership of its resources", () => {
+    const material = new THREE.MeshStandardMaterial({ color: "#989f9b", vertexColors: true });
+    const disposed = vi.spyOn(material, "dispose");
+    const terrain = createTerrain(ENTITIES, { extent, maps: false, foundationMaterial: material });
+    const floor = terrain.group.getObjectByName("preserved-circulation-floor") as THREE.Mesh;
+    expect(floor.material).toBe(material);
+    const colors = floor.geometry.getAttribute("color");
+    for (let i = 0; i < colors.count; i++) {
+      expect([colors.getX(i), colors.getY(i), colors.getZ(i)]).toEqual([1, 1, 1]);
+    }
+    terrain.dispose();
+    terrain.dispose();
+    expect(disposed).not.toHaveBeenCalled();
+    material.dispose();
+  });
+
+  it("keeps the large underlay behind preserved circulation without modifying shared floor depth or geometry", () => {
+    const shared = new THREE.MeshStandardMaterial({ color: "#989f9b" });
+    const before = JSON.stringify(ENTITIES);
+    const terrain = createTerrain(ENTITIES, {
+      extent: { minX: -5263, minY: -5181, maxX: 5327, maxY: 5333 },
+      maps: false,
+      foundationMaterial: shared,
+    });
+    try {
+      const soil = terrain.group.getObjectByName("external-soil") as THREE.Mesh;
+      const floor = terrain.group.getObjectByName("preserved-circulation-floor") as THREE.Mesh;
+      const floorGeometry = floor.geometry;
+      const positions = Array.from(floorGeometry.getAttribute("position").array);
+      // These visual witnesses previously leaked green despite lying in one
+      // intact concrete cell, without any source landscape at either location.
+      for (const witness of [
+        [55.9323, 81.3789],
+        [58.9614, 76.2451],
+      ] as Point[]) {
+        expect(inside(witness, terrain.topology.protectedCells)).toBe(true);
+        expect(ENTITIES.some((entity) => pointInPolygon(witness, entity.polygon))).toBe(false);
+      }
+      expect(soil.material).toBe(terrain.material);
+      expect(terrain.material.polygonOffset).toBe(true);
+      expect(terrain.material.polygonOffsetFactor).toBeGreaterThan(0);
+      expect(terrain.material.polygonOffsetUnits).toBeGreaterThan(0);
+      for (const tier of ["light", "balanced", "detailed"] as const) terrain.setQuality(tier);
+      terrain.setExtent({ minX: -6000, minY: -6000, maxX: 6000, maxY: 6000 });
+      expect(floor.material).toBe(shared);
+      expect(shared.polygonOffset).toBe(false);
+      expect(shared.polygonOffsetFactor).toBe(0);
+      expect(shared.polygonOffsetUnits).toBe(0);
+      expect(shared.depthWrite).toBe(true);
+      expect(floor.geometry).toBe(floorGeometry);
+      expect(Array.from(floor.geometry.getAttribute("position").array)).toEqual(positions);
+      expect(terrain.material.polygonOffset).toBe(true);
+      expect(JSON.stringify(ENTITIES)).toBe(before);
+    } finally {
+      terrain.dispose();
+      shared.dispose();
     }
   });
 

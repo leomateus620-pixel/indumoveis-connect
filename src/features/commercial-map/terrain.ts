@@ -2,8 +2,7 @@ import * as THREE from "three";
 import type { MapEntity, Point } from "./data/territory";
 import { polygonBounds, type Bounds } from "./geometry";
 import { pavementUnionCells } from "./pavement";
-import type { SurfaceQuality } from "./surfaceMaterials";
-import { VISUAL_THEME } from "./visualTheme";
+import { SURFACE_PALETTE, type SurfaceQuality } from "./surfaceMaterials";
 
 /** All distances use drawing units (10 PDF points), not surveyed metres.
  * The former board already sat at -0.15. Keeping its elevation preserves the
@@ -227,7 +226,13 @@ function terrainMap(kind: "albedo" | "detail") {
  * The scene owns illumination; terrain never changes global exposure/lights. */
 export function createTerrain(
   entities: readonly MapEntity[],
-  options: { extent: Bounds; quality?: SurfaceQuality; maps?: boolean; deferMaps?: boolean },
+  options: {
+    extent: Bounds;
+    quality?: SurfaceQuality;
+    maps?: boolean;
+    deferMaps?: boolean;
+    foundationMaterial?: THREE.Material;
+  },
 ) {
   const group = new THREE.Group();
   group.name = "indumoveis-external-ground";
@@ -255,6 +260,13 @@ export function createTerrain(
         name: "indumoveis-matte-external-soil",
         color: TERRAIN.palette[0],
         envMapIntensity: 0,
+        // The finite horizon plane spans thousands of units. Its interpolated
+        // depth can win against the circulation floor despite the real .03
+        // height gap. Push only this background underlay away in raster depth;
+        // commercial positions, shared materials and world UVs stay untouched.
+        polygonOffset: true,
+        polygonOffsetFactor: 1,
+        polygonOffsetUnits: 2,
       }),
     );
     const atmosphere = {
@@ -316,12 +328,14 @@ export function createTerrain(
       material.map = placeholder;
       material.color.set("#ffffff");
     }
-    const foundation = own(
-      new THREE.MeshLambertMaterial({
-        name: "indumoveis-preserved-circulation-base",
-        color: VISUAL_THEME.ground,
-      }),
-    );
+    const foundation =
+      options.foundationMaterial ??
+      own(
+        new THREE.MeshLambertMaterial({
+          name: "indumoveis-preserved-circulation-base",
+          color: SURFACE_PALETTE.concrete,
+        }),
+      );
     // A continuous underlay avoids GPU raster cracks from kilometre-long,
     // subpixel-width complement triangles at the source's tiny drafting slabs.
     // The protected backing occludes it completely; 0.03 drawing units is below
@@ -333,7 +347,18 @@ export function createTerrain(
       );
     const ground = new THREE.Mesh(own(baseGeometry(topology.extent)), material);
     ground.name = "external-soil";
-    const floor = new THREE.Mesh(own(surfaceGeometry(protectedCells)), foundation);
+    const floorGeometry = own(surfaceGeometry(protectedCells));
+    floorGeometry.setAttribute(
+      "color",
+      new THREE.Float32BufferAttribute(
+        new Float32Array(floorGeometry.getAttribute("position").count * 3).fill(1),
+        3,
+      ),
+    );
+    const floorUvs = floorGeometry.getAttribute("uv");
+    for (let i = 0; i < floorUvs.count; i++)
+      floorUvs.setXY(i, floorUvs.getX(i) / 2.8, floorUvs.getY(i) / 2.8);
+    const floor = new THREE.Mesh(floorGeometry, foundation);
     floor.name = "preserved-circulation-floor";
     for (const mesh of [ground, floor]) {
       mesh.raycast = () => {};
@@ -341,6 +366,7 @@ export function createTerrain(
       mesh.castShadow = mesh.receiveShadow = false;
       group.add(mesh);
     }
+    floor.receiveShadow = true;
     let quality = options.quality ?? "balanced";
     let lastDistance = 80;
     function updateDetail(distance: number) {

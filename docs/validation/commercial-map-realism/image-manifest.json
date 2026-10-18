@@ -1,0 +1,354 @@
+[
+  {
+    "file": "comparison-overview.webp",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/overview.png",
+    "sourceAfter": "after/overview.png",
+    "size": [
+      1200,
+      1252
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "1150603e807a8632b8467f16c1aedf421281d06162dbd133b03b2f56824ed7a1",
+    "bytes": 399484,
+    "sha256": "e246675068b74c4d6e1d142cae8cfa5956a663bce2dc6bce21defc18146b9df3"
+  },
+  {
+    "file": "comparison-low-oblique.webp",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/low-oblique.png",
+    "sourceAfter": "after/low-oblique.png",
+    "size": [
+      1200,
+      1252
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "ddd660f51c289b35d80f895a721488c33e5c521b825e29341baa441c52d2505c",
+    "bytes": 369988,
+    "sha256": "d328c7b1b6a84829993f9c712552c6687827ce3f751a22d60378af438ef526ef"
+  },
+  {
+    "file": "comparison-perimeter.webp",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/perimeter.png",
+    "sourceAfter": "after/perimeter.png",
+    "size": [
+      1200,
+      1252
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "cc3aab970c060e87fc9c4863e4be3769db7e4bd9647485075fe190b7234f74f1",
+    "bytes": 712664,
+    "sha256": "b99eb1b2c7144e232cd27aa271452478c73b346683cd2d9b355d217d2816fb26"
+  },
+  {
+    "file": "comparison-near.webp",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/near.png",
+    "sourceAfter": "after/near.png",
+    "size": [
+      1200,
+      1252
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "ba28d88b572ab763679fe4488326143ade3d587a70cb7d3ebdba79b126a7db74",
+    "bytes": 612132,
+    "sha256": "dd7f561b3e89c3150fc86d4477cbd5d44e34fb0a9b3a737467ec7213c8386892"
+  },
+  {
+    "file": "comparison-far.webp",
+    "kind": "paired-canvas",
+    "sourceBefore": "before/far.png",
+    "sourceAfter": "after/far.png",
+    "size": [
+      1200,
+      1252
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "79672e23ab064c39b225db1081ea8e5e834c395008c8aec17ab87a5de1ed5472",
+    "bytes": 382806,
+    "sha256": "19b772f0c10b51d6230a3e3347c26e0ddb6ed27189aca2a89cc7bae9f1526b13"
+  },
+  {
+    "file": "comparison-urban-topology.webp",
+    "kind": "paired-urban-canvas",
+    "sourceBefore": "urban-before-details/realism-normal-topology-complete.png",
+    "sourceAfter": "after-details/realism-normal-topology-complete.png",
+    "size": [
+      1200,
+      1252
+    ],
+    "crop": null,
+    "samePose": true,
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "3a6f9562459ecf006d2c2c3be81ccdfa5a5aeb6473ed12cbeb2bd5a306ed0a1a",
+    "bytes": 264898,
+    "sha256": "fd684e66c6c93250297e6263f7195121c50962f1cb3c32150fce70c033cbee03"
+  },
+  {
+    "file": "comparison-urban-context.webp",
+    "kind": "paired-urban-canvas",
+    "sourceBefore": "urban-before-details/realism-normal-urban-context.png",
+    "sourceAfter": "after-details/realism-normal-urban-context.png",
+    "size": [
+      600,
+      812
+    ],
+    "crop": [
+      300,
+      180,
+      900,
+      560
+    ],
+    "samePose": true,
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "fe06a570cfeb86d6dea2c0a751ac2ce35f90c7f7ee0169c79db18c2726574aa7",
+    "bytes": 159540,
+    "sha256": "a996dbde39dc23cc8a4566b96805fa1982231ab38dd12b28a8fdecdb1378e9e9"
+  },
+  {
+    "file": "comparison-urban-close.webp",
+    "kind": "paired-urban-canvas",
+    "sourceBefore": "urban-before-details/realism-normal-urban-close.png",
+    "sourceAfter": "after-details/realism-normal-urban-close.png",
+    "size": [
+      720,
+      772
+    ],
+    "crop": [
+      240,
+      180,
+      960,
+      540
+    ],
+    "samePose": true,
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "b9c4240dedbeb99af0b40bb03dc44373d382c1b80a88a25237c124c1c753b5a5",
+    "bytes": 248386,
+    "sha256": "ea0766d8f94c610f8e323ae6e949a9146e7c56ce595f1a885ac39eb789199b15"
+  },
+  {
+    "file": "mobile-fullscreen.webp",
+    "kind": "final-capture",
+    "source": "after/mobile-fullscreen.png",
+    "size": [
+      844,
+      390
+    ],
+    "originalSize": [
+      844,
+      390
+    ],
+    "crop": null,
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "f034e07223165d5a0a8953e739d4c5da6681e152095f3ddb6a9c26c007bcb9c3",
+    "bytes": 134698,
+    "sha256": "2dfc96db639bb93b316978eeb869cc8489ee695df7c9a7908b5a2553c3bd5c3f"
+  },
+  {
+    "file": "realism-normal-initial.webp",
+    "kind": "final-capture",
+    "source": "after-details/realism-normal-initial.png",
+    "size": [
+      1208,
+      605
+    ],
+    "originalSize": [
+      1208,
+      605
+    ],
+    "crop": null,
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "0c3e45eef6d16a2d0e638e81bc3cb92e255a48ba27beaa94077d5587fdb58c44",
+    "bytes": 202544,
+    "sha256": "06b40293a6a2b341cc65023550df469f3b3d411ce5b5510a211c152f77a80a0f"
+  },
+  {
+    "file": "realism-normal-grass-close.webp",
+    "kind": "final-capture",
+    "source": "after-details/realism-normal-grass-close.png",
+    "size": [
+      400,
+      240
+    ],
+    "originalSize": [
+      1200,
+      600
+    ],
+    "crop": [
+      320,
+      350,
+      720,
+      590
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "10750b1f155fbbf6b7e42d0df8192592db426a6d79f1bd69bb1dd089b764dbe8",
+    "bytes": 86178,
+    "sha256": "c50664d367e24ceb1a16a2c70007177a9873cdb6b5a0487bfdaec54117982190"
+  },
+  {
+    "file": "realism-normal-tree-close.webp",
+    "kind": "final-capture",
+    "source": "after-details/realism-normal-tree-close.png",
+    "size": [
+      420,
+      340
+    ],
+    "originalSize": [
+      1200,
+      600
+    ],
+    "crop": [
+      330,
+      260,
+      750,
+      600
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "e98b9947117020232cf2b0e4faf80051fb74c284523b080fcfcb9b0307406e56",
+    "bytes": 35448,
+    "sha256": "594fcab818eaf1147df231cd184302dca208bbc2cdf9b5790e982e1bcd2f20c7"
+  },
+  {
+    "file": "urban-mid.webp",
+    "kind": "final-capture",
+    "source": "after-details/realism-normal-urban-mid.png",
+    "size": [
+      1200,
+      600
+    ],
+    "originalSize": [
+      1200,
+      600
+    ],
+    "crop": null,
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "82f38dee617536a1c9abee8522da86ce2363c87ae204b3e5b1ee44123df77d6b",
+    "bytes": 347304,
+    "sha256": "f618b5f6b0a7535fb229ab8a3a056b76eaf2445a53cee90cd5d6888c29899d79"
+  },
+  {
+    "file": "realism-normal-concrete-close.webp",
+    "kind": "final-capture",
+    "source": "after-details/realism-normal-concrete-close.png",
+    "size": [
+      440,
+      300
+    ],
+    "originalSize": [
+      1200,
+      600
+    ],
+    "crop": [
+      500,
+      0,
+      940,
+      300
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "0c219ed903be2af3d67db239ba7b286baef59d6737e1c719c260cd6929a22e41",
+    "bytes": 98898,
+    "sha256": "00c7c3f37e3c2281093960b3a59651b4a3c4b85a6b6a7759e8b2fc63e579d862"
+  },
+  {
+    "file": "realism-normal-roundabout-secondary.webp",
+    "kind": "final-capture",
+    "source": "after-details/realism-normal-roundabout-secondary.png",
+    "size": [
+      380,
+      270
+    ],
+    "originalSize": [
+      1200,
+      600
+    ],
+    "crop": [
+      420,
+      190,
+      800,
+      460
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "e6994a89a8a70855a680850769ac4457b91388b19918bc336d9f8de0108610b6",
+    "bytes": 34952,
+    "sha256": "4b4a6b1716f11af5abca8dc145fe7e892dd76407356859b74c8c594e23f9763e"
+  },
+  {
+    "file": "realism-detailed-roof-shadows.webp",
+    "kind": "final-capture",
+    "source": "after-lighting/realism-detailed-roof-shadows.png",
+    "size": [
+      600,
+      360
+    ],
+    "originalSize": [
+      1200,
+      600
+    ],
+    "crop": [
+      350,
+      120,
+      950,
+      480
+    ],
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "9a007bdc205321082af2b948839647e5ada79ffa07c80553c53b3e259b09e873",
+    "bytes": 209216,
+    "sha256": "bf5cefaf798f5fd55c08e9c855eab45ef4b79676326cf3b3a06c8f4423fd2e37"
+  },
+  {
+    "file": "daylight-horizon-allowed.webp",
+    "kind": "final-capture",
+    "source": "after-lighting/daylight-horizon-allowed.png",
+    "size": [
+      1200,
+      600
+    ],
+    "originalSize": [
+      1200,
+      600
+    ],
+    "crop": null,
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "2b9f3a6258cc3d21f2ad6140f3e71528f75101cc011619b98faac7676fdd7122",
+    "bytes": 112422,
+    "sha256": "ffa16fb27045e39fbcd66026b4d5f26d55cd695619ea0042926c7636ce9c52cb"
+  },
+  {
+    "file": "software-auto-dpr-0.4.webp",
+    "kind": "labeled-software-capture",
+    "source": "after-software-auto/automatic-software-after-settle.png",
+    "size": [
+      1366,
+      796
+    ],
+    "headerHeight": 28,
+    "originalSize": [
+      1366,
+      768
+    ],
+    "dpr": 0.4,
+    "encoding": "lossless WebP; native pixels without resampling; optional crop bounds recorded",
+    "losslessPixelMatch": true,
+    "pixelSha256": "7c9b44c076c7e2843123b5415055297087f2bde63b5ccc951f1f6829d2df324f",
+    "bytes": 287220,
+    "sha256": "e460e1adb81f68d949f20d0007b00d22735e7fbff5547e5482654e55d5877d3a"
+  }
+]

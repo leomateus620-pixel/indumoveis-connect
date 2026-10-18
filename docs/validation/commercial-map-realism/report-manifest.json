@@ -1,0 +1,155 @@
+[
+  {
+    "file": "baseline-bench.json.gz",
+    "source": "before-bench/realism-validation.json",
+    "sourceSha256": "d5c19527ee52e78f456fb5e6d048c7c0a85927762d8ef1cfa2734a03e95a0a06",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "bd6f4b4d91e6c1a91f7a7a84db987db732015ac5e60fac2abfde81b433c14566",
+    "bytes": 1461
+  },
+  {
+    "file": "final-bench.json.gz",
+    "source": "after-bench/realism-validation.json",
+    "sourceSha256": "a8285d7f28523f8ede6e3bd963c41c106d136c2e109e2d16384fc3c7a532188e",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "3f552481db6c49530f30ff2701b17890e011388802dcdee90087776b7324f94e",
+    "bytes": 144065
+  },
+  {
+    "file": "urban-baseline-bench.json.gz",
+    "source": "urban-before-bench/realism-validation.json",
+    "sourceSha256": "267c361a0af9959701552a24634dcb295b4d864d1947b96dd384bdf706189923",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "43fc7bf724cfe91a2cfb56274aa57d6620c0cf3d6eb8f2e617407cdb106a013b",
+    "bytes": 114099
+  },
+  {
+    "file": "urban-baseline-details.json.gz",
+    "source": "urban-before-details/realism-validation.json",
+    "sourceSha256": "52954a1e10c1da17f764e154a39d3ff05563215dbe354ff1f19ff4f4f1ce3ca7",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "54f65de7217f32e4716d93f2a941eb099769b61593bb97643b2fd6502bced013",
+    "bytes": 32228
+  },
+  {
+    "file": "baseline-openings.json.gz",
+    "source": "before-openings/realism-validation.json",
+    "sourceSha256": "73957febfddc6ac3690094095a876cb9b71c76b084cac3f7c0a04d5a5bdafbcb",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "5c2ca2863b18d8b199c25a79f5809c9b4941815c96ebd2bd09dde46827da5660",
+    "bytes": 5345
+  },
+  {
+    "file": "baseline-opening-recheck.json.gz",
+    "source": "before-recheck-openings/realism-validation.json",
+    "sourceSha256": "a2fa7a4e9aa7abaf97138be3d518eec7b08f1a74544858fbb2391364af1ffbba",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "2f17c8b742547e72884af2d2f5b51401f885ee9be07bb63c7b79b5664d007e37",
+    "bytes": 2715
+  },
+  {
+    "file": "final-openings.json.gz",
+    "source": "after-openings/realism-validation.json",
+    "sourceSha256": "48be0983c326687159b865da08ae9ad29d3b8b1ec9a5c5257e42bc89fea56d3c",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "55c702c3f036cb1aa2c9acff3eb446dafe16ddc9b534ae3671dcb0177bf834b5",
+    "bytes": 732224
+  },
+  {
+    "file": "baseline-functional.json.gz",
+    "source": "before/realism-validation.json",
+    "sourceSha256": "4f64846ceb7c72efa4c3cffc9825e8066f2724eb67b58b68d41ac5ff4ef5a28b",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "ef2ac7cd4714dd266ca8323d65831ed0836d441ecacf7299149e096980e5a76e",
+    "bytes": 32353
+  },
+  {
+    "file": "final-functional.json.gz",
+    "source": "after/realism-validation.json",
+    "sourceSha256": "2d39842cfe4c6030538ced78200c378c0ee2b74797225fd4f9a64e4b04b54db9",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "fe4f60a77c4bb02bf87ba8002f3d9eba909d98de5409de8f462784c40cfd72d6",
+    "bytes": 442236
+  },
+  {
+    "file": "baseline-details.json.gz",
+    "source": "before-details/realism-validation.json",
+    "sourceSha256": "15fdac7b479870d6f6a1ad6a074c74d118c4c66e92ac18c1a493dfa0840324e5",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "58532441328255f074e4a2e8aa42dae1ab181cb44dbdcd6ac7ae2bef461725ee",
+    "bytes": 4068
+  },
+  {
+    "file": "final-details.json.gz",
+    "source": "after-details/realism-validation.json",
+    "sourceSha256": "a666a08fc9bc29a0b7966611a7fc78cb5f4cd2009a8382131cfc54943ce90a03",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "9be93f3d380d7b457a149ca26031fff8705955434fd911a5273a7ddb831660d1",
+    "bytes": 40369
+  },
+  {
+    "file": "final-lighting.json.gz",
+    "source": "after-lighting/realism-validation.json",
+    "sourceSha256": "370cd9ed29c36289c5847f9707e284d5d73e66fa0012e5f7a434cc0f3411597d",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "dd95c7779491014aefab9583151a04eb8972bf9a82188e4c6379f079a14515de",
+    "bytes": 73973
+  },
+  {
+    "file": "baseline-software-auto.json.gz",
+    "source": "before-software-auto/realism-validation.json",
+    "sourceSha256": "32f409045ae2853a9d6a4a0b39931006a185fe2c4779d0ac031cc9b6528fa75b",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "5afeba1b87fb80d706a891df89bd5b35e45e624a07ab084c47bf7ba7058b13a6",
+    "bytes": 5183
+  },
+  {
+    "file": "final-software-auto.json.gz",
+    "source": "after-software-auto/realism-validation.json",
+    "sourceSha256": "03c373f8d21409c3bfb2b2b6a1d6ca6842251f2436bd64b95965df864515cd35",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "a1d829dfe8884b43569b7eede0aec17ba676b524c2cd27bf6aff3e6ea532587c",
+    "bytes": 26482
+  },
+  {
+    "file": "final-software-repeat2.json.gz",
+    "source": "after-software-auto-repeat2/realism-validation.json",
+    "sourceSha256": "f72201a2d49851ec5743afc0adb89dd4326e1782d4823c5ce75e57d6822cb479",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "fdda99c0b419abe7563f63d955787264cf420d55801bb36255de12ec362a5502",
+    "bytes": 26442
+  },
+  {
+    "file": "final-software-repeat3.json.gz",
+    "source": "after-software-auto-repeat3/realism-validation.json",
+    "sourceSha256": "28a420ed750705a18b51738247b067e08371cac6f62bb0561c8a89a6f694bdcd",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "5d8138d2d8e7afde1ccc8bb6ea98f9cebe90c00631fd0c3bde6492457668faf0",
+    "bytes": 26520
+  },
+  {
+    "file": "final-software-restoration.json.gz",
+    "source": "after-software-restoration/realism-validation.json",
+    "sourceSha256": "bb83556f4279b250be3521ac1bf567ba338c5d13e0abe2b5735ab3205270da61",
+    "encoding": "gzip of raw JSON data with whitespace removed; parsed values unchanged",
+    "parsedValuesVerified": true,
+    "sha256": "02c3c39bd72854f988c1ff3c2aded2f70d3854e4637f42f1ff69743940191cbd",
+    "bytes": 35884
+  }
+]

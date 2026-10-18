@@ -135,7 +135,10 @@ export function CommercialMapWorkspace({
   const lightGesture = useRef(false),
     lightNavigated = useRef(false);
   const readInitialTarget = useCallback(
-    () => lightMap.current?.getTarget() ?? lastTarget.current,
+    () =>
+      lightNavigated.current
+        ? (lightMap.current?.getTarget() ?? lastTarget.current)
+        : lastTarget.current,
     [],
   );
   const canPresent = useCallback(() => !lightGesture.current, []);
@@ -296,7 +299,8 @@ export function CommercialMapWorkspace({
     import("./MapRenderer")
       .then((module) => {
         if (!cancelled) {
-          lastTarget.current = lightMap.current?.getTarget() ?? lastTarget.current;
+          if (lightNavigated.current)
+            lastTarget.current = lightMap.current?.getTarget() ?? lastTarget.current;
           performance.mark("indumoveis:renderer-chunk");
           setRenderer(() => module.default);
         }
@@ -635,6 +639,18 @@ export function CommercialMapWorkspace({
             </>
           )}
         </div>
+        {representation === "ready" && (
+          <a
+            className="im-map-attribution"
+            style={{ bottom: Math.max(5, insets.bottom + 5) }}
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Entorno: dados de OpenStreetMap, licença ODbL"
+          >
+            Entorno © OpenStreetMap
+          </a>
+        )}
         {(notice || commercialState === "unavailable") && (
           <div className="im-map-notice" role="status">
             {notice || "Situação comercial não confirmada."}

@@ -3,10 +3,18 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
 import { createSurfaceMaterials } from "./surfaceMaterials";
-import { createVegetation } from "./vegetation";
+import { createSoftwareMaterials } from "./softwareMaterials";
+import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
 import { createTerrain, TERRAIN } from "./terrain";
 import { DAYLIGHT, createDaylightSky, createDaylightBackground } from "./daylight";
 import { createSunShadows } from "./sunShadows";
+import { createLotGrass } from "./lotGrass";
+import type { createUrbanContext } from "./urbanContext";
+import { deriveUrbanHouses } from "./urbanLayout";
+import { EXPLORATION_POLYGONS } from "./urbanReference";
+import { createParkDetails, lotStatusBands } from "./parkDetails";
+import { createSolarShadows } from "./solarShadows";
+import { isSoftwareRasterizer, ResolutionBudget } from "./performanceBudget";
 import { VISUAL_THEME as PALETTE, COMMERCIAL_STATUS_COLORS } from "./visualTheme";
 import {
   STREET_LABEL,
@@ -20,6 +28,7 @@ import { ENTITIES, MAP_BOUNDS, type MapEntity, type Point } from "./data/territo
 import {
   framingDistance,
   framingBoxDistance,
+  framingPointsDistance,
   initialQuality,
   isClick,
   MOVEMENT,
@@ -118,6 +127,24 @@ type Diagnostic = {
     pickable: boolean;
     mapsReady: boolean;
   } | null;
+  realism: {
+    ready: boolean;
+    preparationMs: number;
+    pbr: {
+      loaded: boolean;
+      compressed: boolean;
+      source: string;
+      textureBytes: number;
+      reason?: string;
+    } | null;
+    grass: ReturnType<typeof createLotGrass>["metadata"] | null;
+    planting: ReturnType<typeof createVegetation>["metadata"] | null;
+    woodland: ReturnType<typeof createVegetation>["metadata"] | null;
+    urban: ReturnType<typeof createUrbanContext>["metadata"] | null;
+    shadows: { enabled: boolean; updates: number; textureBytes: number };
+    adaptiveResolution: number;
+    softwareRasterizer: boolean;
+  };
 };
 
 declare global {
@@ -168,6 +195,16 @@ const SMALLEST_LOT_SPAN = smallestSelectableSpan(
   ENTITIES.filter((entity) => entity.kind === "lot").map((entity) => entity.polygon),
 );
 const COMMERCIAL_POLYGONS = ENTITIES.map((entity) => entity.polygon);
+const CONTEXT_EXPLORATION = [
+  ...EXPLORATION_POLYGONS,
+  ...deriveUrbanHouses().map((house) => house.parcel),
+  ...CONTEXT_WOODLAND.map((tree) =>
+    Array.from({ length: 12 }, (_, i): Point => [
+      tree.world[0] + Math.cos((i * Math.PI) / 6) * 5,
+      tree.world[1] + Math.sin((i * Math.PI) / 6) * 5,
+    ]),
+  ),
+];
 
 function polygonGeometry(polygon: Point[], height: number) {
   const triangles = THREE.ShapeUtils.triangulateShape(
@@ -363,11 +400,21 @@ function initializeMapRuntime(
   controls.panSpeed = 0.85;
   controls.zoomSpeed = 0.8;
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
-  let tier =
-    props().quality === "auto"
-      ? initialQuality(memory, navigator.hardwareConcurrency)
-      : (props().quality as QualityTier);
+  let softwareRasterizer = false;
+  try {
+    const extension = context.getExtension("WEBGL_debug_renderer_info");
+    if (extension)
+      softwareRasterizer = isSoftwareRasterizer(
+        context.getParameter(extension.UNMASKED_RENDERER_WEBGL),
+      );
+  } catch {
+    /* Driver metadata is optional; measured adaptation still applies. */
+  }
+  const automaticTier = () =>
+    softwareRasterizer ? ("light" as const) : initialQuality(memory, navigator.hardwareConcurrency);
+  let tier = props().quality === "auto" ? automaticTier() : (props().quality as QualityTier);
   let pendingTier: QualityTier | null = null;
+  let pendingSoftwareMode: boolean | null = null;
   let width = Math.max(1, host.clientWidth),
     height = Math.max(1, host.clientHeight);
   let disposed = false,
@@ -383,6 +430,17 @@ function initializeMapRuntime(
   let environmentResource: ReturnType<typeof createReflectionEnvironment> | null = null;
   let environmentAttempted = false;
   let vegetation: ReturnType<typeof createVegetation> | null = null;
+  let contextVegetation: ReturnType<typeof createVegetation> | null = null;
+  let lotGrass: ReturnType<typeof createLotGrass> | null = null;
+  let urban: ReturnType<typeof createUrbanContext> | null = null;
+  let parkDetails: ReturnType<typeof createParkDetails> | null = null;
+  let parkDetailsPrepared = false;
+  let contextTask = 0;
+  let contextAttempted = false;
+  let contextPrepared = false;
+  const resolutionBudget = new ResolutionBudget({
+    software: softwareRasterizer && props().quality === "auto",
+  });
   let ambientDisabled = false;
   let ambientSlowFrames = 0;
   type CameraAction = "focus" | "view" | "wheel" | "zoom" | "rotate";
@@ -496,6 +554,18 @@ function initializeMapRuntime(
     sampledFrameWindows: 0,
     navigation: null,
     terrain: null,
+    realism: {
+      ready: false,
+      preparationMs: 0,
+      pbr: null,
+      grass: null,
+      planting: null,
+      woodland: null,
+      urban: null,
+      shadows: { enabled: false, updates: 0, textureBytes: 0 },
+      adaptiveResolution: resolutionBudget.scale,
+      softwareRasterizer,
+    },
     transforms() {
       if (!diag.enabled || disposed) return [];
       commercialGroup.updateMatrixWorld(true);
@@ -562,10 +632,15 @@ function initializeMapRuntime(
   const presentationParams = new URLSearchParams(window.location.search);
   const surfaces = createSurfaceMaterials({
     maps: !(diag.enabled && presentationParams.get("mapSurfaceMaps") === "off"),
+    software: softwareRasterizer && props().quality === "auto",
   });
   surfaces.setQuality(tier);
   diag.textureBytes += surfaces.textureBytes;
   rollback.push(() => surfaces.dispose());
+  const softwareMaterials = createSoftwareMaterials({
+    enabled: softwareRasterizer && props().quality === "auto",
+  });
+  rollback.push(() => softwareMaterials.dispose());
   scene.add(
     new THREE.HemisphereLight(
       DAYLIGHT.hemisphere.sky,
@@ -576,6 +651,12 @@ function initializeMapRuntime(
   const sunlight = new THREE.DirectionalLight(DAYLIGHT.sunlight.color, DAYLIGHT.sunlight.intensity);
   sunlight.position.set(...DAYLIGHT.sunDirection).multiplyScalar(180);
   scene.add(sunlight);
+  const solarShadows = createSolarShadows(sunlight, ENTITIES);
+  scene.add(sunlight.target);
+  rollback.push(() => solarShadows.dispose());
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  solarShadows.setQuality(tier);
   const fill = new THREE.DirectionalLight(DAYLIGHT.fill.color, DAYLIGHT.fill.intensity);
   fill.position.set(80, 60, -110);
   scene.add(fill);
@@ -587,15 +668,25 @@ function initializeMapRuntime(
     height,
     insets: props().insets,
     protectedPolygons: COMMERCIAL_POLYGONS,
+    explorationPolygons: CONTEXT_EXPLORATION,
     fov: camera.fov,
   });
   const terrain = createTerrain(ENTITIES, {
     extent: envelope.terrainBounds,
     quality: tier,
     deferMaps: true,
+    foundationMaterial: track(
+      new THREE.MeshLambertMaterial({
+        name: "indumoveis-preserved-circulation-initial",
+        color: surfaces.materials.concrete.color,
+        vertexColors: true,
+      }),
+    ),
     maps: !(diag.enabled && presentationParams.get("mapTerrainMaps") === "off"),
   });
   scene.add(terrain.group);
+  const foundationMesh = terrain.group.getObjectByName("preserved-circulation-floor") as
+    THREE.Mesh<THREE.BufferGeometry, THREE.Material> | undefined;
   terrain.setAtmosphere(envelope.horizonFade, DAYLIGHT.sky.horizon);
   rollback.push(() => terrain.dispose());
   diag.textureBytes += terrain.textureBytes;
@@ -609,8 +700,14 @@ function initializeMapRuntime(
 
   // Each static ground category is one draw call, independent of lot count.
   const lotRanges = new Map<string, [number, number]>();
+  const statusRanges = new Map<string, [number, number]>();
+  const statusPositions: number[] = [],
+    statusColors: number[] = [];
   let lotGeometry: THREE.BufferGeometry | null = null;
-  const pavement = createPavement(ENTITIES, surfaces);
+  let lotBaseMesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material> | null = null;
+  const pavement = createPavement(ENTITIES, surfaces, {
+    openSouthEdgesOf: new Set(["indumoveis:road:benvenuto", "indumoveis:road:imigrantes"]),
+  });
   commercialGroup.add(pavement.group);
   pavement.resources.forEach(track);
   diag.textureBytes += pavement.textureBytes;
@@ -637,14 +734,25 @@ function initializeMapRuntime(
       const start = positions.length / 3;
       positions.push(...data);
       const color = new THREE.Color(
-        kind === "lot"
-          ? statusColor(props().statuses[entity.id])
-          : kind === "landscape"
-            ? PALETTE.landscape
-            : PALETTE.support,
+        kind === "lot" ? "#ffffff" : kind === "landscape" ? PALETTE.landscape : PALETTE.support,
       );
       for (let i = 0; i < data.length / 3; i++) colors.push(color.r, color.g, color.b);
       if (kind === "lot") lotRanges.set(entity.id, [start, data.length / 3]);
+      if (kind === "lot") {
+        const bandStart = statusPositions.length / 3;
+        const bandColor = new THREE.Color(
+          props().statuses[entity.id] ? statusColor(props().statuses[entity.id]) : PALETTE.lotEdge,
+        );
+        for (const band of lotStatusBands(entity.polygon)) {
+          const shape = polygonGeometry(band, 0.062);
+          const vertices = shape.getAttribute("position").array;
+          statusPositions.push(...vertices);
+          for (let i = 0; i < vertices.length / 3; i++)
+            statusColors.push(bandColor.r, bandColor.g, bandColor.b);
+          shape.dispose();
+        }
+        statusRanges.set(entity.id, [bandStart, statusPositions.length / 3 - bandStart]);
+      }
       if (kind !== "landscape") borderPositions.push(...edges(entity.polygon, elevation + 0.035));
       if (kind === "lot" || kind === "support") {
         const pick = new THREE.Mesh(track(geometry), basic("#ffffff"));
@@ -656,10 +764,34 @@ function initializeMapRuntime(
     const geometry = track(new THREE.BufferGeometry());
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+    if (kind === "lot")
+      geometry.setAttribute(
+        "uv",
+        new THREE.Float32BufferAttribute(
+          positions.flatMap((_, i) =>
+            i % 3 === 0 ? [positions[i] / 2.8, positions[i + 2] / 2.8] : [],
+          ),
+          2,
+        ),
+      );
     geometry.computeVertexNormals();
-    const material = track(new THREE.MeshLambertMaterial({ vertexColors: true }));
-    commercialGroup.add(new THREE.Mesh(geometry, material));
-    if (kind === "lot") lotGeometry = geometry;
+    const material =
+      kind === "lot"
+        ? track(
+            new THREE.MeshLambertMaterial({
+              name: "indumoveis-lot-grass-initial",
+              color: surfaces.materials.grass.color,
+              vertexColors: true,
+            }),
+          )
+        : track(new THREE.MeshLambertMaterial({ vertexColors: true }));
+    const groundMesh = new THREE.Mesh(geometry, material);
+    groundMesh.receiveShadow = true;
+    commercialGroup.add(groundMesh);
+    if (kind === "lot") {
+      lotGeometry = geometry;
+      lotBaseMesh = groundMesh;
+    }
     if (borderPositions.length) {
       const border = track(new THREE.BufferGeometry());
       border.setAttribute("position", new THREE.Float32BufferAttribute(borderPositions, 3));
@@ -673,6 +805,15 @@ function initializeMapRuntime(
       );
     }
   }
+  const statusGeometry = track(new THREE.BufferGeometry());
+  statusGeometry.setAttribute("position", new THREE.Float32BufferAttribute(statusPositions, 3));
+  statusGeometry.setAttribute("color", new THREE.Float32BufferAttribute(statusColors, 3));
+  const statusMesh = new THREE.Mesh(
+    statusGeometry,
+    track(new THREE.MeshBasicMaterial({ vertexColors: true })),
+  );
+  statusMesh.raycast = () => {};
+  commercialGroup.add(statusMesh);
 
   const architecture = buildArchitecture(ENTITIES, surfaces);
   commercialGroup.add(architecture.group);
@@ -680,6 +821,7 @@ function initializeMapRuntime(
   rollback.push(() => architecture.dispose());
   const sunShadows = createSunShadows(ENTITIES);
   commercialGroup.add(sunShadows.mesh);
+  sunShadows.mesh.visible = !solarShadows.enabled;
   rollback.push(() => sunShadows.dispose());
   diag.textureBytes += sky.textureBytes;
 
@@ -1048,7 +1190,7 @@ function initializeMapRuntime(
         }));
   }
 
-  function addTrees() {
+  async function addTrees() {
     optionalTask = 0;
     if (disposed || failed) return;
     if (document.hidden) return;
@@ -1057,15 +1199,166 @@ function initializeMapRuntime(
       return;
     }
     try {
-      vegetation = createVegetation();
+      vegetation = createVegetation({ quality: tier, additionalPlanting: true });
+      vegetation.group.visible = false;
       commercialGroup.add(vegetation.group);
+      diag.realism.planting = vegetation.metadata;
       diag.textureBytes += vegetation.textureBytes;
       rollback.push(() => vegetation?.dispose());
+      softwareMaterials.sync(vegetation.group);
+      await renderer.compileAsync(vegetation.group, camera, scene);
+      if (disposed || failed) return;
+      vegetation.group.visible = true;
     } catch {
       ambientDisabled = true;
       diag.optionalFailures.push("vegetation-preparation");
     }
     invalidate();
+  }
+
+  async function prepareContext() {
+    contextTask = 0;
+    if (disposed || failed || contextAttempted || document.hidden) return;
+    if (activePointers.size || transition || diag.environmentReadyAt === undefined) {
+      contextTask = window.setTimeout(prepareContext, 250);
+      return;
+    }
+    contextAttempted = true;
+    const begin = performance.now();
+    const complete = () => {
+      contextPrepared = true;
+      diag.realism.preparationMs = performance.now() - begin;
+      diag.realism.ready = diag.realism.pbr !== null && diag.environmentReadyAt !== undefined;
+      invalidate();
+    };
+    try {
+      // Cosmetic road/pavement details stay off the first-draw path, but do
+      // not depend on the separately downloaded residential factory.
+      if (!parkDetails) {
+        parkDetails = createParkDetails(ENTITIES, surfaces);
+        parkDetails.group.visible = false;
+        commercialGroup.add(parkDetails.group);
+        rollback.push(() => parkDetails?.dispose());
+      }
+      if (!parkDetailsPrepared) {
+        softwareMaterials.sync(parkDetails.group);
+        await renderer.compileAsync(parkDetails.group, camera, scene);
+        if (disposed || failed) return;
+        parkDetailsPrepared = true;
+      }
+      if (activePointers.size || transition || document.hidden) {
+        contextAttempted = false;
+        contextTask = window.setTimeout(prepareContext, 250);
+        return;
+      }
+      parkDetails.group.visible = true;
+      invalidate();
+      // Layout required for navigation is lightweight and already available.
+      // Parse the optional architecture/landscape/contact factory only after
+      // the core 3D and the shared material/environment preparation are ready.
+      const { createUrbanContext } = await import("./urbanContext");
+      if (disposed || failed) return;
+      // A gesture may have started during module download/parse. Do not claim
+      // the camera/input thread for static preparation until it is idle again.
+      if (activePointers.size || transition || document.hidden) {
+        contextAttempted = false;
+        contextTask = window.setTimeout(prepareContext, 250);
+        return;
+      }
+      lotGrass = createLotGrass(ENTITIES, { quality: tier });
+      lotGrass.group.visible = false;
+      commercialGroup.add(lotGrass.group);
+      diag.realism.grass = lotGrass.metadata;
+      rollback.push(() => lotGrass?.dispose());
+      urban = createUrbanContext({ quality: tier, sharedSurfaces: surfaces });
+      contextVegetation = createVegetation({ quality: tier, contextPlanting: CONTEXT_WOODLAND });
+      contextVegetation.group.visible = false;
+      scene.add(contextVegetation.group);
+      diag.realism.woodland = contextVegetation.metadata;
+      diag.textureBytes += contextVegetation.textureBytes;
+      rollback.push(() => contextVegetation?.dispose());
+      urban.group.visible = false;
+      scene.add(urban.group);
+      diag.realism.urban = urban.metadata;
+      rollback.push(() => urban?.dispose());
+      softwareMaterials.sync(lotGrass.group);
+      softwareMaterials.sync(urban.group);
+      softwareMaterials.sync(contextVegetation.group);
+      await renderer.compileAsync(lotGrass.group, camera, scene);
+      if (disposed || failed) return;
+      await renderer.compileAsync(urban.group, camera, scene);
+      if (disposed || failed) return;
+      await renderer.compileAsync(contextVegetation.group, camera, scene);
+      if (disposed || failed) return;
+      const progressiveFloors = [
+        {
+          mesh: lotBaseMesh,
+          material: surfaces.materials.grass,
+          failure: "lot-surface-preparation",
+          prepared: false,
+          attempted: false,
+        },
+        {
+          mesh: foundationMesh,
+          material: surfaces.materials.concrete,
+          failure: "circulation-surface-preparation",
+          prepared: false,
+          attempted: false,
+        },
+      ];
+      const publish = async () => {
+        contextTask = 0;
+        if (disposed || failed) return;
+        if (activePointers.size || transition || document.hidden) {
+          contextTask = window.setTimeout(publish, 100);
+          return;
+        }
+        for (const floor of progressiveFloors) {
+          if (!floor.mesh || floor.attempted) continue;
+          floor.attempted = true;
+          try {
+            // A shallow scratch mesh borrows the exact geometry/flags. Prepare
+            // its final atlas/environment variant only after an idle check,
+            // without changing the live floor or adding a duplicate surface.
+            const scratchFloor = floor.mesh.clone(false);
+            scratchFloor.material = floor.material;
+            softwareMaterials.sync(scratchFloor);
+            await renderer.compileAsync(scratchFloor, camera, scene);
+            if (disposed || failed) return;
+            floor.prepared = true;
+          } catch {
+            if (disposed || failed) return;
+            diag.optionalFailures.push(floor.failure);
+          }
+          // If input resumed during asynchronous compilation, keep Lambert
+          // until idle. The attempted flag prevents compiling again on retry.
+          if (activePointers.size || transition || document.hidden) {
+            contextTask = window.setTimeout(publish, 100);
+            return;
+          }
+        }
+        for (const floor of progressiveFloors) {
+          if (!floor.mesh || !floor.prepared) continue;
+          const initialMaterial = floor.mesh.material;
+          floor.mesh.material = floor.material;
+          // Only the temporary Lambert belongs to the renderer's own set;
+          // the final material and its atlas remain owned by surfaces.
+          if (resources.delete(initialMaterial)) initialMaterial.dispose();
+        }
+        softwareMaterials.sync(scene);
+        lotGrass!.group.visible = true;
+        urban!.group.visible = true;
+        contextVegetation!.group.visible = true;
+        complete();
+      };
+      await publish();
+      return;
+    } catch {
+      if (disposed || failed) return;
+      diag.optionalFailures.push("context-preparation");
+    }
+    if (disposed || failed) return;
+    complete();
   }
 
   // Deferred optional reflection: first navigation already works with local
@@ -1079,6 +1372,15 @@ function initializeMapRuntime(
       return;
     }
     environmentAttempted = true;
+    const surfaceBytesBefore = surfaces.textureBytes;
+    diag.realism.pbr = await surfaces.prepareCompressed(renderer, {
+      fail: diag.enabled && presentationParams.get("mapPbr") === "fail",
+      resolution: tier === "detailed" ? 1024 : 512,
+      canCommit: () => !activePointers.size && !transition && !document.hidden,
+    });
+    if (disposed || failed) return;
+    diag.textureBytes += surfaces.textureBytes - surfaceBytesBefore;
+    diag.realism.ready = false;
     const terrainBegin = performance.now();
     const terrainBytesBefore = terrain.textureBytes;
     try {
@@ -1128,6 +1430,7 @@ function initializeMapRuntime(
       // family's intensity. Explicit PBR maps keep semantic lots/trees diffuse
       // and preserve the intended per-surface reflection strength.
       surfaces.setEnvironment(environmentTarget.texture);
+      softwareMaterials.update();
       rollback.push(() => environment.dispose());
       // Public API prepares this one environment/material variant before its
       // first interaction. No shader compilation or filtering during gestures.
@@ -1147,6 +1450,7 @@ function initializeMapRuntime(
     }
     diag.environmentPrepareMs = performance.now() - environmentBegin;
     diag.environmentReadyAt = performance.now();
+    diag.realism.ready = contextPrepared;
     if (disposed) return;
     invalidate();
   }
@@ -1240,14 +1544,24 @@ function initializeMapRuntime(
     view: MapView,
     box?: { width: number; depth: number; height: number },
     currentDirection?: THREE.Vector3,
+    fitContext = false,
   ) {
     const distance = Math.min(
       envelope.maxDistance,
       Math.max(
         envelope.minDistance,
-        box
-          ? framingBoxDistance(
-              box,
+        fitContext
+          ? framingPointsDistance(
+              envelope.navigationRegions.flatMap((region) =>
+                region.polygon.flatMap(
+                  ([x, z]) =>
+                    [
+                      [x, 0, z],
+                      [x, COMMERCIAL_HEIGHT, z],
+                    ] as [number, number, number][],
+                ),
+              ),
+              center,
               width,
               height,
               props().insets,
@@ -1255,7 +1569,17 @@ function initializeMapRuntime(
               camera.fov,
               currentDirection?.toArray(),
             )
-          : framingDistance(radius, width, height, props().insets),
+          : box
+            ? framingBoxDistance(
+                box,
+                width,
+                height,
+                props().insets,
+                view,
+                camera.fov,
+                currentDirection?.toArray(),
+              )
+            : framingDistance(radius, width, height, props().insets),
       ),
     );
     const direction = currentDirection ?? new THREE.Vector3(...viewDirection(view)).normalize();
@@ -1281,7 +1605,21 @@ function initializeMapRuntime(
   }
   function focus(id?: string) {
     const entity = id ? ENTITY_BY_ID.get(id) : undefined;
-    const bounds = boundsOf(entity);
+    const bounds = entity
+      ? boundsOf(entity)
+      : {
+          center: envelope.viewCenter,
+          radius:
+            Math.hypot(
+              envelope.viewBounds.maxX - envelope.viewBounds.minX,
+              envelope.viewBounds.maxY - envelope.viewBounds.minY,
+            ) / 2,
+          box: {
+            width: envelope.viewBounds.maxX - envelope.viewBounds.minX,
+            depth: envelope.viewBounds.maxY - envelope.viewBounds.minY,
+            height: COMMERCIAL_HEIGHT,
+          },
+        };
     animate(
       freeRegionPose(
         bounds.center,
@@ -1291,6 +1629,7 @@ function initializeMapRuntime(
         ready
           ? new THREE.Vector3().subVectors(camera.position, controls.target).normalize()
           : undefined,
+        !entity,
       ),
       entity ? MOVEMENT.focusNearMs : MOVEMENT.focusFarMs,
     );
@@ -1376,8 +1715,20 @@ function initializeMapRuntime(
       now / 1000,
       tier === "detailed" && !reduceMotion.matches && !ambientDisabled,
     );
+    const lodDistance = camera.position.distanceTo(controls.target);
+    const lodTarget: Point = [controls.target.x, controls.target.z];
+    vegetation?.updateLod(lodDistance, lodTarget);
+    contextVegetation?.updateLod(lodDistance, lodTarget);
+    contextVegetation?.animate(
+      now / 1000,
+      tier === "detailed" && !reduceMotion.matches && !ambientDisabled,
+    );
+    lotGrass?.updateLod(lodDistance, lodTarget);
+    urban?.updateLod(lodDistance, lodTarget);
+    lotGrass?.animate(now / 1000, tier === "detailed" && !reduceMotion.matches && !ambientDisabled);
     surfaces.updateDetail(camera.position.distanceTo(controls.target));
     terrain.updateDetail(camera.position.distanceTo(controls.target));
+    softwareMaterials.update();
     camera.near = Math.max(
       0.05,
       Math.min(camera.position.distanceTo(controls.target) / 280, camera.position.y * 0.2),
@@ -1385,6 +1736,7 @@ function initializeMapRuntime(
     camera.updateProjectionMatrix();
     updateLabels();
     try {
+      if (solarShadows.enabled && sunlight.shadow.needsUpdate) diag.realism.shadows.updates++;
       renderer.render(scene, camera);
     } catch (error) {
       fail(error instanceof Error ? error.message : "screen-draw-failed");
@@ -1397,6 +1749,10 @@ function initializeMapRuntime(
     diag.geometries = renderer.info.memory.geometries;
     diag.textures = renderer.info.memory.textures;
     diag.programs = renderer.info.programs?.length ?? 0;
+    diag.realism.shadows.enabled = solarShadows.enabled;
+    const shadowBytes = solarShadows.textureBytes;
+    diag.textureBytes += shadowBytes - diag.realism.shadows.textureBytes;
+    diag.realism.shadows.textureBytes = shadowBytes;
     diag.target[0] = controls.target.x;
     diag.target[1] = controls.target.z;
     camera.position.toArray(diag.position);
@@ -1415,23 +1771,38 @@ function initializeMapRuntime(
       const delta = now - lastFrame;
       ambientSlowFrames = delta > 50 ? ambientSlowFrames + 1 : 0;
       if (ambientSlowFrames >= 8) ambientDisabled = true;
-      if (props().quality === "auto") adaptiveSamples.push(delta);
+      if (props().quality === "auto" && pendingSoftwareMode === null) adaptiveSamples.push(delta);
       else adaptiveSamples.length = 0;
       if (diag.enabled) {
         diag.frameIntervals.push(delta);
         if (diag.frameIntervals.length > 2000) diag.frameIntervals.shift();
       }
-      if (adaptiveSamples.length >= 60 && props().quality === "auto") {
+      if (
+        adaptiveSamples.length >= 60 &&
+        props().quality === "auto" &&
+        pendingSoftwareMode === null
+      ) {
         const mean =
           adaptiveSamples.reduce((sum, value) => sum + value, 0) / adaptiveSamples.length;
         const sorted = [...adaptiveSamples].sort((a, b) => a - b);
         const p95 = sorted[Math.ceil(sorted.length * 0.95) - 1];
+        const resolutionChanged = resolutionBudget.observe(p95, now);
+        if (resolutionChanged) {
+          diag.realism.adaptiveResolution = resolutionBudget.scale;
+          resizeBuffer();
+        }
         if (p95 > 35) ambientDisabled = true;
-        slowWindows = mean > 33 || p95 > 50 ? slowWindows + 1 : 0;
-        fastWindows = mean < 18 && p95 < 22 ? fastWindows + 1 : 0;
+        // A window measured at the previous resolution cannot condemn the new
+        // buffer. Give it fresh samples before reducing quality or falling back.
+        slowWindows = resolutionChanged
+          ? 0
+          : mean > (softwareRasterizer ? 35 : 33) || p95 > 50
+            ? slowWindows + 1
+            : 0;
+        fastWindows = resolutionChanged ? 0 : mean < 18 && p95 < 22 ? fastWindows + 1 : 0;
         diag.slowFrameWindows = slowWindows;
         diag.sampledFrameWindows++;
-        if (shouldUseLightFallback(true, tier, slowWindows)) {
+        if (resolutionBudget.atMinimum && shouldUseLightFallback(true, tier, slowWindows)) {
           fail("sustained-low-frame-rate");
           return;
         }
@@ -1463,39 +1834,57 @@ function initializeMapRuntime(
       performance.mark("indumoveis-map:controls-ready");
       props().onReady();
       optionalTask = window.setTimeout(addTrees, 0);
+      contextTask = window.setTimeout(prepareContext, 160);
       environmentTask = window.setTimeout(prepareEnvironment, 350);
     }
     if (
-      pendingTier &&
+      (pendingTier || pendingSoftwareMode !== null) &&
       !activePointers.size &&
       !transition &&
       now - lastActivity >= MOVEMENT.qualitySettleMs
     ) {
-      applyQuality(pendingTier);
+      applyQuality(pendingTier ?? tier);
       pendingTier = null;
     }
-    if (transition || !ready || active || pendingTier) invalidate();
+    if (transition || !ready || active || pendingTier || pendingSoftwareMode !== null) invalidate();
     else {
       diag.cameraState = "idle";
       scheduleAmbient();
     }
   }
   function applyQuality(next: QualityTier) {
+    const softwareMode = pendingSoftwareMode;
     tier = next;
     diag.tier = tier;
     lastQualityChange = performance.now();
     slowWindows = fastWindows = 0;
     adaptiveSamples.length = 0;
     diag.slowFrameWindows = 0;
+    if (pendingSoftwareMode !== null) {
+      surfaces.setSoftwareMode(pendingSoftwareMode);
+      resolutionBudget.reset({ software: pendingSoftwareMode });
+      diag.realism.adaptiveResolution = resolutionBudget.scale;
+      pendingSoftwareMode = null;
+    }
     surfaces.setQuality(tier);
     terrain.setQuality(tier);
+    vegetation?.setQuality(tier);
+    contextVegetation?.setQuality(tier);
+    lotGrass?.setQuality(tier);
+    urban?.setQuality(tier);
+    if (softwareMode !== null) softwareMaterials.setEnabled(softwareMode);
+    softwareMaterials.sync(scene);
+    softwareMaterials.update();
+    solarShadows.setQuality(tier);
+    sunShadows.mesh.visible = !solarShadows.enabled;
     if (!environmentAttempted && !environmentTask)
       environmentTask = window.setTimeout(prepareEnvironment, 350);
     window.clearTimeout(ambientTimer);
     resizeBuffer();
   }
   function resizeBuffer() {
-    const dpr = resolvePixelRatio(width, height, window.devicePixelRatio, tier);
+    const dpr =
+      resolvePixelRatio(width, height, window.devicePixelRatio, tier) * resolutionBudget.scale;
     renderer.setPixelRatio(dpr);
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
@@ -1655,6 +2044,8 @@ function initializeMapRuntime(
       if (ready && !vegetation && !ambientDisabled) optionalTask = window.setTimeout(addTrees, 0);
       if (ready && !environmentAttempted)
         environmentTask = window.setTimeout(prepareEnvironment, 350);
+      if (ready && !contextAttempted && !contextTask)
+        contextTask = window.setTimeout(prepareContext, 160);
       invalidate();
     }
   }
@@ -1699,6 +2090,7 @@ function initializeMapRuntime(
     if (scheduled) cancelAnimationFrame(scheduled);
     window.clearTimeout(optionalTask);
     window.clearTimeout(environmentTask);
+    window.clearTimeout(contextTask);
     window.clearTimeout(ambientTimer);
   }
   rollback.push(removeListeners);
@@ -1785,6 +2177,7 @@ function initializeMapRuntime(
       height,
       insets: props().insets,
       protectedPolygons: COMMERCIAL_POLYGONS,
+      explorationPolygons: CONTEXT_EXPLORATION,
       fov: camera.fov,
     });
     navigationLimits();
@@ -1804,6 +2197,7 @@ function initializeMapRuntime(
     for (const [id, roof] of architecture.roofs) roof.visible = state.inspectedId !== id;
     const inspectionChanged = state.inspectedId !== previousInspected;
     if (inspectionChanged) {
+      solarShadows.invalidate();
       if (state.inspectedId) {
         if (!previousInspected) exteriorPose = pose();
         focus(state.inspectedId);
@@ -1831,10 +2225,8 @@ function initializeMapRuntime(
     previousView = state.view;
     previousViewRevision = state.viewRevision;
     if (state.quality !== previousQuality) {
-      pendingTier =
-        state.quality === "auto"
-          ? initialQuality(memory, navigator.hardwareConcurrency)
-          : state.quality;
+      pendingSoftwareMode = softwareRasterizer && state.quality === "auto";
+      pendingTier = state.quality === "auto" ? automaticTier() : state.quality;
       previousQuality = state.quality;
       slowWindows = fastWindows = 0;
       adaptiveSamples.length = 0;
@@ -1863,12 +2255,14 @@ function initializeMapRuntime(
       surface.dispose();
     } else selectionFillGeometry.setDrawRange(0, 0);
     if (lotGeometry) {
-      const colors = lotGeometry.getAttribute("color") as THREE.BufferAttribute;
-      for (const [id, [start, count]] of lotRanges) {
+      const colors = statusGeometry.getAttribute("color") as THREE.BufferAttribute;
+      for (const [id, [start, count]] of statusRanges) {
         const color = new THREE.Color(
           state.highlightedIds.includes(id) && !state.statuses[id]
             ? "#d5c69c"
-            : statusColor(state.statuses[id]),
+            : state.statuses[id]
+              ? statusColor(state.statuses[id])
+              : PALETTE.lotEdge,
         );
         for (let i = start; i < start + count; i++) colors.setXYZ(i, color.r, color.g, color.b);
       }
@@ -1891,19 +2285,34 @@ function initializeMapRuntime(
   }
 
   resizeBuffer();
-  const overview = freeRegionPose(CENTER, DIAGONAL / 2, props().view, {
-    width: WIDTH,
-    depth: DEPTH,
-    height: Math.max(...ENTITIES.map(architectureVisualHeight)),
-  });
+  const overview = freeRegionPose(
+    envelope.viewCenter,
+    Math.hypot(
+      envelope.viewBounds.maxX - envelope.viewBounds.minX,
+      envelope.viewBounds.maxY - envelope.viewBounds.minY,
+    ) / 2,
+    props().view,
+    {
+      width: envelope.viewBounds.maxX - envelope.viewBounds.minX,
+      depth: envelope.viewBounds.maxY - envelope.viewBounds.minY,
+      height: Math.max(...ENTITIES.map(architectureVisualHeight)),
+    },
+    undefined,
+    true,
+  );
   if (props().initialFocus) {
     const focusTarget = props().initialFocus!;
-    const shift = new THREE.Vector3(focusTarget[0] - CENTER[0], 0, focusTarget[1] - CENTER[1]);
+    const shift = new THREE.Vector3(
+      focusTarget[0] - envelope.viewCenter[0],
+      0,
+      focusTarget[1] - envelope.viewCenter[1],
+    );
     overview.position.add(shift);
     overview.target.add(shift);
   }
   applyPose(overview);
   update();
+  softwareMaterials.sync(scene);
   performance.mark("indumoveis-map:essential-prepared");
   // Keep the already usable SVG/input thread available while the driver links
   // essential programs. Compile against the scene's existing lights, excluding
@@ -1981,9 +2390,16 @@ function initializeMapRuntime(
       diag.activeLoops = 0;
       diag.activeContexts = 0;
       window.clearTimeout(optionalTask);
+      window.clearTimeout(contextTask);
       removeListeners();
       controls.dispose();
+      softwareMaterials.dispose();
       vegetation?.dispose();
+      contextVegetation?.dispose();
+      lotGrass?.dispose();
+      urban?.dispose();
+      parkDetails?.dispose();
+      solarShadows.dispose();
       terrain.dispose();
       sunShadows.dispose();
       daylightBackground.dispose();
