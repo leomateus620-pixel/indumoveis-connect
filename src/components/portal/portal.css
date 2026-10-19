@@ -222,9 +222,6 @@
   .portal-hero__brand {
     animation: portal-rise 420ms var(--portal-ease) both;
   }
-  .portal-count {
-    animation: portal-rise 420ms 60ms var(--portal-ease) both;
-  }
   .portal-grid > li {
     animation: portal-rise 380ms calc(120ms + var(--i, 0) * 40ms) var(--portal-ease) both;
   }
@@ -250,124 +247,280 @@
   margin-top: calc(-1 * var(--portal-overlap));
 }
 
-/* ---------- Contagem ---------- */
+/* ---------- Contagem: ambiente de exposição ----------
+   Uma sala em perspectiva frontal: parede de fundo acetinada, teto com sanca,
+   paredes laterais e piso. Os indicadores são nichos iluminados na parede.
+   Planos com clip-path; peças vetoriais em SVG. Nenhum raster, nenhum WebGL. */
 .portal-count {
+  --pc-ink: oklch(0.985 0.004 340);
+  --pc-ink-soft: oklch(0.88 0.018 345);
+  --pc-ink-faint: oklch(0.8 0.022 345);
+  --pc-metal: oklch(0.82 0.03 78);
+  --pc-metal-deep: oklch(0.6 0.026 76);
+  --pc-shade: oklch(0.12 0.03 352);
+  /* Profundidade da sala; resolvidas nos descendentes, onde cqi mede o próprio card. */
+  --side: clamp(0.875rem, 5.4cqi, 3rem);
+  --ceil: clamp(0.625rem, 2.6cqi, 1.375rem);
+  --gutter: clamp(0.5rem, 2.2cqi, 1.5rem);
+
   container-type: inline-size;
   position: relative;
+  isolation: isolate;
   display: grid;
-  gap: clamp(1rem, 2.4vw, 1.5rem);
-  max-width: 56rem;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 60rem;
   margin-inline: auto;
-  padding: clamp(1.125rem, 3vw, 1.75rem);
-  border: 1px solid var(--portal-line);
-  border-radius: var(--portal-radius-lg);
-  background: var(--portal-surface);
-  box-shadow: var(--portal-shadow-lg);
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: oklch(0.275 0.044 350);
+  color: var(--pc-ink);
+  box-shadow:
+    0 0 0 1px oklch(0.44 0.05 346 / 0.55),
+    0 2px 4px oklch(0.18 0.04 350 / 0.18),
+    0 18px 32px -18px oklch(0.18 0.05 350 / 0.55),
+    0 44px 72px -36px oklch(0.2 0.06 350 / 0.6);
 }
 .portal-count[data-compact] {
-  max-width: 44rem;
+  max-width: 48rem;
 }
+.portal-count :focus-visible {
+  outline-color: var(--pc-ink);
+}
+
+/* Cena (camada mais funda) */
+.portal-count__scene {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+.portal-count__scene > * {
+  position: absolute;
+}
+.portal-count__wall {
+  inset: 0;
+  background:
+    radial-gradient(75% 65% at 16% 0%, oklch(0.45 0.06 346 / 0.55), transparent 70%),
+    radial-gradient(55% 45% at 50% 42%, oklch(0.34 0.05 347 / 0.65), transparent 78%),
+    linear-gradient(180deg, oklch(0.3 0.048 349), oklch(0.255 0.042 351));
+}
+.portal-count__ceil {
+  inset: 0 0 auto;
+  height: var(--ceil);
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--side)) 100%, var(--side) 100%);
+  background: linear-gradient(180deg, oklch(0.19 0.034 353), oklch(0.235 0.038 351));
+}
+/* Sanca: filete de luz na junção teto/parede e um banho suave descendo. */
+.portal-count__cove {
+  top: var(--ceil);
+  left: var(--side);
+  right: var(--side);
+  height: clamp(3rem, 14cqi, 6rem);
+  background:
+    linear-gradient(
+        90deg,
+        transparent,
+        oklch(0.93 0.035 70 / 0.5) 22%,
+        oklch(0.93 0.035 70 / 0.5) 78%,
+        transparent
+      )
+      top / 100% 1px no-repeat,
+    linear-gradient(180deg, oklch(0.78 0.05 50 / 0.1), transparent);
+}
+.portal-count__side {
+  top: 0;
+  bottom: 0;
+  width: var(--side);
+}
+/* Luz entra pela esquerda: parede esquerda iluminada, direita na sombra. */
+.portal-count__side--l {
+  left: 0;
+  clip-path: polygon(0 0, 100% var(--ceil), 100% 100%, 0 100%);
+  background:
+    linear-gradient(90deg, transparent 70%, oklch(0.14 0.03 352 / 0.35)),
+    linear-gradient(180deg, oklch(0.37 0.052 347), oklch(0.31 0.047 349));
+}
+.portal-count__side--r {
+  right: 0;
+  clip-path: polygon(0 var(--ceil), 100% 0, 100% 100%, 0 100%);
+  background:
+    linear-gradient(270deg, transparent 60%, oklch(0.12 0.03 352 / 0.3)),
+    linear-gradient(180deg, oklch(0.235 0.04 351), oklch(0.205 0.036 352));
+}
+.portal-count__lamp {
+  display: none;
+}
+
+/* Conteúdo */
 .portal-count__head {
-  text-align: center;
-}
-.portal-count__eyebrow {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--portal-red);
-}
-.portal-count__title {
-  margin-top: 0.125rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2.6vw, 1.625rem);
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--portal-ink);
-  text-wrap: balance;
-  overflow-wrap: break-word;
-}
-.portal-count__meta {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.125rem;
-  margin-top: 0.5rem;
-  font-size: 0.9375rem;
-  line-height: 1.4;
-  color: var(--portal-ink-soft);
+  gap: clamp(0.375rem, 1.4cqi, 0.625rem);
+  padding: calc(var(--ceil) + clamp(1.25rem, 4.6cqi, 2.25rem)) calc(var(--side) + var(--gutter)) 0;
+  text-align: center;
+}
+.portal-count__title {
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 0.95rem + 3cqi, 2.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--pc-ink);
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
-.portal-count__meta-main {
+/* Ano como na logo: menor, espaçado e no tom metálico. */
+.portal-count__year {
+  display: inline-block;
+  margin-left: 0.12em;
+  font-size: 0.58em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  vertical-align: 0.12em;
+  color: var(--pc-metal);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.portal-count__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: clamp(0.75rem, 0.66rem + 0.5cqi, 0.8125rem);
   font-weight: 600;
-  color: var(--portal-plum-ink);
+  line-height: 1.3;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pc-ink-soft);
 }
-.portal-count__tz,
-.portal-count__date {
-  white-space: nowrap;
+.portal-count__eyebrow::before,
+.portal-count__eyebrow::after {
+  content: "";
+  flex: none;
+  width: clamp(1rem, 5cqi, 2.25rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pc-metal-deep));
 }
-.portal-count__period {
-  font-size: 0.8125rem;
-  color: var(--portal-ink-faint);
+.portal-count__eyebrow::after {
+  transform: scaleX(-1);
 }
+@container (max-width: 24rem) {
+  .portal-count__eyebrow {
+    letter-spacing: 0.1em;
+  }
+  .portal-count__eyebrow::before,
+  .portal-count__eyebrow::after {
+    display: none;
+  }
+}
+
 .portal-count__live {
   display: grid;
-  gap: 0.875rem;
+  gap: 1rem;
+  justify-items: stretch;
+  width: 100%;
+  max-width: calc(38rem + 2 * (var(--side) + var(--gutter)));
+  margin-inline: auto;
+  padding: clamp(1.125rem, 3.6cqi, 1.875rem) calc(var(--side) + var(--gutter))
+    clamp(1.5rem, 4cqi, 2.25rem);
 }
 .portal-count__units {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
+  gap: 1.125rem 0.75rem;
 }
-@container (min-width: 19rem) {
+@container (min-width: 21.5rem) {
   .portal-count__units {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(0.5rem, 2cqi, 1rem);
+    grid-template-columns: minmax(0, 1.22fr) repeat(3, minmax(0, 1fr));
+    gap: clamp(0.5rem, 2.2cqi, 1.125rem);
   }
 }
+
+/* Nicho: recorte na parede com fita de luz sob a verga e prateleira metálica fosca. */
 .portal-count__unit {
+  --niche-r: clamp(0.625rem, 2.6cqi, 1.125rem);
+  --led: oklch(0.47 0.06 345 / 0.85);
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 0;
-  padding: clamp(0.75rem, 3cqi, 1.25rem) 0.25rem clamp(0.625rem, 2.4cqi, 1rem);
-  overflow: hidden;
-  border-radius: var(--portal-radius-md);
-  background: linear-gradient(170deg, oklch(0.36 0.05 347) 0%, var(--portal-plum-deep) 100%);
+  padding: clamp(0.875rem, 3.2cqi, 1.5rem) 0.25rem clamp(0.75rem, 2.6cqi, 1.125rem);
+  border-radius: var(--niche-r) var(--niche-r) 0.25rem 0.25rem;
+  background:
+    radial-gradient(95% 80% at 50% 0%, var(--led), transparent 72%),
+    linear-gradient(180deg, oklch(0.285 0.045 348), oklch(0.205 0.035 352));
   box-shadow:
-    inset 0 1px 0 oklch(1 0 0 / 0.1),
-    0 6px 16px -10px oklch(0.25 0.05 345 / 0.6);
+    inset 0 0 0 1px oklch(0.12 0.03 352 / 0.55),
+    inset 9px 0 12px -10px oklch(0.08 0.03 352 / 0.7),
+    inset -9px 0 12px -10px oklch(0.08 0.03 352 / 0.55),
+    inset 0 -12px 16px -14px oklch(0.08 0.03 352 / 0.8),
+    0 -1px 0 oklch(0.14 0.03 352 / 0.5),
+    0 1px 0 oklch(1 0 0 / 0.06);
+}
+.portal-count__unit[data-primary] {
+  --led: oklch(0.5 0.07 348 / 0.95);
+}
+.portal-count__unit::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 16%;
+  right: 16%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, oklch(0.95 0.03 65 / 0.85), transparent);
+}
+.portal-count__unit::after {
+  content: "";
+  position: absolute;
+  left: -0.1875rem;
+  right: -0.1875rem;
+  bottom: -0.3125rem;
+  height: 0.3125rem;
+  border-radius: 1px 1px 2px 2px;
+  background: linear-gradient(180deg, var(--pc-metal), var(--pc-metal-deep));
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.35),
+    0 5px 8px -3px oklch(0.08 0.03 352 / 0.75);
 }
 .portal-count__unit--skeleton {
-  min-height: clamp(5rem, 22cqi, 7.5rem);
-  background: var(--portal-plum-tint);
-  box-shadow: none;
+  min-height: clamp(5.5rem, 22cqi, 8.5rem);
 }
 .portal-count__value {
   display: block;
-  min-width: 2ch;
+  overflow: clip;
+  padding-block: 0.04em;
   font-family: var(--font-display);
-  font-size: clamp(2.125rem, 1rem + 6.5cqi, 3.75rem);
+  font-size: clamp(2.375rem, 13cqi, 3rem);
   font-weight: 800;
   line-height: 1;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
+  letter-spacing: -0.035em;
   text-align: center;
-  color: var(--portal-on-dark);
+  color: var(--pc-ink);
+  text-shadow: 0 1px 1px oklch(0.1 0.03 352 / 0.35);
+}
+@container (min-width: 21.5rem) {
+  .portal-count__value {
+    font-size: clamp(2.125rem, 0.6rem + 7.4cqi, 4.5rem);
+  }
 }
 .portal-count__digits {
   display: inline-block;
 }
 @media (prefers-reduced-motion: no-preference) {
   .portal-count__digits {
-    animation: portal-tick 280ms var(--portal-ease);
+    animation: portal-count-tick 260ms var(--portal-ease);
   }
 }
-@keyframes portal-tick {
+@keyframes portal-count-tick {
   from {
-    opacity: 0.35;
-    transform: translateY(-0.12em);
+    opacity: 0.2;
+    transform: translateY(-0.28em);
   }
   to {
     opacity: 1;
@@ -375,28 +528,224 @@
   }
 }
 .portal-count__label {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 0.8125rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: clamp(0.5rem, 1.8cqi, 0.75rem);
+  font-size: clamp(0.75rem, 0.62rem + 0.6cqi, 0.875rem);
   font-weight: 600;
-  color: var(--portal-on-dark-soft);
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pc-ink-soft);
 }
+/* Zoom de texto alto em tela estreita: um nicho por linha, número e unidade lado a lado. */
+@container (max-width: 17rem) {
+  .portal-count__units {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .portal-count__unit {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    column-gap: 0.75rem;
+    padding: 0.75rem 0.75rem 0.625rem;
+  }
+  .portal-count__value {
+    font-size: 2.25rem;
+  }
+  .portal-count__label {
+    margin-top: 0;
+    letter-spacing: 0.06em;
+  }
+}
+/* Nichos estreitos (quatro em linha no celular): rótulo em caixa baixa, mais compacto. */
+@container (min-width: 21.5rem) and (max-width: 33rem) {
+  .portal-count__label {
+    gap: 0.3125rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
+  }
+}
+.portal-count__unit[data-primary] .portal-count__label::before {
+  content: "";
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: var(--portal-red);
+  box-shadow: 0 0 0 2px oklch(0.53 0.19 26 / 0.22);
+}
+
+/* Piso: o rodapé é o próprio plano do chão, com perspectiva e reflexo acetinado. */
+.portal-count__foot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 4.5rem;
+  padding: clamp(1.125rem, 3.4cqi, 1.5rem) calc(var(--side) + var(--gutter))
+    clamp(1.25rem, 3.8cqi, 1.875rem);
+  text-align: center;
+}
+.portal-count[data-compact] .portal-count__foot {
+  min-height: 2.75rem;
+  padding-block: 0;
+}
+.portal-count__foot::before,
+.portal-count__foot::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+.portal-count__foot::before {
+  inset: 0;
+  clip-path: polygon(var(--side) 0, calc(100% - var(--side)) 0, 100% 100%, 0 100%);
+  background:
+    radial-gradient(55% 90% at 50% 0%, oklch(0.42 0.055 346 / 0.45), transparent 75%),
+    linear-gradient(180deg, oklch(0.215 0.036 352), oklch(0.3 0.045 349) 70%, oklch(0.33 0.047 348));
+}
+/* Rodapé de parede: filete metálico fosco com sombra de contato sobre o piso. */
+.portal-count__foot::after {
+  top: 0;
+  left: var(--side);
+  right: var(--side);
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--pc-metal-deep),
+    var(--pc-metal) 30%,
+    var(--pc-metal-deep)
+  );
+  opacity: 0.55;
+  box-shadow: 0 4px 10px oklch(0.08 0.03 352 / 0.6);
+}
+.portal-count__floor-lines {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  stroke: oklch(1 0 0 / 0.06);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  mask-image: radial-gradient(60% 120% at 50% 40%, transparent 30%, #000 75%);
+  pointer-events: none;
+}
+.portal-count__floor-lines line {
+  vector-effect: non-scaling-stroke;
+}
+.portal-count__period {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 0.85rem + 1.7cqi, 1.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--pc-ink);
+  text-wrap: balance;
+}
+.portal-count__meta {
+  position: relative;
+  font-size: clamp(0.8125rem, 0.74rem + 0.4cqi, 0.9375rem);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--pc-ink-faint);
+  text-wrap: balance;
+}
+.portal-count__nowrap {
+  white-space: nowrap;
+}
+
+/* Peças de mobiliário: só quando a sala tem largura para recebê-las. */
+.portal-count__prop {
+  display: none;
+  position: absolute;
+  pointer-events: none;
+}
+
+@container (min-width: 40rem) {
+  .portal-count__side--l {
+    background:
+      repeating-linear-gradient(90deg, oklch(1 0 0 / 0.045) 0 1px, transparent 1px 7px),
+      linear-gradient(90deg, transparent 70%, oklch(0.14 0.03 352 / 0.35)),
+      linear-gradient(180deg, oklch(0.37 0.052 347), oklch(0.31 0.047 349));
+  }
+  .portal-count__side--r {
+    background:
+      repeating-linear-gradient(90deg, oklch(1 0 0 / 0.025) 0 1px, transparent 1px 7px),
+      linear-gradient(270deg, transparent 60%, oklch(0.12 0.03 352 / 0.3)),
+      linear-gradient(180deg, oklch(0.235 0.04 351), oklch(0.205 0.036 352));
+  }
+}
+
+@container (min-width: 58rem) {
+  .portal-count__scene,
+  .portal-count__head,
+  .portal-count__live,
+  .portal-count__foot {
+    --side: 4.25rem;
+    --ceil: 1.5rem;
+  }
+  .portal-count__live {
+    max-width: calc(37rem + 2 * var(--gutter));
+    padding-inline: var(--gutter);
+  }
+  .portal-count__lamp {
+    display: block;
+    top: var(--ceil);
+    right: calc(50% - 24.25rem);
+    width: 4rem;
+    height: 9.375rem;
+  }
+  .portal-count__prop {
+    display: block;
+  }
+  .portal-count__prop--arch {
+    bottom: 100%;
+    left: calc(50% - 25.25rem);
+    width: 5rem;
+    height: 9.375rem;
+  }
+  .portal-count__prop--chair {
+    top: 2rem;
+    left: calc(50% - 27rem);
+    width: 7.5rem;
+    height: 6.75rem;
+    transform: translateY(-100%);
+  }
+  .portal-count__prop--table {
+    top: 1.5rem;
+    right: calc(50% - 24.5rem);
+    width: 3.5rem;
+    height: 5.5rem;
+    transform: translateY(-100%);
+  }
+}
+
 .portal-count__done {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   font-family: var(--font-display);
-  font-size: clamp(1.0625rem, 2.4vw, 1.25rem);
+  font-size: clamp(1.0625rem, 0.9rem + 1.2cqi, 1.375rem);
   font-weight: 800;
-  color: var(--portal-red);
+  color: var(--pc-ink);
   text-align: center;
 }
 .portal-count__done svg {
   width: 1.25rem;
   height: 1.25rem;
   flex: none;
+  color: oklch(0.72 0.15 26);
 }
+
+/* Estados sem contagem: mesma sala, aviso em painel translúcido. */
 .portal-count__status {
   display: flex;
   flex-wrap: wrap;
@@ -404,7 +753,8 @@
   gap: 0.75rem 0.875rem;
   padding: 0.875rem 1rem;
   border-radius: var(--portal-radius-md);
-  background: var(--portal-surface-sunken);
+  background: oklch(1 0 0 / 0.06);
+  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.1);
 }
 .portal-count__status-icon {
   display: grid;
@@ -413,8 +763,8 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 999px;
-  background: var(--portal-plum-tint-strong);
-  color: var(--portal-plum-ink);
+  background: oklch(1 0 0 / 0.1);
+  color: var(--pc-metal);
 }
 .portal-count__status-icon svg {
   width: 1.25rem;
@@ -428,12 +778,12 @@
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--portal-ink);
+  color: var(--pc-ink);
 }
 .portal-count__status-text {
   margin-top: 0.125rem;
   font-size: 0.875rem;
-  color: var(--portal-ink-soft);
+  color: var(--pc-ink-soft);
 }
 .portal-count__action {
   display: inline-flex;
@@ -441,31 +791,25 @@
   gap: 0.5rem;
   min-height: 2.75rem;
   padding-inline: 1rem;
-  border: 1px solid var(--portal-line-strong);
+  border: 1px solid oklch(1 0 0 / 0.24);
   border-radius: var(--portal-radius-sm);
-  background: var(--portal-surface);
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--portal-plum-ink);
+  color: var(--pc-ink);
   text-decoration: none;
   touch-action: manipulation;
+  transition: background-color var(--portal-fast) var(--portal-ease);
 }
 .portal-count__action svg {
   width: 1rem;
   height: 1rem;
 }
 .portal-count__action:hover {
-  border-color: var(--portal-plum);
+  background: oklch(1 0 0 / 0.08);
 }
 .portal-skeleton {
   border-radius: var(--portal-radius-sm);
-  background: linear-gradient(
-    90deg,
-    var(--portal-surface-sunken),
-    var(--portal-plum-tint-strong),
-    var(--portal-surface-sunken)
-  );
-  background-size: 200% 100%;
+  background: oklch(1 0 0 / 0.1);
   margin-inline: auto;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -477,6 +821,88 @@
 @keyframes portal-shimmer {
   50% {
     opacity: 0.6;
+  }
+}
+
+/* Revelação única: planos → identificação e números → período. */
+@media (prefers-reduced-motion: no-preference) {
+  .portal-count[data-reveal="wait"]
+    :is(
+      .portal-count__scene > *,
+      .portal-count__head > *,
+      .portal-count__unit,
+      .portal-count__foot > *
+    ),
+  .portal-count[data-reveal="wait"] .portal-count__foot::before {
+    opacity: 0;
+  }
+  .portal-count[data-reveal="play"] .portal-count__wall {
+    animation: portal-count-fade 420ms var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] .portal-count__ceil {
+    animation: portal-count-drop 520ms 40ms var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] .portal-count__side--l {
+    animation: portal-count-from-l 560ms 40ms var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] .portal-count__side--r {
+    animation: portal-count-from-r 560ms 40ms var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] .portal-count__foot::before {
+    animation: portal-count-floor 560ms 80ms var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] :is(.portal-count__cove, .portal-count__lamp) {
+    animation: portal-count-fade 520ms 220ms var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] .portal-count__head > * {
+    animation: portal-count-rise 420ms 240ms var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] .portal-count__head > * + * {
+    animation-delay: 300ms;
+  }
+  .portal-count[data-reveal="play"] .portal-count__unit {
+    animation: portal-count-rise 440ms calc(360ms + var(--i, 0) * 50ms) var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] .portal-count__foot > * {
+    animation: portal-count-rise 420ms 640ms var(--portal-ease) both;
+  }
+  .portal-count[data-reveal="play"] .portal-count__foot > :is(svg, .portal-count__meta) {
+    animation-delay: 700ms;
+  }
+}
+@keyframes portal-count-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes portal-count-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes portal-count-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+@keyframes portal-count-from-l {
+  from {
+    opacity: 0;
+    transform: translateX(-60%);
+  }
+}
+@keyframes portal-count-from-r {
+  from {
+    opacity: 0;
+    transform: translateX(60%);
+  }
+}
+@keyframes portal-count-floor {
+  from {
+    opacity: 0;
+    transform: translateY(18%);
   }
 }
 
