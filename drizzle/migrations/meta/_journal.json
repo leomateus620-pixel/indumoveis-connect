@@ -8,6 +8,13 @@
       "when": 1792392195607,
       "tag": "0000_edition_opening_time",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792396800000,
+      "tag": "0001_edition_official_opening",
+      "breakpoints": true
     }
   ]
 }

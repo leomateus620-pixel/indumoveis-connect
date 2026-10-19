@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PortalPage } from "@/components/portal/PortalPage";
+import { PortalLayout } from "@/components/portal/PortalLayout";
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/_authenticated/portal")({
   head: () => ({
     meta: [
       { title: "Portal — Sistema Indumóveis" },
@@ -17,5 +17,5 @@ export const Route = createFileRoute("/_authenticated/")({
 
 function PortalRoute() {
   const { user } = Route.useRouteContext();
-  return <PortalPage userId={user.id} />;
+  return <PortalLayout userId={user.id} />;
 }

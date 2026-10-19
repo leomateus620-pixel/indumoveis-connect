@@ -185,3 +185,100 @@
 @media (prefers-reduced-motion: reduce) {
   .route-enter, .route-progress::after { animation: none; }
 }
+
+/* Linguagem de carregamento da Indumóveis (portal e layout operacional) */
+.nav-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 70;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+  background: color-mix(in oklab, var(--brand-plum) 16%, transparent);
+}
+.nav-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 38%;
+  background: linear-gradient(90deg, var(--brand-plum), var(--brand-red));
+  animation: route-progress 900ms ease-in-out infinite;
+}
+.nav-pill-region {
+  position: fixed;
+  left: 50%;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: 70;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 1rem 0.5rem 0.625rem;
+  border-radius: 999px;
+  background: oklch(0.27 0.045 350 / 0.96);
+  color: oklch(0.98 0.005 340);
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 10px 30px -12px oklch(0.2 0.05 345 / 0.55);
+  animation: nav-pill-in 160ms ease-out;
+}
+@keyframes nav-pill-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.brand-loader {
+  flex: none;
+}
+.brand-loader__track {
+  fill: color-mix(in oklab, var(--brand-plum) 16%, transparent);
+}
+.brand-loader__fill {
+  fill: var(--brand-plum);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: brand-fill 1.2s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+.brand-loader__dot {
+  fill: var(--brand-red);
+}
+.brand-loader--light .brand-loader__track {
+  fill: oklch(1 0 0 / 0.2);
+}
+.brand-loader--light .brand-loader__fill {
+  fill: oklch(0.96 0.01 340);
+}
+@keyframes brand-fill {
+  0% {
+    transform: scaleY(0.08);
+    opacity: 0.9;
+  }
+  60% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-progress::after,
+  .nav-pill {
+    animation: none;
+  }
+  .brand-loader__fill {
+    animation: none;
+    transform: scaleY(0.6);
+  }
+}

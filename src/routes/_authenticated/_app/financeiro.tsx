@@ -25,7 +25,7 @@ import { useInstallments, useContracts, useCan, useDbMutation, api } from "@/lib
 import { brl, fmtDate, today, toCents, centsToInput, fmtDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/financeiro")({
+export const Route = createFileRoute("/_authenticated/_app/financeiro")({
   validateSearch: (s: Record<string, unknown>): { view?: string; contract?: string } => ({
     view: typeof s.view === "string" ? s.view : undefined,
     contract: typeof s.contract === "string" ? s.contract : undefined,

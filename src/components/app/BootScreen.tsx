@@ -1,5 +1,5 @@
-import { Loader2 } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png.asset.json";
+import { BrandLoader } from "./BrandLoader";
 
 /** Superfície neutra enquanto sessão/perfil são verificados: nada protegido é renderizado. */
 export function BootScreen({ label = "Verificando sessão" }: { label?: string }) {
@@ -16,8 +16,11 @@ export function BootScreen({ label = "Verificando sessão" }: { label?: string }
         className="h-auto w-44 opacity-90"
         decoding="async"
       />
-      <p role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+      <p
+        role="status"
+        className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground"
+      >
+        <BrandLoader className="size-6" />
         {label}…
       </p>
     </main>

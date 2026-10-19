@@ -5,6 +5,7 @@ import {
   formatOpeningLabel,
   nextTickDelay,
   resolveOpening,
+  timeZoneShortLabel,
   zonedTimeToUtc,
 } from "./countdown";
 
@@ -82,5 +83,22 @@ describe("edition countdown", () => {
     expect(formatEditionPeriod("2027-05-14", "2027-05-23")).toBe("14 a 23 de maio de 2027");
     expect(formatEditionPeriod("2027-05-30", "2027-06-02")).toBe("30 de maio a 2 de junho de 2027");
     expect(formatEditionPeriod(undefined, undefined)).toBeNull();
+  });
+
+  it("uses the official Indumóveis 2027 opening: 14/05/2027 10h in Brasília", () => {
+    const r = resolveOpening({ ...edition, opening_time: "10:00:00" });
+    expect(r.status).toBe("configured");
+    if (r.status !== "configured") return;
+    expect(r.openingAt).toBe(Date.parse("2027-05-14T10:00:00-03:00"));
+    expect(formatOpeningLabel(r.openingAt, r.timeZone)).toBe("14 de maio de 2027, às 10h");
+    expect(timeZoneShortLabel(r.timeZone, r.openingAt)).toBe("Brasília");
+    expect(countdownAt(r.openingAt - 1, r.openingAt, r.closingAt)).toMatchObject({
+      phase: "countdown",
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 1,
+    });
+    expect(countdownAt(r.openingAt + 1, r.openingAt, r.closingAt).phase).toBe("open");
   });
 });

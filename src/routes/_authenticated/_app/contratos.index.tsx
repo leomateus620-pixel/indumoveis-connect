@@ -16,7 +16,7 @@ import {
 import { useContracts, useCan } from "@/lib/api";
 import { CONTRACT_STATUS, brl, fmtDate } from "@/lib/format";
 
-export const Route = createFileRoute("/_authenticated/contratos/")({
+export const Route = createFileRoute("/_authenticated/_app/contratos/")({
   head: () => ({
     meta: [
       { title: "Contratos — Sistema Indumóveis" },

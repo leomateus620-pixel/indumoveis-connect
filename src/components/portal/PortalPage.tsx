@@ -1,30 +1,24 @@
-import { useMemo } from "react";
+import { useMemo, type CSSProperties } from "react";
 import { LockKeyhole } from "lucide-react";
-import { useEdition, useMe } from "@/lib/api";
+import { useEdition, type Me } from "@/lib/api";
 import { visibleCategories } from "@/lib/navigation";
-import { PortalHero } from "./PortalHero";
 import { EditionCountdown } from "./EditionCountdown";
 import { PortalCategoryCard } from "./PortalCategoryCard";
 
-export function PortalPage({ userId }: { userId: string }) {
-  const { data: me } = useMe(userId);
+export function PortalPage({ me }: { me: Me }) {
   const edition = useEdition();
-  const perms = me?.perms;
+  const perms = me.perms;
   const categories = useMemo(() => visibleCategories(perms), [perms]);
-  const refetchEdition = edition.refetch;
 
   return (
-    <div className="portal-wrap">
-      <div className="portal-intro">
-        <PortalHero />
-        <EditionCountdown
-          edition={edition.data}
-          isLoading={edition.isLoading}
-          isError={edition.isError && !edition.data}
-          onRetry={refetchEdition}
-          canConfigure={!!perms?.admin?.write}
-        />
-      </div>
+    <div className="portal-wrap portal-body">
+      <EditionCountdown
+        edition={edition.data}
+        isLoading={edition.isLoading}
+        isError={edition.isError && !edition.data}
+        onRetry={edition.refetch}
+        canConfigure={!!perms?.admin?.write}
+      />
 
       <section className="portal-modules" aria-labelledby="portal-modules-title">
         <div className="portal-modules__head">
@@ -34,15 +28,15 @@ export function PortalPage({ userId }: { userId: string }) {
           {categories.length > 0 && (
             <p className="portal-modules__count">
               {categories.length === 1
-                ? "1 categoria liberada"
-                : `${categories.length} categorias liberadas`}
+                ? "1 área liberada para você"
+                : `${categories.length} áreas liberadas para você`}
             </p>
           )}
         </div>
         {categories.length ? (
           <ul className="portal-grid">
-            {categories.map(({ category, destinations }) => (
-              <li key={category.id}>
+            {categories.map(({ category, destinations }, i) => (
+              <li key={category.id} style={{ "--i": i } as CSSProperties}>
                 <PortalCategoryCard category={category} destinations={destinations} />
               </li>
             ))}

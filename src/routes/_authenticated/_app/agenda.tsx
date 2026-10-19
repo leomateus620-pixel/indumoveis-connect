@@ -81,7 +81,7 @@ type Search = {
   day?: string;
 };
 
-export const Route = createFileRoute("/_authenticated/agenda")({
+export const Route = createFileRoute("/_authenticated/_app/agenda")({
   validateSearch: (search: Record<string, unknown>): Search => ({
     view: ["timeline", "panel", "calendar"].includes(String(search.view))
       ? (search.view as View)

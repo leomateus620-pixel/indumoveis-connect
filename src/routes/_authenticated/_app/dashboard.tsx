@@ -16,7 +16,7 @@ import {
 } from "@/lib/api";
 import { brl, fmtDate, today, SPACE_STATUS } from "@/lib/format";
 
-export const Route = createFileRoute("/_authenticated/dashboard")({
+export const Route = createFileRoute("/_authenticated/_app/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — Sistema Indumóveis" },

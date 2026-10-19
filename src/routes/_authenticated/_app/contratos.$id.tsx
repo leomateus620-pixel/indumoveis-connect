@@ -50,7 +50,7 @@ import {
 } from "@/lib/format";
 import { snapshotDiff, snapshotOfDeal, splitInstallments } from "@/lib/journey";
 
-export const Route = createFileRoute("/_authenticated/contratos/$id")({
+export const Route = createFileRoute("/_authenticated/_app/contratos/$id")({
   head: () => ({
     meta: [
       { title: "Contrato — Sistema Indumóveis" },
