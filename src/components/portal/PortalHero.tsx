@@ -20,20 +20,20 @@ export const PortalHero = memo(function PortalHero() {
         aria-hidden="true"
         focusable="false"
       >
-        <path d={arch(-60, 132, 230, 260)} fill="oklch(0.83 0.018 90 / 0.09)" />
+        <path d={arch(-40, 168, 190, 200)} fill="oklch(0.83 0.018 90 / 0.08)" />
         <path
-          d={arch(628, -88, 214, 330)}
+          d={arch(604, 92, 168, 240)}
           fill="none"
-          stroke="oklch(1 0 0 / 0.11)"
+          stroke="oklch(1 0 0 / 0.12)"
           strokeWidth="1.25"
         />
         <path
-          d={arch(662, -54, 146, 262)}
+          d={arch(632, 136, 112, 200)}
           fill="none"
-          stroke="oklch(1 0 0 / 0.06)"
+          stroke="oklch(1 0 0 / 0.07)"
           strokeWidth="1"
         />
-        <circle cx="604" cy="244" r="6" fill="var(--brand-red)" />
+        <circle cx="688" cy="66" r="5.5" fill="var(--brand-red)" />
       </svg>
       <div className="portal-hero__brand">
         <h1 id="portal-hero-title" className="sr-only">

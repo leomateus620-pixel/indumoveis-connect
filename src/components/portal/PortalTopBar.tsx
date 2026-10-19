@@ -52,7 +52,10 @@ export function PortalTopBar({
             <span className="portal-account__name hidden sm:inline">{display}</span>
             <ChevronDown className="size-4 shrink-0 opacity-70" aria-hidden="true" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
+          <DropdownMenuContent
+            align="end"
+            className="w-64 motion-reduce:animate-none motion-reduce:transition-none"
+          >
             <DropdownMenuLabel className="font-normal">
               <p className="truncate text-sm font-semibold">{display}</p>
               {me.email && me.email !== display && (

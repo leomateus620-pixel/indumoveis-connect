@@ -153,7 +153,11 @@ function SidebarBody({
                 key={category.id}
                 role="group"
                 aria-label={category.title}
-                className="space-y-0.5"
+                className={cn(
+                  "space-y-0.5",
+                  !compact &&
+                    "mb-2 border-b border-sidebar-border/60 pb-2 last:mb-0 last:border-b-0",
+                )}
               >
                 {compact ? (
                   <div className="mx-2 my-2 h-px bg-sidebar-border" aria-hidden />
@@ -202,6 +206,17 @@ function SidebarBody({
         </Button>
       </div>
     </div>
+  );
+}
+
+function SkipLink() {
+  return (
+    <a
+      href="#conteudo"
+      className="sr-only z-50 rounded-md bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-lg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      Pular para o conteúdo
+    </a>
   );
 }
 
@@ -336,7 +351,10 @@ function AuthorizedShell({
 
   const sheet = (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent side="left" className="w-[min(19rem,88vw)] overflow-y-auto border-none p-0">
+      <SheetContent
+        side="left"
+        className="w-[min(19rem,88vw)] overflow-y-auto border-none p-0 motion-reduce:animate-none motion-reduce:transition-none"
+      >
         <SheetTitle className="sr-only">Navegação</SheetTitle>
         <SidebarBody compact={false} me={me} onNavigate={closeSheet} onSignOut={onSignOut} />
       </SheetContent>
@@ -354,9 +372,15 @@ function AuthorizedShell({
   if (isPortal)
     return (
       <div className="portal">
+        <SkipLink />
         {sheet}
         <PortalTopBar me={me} onOpenMenu={() => setOpen(true)} onSignOut={onSignOut} />
-        <main className="portal-main relative" aria-busy={pending || undefined}>
+        <main
+          id="conteudo"
+          tabIndex={-1}
+          className="portal-main relative outline-none"
+          aria-busy={pending || undefined}
+        >
           {content}
         </main>
       </div>
@@ -364,6 +388,7 @@ function AuthorizedShell({
 
   return (
     <div className="internal-app flex min-h-dvh w-full bg-workspace">
+      <SkipLink />
       <aside
         className={cn(
           "sticky top-0 hidden h-dvh shrink-0 transition-[width] motion-reduce:transition-none md:block",
@@ -427,7 +452,12 @@ function AuthorizedShell({
             )}
           </span>
         </div>
-        <main className="relative min-w-0 flex-1" aria-busy={pending || undefined}>
+        <main
+          id="conteudo"
+          tabIndex={-1}
+          className="relative min-w-0 flex-1 outline-none"
+          aria-busy={pending || undefined}
+        >
           {content}
         </main>
       </div>

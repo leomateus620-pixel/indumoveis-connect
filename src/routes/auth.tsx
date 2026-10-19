@@ -60,7 +60,7 @@ function ResolveAccess({ userId }: { userId: string }) {
     sessionStorage.removeItem("auth-redirect");
     // Login normal entra no portal; link direto protegido volta ao destino pedido.
     const target = requested && me.perms[requested.module]?.read ? requested.path : PORTAL_PATH;
-    navigate({ to: target as typeof PORTAL_PATH, replace: true });
+    navigate({ href: target, replace: true });
   }, [me, navigate]);
   if (isPending) return <Status title="Carregando seu perfil" />;
   if (isError || !me) return <Status title="Não foi possível consultar seu acesso" detail="Sua sessão permanece ativa." action={<><Button onClick={() => refetch()}>Tentar novamente</Button><SignOut /></>} />;

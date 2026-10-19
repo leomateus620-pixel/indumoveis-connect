@@ -266,6 +266,7 @@
 }
 .portal-count__title {
   margin-top: 0.25rem;
+  overflow-wrap: break-word;
   font-family: var(--font-display);
   font-size: clamp(1.2rem, 2.4vw, 1.4rem);
   font-weight: 800;
@@ -336,10 +337,10 @@
 }
 .portal-count__status {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.875rem;
   padding: 0.875rem 1rem;
-  border: 1px dashed var(--portal-line-strong);
   border-radius: var(--portal-radius-md);
   background: var(--portal-surface-sunken);
 }
@@ -356,6 +357,10 @@
 .portal-count__status-icon svg {
   width: 1.25rem;
   height: 1.25rem;
+}
+.portal-count__status > div {
+  flex: 1 1 12rem;
+  overflow-wrap: break-word;
 }
 .portal-count__status-title {
   font-family: var(--font-display);
@@ -477,7 +482,7 @@
   gap: 0.875rem;
   width: 100%;
   padding: 1rem 1rem 0.875rem;
-  border-radius: inherit;
+  border-radius: var(--portal-radius-lg);
   color: inherit;
   text-align: left;
   touch-action: manipulation;
@@ -490,14 +495,18 @@
 }
 .portal-card__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 0.875rem;
 }
+/* Com zoom de texto alto o emblema sobe e o texto ganha a largura toda. */
 .portal-card__copy {
   display: flex;
+  flex: 1 1 10rem;
   flex-direction: column;
   gap: 0.25rem;
   min-width: 0;
+  overflow-wrap: break-word;
 }
 .portal-card__title {
   font-family: var(--font-display);

@@ -40,7 +40,8 @@ function useEditionClock(openingAt?: number, closingAt?: number) {
       window.removeEventListener("pageshow", sync);
     };
   }, [openingAt, closingAt]);
-  return now;
+  // Antes do primeiro tique após a edição chegar, o estado ainda guarda o instante de montagem.
+  return openingAt === undefined ? now : Math.max(now, Date.now());
 }
 
 function plural(n: number, one: string, many: string) {
@@ -89,7 +90,7 @@ function Status({
       <span className="portal-count__status-icon" aria-hidden="true">
         {icon}
       </span>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0">
         <p className="portal-count__status-title">{title}</p>
         {text && <p className="portal-count__status-text">{text}</p>}
         {children}
