@@ -898,7 +898,6 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
-          opening_time: string | null
           reservation_expiry_action: string | null
           reservation_hold_days: number | null
           starts_on: string
@@ -913,7 +912,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
-          opening_time?: string | null
           reservation_expiry_action?: string | null
           reservation_hold_days?: number | null
           starts_on: string
@@ -928,7 +926,6 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
-          opening_time?: string | null
           reservation_expiry_action?: string | null
           reservation_hold_days?: number | null
           starts_on?: string
