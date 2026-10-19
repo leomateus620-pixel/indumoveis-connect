@@ -1,6 +1,6 @@
 import { memo, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { CalendarCheck, CalendarClock, CalendarDays, RotateCw } from "lucide-react";
+import { CalendarClock, PartyPopper, RotateCw, Settings2 } from "lucide-react";
 import type { Edition } from "@/lib/api";
 import {
   countdownAt,
@@ -9,17 +9,16 @@ import {
   nextTickDelay,
   pad2,
   resolveOpening,
-  timeZoneLabel,
+  timeZoneShortLabel,
   type CountdownSnapshot,
 } from "@/lib/countdown";
 
 const MAX_TIMEOUT = 2_147_000_000;
 
-/** Relógio local: recalcula a partir de Date.now() a cada virada de segundo, pausa em abas ocultas. */
-function useEditionClock(openingAt?: number, closingAt?: number) {
+/** Relógio local: recalcula a partir de Date.now() a cada virada de segundo e ressincroniza ao voltar à aba. */
+function useEditionClock(openingAt: number, closingAt: number) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    if (openingAt === undefined || closingAt === undefined) return;
     let timer: number | undefined;
     const sync = () => {
       window.clearTimeout(timer);
@@ -40,61 +39,72 @@ function useEditionClock(openingAt?: number, closingAt?: number) {
       window.removeEventListener("pageshow", sync);
     };
   }, [openingAt, closingAt]);
-  // Antes do primeiro tique após a edição chegar, o estado ainda guarda o instante de montagem.
-  return openingAt === undefined ? now : Math.max(now, Date.now());
+  return Math.max(now, Date.now());
 }
 
 function plural(n: number, one: string, many: string) {
   return `${n} ${n === 1 ? one : many}`;
 }
 
-function Units({ snapshot }: { snapshot: CountdownSnapshot }) {
+const ZERO = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
+function Units({ value }: { value: Pick<CountdownSnapshot, keyof typeof ZERO> }) {
   const units = [
-    { label: "Dias", value: pad2(snapshot.days) },
-    { label: "Horas", value: pad2(snapshot.hours) },
-    { label: "Min", value: pad2(snapshot.minutes) },
-    { label: "Seg", value: pad2(snapshot.seconds) },
+    { label: "dias", value: value.days },
+    { label: "horas", value: value.hours },
+    { label: "minutos", value: value.minutes },
+    { label: "segundos", value: value.seconds },
   ];
   return (
-    <div role="timer" aria-label="Tempo restante para a abertura">
+    <div className="portal-count__units" aria-hidden="true">
+      {units.map((u) => (
+        <div key={u.label} className="portal-count__unit">
+          <span className="portal-count__value">
+            {/* A chave reinicia a transição apenas no número que mudou. */}
+            <span key={u.value} className="portal-count__digits">
+              {pad2(u.value)}
+            </span>
+          </span>
+          <span className="portal-count__label">{u.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LiveCountdown({
+  openingAt,
+  closingAt,
+  editionName,
+}: {
+  openingAt: number;
+  closingAt: number;
+  editionName: string;
+}) {
+  const now = useEditionClock(openingAt, closingAt);
+  const snapshot = countdownAt(now, openingAt, closingAt);
+
+  if (snapshot.phase !== "countdown")
+    return (
+      <div className="portal-count__live">
+        <Units value={ZERO} />
+        <p className="portal-count__done" role="status">
+          <PartyPopper aria-hidden="true" />
+          {snapshot.phase === "open"
+            ? `A ${editionName} começou!`
+            : `A ${editionName} foi encerrada.`}
+        </p>
+      </div>
+    );
+
+  return (
+    <div className="portal-count__live" role="timer" aria-label="Tempo restante para a abertura">
       {/* Texto por minuto para leitores de tela; os segundos não são anunciados. */}
       <p className="sr-only">
         Faltam {plural(snapshot.days, "dia", "dias")}, {plural(snapshot.hours, "hora", "horas")} e{" "}
         {plural(snapshot.minutes, "minuto", "minutos")} para a abertura.
       </p>
-      <div className="portal-count__units" aria-hidden="true">
-        {units.map((u) => (
-          <div key={u.label} className="portal-count__unit">
-            <span className="portal-count__value">{u.value}</span>
-            <span className="portal-count__label">{u.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Status({
-  icon,
-  title,
-  text,
-  children,
-}: {
-  icon: ReactNode;
-  title: string;
-  text?: ReactNode;
-  children?: ReactNode;
-}) {
-  return (
-    <div className="portal-count__status" role="status">
-      <span className="portal-count__status-icon" aria-hidden="true">
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <p className="portal-count__status-title">{title}</p>
-        {text && <p className="portal-count__status-text">{text}</p>}
-        {children}
-      </div>
+      <Units value={snapshot} />
     </div>
   );
 }
@@ -104,19 +114,22 @@ function Frame({
   meta,
   children,
   busy,
+  compact,
 }: {
   title: ReactNode;
   meta?: ReactNode;
   children: ReactNode;
   busy?: boolean;
+  compact?: boolean;
 }) {
   return (
     <section
       className="portal-count"
+      data-compact={compact || undefined}
       aria-labelledby="portal-count-title"
       aria-busy={busy || undefined}
     >
-      <div>
+      <div className="portal-count__head">
         <p className="portal-count__eyebrow">Contagem regressiva</p>
         <h2 id="portal-count-title" className="portal-count__title">
           {title}
@@ -125,6 +138,29 @@ function Frame({
       </div>
       {children}
     </section>
+  );
+}
+
+function Notice({
+  title,
+  text,
+  children,
+}: {
+  title: string;
+  text?: ReactNode;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="portal-count__status" role="status">
+      <span className="portal-count__status-icon" aria-hidden="true">
+        <CalendarClock />
+      </span>
+      <div className="min-w-0">
+        <p className="portal-count__status-title">{title}</p>
+        {text && <p className="portal-count__status-text">{text}</p>}
+      </div>
+      {children}
+    </div>
   );
 }
 
@@ -144,112 +180,74 @@ export const EditionCountdown = memo(function EditionCountdown({
   canConfigure,
 }: Props) {
   const schedule = useMemo(() => resolveOpening(edition), [edition]);
-  const configured = schedule.status === "configured" ? schedule : null;
-  const now = useEditionClock(configured?.openingAt, configured?.closingAt);
 
   if (isLoading)
     return (
-      <Frame title={<span className="sr-only">Carregando edição</span>} busy>
-        <div className="space-y-2" aria-hidden="true">
-          <div className="portal-skeleton h-6 w-2/3" />
-          <div className="portal-skeleton h-4 w-1/2" />
-          <div className="portal-skeleton mt-3 h-[4.5rem] w-full" />
+      <Frame title={<span className="portal-skeleton block h-7 w-48" />} busy>
+        <span className="sr-only">Carregando a edição</span>
+        <div className="portal-count__units" aria-hidden="true">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="portal-count__unit portal-count__unit--skeleton" />
+          ))}
         </div>
       </Frame>
     );
 
   if (isError)
     return (
-      <Frame title="Edição indisponível">
-        <Status
-          icon={<CalendarClock />}
-          title="Não foi possível carregar a edição"
-          text="Verifique sua conexão e tente novamente."
-        >
-          <button type="button" className="portal-count__retry mt-3" onClick={onRetry}>
-            <RotateCw className="mr-1.5 inline size-4 align-[-3px]" aria-hidden="true" />
+      <Frame title="Edição indisponível" compact>
+        <Notice title="Não foi possível carregar a edição" text="Verifique sua conexão.">
+          <button type="button" className="portal-count__action" onClick={onRetry}>
+            <RotateCw aria-hidden="true" />
             Tentar novamente
           </button>
-        </Status>
+        </Notice>
       </Frame>
     );
 
-  if (!edition)
+  if (!edition || schedule.status !== "configured")
     return (
-      <Frame title="Nenhuma edição configurada">
-        <Status icon={<CalendarClock />} title="Data de abertura a confirmar" />
+      <Frame title={edition?.name ?? "Nenhuma edição ativa"} compact>
+        <Notice
+          title="Contagem indisponível"
+          text={
+            edition
+              ? "A data oficial de abertura não está registrada na configuração da edição."
+              : "Não há edição ativa configurada no sistema."
+          }
+        >
+          {canConfigure && (
+            <Link to="/admin" search={{ aba: "edicao" }} className="portal-count__action">
+              <Settings2 aria-hidden="true" />
+              Configurar edição
+            </Link>
+          )}
+        </Notice>
       </Frame>
     );
 
   const period = formatEditionPeriod(edition.starts_on, edition.ends_on);
-  const periodMeta = period && (
-    <>
-      <CalendarDays aria-hidden="true" />
-      <span>
-        Período da edição: <strong>{period}</strong>
-      </span>
-    </>
-  );
-
-  if (!configured)
-    return (
-      <Frame title={edition.name} meta={periodMeta}>
-        <Status
-          icon={<CalendarClock />}
-          title="Data de abertura a confirmar"
-          text={
-            schedule.status === "invalid" && canConfigure
-              ? "O horário configurado não pôde ser interpretado."
-              : "A contagem começa assim que o horário oficial for definido."
-          }
-        >
-          {canConfigure && (
-            <Link to="/admin" search={{ aba: "edicao" }} className="portal-count__config mt-1">
-              Definir horário oficial
-            </Link>
-          )}
-        </Status>
-      </Frame>
-    );
-
-  const snapshot = countdownAt(now, configured.openingAt, configured.closingAt);
-
-  if (snapshot.phase === "open")
-    return (
-      <Frame title={edition.name} meta={periodMeta}>
-        <Status
-          icon={<CalendarCheck />}
-          title="Feira em andamento"
-          text="A edição está oficialmente aberta."
-        />
-      </Frame>
-    );
-
-  if (snapshot.phase === "closed")
-    return (
-      <Frame title={edition.name} meta={periodMeta}>
-        <Status icon={<CalendarCheck />} title="Edição encerrada" />
-      </Frame>
-    );
-
   return (
     <Frame
       title={edition.name}
       meta={
         <>
-          <CalendarDays aria-hidden="true" />
-          <span>
-            Abertura em{" "}
-            <strong>{formatOpeningLabel(configured.openingAt, configured.timeZone)}</strong>
-            <span className="text-[0.8125rem]">
+          <span className="portal-count__meta-main">
+            Abertura oficial — {formatOpeningLabel(schedule.openingAt, schedule.timeZone)}
+            <span className="portal-count__tz">
               {" "}
-              · {timeZoneLabel(configured.timeZone, configured.openingAt)}
+              · {timeZoneShortLabel(schedule.timeZone, schedule.openingAt)}
             </span>
           </span>
+          {period && <span className="portal-count__period">Feira de {period}</span>}
         </>
       }
     >
-      <Units snapshot={snapshot} />
+      <LiveCountdown
+        openingAt={schedule.openingAt}
+        closingAt={schedule.closingAt}
+        editionName={edition.name}
+      />
     </Frame>
   );
 });

@@ -12,31 +12,33 @@ function arch(x: number, y: number, w: number, h: number) {
 
 export const PortalHero = memo(function PortalHero() {
   return (
-    <section className="portal-hero" aria-labelledby="portal-hero-title">
+    <div className="portal-hero">
       <svg
         className="portal-hero__decor"
-        viewBox="0 0 800 300"
-        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 1200 420"
+        preserveAspectRatio="xMidYMax slice"
         aria-hidden="true"
         focusable="false"
       >
-        <path d={arch(-40, 168, 190, 200)} fill="oklch(0.83 0.018 90 / 0.08)" />
+        <path d={arch(-60, 210, 260, 260)} fill="oklch(1 0 0 / 0.045)" />
         <path
-          d={arch(604, 92, 168, 240)}
+          d={arch(-20, 250, 180, 220)}
           fill="none"
-          stroke="oklch(1 0 0 / 0.12)"
+          stroke="oklch(1 0 0 / 0.08)"
           strokeWidth="1.25"
         />
+        <path d={arch(960, 120, 240, 340)} fill="oklch(1 0 0 / 0.04)" />
         <path
-          d={arch(632, 136, 112, 200)}
+          d={arch(1000, 170, 160, 300)}
           fill="none"
-          stroke="oklch(1 0 0 / 0.07)"
-          strokeWidth="1"
+          stroke="oklch(1 0 0 / 0.1)"
+          strokeWidth="1.25"
         />
-        <circle cx="688" cy="66" r="5.5" fill="var(--brand-red)" />
+        <circle cx="1080" cy="92" r="7" fill="var(--brand-red)" />
+        <circle cx="170" cy="168" r="3.5" fill="oklch(1 0 0 / 0.28)" />
       </svg>
       <div className="portal-hero__brand">
-        <h1 id="portal-hero-title" className="sr-only">
+        <h1 id="portal-title" className="sr-only">
           Portal Indumóveis 2027
         </h1>
         <img
@@ -51,6 +53,6 @@ export const PortalHero = memo(function PortalHero() {
         />
         <p className="portal-hero__tagline">Inspiramos sonhos, impulsionamos negócios</p>
       </div>
-    </section>
+    </div>
   );
 });

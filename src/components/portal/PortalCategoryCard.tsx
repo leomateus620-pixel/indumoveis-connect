@@ -2,6 +2,7 @@ import { memo, useId, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import type { NavCategory, NavDestination } from "@/lib/navigation";
+import { PortalEmblem } from "./PortalEmblem";
 
 type Props = {
   category: NavCategory;
@@ -9,21 +10,34 @@ type Props = {
   destinations: NavDestination[];
 };
 
-function CardHead({ category, only }: { category: NavCategory; only?: NavDestination }) {
-  const Icon = category.icon;
-  const OnlyIcon = only?.icon;
+function CardHead({
+  category,
+  destinations,
+  only,
+}: {
+  category: NavCategory;
+  destinations: NavDestination[];
+  only?: NavDestination;
+}) {
+  const group = destinations.length > 1;
   return (
     <span className="portal-card__head">
-      <span className="portal-emblem" aria-hidden="true">
-        <Icon strokeWidth={1.75} />
-      </span>
+      <PortalEmblem id={category.id} tone={category.tone} />
       <span className="portal-card__copy">
         <span className="portal-card__title">{category.title}</span>
         <span className="portal-card__desc">{category.description}</span>
-        {only && OnlyIcon && (
-          <span className="portal-card__only">
-            <OnlyIcon aria-hidden="true" strokeWidth={2} />
-            {only.label}
+        {group && (
+          <span className="portal-card__chips" aria-hidden="true">
+            {destinations.map((d) => (
+              <span key={d.to} className="portal-card__chip">
+                {d.label}
+              </span>
+            ))}
+          </span>
+        )}
+        {only && (
+          <span className="portal-card__chips">
+            <span className="portal-card__chip">{only.label}</span>
           </span>
         )}
       </span>
@@ -47,12 +61,13 @@ export const PortalCategoryCard = memo(function PortalCategoryCard({
         to={dest.to}
         className="portal-card portal-card__surface"
         data-kind="link"
+        data-tone={category.tone}
         data-category={category.id}
         aria-label={`${dest.openLabel}: ${category.title}${only ? ` — ${dest.label}` : ""}`}
         onPointerDown={dest.prewarm}
         onFocus={dest.prewarm}
       >
-        <CardHead category={category} only={only} />
+        <CardHead category={category} destinations={destinations} only={only} />
         <span className="portal-card__foot" aria-hidden="true">
           <span className="portal-card__action">{dest.openLabel}</span>
           <span className="portal-card__cue portal-card__cue--go">
@@ -67,6 +82,7 @@ export const PortalCategoryCard = memo(function PortalCategoryCard({
     <div
       className="portal-card"
       data-kind="group"
+      data-tone={category.tone}
       data-category={category.id}
       data-expanded={expanded || undefined}
     >
@@ -77,14 +93,11 @@ export const PortalCategoryCard = memo(function PortalCategoryCard({
         aria-controls={panelId}
         onClick={() => setExpanded((v) => !v)}
       >
-        <CardHead category={category} />
+        <CardHead category={category} destinations={destinations} />
         <span className="portal-card__foot">
           <span className="portal-card__action">
-            {expanded ? "Ocultar opções" : "Ver opções"}
-            <span className="sr-only">
-              {" "}
-              de {category.title} ({destinations.length} destinos)
-            </span>
+            {expanded ? "Ocultar opções" : `Ver ${destinations.length} opções`}
+            <span className="sr-only"> de {category.title}</span>
           </span>
           <span className="portal-card__cue portal-card__cue--toggle" aria-hidden="true">
             <ChevronDown strokeWidth={2.25} />
