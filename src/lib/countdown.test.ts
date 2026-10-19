@@ -3,6 +3,7 @@ import {
   countdownAt,
   formatEditionPeriod,
   formatOpeningLabel,
+  formatOpeningShort,
   nextTickDelay,
   resolveOpening,
   timeZoneShortLabel,
@@ -79,6 +80,12 @@ describe("edition countdown", () => {
     );
     expect(formatOpeningLabel(Date.UTC(2027, 4, 14, 13, 30), "America/Sao_Paulo")).toBe(
       "14 de maio de 2027, às 10h30",
+    );
+    expect(formatOpeningShort(Date.UTC(2027, 4, 14, 13), "America/Sao_Paulo")).toBe(
+      "14/05, às 10h",
+    );
+    expect(formatOpeningShort(Date.UTC(2027, 4, 14, 13, 30), "America/Sao_Paulo")).toBe(
+      "14/05, às 10h30",
     );
     expect(formatEditionPeriod("2027-05-14", "2027-05-23")).toBe("14 a 23 de maio de 2027");
     expect(formatEditionPeriod("2027-05-30", "2027-06-02")).toBe("30 de maio a 2 de junho de 2027");
