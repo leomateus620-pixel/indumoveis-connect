@@ -138,6 +138,12 @@ export function formatOpeningLabel(openingAt: number, timeZone: string) {
   return `${date}, às ${hour}h${minute === "00" ? "" : minute}`;
 }
 
+/** Rótulo curto do fuso para o card ("Brasília" para America/Sao_Paulo). */
+export function timeZoneShortLabel(timeZone: string, at: number) {
+  if (timeZone === "America/Sao_Paulo") return "Brasília";
+  return timeZoneLabel(timeZone, at);
+}
+
 export function timeZoneLabel(timeZone: string, at: number) {
   try {
     const name = new Intl.DateTimeFormat("pt-BR", { timeZone, timeZoneName: "long" })
