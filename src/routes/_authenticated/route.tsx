@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app/AppShell";
+import { BootScreen } from "@/components/app/BootScreen";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_authenticated")({
     }
     return { user };
   },
+  pendingComponent: () => <BootScreen />,
   component: AuthenticatedLayout,
 });
 

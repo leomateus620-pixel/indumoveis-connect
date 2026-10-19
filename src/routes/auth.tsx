@@ -7,6 +7,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMe } from "@/lib/api";
+import { NAV_DESTINATIONS, PORTAL_PATH } from "@/lib/navigation";
 import logoLight from "@/assets/logo-light.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
@@ -21,16 +22,14 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const allowed = ["/dashboard", "/mapa", "/comercializacao", "/empresas", "/contratos", "/vistorias", "/financeiro", "/agenda", "/documentos", "/admin"] as const;
 const detailPaths = ["/empresas", "/contratos", "/vistorias"] as const;
-const moduleFor: Record<string, string> = { "/dashboard": "dashboard", "/mapa": "mapa", "/comercializacao": "comercial", "/empresas": "empresas", "/contratos": "contratos", "/vistorias": "vistorias", "/financeiro": "financeiro", "/agenda": "agenda", "/documentos": "documentos", "/admin": "admin" };
 function safeDestination(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return null;
   try {
     const url = new URL(value, window.location.origin);
     if (url.origin !== window.location.origin) return null;
-    const root = allowed.find((p) => url.pathname === p || (detailPaths.some((d) => d === p) && new RegExp(`^${p}/[a-zA-Z0-9-]+/?$`).test(url.pathname)));
-    return root ? { path: url.pathname + url.search, module: moduleFor[root] } : null;
+    const root = NAV_DESTINATIONS.find((d) => url.pathname === d.to || (detailPaths.some((p) => p === d.to) && new RegExp(`^${d.to}/[a-zA-Z0-9-]+/?$`).test(url.pathname)));
+    return root ? { path: url.pathname + url.search, module: root.module } : null;
   } catch { return null; }
 }
 
@@ -59,8 +58,9 @@ function ResolveAccess({ userId }: { userId: string }) {
     if (!me || !me.roles.length) return;
     const requested = safeDestination(new URLSearchParams(window.location.search).get("redirect") ?? sessionStorage.getItem("auth-redirect"));
     sessionStorage.removeItem("auth-redirect");
-    const target = requested && me.perms[requested.module]?.read ? requested.path : (allowed.find((p) => me.perms[moduleFor[p]]?.read) ?? "/auth");
-    navigate({ to: target as "/dashboard", replace: true });
+    // Login normal entra no portal; link direto protegido volta ao destino pedido.
+    const target = requested && me.perms[requested.module]?.read ? requested.path : PORTAL_PATH;
+    navigate({ to: target as typeof PORTAL_PATH, replace: true });
   }, [me, navigate]);
   if (isPending) return <Status title="Carregando seu perfil" />;
   if (isError || !me) return <Status title="Não foi possível consultar seu acesso" detail="Sua sessão permanece ativa." action={<><Button onClick={() => refetch()}>Tentar novamente</Button><SignOut /></>} />;
