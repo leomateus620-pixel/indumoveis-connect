@@ -33,18 +33,27 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { aba?: string } => ({
+    aba: typeof s.aba === "string" ? s.aba : undefined,
+  }),
   component: AdminPage,
 });
+
+const ADMIN_TABS = ["usuarios", "perfis", "edicao", "checklists", "auditoria"];
 
 const ROLES = ["admin", "comercial", "financeiro", "operacao", "consulta"];
 
 function AdminPage() {
   const can = useCan("admin");
+  const { aba } = Route.useSearch();
   if (!can.read) return <Restricted />;
   return (
     <>
       <PageHeader title="Administração" />
-      <Tabs defaultValue="usuarios" className="min-w-0 p-4 md:p-6 xl:p-8">
+      <Tabs
+        defaultValue={aba && ADMIN_TABS.includes(aba) ? aba : "usuarios"}
+        className="min-w-0 p-4 md:p-6 xl:p-8"
+      >
         <TabsList className="flex h-auto max-w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="usuarios">Usuários</TabsTrigger>
           <TabsTrigger value="perfis">Perfis e permissões</TabsTrigger>
@@ -226,6 +235,7 @@ function EditionForm() {
         venue: e.venue ?? "",
         hold: e.reservation_hold_days ?? "",
         template: e.contract_template ?? "",
+        opening: e.opening_time ? e.opening_time.slice(0, 5) : "",
       });
   }, [e]);
   const m = useDbMutation(
@@ -239,6 +249,8 @@ function EditionForm() {
         reservation_hold_days: f.hold === "" ? null : Number(f.hold),
         reservation_expiry_action: f.hold === "" ? null : "alertar",
         contract_template: f.template || null,
+        // Só envia o horário quando a coluna já existe no banco (migração aplicada).
+        ...(e && "opening_time" in e ? { opening_time: f.opening || null } : {}),
       }),
     { success: "Edição atualizada" },
   );
@@ -282,6 +294,25 @@ function EditionForm() {
               type="date"
               value={f.ends_on ?? ""}
               onChange={(x) => setF({ ...f, ends_on: x.target.value })}
+            />
+          </FormRow>
+        </div>
+        <div className="mt-3">
+          <FormRow
+            label="Horário oficial de abertura"
+            htmlFor="eo"
+            hint={
+              e && "opening_time" in e
+                ? `No dia de início, fuso ${e.timezone}. Vazio = abertura a confirmar; a contagem do portal só aparece com o horário definido.`
+                : "Disponível após aplicar a migração do horário de abertura no banco."
+            }
+          >
+            <Input
+              id="eo"
+              type="time"
+              value={f.opening ?? ""}
+              disabled={!e || !("opening_time" in e)}
+              onChange={(x) => setF({ ...f, opening: x.target.value })}
             />
           </FormRow>
         </div>
