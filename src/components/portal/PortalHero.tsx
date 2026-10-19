@@ -34,7 +34,7 @@ export const PortalHero = memo(function PortalHero() {
           stroke="oklch(1 0 0 / 0.1)"
           strokeWidth="1.25"
         />
-        <circle cx="1080" cy="92" r="7" fill="var(--brand-red)" />
+        <circle cx="1080" cy="236" r="7" fill="var(--brand-red)" />
         <circle cx="170" cy="168" r="3.5" fill="oklch(1 0 0 / 0.28)" />
       </svg>
       <div className="portal-hero__brand">

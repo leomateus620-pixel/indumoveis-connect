@@ -233,7 +233,10 @@ export const EditionCountdown = memo(function EditionCountdown({
       meta={
         <>
           <span className="portal-count__meta-main">
-            Abertura oficial — {formatOpeningLabel(schedule.openingAt, schedule.timeZone)}
+            Abertura oficial{"\u00a0"}—{" "}
+            <span className="portal-count__date">
+              {formatOpeningLabel(schedule.openingAt, schedule.timeZone)}
+            </span>
             <span className="portal-count__tz">
               {" "}
               · {timeZoneShortLabel(schedule.timeZone, schedule.openingAt)}
