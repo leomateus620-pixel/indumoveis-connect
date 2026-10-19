@@ -755,7 +755,7 @@
   display: grid;
   gap: 0.375rem;
   margin: 0;
-  padding: 0 0.75rem 0.75rem;
+  padding: 0.375rem 0.75rem 0.75rem;
   list-style: none;
   opacity: 0;
   transition: opacity var(--portal-fast) var(--portal-ease);

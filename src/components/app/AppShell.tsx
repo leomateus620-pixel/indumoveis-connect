@@ -1,4 +1,4 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useMatches, useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ChevronRight,
@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { AccessGate, Notice } from "./AccessGate";
 import { NavigationProgress } from "./NavigationProgress";
 import { useSignOut } from "./session";
+import { readCompactPreference, writeCompactPreference } from "./sidebar-preference";
 import logoLight from "@/assets/logo-light.png.asset.json";
 import markLight from "@/assets/mark-light.png.asset.json";
 
@@ -212,7 +213,9 @@ export function AppShell({ userId }: { userId: string }) {
 
 function ModuleGuard({ me }: { me: Me }) {
   const signOut = useSignOut();
-  const path = useRouterState({ select: (s) => s.location.pathname });
+  // `location` já aponta para o destino enquanto a navegação carrega; as matches
+  // confirmadas descrevem a página que está de fato na tela.
+  const path = useMatches({ select: (ms) => ms[ms.length - 1]?.pathname ?? "" });
   const current = matchDestination(path);
   if (!current || !me.perms[current.module]?.read)
     return (
@@ -258,19 +261,16 @@ function AuthorizedShell({
   current: NavDestination;
   onSignOut: () => void;
 }) {
-  const [compact, setCompact] = useState(false);
+  const [compact, setCompact] = useState(readCompactPreference);
   const [open, setOpen] = useState(false);
   const { data: edition } = useEdition();
   const pending = useRouterState({ select: (s) => s.status === "pending" });
   const closeSheet = useCallback(() => setOpen(false), []);
   useIdlePrewarm();
 
-  useEffect(() => {
-    setCompact(localStorage.getItem("sidebar-compact") === "1");
-  }, []);
   const toggle = useCallback(() => {
     setCompact((c) => {
-      localStorage.setItem("sidebar-compact", c ? "0" : "1");
+      writeCompactPreference(!c);
       return !c;
     });
   }, []);

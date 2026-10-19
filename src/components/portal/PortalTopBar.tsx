@@ -17,7 +17,7 @@ export function PortalTopBar({ me, onSignOut }: { me: Me; onSignOut: () => void 
     <header className="portal-topbar">
       <div className="portal-wrap portal-topbar__row">
         <p className="portal-topbar__brand">Sistema Indumóveis</p>
-        <div className="portal-account" aria-label="Conta conectada">
+        <div className="portal-account" role="group" aria-label="Conta conectada">
           <span className="portal-account__avatar" aria-hidden="true">
             {initials(display)}
           </span>

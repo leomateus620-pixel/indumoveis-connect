@@ -4,7 +4,9 @@ import { AlertTriangle } from "lucide-react";
 import { destinationName, PORTAL_PATH } from "@/lib/navigation";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { BrandLoader } from "./BrandLoader";
+import { readCompactPreference } from "./sidebar-preference";
 
 const CHUNK_ERROR =
   /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk [\w-]+ failed/i;
@@ -61,7 +63,13 @@ export function ModuleOpening() {
   const name = destinationName(path);
   return (
     <div className="flex min-h-dvh w-full bg-workspace" aria-busy="true">
-      <div className="hidden w-64 shrink-0 bg-sidebar md:block" aria-hidden="true" />
+      <div
+        className={cn(
+          "hidden shrink-0 bg-sidebar md:block",
+          readCompactPreference() ? "w-[4.5rem]" : "w-64",
+        )}
+        aria-hidden="true"
+      />
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="min-h-12 border-b bg-card" aria-hidden="true" />
         <div className="flex flex-1 items-center justify-center p-6">
