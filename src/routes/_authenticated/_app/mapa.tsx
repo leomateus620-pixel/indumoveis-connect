@@ -6,7 +6,7 @@ import { CommercialMapWorkspace } from "@/features/commercial-map/CommercialMapW
 import { ENTITIES } from "@/features/commercial-map/data/territory";
 import { resolveMapCommercialLinks } from "@/features/commercial-map/commercial";
 
-export const Route = createFileRoute("/_authenticated/mapa")({
+export const Route = createFileRoute("/_authenticated/_app/mapa")({
   validateSearch: (
     s: Record<string, unknown>,
   ): { status?: string; space?: string; deal?: string } => ({

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   NAV_CATEGORIES,
   NAV_DESTINATIONS,
+  destinationName,
   matchDestination,
   visibleCategories,
 } from "./navigation";
@@ -39,6 +40,9 @@ describe("navigation registry", () => {
     expect(matchDestination("/empresas/abc-1")?.module).toBe("empresas");
     expect(matchDestination("/contratos")?.module).toBe("contratos");
     expect(matchDestination("/")).toBeUndefined();
+    expect(matchDestination("/portal")).toBeUndefined();
+    expect(destinationName("/portal")).toBe("Portal");
+    expect(destinationName("/vistorias/abc")).toBe("Vistorias");
     expect(matchDestination("/mapas")).toBeUndefined();
   });
 

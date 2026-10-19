@@ -1,8 +1,8 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { AppShell } from "@/components/app/AppShell";
 import { BootScreen } from "@/components/app/BootScreen";
 
+// Proteção de sessão compartilhada pelo portal (/portal) e pelo layout operacional (_app).
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location, context }) => {
@@ -25,10 +25,5 @@ export const Route = createFileRoute("/_authenticated")({
     return { user };
   },
   pendingComponent: () => <BootScreen />,
-  component: AuthenticatedLayout,
+  component: Outlet,
 });
-
-function AuthenticatedLayout() {
-  const { user } = Route.useRouteContext();
-  return <AppShell userId={user.id} />;
-}

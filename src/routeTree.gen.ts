@@ -9,26 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
-import { Route as AuthenticatedComercializacaoRouteImport } from './routes/_authenticated/comercializacao'
-import { Route as AuthenticatedContratosRouteImport } from './routes/_authenticated/contratos'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
-import { Route as AuthenticatedEmpresasRouteImport } from './routes/_authenticated/empresas'
-import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
-import { Route as AuthenticatedMapaRouteImport } from './routes/_authenticated/mapa'
-import { Route as AuthenticatedVistoriasRouteImport } from './routes/_authenticated/vistorias'
-import { Route as AuthenticatedContratosIndexRouteImport } from './routes/_authenticated/contratos.index'
-import { Route as AuthenticatedContratosIdRouteImport } from './routes/_authenticated/contratos.$id'
-import { Route as AuthenticatedEmpresasIndexRouteImport } from './routes/_authenticated/empresas.index'
-import { Route as AuthenticatedEmpresasIdRouteImport } from './routes/_authenticated/empresas.$id'
-import { Route as AuthenticatedVistoriasIndexRouteImport } from './routes/_authenticated/vistorias.index'
-import { Route as AuthenticatedVistoriasIdRouteImport } from './routes/_authenticated/vistorias.$id'
+import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/_app/route'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
+import { Route as AuthenticatedAppAdminRouteImport } from './routes/_authenticated/_app/admin'
+import { Route as AuthenticatedAppAgendaRouteImport } from './routes/_authenticated/_app/agenda'
+import { Route as AuthenticatedAppComercializacaoRouteImport } from './routes/_authenticated/_app/comercializacao'
+import { Route as AuthenticatedAppContratosRouteImport } from './routes/_authenticated/_app/contratos'
+import { Route as AuthenticatedAppDashboardRouteImport } from './routes/_authenticated/_app/dashboard'
+import { Route as AuthenticatedAppDocumentosRouteImport } from './routes/_authenticated/_app/documentos'
+import { Route as AuthenticatedAppEmpresasRouteImport } from './routes/_authenticated/_app/empresas'
+import { Route as AuthenticatedAppFinanceiroRouteImport } from './routes/_authenticated/_app/financeiro'
+import { Route as AuthenticatedAppMapaRouteImport } from './routes/_authenticated/_app/mapa'
+import { Route as AuthenticatedAppVistoriasRouteImport } from './routes/_authenticated/_app/vistorias'
+import { Route as AuthenticatedAppContratosIndexRouteImport } from './routes/_authenticated/_app/contratos.index'
+import { Route as AuthenticatedAppContratosIdRouteImport } from './routes/_authenticated/_app/contratos.$id'
+import { Route as AuthenticatedAppEmpresasIndexRouteImport } from './routes/_authenticated/_app/empresas.index'
+import { Route as AuthenticatedAppEmpresasIdRouteImport } from './routes/_authenticated/_app/empresas.$id'
+import { Route as AuthenticatedAppVistoriasIndexRouteImport } from './routes/_authenticated/_app/vistorias.index'
+import { Route as AuthenticatedAppVistoriasIdRouteImport } from './routes/_authenticated/_app/vistorias.$id'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -38,162 +45,178 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedAppRouteRoute = AuthenticatedAppRouteRouteImport.update({
+  id: '/_app',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAppAdminRoute = AuthenticatedAppAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
-const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
+const AuthenticatedAppAgendaRoute = AuthenticatedAppAgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
-const AuthenticatedComercializacaoRoute =
-  AuthenticatedComercializacaoRouteImport.update({
+const AuthenticatedAppComercializacaoRoute =
+  AuthenticatedAppComercializacaoRouteImport.update({
     id: '/comercializacao',
     path: '/comercializacao',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
-const AuthenticatedContratosRoute = AuthenticatedContratosRouteImport.update({
-  id: '/contratos',
-  path: '/contratos',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDocumentosRoute = AuthenticatedDocumentosRouteImport.update({
-  id: '/documentos',
-  path: '/documentos',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedEmpresasRoute = AuthenticatedEmpresasRouteImport.update({
-  id: '/empresas',
-  path: '/empresas',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMapaRoute = AuthenticatedMapaRouteImport.update({
+const AuthenticatedAppContratosRoute =
+  AuthenticatedAppContratosRouteImport.update({
+    id: '/contratos',
+    path: '/contratos',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
+const AuthenticatedAppDashboardRoute =
+  AuthenticatedAppDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
+const AuthenticatedAppDocumentosRoute =
+  AuthenticatedAppDocumentosRouteImport.update({
+    id: '/documentos',
+    path: '/documentos',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
+const AuthenticatedAppEmpresasRoute =
+  AuthenticatedAppEmpresasRouteImport.update({
+    id: '/empresas',
+    path: '/empresas',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
+const AuthenticatedAppFinanceiroRoute =
+  AuthenticatedAppFinanceiroRouteImport.update({
+    id: '/financeiro',
+    path: '/financeiro',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
+const AuthenticatedAppMapaRoute = AuthenticatedAppMapaRouteImport.update({
   id: '/mapa',
   path: '/mapa',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
-const AuthenticatedVistoriasRoute = AuthenticatedVistoriasRouteImport.update({
-  id: '/vistorias',
-  path: '/vistorias',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedContratosIndexRoute =
-  AuthenticatedContratosIndexRouteImport.update({
+const AuthenticatedAppVistoriasRoute =
+  AuthenticatedAppVistoriasRouteImport.update({
+    id: '/vistorias',
+    path: '/vistorias',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
+const AuthenticatedAppContratosIndexRoute =
+  AuthenticatedAppContratosIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedContratosRoute,
+    getParentRoute: () => AuthenticatedAppContratosRoute,
   } as any)
-const AuthenticatedContratosIdRoute =
-  AuthenticatedContratosIdRouteImport.update({
+const AuthenticatedAppContratosIdRoute =
+  AuthenticatedAppContratosIdRouteImport.update({
     id: '/$id',
     path: '/$id',
-    getParentRoute: () => AuthenticatedContratosRoute,
+    getParentRoute: () => AuthenticatedAppContratosRoute,
   } as any)
-const AuthenticatedEmpresasIndexRoute =
-  AuthenticatedEmpresasIndexRouteImport.update({
+const AuthenticatedAppEmpresasIndexRoute =
+  AuthenticatedAppEmpresasIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedEmpresasRoute,
+    getParentRoute: () => AuthenticatedAppEmpresasRoute,
   } as any)
-const AuthenticatedEmpresasIdRoute = AuthenticatedEmpresasIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthenticatedEmpresasRoute,
-} as any)
-const AuthenticatedVistoriasIndexRoute =
-  AuthenticatedVistoriasIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedVistoriasRoute,
-  } as any)
-const AuthenticatedVistoriasIdRoute =
-  AuthenticatedVistoriasIdRouteImport.update({
+const AuthenticatedAppEmpresasIdRoute =
+  AuthenticatedAppEmpresasIdRouteImport.update({
     id: '/$id',
     path: '/$id',
-    getParentRoute: () => AuthenticatedVistoriasRoute,
+    getParentRoute: () => AuthenticatedAppEmpresasRoute,
+  } as any)
+const AuthenticatedAppVistoriasIndexRoute =
+  AuthenticatedAppVistoriasIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppVistoriasRoute,
+  } as any)
+const AuthenticatedAppVistoriasIdRoute =
+  AuthenticatedAppVistoriasIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAppVistoriasRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/admin': typeof AuthenticatedAdminRoute
-  '/agenda': typeof AuthenticatedAgendaRoute
-  '/comercializacao': typeof AuthenticatedComercializacaoRoute
-  '/contratos': typeof AuthenticatedContratosRouteWithChildren
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/documentos': typeof AuthenticatedDocumentosRoute
-  '/empresas': typeof AuthenticatedEmpresasRouteWithChildren
-  '/financeiro': typeof AuthenticatedFinanceiroRoute
-  '/mapa': typeof AuthenticatedMapaRoute
-  '/vistorias': typeof AuthenticatedVistoriasRouteWithChildren
-  '/contratos/$id': typeof AuthenticatedContratosIdRoute
-  '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
-  '/vistorias/$id': typeof AuthenticatedVistoriasIdRoute
-  '/contratos/': typeof AuthenticatedContratosIndexRoute
-  '/empresas/': typeof AuthenticatedEmpresasIndexRoute
-  '/vistorias/': typeof AuthenticatedVistoriasIndexRoute
+  '/portal': typeof AuthenticatedPortalRoute
+  '/admin': typeof AuthenticatedAppAdminRoute
+  '/agenda': typeof AuthenticatedAppAgendaRoute
+  '/comercializacao': typeof AuthenticatedAppComercializacaoRoute
+  '/contratos': typeof AuthenticatedAppContratosRouteWithChildren
+  '/dashboard': typeof AuthenticatedAppDashboardRoute
+  '/documentos': typeof AuthenticatedAppDocumentosRoute
+  '/empresas': typeof AuthenticatedAppEmpresasRouteWithChildren
+  '/financeiro': typeof AuthenticatedAppFinanceiroRoute
+  '/mapa': typeof AuthenticatedAppMapaRoute
+  '/vistorias': typeof AuthenticatedAppVistoriasRouteWithChildren
+  '/contratos/$id': typeof AuthenticatedAppContratosIdRoute
+  '/empresas/$id': typeof AuthenticatedAppEmpresasIdRoute
+  '/vistorias/$id': typeof AuthenticatedAppVistoriasIdRoute
+  '/contratos/': typeof AuthenticatedAppContratosIndexRoute
+  '/empresas/': typeof AuthenticatedAppEmpresasIndexRoute
+  '/vistorias/': typeof AuthenticatedAppVistoriasIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/admin': typeof AuthenticatedAdminRoute
-  '/agenda': typeof AuthenticatedAgendaRoute
-  '/comercializacao': typeof AuthenticatedComercializacaoRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/documentos': typeof AuthenticatedDocumentosRoute
-  '/financeiro': typeof AuthenticatedFinanceiroRoute
-  '/mapa': typeof AuthenticatedMapaRoute
-  '/': typeof AuthenticatedIndexRoute
-  '/contratos/$id': typeof AuthenticatedContratosIdRoute
-  '/empresas/$id': typeof AuthenticatedEmpresasIdRoute
-  '/vistorias/$id': typeof AuthenticatedVistoriasIdRoute
-  '/contratos': typeof AuthenticatedContratosIndexRoute
-  '/empresas': typeof AuthenticatedEmpresasIndexRoute
-  '/vistorias': typeof AuthenticatedVistoriasIndexRoute
+  '/portal': typeof AuthenticatedPortalRoute
+  '/admin': typeof AuthenticatedAppAdminRoute
+  '/agenda': typeof AuthenticatedAppAgendaRoute
+  '/comercializacao': typeof AuthenticatedAppComercializacaoRoute
+  '/dashboard': typeof AuthenticatedAppDashboardRoute
+  '/documentos': typeof AuthenticatedAppDocumentosRoute
+  '/financeiro': typeof AuthenticatedAppFinanceiroRoute
+  '/mapa': typeof AuthenticatedAppMapaRoute
+  '/contratos/$id': typeof AuthenticatedAppContratosIdRoute
+  '/empresas/$id': typeof AuthenticatedAppEmpresasIdRoute
+  '/vistorias/$id': typeof AuthenticatedAppVistoriasIdRoute
+  '/contratos': typeof AuthenticatedAppContratosIndexRoute
+  '/empresas': typeof AuthenticatedAppEmpresasIndexRoute
+  '/vistorias': typeof AuthenticatedAppVistoriasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
-  '/_authenticated/comercializacao': typeof AuthenticatedComercializacaoRoute
-  '/_authenticated/contratos': typeof AuthenticatedContratosRouteWithChildren
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
-  '/_authenticated/empresas': typeof AuthenticatedEmpresasRouteWithChildren
-  '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
-  '/_authenticated/mapa': typeof AuthenticatedMapaRoute
-  '/_authenticated/vistorias': typeof AuthenticatedVistoriasRouteWithChildren
-  '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/contratos/$id': typeof AuthenticatedContratosIdRoute
-  '/_authenticated/empresas/$id': typeof AuthenticatedEmpresasIdRoute
-  '/_authenticated/vistorias/$id': typeof AuthenticatedVistoriasIdRoute
-  '/_authenticated/contratos/': typeof AuthenticatedContratosIndexRoute
-  '/_authenticated/empresas/': typeof AuthenticatedEmpresasIndexRoute
-  '/_authenticated/vistorias/': typeof AuthenticatedVistoriasIndexRoute
+  '/_authenticated/_app': typeof AuthenticatedAppRouteRouteWithChildren
+  '/_authenticated/portal': typeof AuthenticatedPortalRoute
+  '/_authenticated/_app/admin': typeof AuthenticatedAppAdminRoute
+  '/_authenticated/_app/agenda': typeof AuthenticatedAppAgendaRoute
+  '/_authenticated/_app/comercializacao': typeof AuthenticatedAppComercializacaoRoute
+  '/_authenticated/_app/contratos': typeof AuthenticatedAppContratosRouteWithChildren
+  '/_authenticated/_app/dashboard': typeof AuthenticatedAppDashboardRoute
+  '/_authenticated/_app/documentos': typeof AuthenticatedAppDocumentosRoute
+  '/_authenticated/_app/empresas': typeof AuthenticatedAppEmpresasRouteWithChildren
+  '/_authenticated/_app/financeiro': typeof AuthenticatedAppFinanceiroRoute
+  '/_authenticated/_app/mapa': typeof AuthenticatedAppMapaRoute
+  '/_authenticated/_app/vistorias': typeof AuthenticatedAppVistoriasRouteWithChildren
+  '/_authenticated/_app/contratos/$id': typeof AuthenticatedAppContratosIdRoute
+  '/_authenticated/_app/empresas/$id': typeof AuthenticatedAppEmpresasIdRoute
+  '/_authenticated/_app/vistorias/$id': typeof AuthenticatedAppVistoriasIdRoute
+  '/_authenticated/_app/contratos/': typeof AuthenticatedAppContratosIndexRoute
+  '/_authenticated/_app/empresas/': typeof AuthenticatedAppEmpresasIndexRoute
+  '/_authenticated/_app/vistorias/': typeof AuthenticatedAppVistoriasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/portal'
     | '/admin'
     | '/agenda'
     | '/comercializacao'
@@ -212,7 +235,9 @@ export interface FileRouteTypes {
     | '/vistorias/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/auth'
+    | '/portal'
     | '/admin'
     | '/agenda'
     | '/comercializacao'
@@ -220,7 +245,6 @@ export interface FileRouteTypes {
     | '/documentos'
     | '/financeiro'
     | '/mapa'
-    | '/'
     | '/contratos/$id'
     | '/empresas/$id'
     | '/vistorias/$id'
@@ -229,34 +253,44 @@ export interface FileRouteTypes {
     | '/vistorias'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/auth'
-    | '/_authenticated/admin'
-    | '/_authenticated/agenda'
-    | '/_authenticated/comercializacao'
-    | '/_authenticated/contratos'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/documentos'
-    | '/_authenticated/empresas'
-    | '/_authenticated/financeiro'
-    | '/_authenticated/mapa'
-    | '/_authenticated/vistorias'
-    | '/_authenticated/'
-    | '/_authenticated/contratos/$id'
-    | '/_authenticated/empresas/$id'
-    | '/_authenticated/vistorias/$id'
-    | '/_authenticated/contratos/'
-    | '/_authenticated/empresas/'
-    | '/_authenticated/vistorias/'
+    | '/_authenticated/_app'
+    | '/_authenticated/portal'
+    | '/_authenticated/_app/admin'
+    | '/_authenticated/_app/agenda'
+    | '/_authenticated/_app/comercializacao'
+    | '/_authenticated/_app/contratos'
+    | '/_authenticated/_app/dashboard'
+    | '/_authenticated/_app/documentos'
+    | '/_authenticated/_app/empresas'
+    | '/_authenticated/_app/financeiro'
+    | '/_authenticated/_app/mapa'
+    | '/_authenticated/_app/vistorias'
+    | '/_authenticated/_app/contratos/$id'
+    | '/_authenticated/_app/empresas/$id'
+    | '/_authenticated/_app/vistorias/$id'
+    | '/_authenticated/_app/contratos/'
+    | '/_authenticated/_app/empresas/'
+    | '/_authenticated/_app/vistorias/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -271,207 +305,229 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
+    '/_authenticated/_app': {
+      id: '/_authenticated/_app'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedAppRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/_app/admin': {
+      id: '/_authenticated/_app/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppAdminRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/agenda': {
-      id: '/_authenticated/agenda'
+    '/_authenticated/_app/agenda': {
+      id: '/_authenticated/_app/agenda'
       path: '/agenda'
       fullPath: '/agenda'
-      preLoaderRoute: typeof AuthenticatedAgendaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppAgendaRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/comercializacao': {
-      id: '/_authenticated/comercializacao'
+    '/_authenticated/_app/comercializacao': {
+      id: '/_authenticated/_app/comercializacao'
       path: '/comercializacao'
       fullPath: '/comercializacao'
-      preLoaderRoute: typeof AuthenticatedComercializacaoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppComercializacaoRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/contratos': {
-      id: '/_authenticated/contratos'
+    '/_authenticated/_app/contratos': {
+      id: '/_authenticated/_app/contratos'
       path: '/contratos'
       fullPath: '/contratos'
-      preLoaderRoute: typeof AuthenticatedContratosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppContratosRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
+    '/_authenticated/_app/dashboard': {
+      id: '/_authenticated/_app/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppDashboardRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/documentos': {
-      id: '/_authenticated/documentos'
+    '/_authenticated/_app/documentos': {
+      id: '/_authenticated/_app/documentos'
       path: '/documentos'
       fullPath: '/documentos'
-      preLoaderRoute: typeof AuthenticatedDocumentosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppDocumentosRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/empresas': {
-      id: '/_authenticated/empresas'
+    '/_authenticated/_app/empresas': {
+      id: '/_authenticated/_app/empresas'
       path: '/empresas'
       fullPath: '/empresas'
-      preLoaderRoute: typeof AuthenticatedEmpresasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppEmpresasRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/financeiro': {
-      id: '/_authenticated/financeiro'
+    '/_authenticated/_app/financeiro': {
+      id: '/_authenticated/_app/financeiro'
       path: '/financeiro'
       fullPath: '/financeiro'
-      preLoaderRoute: typeof AuthenticatedFinanceiroRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/mapa': {
-      id: '/_authenticated/mapa'
+    '/_authenticated/_app/mapa': {
+      id: '/_authenticated/_app/mapa'
       path: '/mapa'
       fullPath: '/mapa'
-      preLoaderRoute: typeof AuthenticatedMapaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppMapaRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/vistorias': {
-      id: '/_authenticated/vistorias'
+    '/_authenticated/_app/vistorias': {
+      id: '/_authenticated/_app/vistorias'
       path: '/vistorias'
       fullPath: '/vistorias'
-      preLoaderRoute: typeof AuthenticatedVistoriasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AuthenticatedAppVistoriasRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/contratos/': {
-      id: '/_authenticated/contratos/'
+    '/_authenticated/_app/contratos/': {
+      id: '/_authenticated/_app/contratos/'
       path: '/'
       fullPath: '/contratos/'
-      preLoaderRoute: typeof AuthenticatedContratosIndexRouteImport
-      parentRoute: typeof AuthenticatedContratosRoute
+      preLoaderRoute: typeof AuthenticatedAppContratosIndexRouteImport
+      parentRoute: typeof AuthenticatedAppContratosRoute
     }
-    '/_authenticated/contratos/$id': {
-      id: '/_authenticated/contratos/$id'
+    '/_authenticated/_app/contratos/$id': {
+      id: '/_authenticated/_app/contratos/$id'
       path: '/$id'
       fullPath: '/contratos/$id'
-      preLoaderRoute: typeof AuthenticatedContratosIdRouteImport
-      parentRoute: typeof AuthenticatedContratosRoute
+      preLoaderRoute: typeof AuthenticatedAppContratosIdRouteImport
+      parentRoute: typeof AuthenticatedAppContratosRoute
     }
-    '/_authenticated/empresas/': {
-      id: '/_authenticated/empresas/'
+    '/_authenticated/_app/empresas/': {
+      id: '/_authenticated/_app/empresas/'
       path: '/'
       fullPath: '/empresas/'
-      preLoaderRoute: typeof AuthenticatedEmpresasIndexRouteImport
-      parentRoute: typeof AuthenticatedEmpresasRoute
+      preLoaderRoute: typeof AuthenticatedAppEmpresasIndexRouteImport
+      parentRoute: typeof AuthenticatedAppEmpresasRoute
     }
-    '/_authenticated/empresas/$id': {
-      id: '/_authenticated/empresas/$id'
+    '/_authenticated/_app/empresas/$id': {
+      id: '/_authenticated/_app/empresas/$id'
       path: '/$id'
       fullPath: '/empresas/$id'
-      preLoaderRoute: typeof AuthenticatedEmpresasIdRouteImport
-      parentRoute: typeof AuthenticatedEmpresasRoute
+      preLoaderRoute: typeof AuthenticatedAppEmpresasIdRouteImport
+      parentRoute: typeof AuthenticatedAppEmpresasRoute
     }
-    '/_authenticated/vistorias/': {
-      id: '/_authenticated/vistorias/'
+    '/_authenticated/_app/vistorias/': {
+      id: '/_authenticated/_app/vistorias/'
       path: '/'
       fullPath: '/vistorias/'
-      preLoaderRoute: typeof AuthenticatedVistoriasIndexRouteImport
-      parentRoute: typeof AuthenticatedVistoriasRoute
+      preLoaderRoute: typeof AuthenticatedAppVistoriasIndexRouteImport
+      parentRoute: typeof AuthenticatedAppVistoriasRoute
     }
-    '/_authenticated/vistorias/$id': {
-      id: '/_authenticated/vistorias/$id'
+    '/_authenticated/_app/vistorias/$id': {
+      id: '/_authenticated/_app/vistorias/$id'
       path: '/$id'
       fullPath: '/vistorias/$id'
-      preLoaderRoute: typeof AuthenticatedVistoriasIdRouteImport
-      parentRoute: typeof AuthenticatedVistoriasRoute
+      preLoaderRoute: typeof AuthenticatedAppVistoriasIdRouteImport
+      parentRoute: typeof AuthenticatedAppVistoriasRoute
     }
   }
 }
 
-interface AuthenticatedContratosRouteChildren {
-  AuthenticatedContratosIdRoute: typeof AuthenticatedContratosIdRoute
-  AuthenticatedContratosIndexRoute: typeof AuthenticatedContratosIndexRoute
+interface AuthenticatedAppContratosRouteChildren {
+  AuthenticatedAppContratosIdRoute: typeof AuthenticatedAppContratosIdRoute
+  AuthenticatedAppContratosIndexRoute: typeof AuthenticatedAppContratosIndexRoute
 }
 
-const AuthenticatedContratosRouteChildren: AuthenticatedContratosRouteChildren =
+const AuthenticatedAppContratosRouteChildren: AuthenticatedAppContratosRouteChildren =
   {
-    AuthenticatedContratosIdRoute: AuthenticatedContratosIdRoute,
-    AuthenticatedContratosIndexRoute: AuthenticatedContratosIndexRoute,
+    AuthenticatedAppContratosIdRoute: AuthenticatedAppContratosIdRoute,
+    AuthenticatedAppContratosIndexRoute: AuthenticatedAppContratosIndexRoute,
   }
 
-const AuthenticatedContratosRouteWithChildren =
-  AuthenticatedContratosRoute._addFileChildren(
-    AuthenticatedContratosRouteChildren,
+const AuthenticatedAppContratosRouteWithChildren =
+  AuthenticatedAppContratosRoute._addFileChildren(
+    AuthenticatedAppContratosRouteChildren,
   )
 
-interface AuthenticatedEmpresasRouteChildren {
-  AuthenticatedEmpresasIdRoute: typeof AuthenticatedEmpresasIdRoute
-  AuthenticatedEmpresasIndexRoute: typeof AuthenticatedEmpresasIndexRoute
+interface AuthenticatedAppEmpresasRouteChildren {
+  AuthenticatedAppEmpresasIdRoute: typeof AuthenticatedAppEmpresasIdRoute
+  AuthenticatedAppEmpresasIndexRoute: typeof AuthenticatedAppEmpresasIndexRoute
 }
 
-const AuthenticatedEmpresasRouteChildren: AuthenticatedEmpresasRouteChildren = {
-  AuthenticatedEmpresasIdRoute: AuthenticatedEmpresasIdRoute,
-  AuthenticatedEmpresasIndexRoute: AuthenticatedEmpresasIndexRoute,
-}
-
-const AuthenticatedEmpresasRouteWithChildren =
-  AuthenticatedEmpresasRoute._addFileChildren(
-    AuthenticatedEmpresasRouteChildren,
-  )
-
-interface AuthenticatedVistoriasRouteChildren {
-  AuthenticatedVistoriasIdRoute: typeof AuthenticatedVistoriasIdRoute
-  AuthenticatedVistoriasIndexRoute: typeof AuthenticatedVistoriasIndexRoute
-}
-
-const AuthenticatedVistoriasRouteChildren: AuthenticatedVistoriasRouteChildren =
+const AuthenticatedAppEmpresasRouteChildren: AuthenticatedAppEmpresasRouteChildren =
   {
-    AuthenticatedVistoriasIdRoute: AuthenticatedVistoriasIdRoute,
-    AuthenticatedVistoriasIndexRoute: AuthenticatedVistoriasIndexRoute,
+    AuthenticatedAppEmpresasIdRoute: AuthenticatedAppEmpresasIdRoute,
+    AuthenticatedAppEmpresasIndexRoute: AuthenticatedAppEmpresasIndexRoute,
   }
 
-const AuthenticatedVistoriasRouteWithChildren =
-  AuthenticatedVistoriasRoute._addFileChildren(
-    AuthenticatedVistoriasRouteChildren,
+const AuthenticatedAppEmpresasRouteWithChildren =
+  AuthenticatedAppEmpresasRoute._addFileChildren(
+    AuthenticatedAppEmpresasRouteChildren,
+  )
+
+interface AuthenticatedAppVistoriasRouteChildren {
+  AuthenticatedAppVistoriasIdRoute: typeof AuthenticatedAppVistoriasIdRoute
+  AuthenticatedAppVistoriasIndexRoute: typeof AuthenticatedAppVistoriasIndexRoute
+}
+
+const AuthenticatedAppVistoriasRouteChildren: AuthenticatedAppVistoriasRouteChildren =
+  {
+    AuthenticatedAppVistoriasIdRoute: AuthenticatedAppVistoriasIdRoute,
+    AuthenticatedAppVistoriasIndexRoute: AuthenticatedAppVistoriasIndexRoute,
+  }
+
+const AuthenticatedAppVistoriasRouteWithChildren =
+  AuthenticatedAppVistoriasRoute._addFileChildren(
+    AuthenticatedAppVistoriasRouteChildren,
+  )
+
+interface AuthenticatedAppRouteRouteChildren {
+  AuthenticatedAppAdminRoute: typeof AuthenticatedAppAdminRoute
+  AuthenticatedAppAgendaRoute: typeof AuthenticatedAppAgendaRoute
+  AuthenticatedAppComercializacaoRoute: typeof AuthenticatedAppComercializacaoRoute
+  AuthenticatedAppContratosRoute: typeof AuthenticatedAppContratosRouteWithChildren
+  AuthenticatedAppDashboardRoute: typeof AuthenticatedAppDashboardRoute
+  AuthenticatedAppDocumentosRoute: typeof AuthenticatedAppDocumentosRoute
+  AuthenticatedAppEmpresasRoute: typeof AuthenticatedAppEmpresasRouteWithChildren
+  AuthenticatedAppFinanceiroRoute: typeof AuthenticatedAppFinanceiroRoute
+  AuthenticatedAppMapaRoute: typeof AuthenticatedAppMapaRoute
+  AuthenticatedAppVistoriasRoute: typeof AuthenticatedAppVistoriasRouteWithChildren
+}
+
+const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
+  AuthenticatedAppAdminRoute: AuthenticatedAppAdminRoute,
+  AuthenticatedAppAgendaRoute: AuthenticatedAppAgendaRoute,
+  AuthenticatedAppComercializacaoRoute: AuthenticatedAppComercializacaoRoute,
+  AuthenticatedAppContratosRoute: AuthenticatedAppContratosRouteWithChildren,
+  AuthenticatedAppDashboardRoute: AuthenticatedAppDashboardRoute,
+  AuthenticatedAppDocumentosRoute: AuthenticatedAppDocumentosRoute,
+  AuthenticatedAppEmpresasRoute: AuthenticatedAppEmpresasRouteWithChildren,
+  AuthenticatedAppFinanceiroRoute: AuthenticatedAppFinanceiroRoute,
+  AuthenticatedAppMapaRoute: AuthenticatedAppMapaRoute,
+  AuthenticatedAppVistoriasRoute: AuthenticatedAppVistoriasRouteWithChildren,
+}
+
+const AuthenticatedAppRouteRouteWithChildren =
+  AuthenticatedAppRouteRoute._addFileChildren(
+    AuthenticatedAppRouteRouteChildren,
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
-  AuthenticatedComercializacaoRoute: typeof AuthenticatedComercializacaoRoute
-  AuthenticatedContratosRoute: typeof AuthenticatedContratosRouteWithChildren
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
-  AuthenticatedEmpresasRoute: typeof AuthenticatedEmpresasRouteWithChildren
-  AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
-  AuthenticatedMapaRoute: typeof AuthenticatedMapaRoute
-  AuthenticatedVistoriasRoute: typeof AuthenticatedVistoriasRouteWithChildren
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAppRouteRoute: typeof AuthenticatedAppRouteRouteWithChildren
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
-  AuthenticatedComercializacaoRoute: AuthenticatedComercializacaoRoute,
-  AuthenticatedContratosRoute: AuthenticatedContratosRouteWithChildren,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
-  AuthenticatedEmpresasRoute: AuthenticatedEmpresasRouteWithChildren,
-  AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
-  AuthenticatedMapaRoute: AuthenticatedMapaRoute,
-  AuthenticatedVistoriasRoute: AuthenticatedVistoriasRouteWithChildren,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAppRouteRoute: AuthenticatedAppRouteRouteWithChildren,
+  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
 }

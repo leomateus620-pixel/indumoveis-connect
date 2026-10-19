@@ -51,7 +51,7 @@ const date = (v: unknown) =>
   typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : undefined;
 const PAGE = 25;
 
-export const Route = createFileRoute("/_authenticated/documentos")({
+export const Route = createFileRoute("/_authenticated/_app/documentos")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     q: str(s.q),
     col: s.col === "recent" || s.col === "unlinked" ? s.col : undefined,

@@ -22,7 +22,7 @@ import {
 } from "@/lib/api";
 import { ROLE_LABEL, MODULES, fmtDateTime } from "@/lib/format";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/_app/admin")({
   head: () => ({
     meta: [
       { title: "Administração — Sistema Indumóveis" },

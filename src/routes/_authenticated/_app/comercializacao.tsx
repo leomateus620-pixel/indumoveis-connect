@@ -64,7 +64,7 @@ import {
   centsToInput,
 } from "@/lib/format";
 
-export const Route = createFileRoute("/_authenticated/comercializacao")({
+export const Route = createFileRoute("/_authenticated/_app/comercializacao")({
   validateSearch: (
     s: Record<string, unknown>,
   ): { status?: string; id?: string; company?: string } => ({

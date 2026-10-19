@@ -35,7 +35,7 @@ import {
 import { INSPECTION_STATUS, fmtDate, fmtDateTime, area } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/vistorias/$id")({
+export const Route = createFileRoute("/_authenticated/_app/vistorias/$id")({
   head: () => ({
     meta: [
       { title: "Vistoria — Sistema Indumóveis" },

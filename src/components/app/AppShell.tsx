@@ -1,4 +1,4 @@
-import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ChevronRight,
@@ -10,8 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
-import { useMe, useEdition, type Me } from "@/lib/api";
+import { useEdition, type Me } from "@/lib/api";
 import { ROLE_LABEL, fmtDate } from "@/lib/format";
 import {
   PORTAL_ENTRY,
@@ -24,24 +23,11 @@ import {
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
-import { PortalTopBar } from "@/components/portal/PortalTopBar";
-import { BootScreen } from "./BootScreen";
+import { AccessGate, Notice } from "./AccessGate";
+import { NavigationProgress } from "./NavigationProgress";
+import { useSignOut } from "./session";
 import logoLight from "@/assets/logo-light.png.asset.json";
 import markLight from "@/assets/mark-light.png.asset.json";
-import "@/components/portal/portal.css";
-
-function useSignOut() {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  return useCallback(async () => {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    queryClient.setQueryData(["auth", "session"], null);
-    navigate({ to: "/auth", replace: true });
-  }, [queryClient, navigate]);
-}
 
 function isActive(path: string, to: string) {
   return to === PORTAL_PATH ? path === to : path === to || path.startsWith(to + "/");
@@ -220,70 +206,15 @@ function SkipLink() {
   );
 }
 
-function Notice({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <main className="flex min-h-dvh items-center justify-center p-6">
-      <div className="max-w-md space-y-4 text-center">
-        <h1 className="font-display text-xl font-bold">{title}</h1>
-        {children}
-      </div>
-    </main>
-  );
+export function AppShell({ userId }: { userId: string }) {
+  return <AccessGate userId={userId}>{(me) => <ModuleGuard me={me} />}</AccessGate>;
 }
 
-export function AppShell({ userId }: { userId: string }) {
-  const [compact, setCompact] = useState(false);
-  const [open, setOpen] = useState(false);
-  const { data: me, isLoading, refetch, isRefetching } = useMe(userId);
+function ModuleGuard({ me }: { me: Me }) {
   const signOut = useSignOut();
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const isPortal = path === PORTAL_PATH;
-  const current = isPortal ? undefined : matchDestination(path);
-
-  useEffect(() => {
-    setCompact(localStorage.getItem("sidebar-compact") === "1");
-  }, []);
-  const toggle = useCallback(() => {
-    setCompact((c) => {
-      localStorage.setItem("sidebar-compact", c ? "0" : "1");
-      return !c;
-    });
-  }, []);
-
-  if (isLoading) return <BootScreen label="Carregando seu acesso" />;
-  // Falha de atualização em segundo plano mantém o perfil já carregado.
-  if (!me || me.id !== userId)
-    return (
-      <Notice title="Não foi possível consultar seu acesso">
-        <p className="text-muted-foreground">
-          Sua sessão continua ativa. Tente novamente ou saia da conta.
-        </p>
-        <div className="flex justify-center gap-3">
-          <Button onClick={() => refetch()} disabled={isRefetching}>
-            {isRefetching ? "Verificando…" : "Tentar novamente"}
-          </Button>
-          <Button variant="outline" onClick={signOut}>
-            Sair
-          </Button>
-        </div>
-      </Notice>
-    );
-  if (me.roles.length === 0)
-    return (
-      <Notice title="Acesso aguardando liberação">
-        <p className="text-muted-foreground">
-          Sua conta ({me.email}) ainda não possui perfil. Solicite à administração a liberação do
-          acesso.
-        </p>
-        <div className="flex justify-center gap-3">
-          <Button variant="outline" onClick={() => refetch()} disabled={isRefetching}>
-            {isRefetching ? "Verificando…" : "Verificar acesso"}
-          </Button>
-          <Button onClick={signOut}>Sair</Button>
-        </div>
-      </Notice>
-    );
-  if (!isPortal && (!current || !me.perms[current.module]?.read))
+  const current = matchDestination(path);
+  if (!current || !me.perms[current.module]?.read)
     return (
       <Notice title="Acesso não permitido">
         <p className="text-muted-foreground">Seu perfil não permite consultar este módulo.</p>
@@ -297,98 +228,57 @@ export function AppShell({ userId }: { userId: string }) {
         </div>
       </Notice>
     );
-  return (
-    <AuthorizedShell
-      compact={compact}
-      open={open}
-      setOpen={setOpen}
-      me={me}
-      current={current}
-      toggle={toggle}
-      onSignOut={signOut}
-    />
-  );
+  return <AuthorizedShell me={me} current={current} onSignOut={signOut} />;
 }
 
-function AuthorizedShell({
-  compact,
-  open,
-  setOpen,
-  me,
-  current,
-  toggle,
-  onSignOut,
-}: {
-  compact: boolean;
-  open: boolean;
-  setOpen: (v: boolean) => void;
-  me: Me;
-  current: NavDestination | undefined;
-  toggle: () => void;
-  onSignOut: () => void;
-}) {
-  const { data: edition } = useEdition();
-  const pending = useRouterState({ select: (s) => s.status === "pending" });
-  const isPortal = !current;
-  const pathKey = current?.to ?? PORTAL_PATH;
-  const closeSheet = useCallback(() => setOpen(false), [setOpen]);
-
+function useIdlePrewarm() {
   useEffect(() => {
-    // Nos módulos internos o renderer 3D é aquecido em tempo ocioso; no portal,
-    // só por intenção (toque/foco no acesso ao mapa) para a entrada continuar leve.
-    if (isPortal) return;
+    // Só em desktop (ponteiro fino) e quando aparelho e rede permitirem; no celular
+    // o mapa 3D carrega apenas ao ser aberto.
+    if (!window.matchMedia?.("(pointer: fine)").matches) return;
     const w = window as Window & {
-      requestIdleCallback?: (cb: () => void) => number;
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
       cancelIdleCallback?: (id: number) => void;
     };
     if (w.requestIdleCallback) {
-      const id = w.requestIdleCallback(prewarmMapRenderer);
+      const id = w.requestIdleCallback(prewarmMapRenderer, { timeout: 8000 });
       return () => w.cancelIdleCallback?.(id);
     }
-    const id = window.setTimeout(prewarmMapRenderer, 2000);
+    const id = window.setTimeout(prewarmMapRenderer, 2500);
     return () => window.clearTimeout(id);
-  }, [isPortal]);
+  }, []);
+}
 
-  const sheet = (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent
-        side="left"
-        className="w-[min(19rem,88vw)] overflow-y-auto border-none p-0 motion-reduce:animate-none motion-reduce:transition-none"
-      >
-        <SheetTitle className="sr-only">Navegação</SheetTitle>
-        <SidebarBody compact={false} me={me} onNavigate={closeSheet} onSignOut={onSignOut} />
-      </SheetContent>
-    </Sheet>
-  );
-  const content = (
-    <>
-      {pending && <div className="route-progress" role="progressbar" aria-label="Carregando" />}
-      <div key={pathKey} className={cn("route-enter", pending && "route-pending")}>
-        <Outlet />
-      </div>
-    </>
-  );
+function AuthorizedShell({
+  me,
+  current,
+  onSignOut,
+}: {
+  me: Me;
+  current: NavDestination;
+  onSignOut: () => void;
+}) {
+  const [compact, setCompact] = useState(false);
+  const [open, setOpen] = useState(false);
+  const { data: edition } = useEdition();
+  const pending = useRouterState({ select: (s) => s.status === "pending" });
+  const closeSheet = useCallback(() => setOpen(false), []);
+  useIdlePrewarm();
 
-  if (isPortal)
-    return (
-      <div className="portal">
-        <SkipLink />
-        {sheet}
-        <PortalTopBar me={me} onOpenMenu={() => setOpen(true)} onSignOut={onSignOut} />
-        <main
-          id="conteudo"
-          tabIndex={-1}
-          className="portal-main relative outline-none"
-          aria-busy={pending || undefined}
-        >
-          {content}
-        </main>
-      </div>
-    );
+  useEffect(() => {
+    setCompact(localStorage.getItem("sidebar-compact") === "1");
+  }, []);
+  const toggle = useCallback(() => {
+    setCompact((c) => {
+      localStorage.setItem("sidebar-compact", c ? "0" : "1");
+      return !c;
+    });
+  }, []);
 
   return (
     <div className="internal-app flex min-h-dvh w-full bg-workspace">
       <SkipLink />
+      <NavigationProgress />
       <aside
         className={cn(
           "sticky top-0 hidden h-dvh shrink-0 transition-[width] motion-reduce:transition-none md:block",
@@ -397,7 +287,15 @@ function AuthorizedShell({
       >
         <SidebarBody compact={compact} me={me} onSignOut={onSignOut} />
       </aside>
-      {sheet}
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent
+          side="left"
+          className="w-[min(19rem,88vw)] overflow-y-auto border-none p-0 motion-reduce:animate-none motion-reduce:transition-none"
+        >
+          <SheetTitle className="sr-only">Navegação</SheetTitle>
+          <SidebarBody compact={false} me={me} onNavigate={closeSheet} onSignOut={onSignOut} />
+        </SheetContent>
+      </Sheet>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b bg-card px-3 text-sm md:px-6">
           <div className="flex min-w-0 items-center gap-2">
@@ -437,7 +335,7 @@ function AuthorizedShell({
                 aria-hidden
               />
               <span className="truncate font-semibold" aria-current="page">
-                {current?.title}
+                {current.title}
               </span>
             </nav>
           </div>
@@ -458,7 +356,9 @@ function AuthorizedShell({
           className="relative min-w-0 flex-1 outline-none"
           aria-busy={pending || undefined}
         >
-          {content}
+          <div key={current.to} className={cn("route-enter", pending && "route-pending")}>
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

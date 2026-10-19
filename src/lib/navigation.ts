@@ -61,8 +61,11 @@ export type NavDestination = {
 export type NavCategoryId =
   "agenda" | "mapa" | "empresas" | "financeiro" | "vistorias" | "administracao";
 
+export type NavTone = "plum" | "red" | "taupe";
+
 export type NavCategory = {
   id: NavCategoryId;
+  tone: NavTone;
   title: string;
   description: string;
   icon: LucideIcon;
@@ -71,16 +74,29 @@ export type NavCategory = {
 
 export type Perms = Record<string, { read: boolean; write?: boolean }> | undefined;
 
+/** Evita baixar o renderer 3D em economia de dados, rede 2G ou aparelhos com pouca memória. */
+export function canPrewarmHeavy() {
+  if (typeof navigator === "undefined") return false;
+  const n = navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+    deviceMemory?: number;
+  };
+  if (n.connection?.saveData) return false;
+  if (n.connection?.effectiveType && /(^|-)2g$/.test(n.connection.effectiveType)) return false;
+  if (n.deviceMemory !== undefined && n.deviceMemory < 4) return false;
+  return true;
+}
+
 let mapRendererWarmed = false;
 export function prewarmMapRenderer() {
-  if (mapRendererWarmed) return;
+  if (mapRendererWarmed || !canPrewarmHeavy()) return;
   mapRendererWarmed = true;
   void import("@/features/commercial-map/MapRenderer").catch(() => {
     mapRendererWarmed = false;
   });
 }
 
-export const PORTAL_PATH = "/" as const;
+export const PORTAL_PATH = "/portal" as const;
 export const PORTAL_ENTRY = {
   to: PORTAL_PATH,
   label: "Portal",
@@ -91,6 +107,7 @@ export const PORTAL_ENTRY = {
 export const NAV_CATEGORIES: readonly NavCategory[] = [
   {
     id: "agenda",
+    tone: "plum",
     title: "Agenda",
     description: "Compromissos e atividades da feira.",
     icon: CalendarDays,
@@ -107,6 +124,7 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
   },
   {
     id: "mapa",
+    tone: "red",
     title: "Mapa Comercial",
     description: "Espaços, disponibilidade e comercialização.",
     icon: MapPinned,
@@ -132,6 +150,7 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
   },
   {
     id: "empresas",
+    tone: "taupe",
     title: "Empresas / Expositores",
     description: "Cadastro e gestão dos participantes.",
     icon: UsersRound,
@@ -148,6 +167,7 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
   },
   {
     id: "financeiro",
+    tone: "plum",
     title: "Financeiro",
     description: "Recebimentos e operação financeira.",
     icon: Wallet,
@@ -164,6 +184,7 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
   },
   {
     id: "vistorias",
+    tone: "red",
     title: "Vistorias",
     description: "Inspeções e acompanhamento dos espaços.",
     icon: ClipboardCheck,
@@ -180,6 +201,7 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
   },
   {
     id: "administracao",
+    tone: "taupe",
     title: "Administração",
     description: "Dashboard, documentos, contratos e configurações.",
     icon: BriefcaseBusiness,
@@ -223,6 +245,17 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
 export const NAV_DESTINATIONS: readonly NavDestination[] = NAV_CATEGORIES.flatMap(
   (c) => c.destinations,
 );
+
+/** Nome legível de um caminho para mensagens de carregamento ("Abrindo Agenda"). */
+export function destinationName(pathname: string) {
+  if (pathname === PORTAL_PATH) return "Portal";
+  const d = matchDestination(pathname);
+  if (!d) return null;
+  return (
+    NAV_CATEGORIES.find((c) => c.destinations.length === 1 && c.destinations[0] === d)?.title ??
+    d.title
+  );
+}
 
 /** Destino dono de um caminho, incluindo rotas de detalhe (`/empresas/:id`). */
 export function matchDestination(pathname: string): NavDestination | undefined {

@@ -30,7 +30,7 @@ import {
 import { useCompany, useCan, useDeals, useContracts, useDbMutation, api } from "@/lib/api";
 import { DEAL_STATUS, CONTRACT_STATUS, brl, area } from "@/lib/format";
 
-export const Route = createFileRoute("/_authenticated/empresas/$id")({
+export const Route = createFileRoute("/_authenticated/_app/empresas/$id")({
   head: () => ({
     meta: [
       { title: "Ficha da empresa — Sistema Indumóveis" },

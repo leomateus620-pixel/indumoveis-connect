@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useCompanies, useCan } from "@/lib/api";
 import { CompanyDialog } from "@/components/app/CompanyDialog";
 
-export const Route = createFileRoute("/_authenticated/empresas/")({
+export const Route = createFileRoute("/_authenticated/_app/empresas/")({
   head: () => ({
     meta: [
       { title: "Empresas / Expositores — Sistema Indumóveis" },
