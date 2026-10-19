@@ -99,6 +99,8 @@ export type Edition = {
   reservation_expiry_action: string | null;
   contract_template: string | null;
   timezone: string;
+  /** Ausente enquanto a migração não for aplicada; nulo enquanto não confirmado. */
+  opening_time?: string | null;
 };
 export function useEdition() {
   return useQuery({
