@@ -15,6 +15,13 @@
       "when": 1792396800000,
       "tag": "0001_edition_official_opening",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792396587755,
+      "tag": "0002_edition_opening_time_comment",
+      "breakpoints": true
     }
   ]
 }

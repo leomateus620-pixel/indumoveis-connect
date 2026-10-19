@@ -1,0 +1,2 @@
+alter table public.editions add column if not exists opening_time time without time zone;
+comment on column public.editions.opening_time is 'Horário oficial de abertura no dia starts_on, no fuso da edição.';
