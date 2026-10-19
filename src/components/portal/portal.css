@@ -71,10 +71,6 @@
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--portal-ink);
-  transform: translateY(-200%);
-}
-.portal-skip:focus {
-  transform: none;
 }
 
 /* ---------- Palco institucional (fundo ameixa de ponta a ponta) ---------- */

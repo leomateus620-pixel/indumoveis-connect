@@ -13,7 +13,7 @@ export function PortalLayout({ userId }: { userId: string }) {
     <AccessGate userId={userId}>
       {(me) => (
         <div className="portal">
-          <a href="#conteudo" className="portal-skip">
+          <a href="#conteudo" className="portal-skip sr-only focus:not-sr-only">
             Pular para o conteúdo
           </a>
           <NavigationProgress />
