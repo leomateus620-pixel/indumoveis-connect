@@ -85,7 +85,7 @@ export const MODULES: { key: string; label: string }[] = [
   { key: "contratos", label: "Contratos" },
   { key: "vistorias", label: "Vistorias" },
   { key: "financeiro", label: "Financeiro Operacional" },
-  { key: "agenda", label: "Agenda / Atividades" },
+  { key: "agenda", label: "Agenda Indumóveis" },
   { key: "documentos", label: "Documentos" },
   { key: "admin", label: "Administração" },
 ];

@@ -1,3 +1,24 @@
+# Agenda Indumóveis — Design QA, 27/10/2026
+
+final result: passed
+
+A comparação foi feita com screenshots reais dos componentes anteriores (`5904289`) e novos, usando os mesmos dados de validação em 1366 × 768, 1440 × 900 e 390 × 844. Os combinados foram abertos e examinados juntos: [notebook](docs/validation/agenda-indumoveis/comparison-1366.jpg), [desktop](docs/validation/agenda-indumoveis/comparison-1440.jpg) e [mobile](docs/validation/agenda-indumoveis/comparison-390.jpg). A referência FenaSoja orienta organização e hierarquia, não clonagem de cores ou funções extras.
+
+| Superfície           | Resultado observado                                                                                                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fontes e tipografia  | Figtree e Plus Jakarta Sans existentes; título do evento domina, metadados secundários legíveis e data tabular em suporte próprio. Sem título grande duplicado.                        |
+| Espaçamento e layout | Cabeçalho desktop de 64 px, faixa de período de 74 px e eventos de largura de 1062/1136 px. Sem max-w-5xl. Mobile reorganiza cabeçalho e ações; rolagem natural.                       |
+| Cores e tokens       | Ameixa, vermelho de destaque, taupe e neutros. Situações indicadas por texto e símbolo; cancelamento com traço e conclusão com suporte discreto, sem opacidade que prejudique leitura. |
+| Imagens e ícones     | Logo oficial existente na sidebar. Sem fotos inventadas; responsáveis nos detalhes usam iniciais. Suportes de ícones leves e coerentes.                                                |
+| Texto e conteúdo     | Agenda Indumóveis consistente, mês com capitalização natural, edição/período uma vez, Nova atividade uma vez. Descrição completa nos detalhes aparece uma vez.                         |
+| Interação            | Slot React tipado com cleanup, busca e filtros na URL, popover desktop/Sheet mobile, retorno de foco e transição detalhe→edição sem painéis sobrepostos.                               |
+
+Não restam achados impeditivos nos estados examinados. Durante QA foram corrigidos overflow no breadcrumb com texto ampliado, cálculo de atraso pelo fim do intervalo, indicadores sem filtro correspondente, ação de cadastro duplicada no vazio, datas civis inválidas, mês adjacente no calendário e risco de refetch apagar rascunho/versão esperada. Os overlays portaled também passaram a respeitar redução de movimento.
+
+[Relatório, capturas, medidas e limites](docs/validation/agenda-indumoveis/README.md). Build, TypeScript e 275 testes passaram; lint dos arquivos alterados limpo. O lint global mantém 1.581 erros e 12 avisos já existentes. Os cenários usam fixture local e mocks de mutações; nenhum registro de produção foi criado nesta validação.
+
+---
+
 # Portal Indumóveis — Design QA, 27/10/2026
 
 final result: passed
@@ -14,13 +35,13 @@ As mudanças de composição são intencionais, não desvios da referência: um 
 
 ## Superfícies obrigatórias
 
-| Superfície | Avaliação final |
-| --- | --- |
-| Fontes e tipografia | Figtree e Plus Jakarta Sans preservadas em controles, títulos e números tabulares. Datas recuam para 14 px e legenda 12 px. A frase mantém 15 px, com Cormorant Garamond itálica 600 somente nos termos de destaque, sem sublinhado ou brilho genérico. Fallback Georgia e carregamento sem bloqueio. |
-| Espaçamento e layout | Topo 378 px no desktop. No notebook, primeira linha termina em y=649,5 px. Cards 200 px, rodapés alinhados, sem sobreposição negativa. Duas colunas no tablet e uma no celular; marca em lateral compacta conforme a direção revisada. |
-| Cores e tokens | Ameixa, vermelho e taupe mantidos. Ano e detalhes da assinatura usam dourado fosco compatível com o metal da cena; a marca e a contagem pertencem à mesma superfície. Sem painel claro independente na logo. |
-| Imagens e qualidade | Mesmo PNG oficial; proporções mantidas, leitura rotacionada. Filtro de alfa remove o arco translúcido por solicitação, sem desenhar outro letreiro. Ano da edição permanece HTML. Nichos, luz, piso e mobiliário vetorial existentes foram reaproveitados. Emblemas personalizados preservados. |
-| Texto e conteúdo | Frase intacta, incluindo espaço após a vírgula. Subtítulo redundante removido. Período civil preservado e legenda final “Abertura às 15h · Brasília”, ambos derivados da configuração. Identificação do administrador acima da contagem. |
+| Superfície           | Avaliação final                                                                                                                                                                                                                                                                                       |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fontes e tipografia  | Figtree e Plus Jakarta Sans preservadas em controles, títulos e números tabulares. Datas recuam para 14 px e legenda 12 px. A frase mantém 15 px, com Cormorant Garamond itálica 600 somente nos termos de destaque, sem sublinhado ou brilho genérico. Fallback Georgia e carregamento sem bloqueio. |
+| Espaçamento e layout | Topo 378 px no desktop. No notebook, primeira linha termina em y=649,5 px. Cards 200 px, rodapés alinhados, sem sobreposição negativa. Duas colunas no tablet e uma no celular; marca em lateral compacta conforme a direção revisada.                                                                |
+| Cores e tokens       | Ameixa, vermelho e taupe mantidos. Ano e detalhes da assinatura usam dourado fosco compatível com o metal da cena; a marca e a contagem pertencem à mesma superfície. Sem painel claro independente na logo.                                                                                          |
+| Imagens e qualidade  | Mesmo PNG oficial; proporções mantidas, leitura rotacionada. Filtro de alfa remove o arco translúcido por solicitação, sem desenhar outro letreiro. Ano da edição permanece HTML. Nichos, luz, piso e mobiliário vetorial existentes foram reaproveitados. Emblemas personalizados preservados.       |
+| Texto e conteúdo     | Frase intacta, incluindo espaço após a vírgula. Subtítulo redundante removido. Período civil preservado e legenda final “Abertura às 15h · Brasília”, ambos derivados da configuração. Identificação do administrador acima da contagem.                                                              |
 
 ## Iterações e correções verificadas
 

@@ -114,8 +114,8 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
     destinations: [
       {
         to: "/agenda",
-        label: "Agenda / Atividades",
-        title: "Agenda / Atividades",
+        label: "Agenda Indumóveis",
+        title: "Agenda Indumóveis",
         openLabel: "Abrir agenda",
         module: "agenda",
         icon: CalendarDays,

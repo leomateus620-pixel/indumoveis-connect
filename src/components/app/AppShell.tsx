@@ -10,7 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEdition, type Me } from "@/lib/api";
+import { useEdition, type Edition, type Me } from "@/lib/api";
 import { ROLE_LABEL, fmtDate } from "@/lib/format";
 import {
   PORTAL_ENTRY,
@@ -27,6 +27,7 @@ import { AccessGate, Notice } from "./AccessGate";
 import { NavigationProgress } from "./NavigationProgress";
 import { useSignOut } from "./session";
 import { readCompactPreference, writeCompactPreference } from "./sidebar-preference";
+import { AppHeaderProvider, useAppHeaderSlot } from "./AppHeaderContext";
 import logoLight from "@/assets/logo-light.png.asset.json";
 import markLight from "@/assets/mark-light.png.asset.json";
 
@@ -252,7 +253,15 @@ function useIdlePrewarm() {
   }, []);
 }
 
-function AuthorizedShell({
+function AuthorizedShell(props: { me: Me; current: NavDestination; onSignOut: () => void }) {
+  return (
+    <AppHeaderProvider>
+      <AuthorizedWorkspace {...props} />
+    </AppHeaderProvider>
+  );
+}
+
+function AuthorizedWorkspace({
   me,
   current,
   onSignOut,
@@ -297,59 +306,13 @@ function AuthorizedShell({
         </SheetContent>
       </Sheet>
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b bg-card px-3 text-sm md:px-6">
-          <div className="flex min-w-0 items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="min-h-11 min-w-11 md:hidden"
-              aria-label="Abrir menu"
-              onClick={() => setOpen(true)}
-            >
-              <Menu className="size-5" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="hidden md:inline-flex"
-              aria-label={compact ? "Expandir menu" : "Recolher menu"}
-              onClick={toggle}
-            >
-              {compact ? (
-                <PanelLeftOpen className="size-4" />
-              ) : (
-                <PanelLeftClose className="size-4" />
-              )}
-            </Button>
-            <nav aria-label="Localização" className="flex min-w-0 items-center gap-1.5">
-              <Link
-                to={PORTAL_PATH}
-                className="hidden min-h-11 items-center rounded-md px-1.5 font-medium text-muted-foreground hover:text-foreground md:inline-flex"
-              >
-                Portal
-              </Link>
-              <ChevronRight
-                className="hidden size-3.5 shrink-0 text-muted-foreground md:block"
-                aria-hidden
-              />
-              <span className="truncate font-semibold" aria-current="page">
-                {current.title}
-              </span>
-            </nav>
-          </div>
-          <span className="tnum min-w-0 truncate text-right text-xs text-muted-foreground">
-            {edition ? (
-              <>
-                <span className="font-semibold text-foreground">{edition.name}</span> ·{" "}
-                {fmtDate(edition.starts_on)} a {fmtDate(edition.ends_on)}
-              </>
-            ) : (
-              "Nenhuma edição configurada"
-            )}
-          </span>
-        </div>
+        <ShellHeader
+          current={current}
+          compact={compact}
+          edition={edition}
+          onOpenMenu={() => setOpen(true)}
+          onToggleMenu={toggle}
+        />
         <main
           id="conteudo"
           tabIndex={-1}
@@ -361,6 +324,96 @@ function AuthorizedShell({
           </div>
         </main>
       </div>
+    </div>
+  );
+}
+
+function ShellHeader({
+  current,
+  compact,
+  edition,
+  onOpenMenu,
+  onToggleMenu,
+}: {
+  current: NavDestination;
+  compact: boolean;
+  edition: Edition | null | undefined;
+  onOpenMenu: () => void;
+  onToggleMenu: () => void;
+}) {
+  const slot = useAppHeaderSlot(current.to);
+  return (
+    <div
+      className={cn(
+        "items-center border-b bg-card px-3 text-sm md:px-6",
+        slot
+          ? "app-context-header flex min-h-16 flex-wrap gap-x-3 gap-y-1.5 py-2 xl:gap-x-4"
+          : "grid min-h-12 grid-cols-[minmax(0,1fr)_auto] gap-2",
+      )}
+    >
+      <div className={cn("flex min-w-0 items-center gap-2", slot && "shrink-0")}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="min-h-11 min-w-11 md:hidden"
+          aria-label="Abrir menu"
+          onClick={onOpenMenu}
+        >
+          <Menu className="size-5" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="hidden md:inline-flex"
+          aria-label={compact ? "Expandir menu" : "Recolher menu"}
+          onClick={onToggleMenu}
+        >
+          {compact ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+        </Button>
+        <nav aria-label="Localização" className="flex min-w-0 items-center gap-1.5">
+          <Link
+            to={PORTAL_PATH}
+            className={cn(
+              "min-h-11 items-center rounded-md px-1.5 font-medium text-muted-foreground hover:text-foreground",
+              slot ? "inline-flex" : "hidden md:inline-flex",
+            )}
+          >
+            Portal
+          </Link>
+          <ChevronRight
+            className={cn(
+              "size-3.5 shrink-0 text-muted-foreground",
+              slot ? "block" : "hidden md:block",
+            )}
+            aria-hidden
+          />
+          <span className="truncate font-semibold" aria-current="page">
+            {current.title}
+          </span>
+        </nav>
+      </div>
+      {slot && (
+        <div className="order-2 w-full min-w-0 xl:order-none xl:w-auto xl:flex-1">
+          {slot.commands}
+        </div>
+      )}
+      <span
+        className={cn(
+          "tnum min-w-0 text-right text-xs text-muted-foreground",
+          slot ? "ml-auto max-w-full shrink-0" : "truncate",
+        )}
+      >
+        {edition ? (
+          <>
+            <span className="font-semibold text-foreground">{edition.name}</span> ·{" "}
+            {fmtDate(edition.starts_on)} a {fmtDate(edition.ends_on)}
+          </>
+        ) : (
+          "Nenhuma edição configurada"
+        )}
+      </span>
     </div>
   );
 }

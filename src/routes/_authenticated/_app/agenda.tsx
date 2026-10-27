@@ -1,16 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useCallback, useRef, useMemo, useState } from "react";
 import {
-  BarChart3,
+  ArrowUpRight,
+  CheckCircle2,
+  CircleDashed,
+  CircleX,
+  Layers3,
+  AlertCircle,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
   Clock3,
-  ListTree,
   MapPin,
   Plus,
-  Settings2,
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,17 +28,23 @@ import {
 } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActivityDialog } from "@/components/app/ActivityDialog";
-import { RelatedLink, RELATED_LABEL } from "@/components/app/shared";
-import { AttachedDocuments } from "@/components/app/documents/AttachedDocuments";
+import { ActivityDetails } from "@/components/app/ActivityDetails";
+import { AgendaCommands } from "@/components/app/AgendaCommands";
+import { useAppHeaderCommands } from "@/components/app/AppHeaderContext";
+import {
+  activeAgendaCriteria,
+  clearedAgendaCriteria,
+  validateAgendaSearch,
+  type AgendaSearch as Search,
+} from "@/lib/agenda-search";
+import "@/components/app/agenda.css";
+import { RelatedLink } from "@/components/app/shared";
 import {
   EmptyState,
   ErrorBox,
   FormRow,
-  Loading,
   NativeSelect,
-  PageHeader,
   Restricted,
-  SearchInput,
   StatusBadge,
 } from "@/components/app/ui";
 import {
@@ -57,55 +66,29 @@ import {
   agendaMetrics,
   buildAgendaItems,
   dateKeyInZone,
-  daysForItem,
   filterAgendaItems,
   groupAgendaItemsAcrossDays,
-  groupAgendaItemsByDate,
-  monthBounds,
   monthKeyInZone,
   timeInZone,
   type AgendaItem,
 } from "@/lib/agenda";
 import { cn } from "@/lib/utils";
 
-type View = "timeline" | "panel" | "calendar";
-type Search = {
-  view?: View;
-  month?: string;
-  q?: string;
-  status?: string;
-  category?: string;
-  commission?: string;
-  assignee?: string;
-  activity?: string;
-  day?: string;
-};
-
 export const Route = createFileRoute("/_authenticated/_app/agenda")({
-  validateSearch: (search: Record<string, unknown>): Search => ({
-    view: ["timeline", "panel", "calendar"].includes(String(search.view))
-      ? (search.view as View)
-      : undefined,
-    month: /^\d{4}-\d{2}$/.test(String(search.month)) ? String(search.month) : undefined,
-    q: typeof search.q === "string" ? search.q : undefined,
-    status: typeof search.status === "string" ? search.status : undefined,
-    category: typeof search.category === "string" ? search.category : undefined,
-    commission: typeof search.commission === "string" ? search.commission : undefined,
-    assignee: typeof search.assignee === "string" ? search.assignee : undefined,
-    activity: typeof search.activity === "string" ? search.activity : undefined,
-    day: /^\d{4}-\d{2}-\d{2}$/.test(String(search.day)) ? String(search.day) : undefined,
-  }),
+  validateSearch: validateAgendaSearch,
   head: () => ({
     meta: [
-      { title: "Agenda Operacional — Sistema Indumóveis" },
+      { title: "Agenda Indumóveis — Sistema Indumóveis" },
       {
         name: "description",
-        content: "Linha do tempo, painel e calendário operacional da Indumóveis.",
+        content:
+          "Agenda Indumóveis: atividades, vistorias e vencimentos em uma área de trabalho integrada.",
       },
-      { property: "og:title", content: "Agenda Operacional — Sistema Indumóveis" },
+      { property: "og:title", content: "Agenda Indumóveis — Sistema Indumóveis" },
       {
         property: "og:description",
-        content: "Linha do tempo, painel e calendário operacional da Indumóveis.",
+        content:
+          "Agenda Indumóveis: atividades, vistorias e vencimentos em uma área de trabalho integrada.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -136,8 +119,16 @@ function AgendaPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
 
-  const setSearch = (patch: Partial<Search>) =>
-    navigate({ search: (previous) => ({ ...previous, ...patch }), replace: true });
+  const setSearch = useCallback(
+    (patch: Partial<Search>) =>
+      navigate({
+        search: (previous) => ({ ...previous, ...patch }),
+        replace: true,
+        resetScroll: false,
+      }),
+    [navigate],
+  );
+  const selectedTrigger = useRef<HTMLElement | null>(null);
   const allItems = useMemo(
     () =>
       buildAgendaItems({
@@ -175,127 +166,52 @@ function AgendaPage() {
     finance.read && installmentsQuery.isError && { label: "Financeiro", query: installmentsQuery },
   ].filter(Boolean) as { label: string; query: any }[];
 
+  const criteriaCount = activeAgendaCriteria(search);
+  const clearFilters = () => setSearch(clearedAgendaCriteria);
+  const selectItem = (item: AgendaItem) => {
+    selectedTrigger.current = document.activeElement as HTMLElement;
+    if (item.activity) void setSearch({ activity: item.activity.id });
+  };
+  useAppHeaderCommands({
+    route: "/agenda",
+    commands: can.read ? (
+      <AgendaCommands
+        search={search}
+        view={view}
+        onChange={setSearch}
+        categories={categoriesQuery.data ?? []}
+        commissions={commissionsQuery.data ?? []}
+        people={peopleQuery.data ?? []}
+        count={filtered.length}
+        canWrite={can.write}
+        onCatalog={() => setCatalogOpen(true)}
+      />
+    ) : null,
+  });
+
   if (!can.read) return <Restricted />;
-  if (activitiesQuery.isLoading || categoriesQuery.isLoading || commissionsQuery.isLoading)
-    return <Loading />;
-  if (activitiesQuery.isError)
+  if (activitiesQuery.isLoading) return <AgendaSkeleton />;
+  if (activitiesQuery.isError && !activitiesQuery.data)
     return (
       <ErrorBox error={activitiesQuery.error} onRetry={() => void activitiesQuery.refetch()} />
     );
 
   return (
     <div className="agenda-workspace min-w-0">
-      <PageHeader
-        title="Agenda / Atividades"
-        subtitle={`${edition?.name ?? "Edição ativa"} · ${fmtMonth(month)} · fuso de Santa Rosa`}
-        actions={
-          <>
-            {can.write && (
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Configurar categorias e comissões"
-                onClick={() => setCatalogOpen(true)}
-              >
-                <Settings2 className="size-4" />
-              </Button>
-            )}
-            {can.write && (
-              <Button size="sm" onClick={() => setCreateOpen(true)}>
-                <Plus className="size-4" />
-                Nova atividade
-              </Button>
-            )}
-          </>
-        }
-      >
-        <div className="flex flex-col gap-3 pb-3 lg:flex-row lg:items-center lg:justify-between">
-          <Tabs
-            value={view}
-            onValueChange={(value) =>
-              setSearch({ view: value as View, day: undefined, activity: undefined })
-            }
-          >
-            <TabsList className="grid w-full grid-cols-3 sm:w-auto">
-              <TabsTrigger value="timeline">
-                <ListTree className="mr-1.5 size-4" />
-                Linha do tempo
-              </TabsTrigger>
-              <TabsTrigger value="panel">
-                <BarChart3 className="mr-1.5 size-4" />
-                Painel
-              </TabsTrigger>
-              <TabsTrigger value="calendar">
-                <CalendarDays className="mr-1.5 size-4" />
-                Calendário
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <MonthNav
-            month={month}
-            timeZone={timeZone}
-            onChange={(value) => setSearch({ month: value, day: undefined })}
-          />
-        </div>
-      </PageHeader>
-
-      <div className="grid gap-2 border-b bg-surface-subtle px-4 py-3 sm:grid-cols-2 lg:grid-cols-[minmax(15rem,1fr)_repeat(4,minmax(9rem,auto))] md:px-6 xl:px-8">
-        <SearchInput
-          value={search.q ?? ""}
-          onChange={(q) => setSearch({ q: q || undefined })}
-          placeholder="Buscar atividade, pessoa, local…"
+      <h1 className="sr-only">Agenda Indumóveis</h1>
+      <div className="agenda-period-bar">
+        <MonthNav
+          month={month}
+          timeZone={timeZone}
+          onChange={(value) => setSearch({ month: value, day: undefined })}
         />
-        <NativeSelect
-          aria-label="Situação"
-          value={search.status ?? "todas"}
-          onChange={(event) =>
-            setSearch({ status: event.target.value === "todas" ? undefined : event.target.value })
-          }
-        >
-          <option value="todas">Todas as situações</option>
-          <option value="aberta">Abertas</option>
-          <option value="minhas">Minhas atividades</option>
-          <option value="concluida">Concluídas</option>
-          <option value="cancelada">Canceladas</option>
-        </NativeSelect>
-        <NativeSelect
-          aria-label="Categoria"
-          value={search.category ?? ""}
-          onChange={(event) => setSearch({ category: event.target.value || undefined })}
-        >
-          <option value="">Todas as categorias</option>
-          {(categoriesQuery.data ?? []).map((row: any) => (
-            <option key={row.id} value={row.id}>
-              {row.name}
-            </option>
-          ))}
-        </NativeSelect>
-        <NativeSelect
-          aria-label="Comissão"
-          value={search.commission ?? ""}
-          onChange={(event) => setSearch({ commission: event.target.value || undefined })}
-        >
-          <option value="">Todas as comissões</option>
-          {(commissionsQuery.data ?? []).map((row: any) => (
-            <option key={row.id} value={row.id}>
-              {row.name}
-            </option>
-          ))}
-        </NativeSelect>
-        <NativeSelect
-          aria-label="Responsável"
-          value={search.assignee ?? ""}
-          onChange={(event) => setSearch({ assignee: event.target.value || undefined })}
-        >
-          <option value="">Todos os responsáveis</option>
-          {(peopleQuery.data ?? []).map((row: any) => (
-            <option key={row.id} value={row.id}>
-              {row.full_name || row.email}
-            </option>
-          ))}
-        </NativeSelect>
+        {can.write && (
+          <Button size="sm" className="agenda-create" onClick={() => setCreateOpen(true)}>
+            <Plus className="size-4" />
+            Nova atividade
+          </Button>
+        )}
       </div>
-
       {failures.map(({ label, query }) => (
         <div key={label} className="px-4 pt-3 md:px-6 xl:px-8">
           <ErrorBox
@@ -304,40 +220,65 @@ function AgendaPage() {
           />
         </div>
       ))}
-      {view === "timeline" && (
-        <Timeline
-          items={filtered}
-          today={today}
-          timeZone={timeZone}
-          canWrite={can.write}
-          onSelect={(item) => setSearch({ activity: item.activity?.id })}
-        />
-      )}
-      {view === "panel" && (
-        <Dashboard
-          items={filtered}
-          allItems={allItems}
-          today={today}
-          categories={categoriesQuery.data ?? []}
-          commissions={commissionsQuery.data ?? []}
-          people={peopleQuery.data ?? []}
-          onFilter={(patch) => setSearch({ ...patch, view: "timeline" })}
-        />
-      )}
-      {view === "calendar" && (
-        <Calendar
-          month={month}
-          day={search.day}
-          items={filtered}
-          today={today}
-          timeZone={timeZone}
-          onDay={(day) => setSearch({ day })}
-          onSelect={(item) =>
-            item.activity ? setSearch({ activity: item.activity.id }) : undefined
+      {!filtered.length ? (
+        <EmptyState
+          title={
+            criteriaCount
+              ? "Nenhum resultado para estes filtros"
+              : allItems.length
+                ? "Nenhum evento neste mês"
+                : "Nenhum evento cadastrado"
+          }
+          text={
+            criteriaCount
+              ? "Tente outros critérios ou limpe os filtros para ver os eventos do período."
+              : allItems.length
+                ? "Navegue entre os meses para consultar a programação."
+                : "As atividades, vistorias e vencimentos da edição aparecem aqui."
+          }
+          action={
+            criteriaCount ? (
+              <Button variant="outline" onClick={clearFilters}>
+                Limpar filtros
+              </Button>
+            ) : undefined
           }
         />
+      ) : (
+        <>
+          {view === "timeline" && (
+            <Timeline
+              items={filtered}
+              today={today}
+              timeZone={timeZone}
+              canWrite={can.write}
+              onSelect={selectItem}
+            />
+          )}
+          {view === "panel" && (
+            <Dashboard
+              items={filtered}
+              allItems={allItems}
+              today={today}
+              categories={categoriesQuery.data ?? []}
+              commissions={commissionsQuery.data ?? []}
+              people={peopleQuery.data ?? []}
+              onFilter={(patch) => setSearch({ ...patch, view: "timeline" })}
+            />
+          )}
+          {view === "calendar" && (
+            <Calendar
+              month={month}
+              day={search.day}
+              items={filtered}
+              today={today}
+              timeZone={timeZone}
+              onDay={(day) => setSearch({ day, month: day.slice(0, 7) })}
+              onSelect={selectItem}
+            />
+          )}
+        </>
       )}
-
       <ActivityDialog open={createOpen} onOpenChange={setCreateOpen} />
       <ActivityDialog open={editOpen} onOpenChange={setEditOpen} activity={selected} />
       <ActivityDetails
@@ -346,7 +287,11 @@ function AgendaPage() {
         timeZone={timeZone}
         onEdit={() => setEditOpen(true)}
         open={!!search.activity && !editOpen}
-        onOpenChange={(open) => !open && setSearch({ activity: undefined })}
+        onOpenChange={(open) => !open && !editOpen && setSearch({ activity: undefined })}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          if (!editOpen) selectedTrigger.current?.focus({ preventScroll: true });
+        }}
       />
       <CatalogDialog
         open={catalogOpen}
@@ -370,27 +315,26 @@ function MonthNav({
 }) {
   const shift = (amount: number) => {
     const [y, m] = month.split("-").map(Number);
-    const d = new Date(Date.UTC(y, m - 1 + amount, 1));
-    onChange(d.toISOString().slice(0, 7));
+    onChange(new Date(Date.UTC(y, m - 1 + amount, 1)).toISOString().slice(0, 7));
   };
   return (
-    <div className="flex items-center justify-between gap-1">
-      <Button variant="outline" size="icon" aria-label="Mês anterior" onClick={() => shift(-1)}>
-        <ChevronLeft className="size-4" />
-      </Button>
-      <span className="min-w-36 text-center text-sm font-semibold capitalize">
-        {fmtMonth(month)}
-      </span>
-      <Button variant="outline" size="icon" aria-label="Próximo mês" onClick={() => shift(1)}>
-        <ChevronRight className="size-4" />
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onChange(monthKeyInZone(new Date(), timeZone))}
-      >
-        Hoje
-      </Button>
+    <div className="agenda-month-nav">
+      <h2>{fmtMonth(month)}</h2>
+      <div className="agenda-month-actions">
+        <Button variant="ghost" size="icon" aria-label="Mês anterior" onClick={() => shift(-1)}>
+          <ChevronLeft className="size-4" />
+        </Button>
+        <Button variant="ghost" size="icon" aria-label="Próximo mês" onClick={() => shift(1)}>
+          <ChevronRight className="size-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onChange(monthKeyInZone(new Date(), timeZone))}
+        >
+          Hoje
+        </Button>
+      </div>
     </div>
   );
 }
@@ -408,62 +352,45 @@ function Timeline({
   canWrite: boolean;
   onSelect: (item: AgendaItem) => void;
 }) {
-  const dated = items.filter((item) => item.date);
-  const unscheduled = items.filter((item) => !item.date);
-  const groups = Object.entries(groupAgendaItemsByDate(dated));
-  if (!items.length)
-    return (
-      <EmptyState
-        title="Nenhuma atividade neste recorte"
-        text="Ajuste o período ou os filtros aplicados."
-      />
-    );
+  const dated = items.filter((item) => item.date),
+    unscheduled = items.filter((item) => !item.date);
   return (
-    <div className="px-4 py-5 md:px-6 xl:px-8">
-      <div className="mx-auto max-w-5xl space-y-8">
-        {groups.map(([date, rows]) => (
-          <section key={date} className="grid gap-3 sm:grid-cols-[7rem_minmax(0,1fr)]">
-            <header className="sm:text-right">
-              <p className={cn("text-sm font-bold", date === today && "text-primary")}>
-                {date === today ? "Hoje" : fmtDate(date)}
-              </p>
-              <p className="text-xs capitalize text-muted-foreground">{weekday(date)}</p>
-            </header>
-            <div className="relative space-y-2 border-l pl-5 before:absolute before:-left-1 before:top-1 before:size-2 before:rounded-full before:bg-brand-red">
-              {rows?.map((item) => (
-                <TimelineRow
-                  key={item.key}
-                  item={item}
-                  timeZone={timeZone}
-                  canWrite={canWrite}
-                  onSelect={onSelect}
-                  overdue={!!item.date && item.date < today && item.status === "aberta"}
-                />
-              ))}
-            </div>
-          </section>
+    <div className="agenda-timeline" aria-label="Eventos da Agenda">
+      <p className="agenda-result-count" role="status">
+        {items.length} {items.length === 1 ? "evento" : "eventos"} no período
+        {unscheduled.length > 0 ? ` · ${unscheduled.length} sem data` : ""}
+      </p>
+      <div className="agenda-event-list">
+        {dated.map((item) => (
+          <TimelineRow
+            key={item.key}
+            item={item}
+            timeZone={timeZone}
+            canWrite={canWrite}
+            onSelect={onSelect}
+            overdue={!!item.date && (item.endDate ?? item.date) < today && item.status === "aberta"}
+          />
         ))}
-        {unscheduled.length > 0 && (
-          <section className="grid gap-3 sm:grid-cols-[7rem_minmax(0,1fr)]">
-            <header className="sm:text-right">
-              <p className="text-sm font-bold">Sem data</p>
-              <p className="text-xs text-muted-foreground">A programar</p>
-            </header>
-            <div className="space-y-2 border-l pl-5">
-              {unscheduled.map((item) => (
-                <TimelineRow
-                  key={item.key}
-                  item={item}
-                  timeZone={timeZone}
-                  canWrite={canWrite}
-                  onSelect={onSelect}
-                  overdue={false}
-                />
-              ))}
-            </div>
-          </section>
-        )}
       </div>
+      {unscheduled.length > 0 && (
+        <section className="agenda-unscheduled">
+          <h2>
+            Sem data <span>A programar</span>
+          </h2>
+          <div className="agenda-event-list">
+            {unscheduled.map((item) => (
+              <TimelineRow
+                key={item.key}
+                item={item}
+                timeZone={timeZone}
+                canWrite={canWrite}
+                onSelect={onSelect}
+                overdue={false}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -482,52 +409,126 @@ function TimelineRow({
   overdue: boolean;
 }) {
   const activity = item.activity;
+  const assignees = [...(activity?.activity_assignees ?? [])].sort(
+    (a: any, b: any) => Number(b.is_primary) - Number(a.is_primary),
+  );
+  const commissions = activity?.activity_commissions ?? [];
+  const StatusIcon =
+    item.status === "concluida" || item.status === "paga" || item.status === "aprovada"
+      ? CheckCircle2
+      : item.status === "cancelada"
+        ? CircleX
+        : CircleDashed;
+  const statusLabel = activity
+    ? ACTIVITY_STATUS[item.status]?.label
+    : item.status.replaceAll("_", " ");
   return (
     <article
       className={cn(
-        "border bg-card px-4 py-3 shadow-xs",
-        item.status === "concluida" && "opacity-70",
-        item.status === "cancelada" && "border-dashed opacity-60",
+        "agenda-event",
+        overdue && "is-overdue",
+        item.status === "concluida" && "is-complete",
+        item.status === "cancelada" && "is-cancelled",
       )}
     >
-      <div className="flex items-start gap-3">
-        <div className="tnum w-14 shrink-0 pt-0.5 text-xs font-semibold text-muted-foreground">
-          {item.allDay ? "Dia todo" : item.startAt ? timeInZone(item.startAt, timeZone) : "—"}
-        </div>
-        <button type="button" className="min-w-0 flex-1 text-left" onClick={() => onSelect(item)}>
-          <span
-            className={cn("block font-semibold", item.status === "cancelada" && "line-through")}
-          >
-            {item.title}
-          </span>
-          <span className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span>{sourceLabel(item.source)}</span>
-            {activity?.activity_categories?.name && (
-              <span>{activity.activity_categories.name}</span>
-            )}
-            {activity?.location && (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="size-3" />
-                {activity.location}
-              </span>
-            )}
-            {activity && (activity.activity_assignees?.length ?? 0) > 0 && (
-              <span className="inline-flex items-center gap-1">
-                <Users className="size-3" />
-                {activity.activity_assignees
-                  .map((row: any) => row.profiles?.full_name || row.profiles?.email)
-                  .join(", ")}
-              </span>
-            )}
-          </span>
-        </button>
-        {activity && <StatusBadge map={ACTIVITY_STATUS} value={activity.status} />}
+      <div className="agenda-date-badge" aria-label={item.date ? fmtDate(item.date) : "Sem data"}>
+        <span className="agenda-date-weekday">{item.date ? weekday(item.date) : "A definir"}</span>
+        <strong>{item.date ? Number(item.date.slice(-2)) : "—"}</strong>
+        <span className="agenda-date-month">
+          {item.date
+            ? new Date(`${item.date}T12:00:00Z`)
+                .toLocaleDateString("pt-BR", { month: "short", timeZone: "UTC" })
+                .replace(".", "")
+            : "Sem data"}
+        </span>
+        <span className="agenda-date-time">
+          <Clock3 className="size-3" aria-hidden />
+          {item.allDay
+            ? "Dia inteiro"
+            : item.startAt
+              ? timeInZone(item.startAt, timeZone)
+              : "A definir"}
+        </span>
       </div>
-      {overdue && <p className="mt-2 pl-17 text-xs font-semibold text-destructive">Atrasada</p>}
-      {activity && canWrite && activity.status === "aberta" && (
-        <StatusButton activity={activity} status="concluida" label="Concluir" />
-      )}
+      <div className="agenda-event-content">
+        <div className="agenda-event-category">
+          <span>{activity?.activity_categories?.name ?? sourceLabel(item.source)}</span>
+          {activity?.activity_categories?.name && <small>{sourceLabel(item.source)}</small>}
+        </div>
+        <h3>
+          {activity ? (
+            <button type="button" onClick={() => onSelect(item)}>
+              {item.title}
+            </button>
+          ) : item.link ? (
+            <RelatedLink type={item.link.type} id={item.link.id}>
+              {item.title}
+              <ArrowUpRight className="size-3.5" aria-hidden />
+            </RelatedLink>
+          ) : (
+            item.title
+          )}
+        </h3>
+        {item.endDate && item.endDate !== item.date && (
+          <p className="agenda-event-range">
+            <CalendarDays className="size-3.5" aria-hidden />
+            {fmtDate(item.date)} a {fmtDate(item.endDate)}
+            {!item.allDay && item.endAt
+              ? ` · até ${timeInZone(item.endAt, timeZone)}`
+              : " · dia inteiro"}
+          </p>
+        )}
+        <div className="agenda-event-meta">
+          {activity?.location && (
+            <span>
+              <MapPin className="size-3.5" aria-hidden />
+              {activity.location}
+            </span>
+          )}
+          {assignees.length > 0 && (
+            <span>
+              <Users className="size-3.5" aria-hidden />
+              {assignees
+                .map((row: any) => row.profiles?.full_name || row.profiles?.email)
+                .filter(Boolean)
+                .join(", ")}
+            </span>
+          )}
+          {commissions.length > 0 && (
+            <span>
+              <Layers3 className="size-3.5" aria-hidden />
+              {commissions.map((row: any) => row.commissions?.name).join(", ")}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="agenda-event-state">
+        <span className="agenda-status" data-status={item.status}>
+          <StatusIcon className="size-3.5" aria-hidden />
+          {statusLabel}
+        </span>
+        {overdue && (
+          <span className="agenda-overdue">
+            <AlertCircle className="size-3.5" aria-hidden />
+            Atrasada
+          </span>
+        )}
+        {activity && canWrite && item.status === "aberta" && (
+          <StatusButton activity={activity} status="concluida" label="Concluir" />
+        )}
+      </div>
     </article>
+  );
+}
+
+function AgendaSkeleton() {
+  return (
+    <div className="agenda-skeleton" role="status" aria-label="Carregando eventos">
+      <div />
+      <div />
+      <div />
+      <span className="sr-only">Carregando eventos…</span>
+    </div>
   );
 }
 
@@ -547,7 +548,7 @@ function StatusButton({
     <Button
       size="sm"
       variant="ghost"
-      className="ml-17 mt-1"
+      className="agenda-complete-action"
       disabled={mutation.isPending}
       onClick={() => mutation.mutate(undefined)}
     >
@@ -597,17 +598,28 @@ function Dashboard({
             ["Concluídas", metrics.completed, { status: "concluida" }],
             ["Sem data", metrics.unscheduled, { status: "aberta" }],
           ] as [string, number, Partial<Search>][]
-        ).map(([label, value, patch]) => (
-          <button
-            key={String(label)}
-            type="button"
-            onClick={() => onFilter(patch)}
-            className="bg-card p-4 text-left transition-colors hover:bg-accent"
-          >
-            <span className="text-xs font-medium text-muted-foreground">{label}</span>
-            <strong className="tnum mt-1 block text-2xl">{value}</strong>
-          </button>
-        ))}
+        ).map(([label, value, patch]) => {
+          const content = (
+            <>
+              <span className="text-xs font-medium text-muted-foreground">{label}</span>
+              <strong className="tnum mt-1 block text-2xl">{value}</strong>
+            </>
+          );
+          return label === "Abertas" || label === "Concluídas" ? (
+            <button
+              key={label}
+              type="button"
+              onClick={() => onFilter(patch)}
+              className="bg-card p-4 text-left transition-colors hover:bg-accent"
+            >
+              {content}
+            </button>
+          ) : (
+            <div key={label} className="bg-card p-4">
+              {content}
+            </div>
+          );
+        })}
       </section>
       <section className="grid gap-6 xl:grid-cols-[minmax(18rem,.75fr)_repeat(3,minmax(0,1fr))]">
         <div className="border-t-2 border-primary bg-card p-4">
@@ -711,7 +723,7 @@ function Calendar({
   return (
     <div className="grid gap-5 px-4 py-5 lg:grid-cols-[minmax(0,1fr)_20rem] md:px-6 xl:px-8">
       <div className="overflow-x-auto">
-        <div className="min-w-[44rem] border bg-card">
+        <div className="agenda-calendar border bg-card">
           <div className="grid grid-cols-7 border-b bg-surface-subtle">
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((label) => (
               <div key={label} className="px-2 py-2 text-xs font-semibold text-muted-foreground">
@@ -727,15 +739,17 @@ function Calendar({
                   key={date}
                   type="button"
                   onClick={() => onDay(date)}
+                  aria-label={`${fmtDate(date)} · ${rows.length} ${rows.length === 1 ? "evento" : "eventos"}`}
+                  aria-pressed={date === selectedDay}
                   className={cn(
-                    "min-h-28 border-b border-r p-2 text-left",
+                    "min-h-20 min-w-0 border-b border-r p-1 text-left sm:min-h-28 sm:p-2",
                     !date.startsWith(month) && "bg-muted/30 text-muted-foreground",
                     date === selectedDay && "bg-accent",
                     date === today && "ring-2 ring-inset ring-primary",
                   )}
                 >
                   <span className="tnum text-xs font-semibold">{Number(date.slice(-2))}</span>
-                  <span className="mt-2 block space-y-1">
+                  <span className="mt-2 hidden space-y-1 sm:block">
                     {rows.slice(0, 3).map((item) => (
                       <span
                         key={item.key}
@@ -753,6 +767,11 @@ function Calendar({
                       </span>
                     )}
                   </span>
+                  {rows.length > 0 && (
+                    <span className="mt-2 block text-[10px] font-semibold text-primary sm:hidden">
+                      {rows.length} {rows.length === 1 ? "evento" : "eventos"}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -765,125 +784,56 @@ function Calendar({
           <ul className="mt-3 divide-y border-y bg-card">
             {selectedRows.map((item) => (
               <li key={item.key}>
-                <button
-                  type="button"
-                  className="w-full px-3 py-3 text-left"
-                  onClick={() => onSelect(item)}
-                >
+                <div className="px-3 py-3 text-left">
                   <span className="block text-xs text-muted-foreground">
-                    {item.allDay ? "Dia todo" : timeInZone(item.startAt, timeZone)}
+                    {item.allDay ? "Dia inteiro" : timeInZone(item.startAt, timeZone)}
                   </span>
-                  <span className="block font-semibold">{item.title}</span>
-                </button>
+                  {item.activity ? (
+                    <button
+                      type="button"
+                      className="text-left font-semibold hover:underline"
+                      onClick={() => onSelect(item)}
+                    >
+                      {item.title}
+                    </button>
+                  ) : item.link ? (
+                    <RelatedLink type={item.link.type} id={item.link.id}>
+                      {item.title}
+                    </RelatedLink>
+                  ) : (
+                    <span className="font-semibold">{item.title}</span>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
         ) : (
           <p className="mt-3 text-sm text-muted-foreground">Nenhum registro neste dia.</p>
         )}
+        {items.some((item) => !item.date) && (
+          <div className="mt-6 border-t pt-4">
+            <h3 className="text-sm font-semibold">Sem data</h3>
+            <ul className="mt-2 space-y-3">
+              {items
+                .filter((item) => !item.date)
+                .map((item) => (
+                  <li key={item.key}>
+                    <button
+                      type="button"
+                      className="text-left text-sm font-medium hover:underline"
+                      onClick={() => onSelect(item)}
+                    >
+                      {item.title}
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
       </section>
     </div>
   );
 }
-function ActivityDetails({
-  activity,
-  open,
-  onOpenChange,
-  canWrite,
-  timeZone,
-  onEdit,
-}: {
-  activity?: any;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  canWrite: boolean;
-  timeZone: string;
-  onEdit: () => void;
-}) {
-  if (!activity) return null;
-  return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
-        <SheetHeader>
-          <SheetTitle>{activity.title}</SheetTitle>
-          <SheetDescription>
-            {activity.activity_categories?.name ?? "Sem categoria"} · versão {activity.version}
-          </SheetDescription>
-        </SheetHeader>
-        <div className="mt-6 space-y-5 text-sm">
-          <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge map={ACTIVITY_STATUS} value={activity.status} />
-            <span className="text-muted-foreground capitalize">{activity.kind}</span>
-          </div>
-          <dl className="grid gap-4 sm:grid-cols-2">
-            <Detail label="Programação">
-              {activity.start_at
-                ? `${fmtDate(dateKeyInZone(activity.start_at, timeZone))}${activity.all_day ? " · dia inteiro" : ` · ${timeInZone(activity.start_at, timeZone)}`}`
-                : "Sem data"}
-              {activity.end_at
-                ? ` até ${fmtDate(dateKeyInZone(activity.end_at, timeZone))} ${activity.all_day ? "" : timeInZone(activity.end_at, timeZone)}`
-                : ""}
-            </Detail>
-            <Detail label="Local">{activity.location || "—"}</Detail>
-            <Detail label="Responsáveis">
-              {activity.activity_assignees
-                ?.map((row: any) => row.profiles?.full_name || row.profiles?.email)
-                .join(", ") || "—"}
-            </Detail>
-            <Detail label="Comissões">
-              {activity.activity_commissions?.map((row: any) => row.commissions?.name).join(", ") ||
-                "—"}
-            </Detail>
-          </dl>
-          {activity.description && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground">Descrição</p>
-              <p className="mt-1 whitespace-pre-wrap">{activity.description}</p>
-            </div>
-          )}
-          {activity.related_type && activity.related_id && (
-            <RelatedLink type={activity.related_type} id={activity.related_id}>
-              Abrir {RELATED_LABEL[activity.related_type] ?? "origem"}
-            </RelatedLink>
-          )}
-          <section className="space-y-2 border-t pt-4">
-            <h3 className="text-xs font-medium text-muted-foreground">Documentos</h3>
-            <AttachedDocuments
-              entityType="activity"
-              entityId={activity.id}
-              entityLabel={activity.title}
-              category="geral"
-              canWrite={canWrite}
-            />
-          </section>
-          {canWrite && (
-            <div className="flex flex-wrap gap-2 border-t pt-4">
-              <Button onClick={onEdit}>Editar</Button>
-              {activity.status !== "concluida" && (
-                <StatusButton activity={activity} status="concluida" label="Concluir" />
-              )}
-              {activity.status !== "aberta" && (
-                <StatusButton activity={activity} status="aberta" label="Reabrir" />
-              )}
-              {activity.status !== "cancelada" && (
-                <StatusButton activity={activity} status="cancelada" label="Cancelar" />
-              )}
-            </div>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-}
-function Detail({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <dt className="text-xs font-medium text-muted-foreground">{label}</dt>
-      <dd className="mt-1 font-medium">{children}</dd>
-    </div>
-  );
-}
-
 function CatalogDialog({
   open,
   onOpenChange,
@@ -1008,10 +958,13 @@ function CatalogDialog({
 const sourceLabel = (source: AgendaItem["source"]) =>
   source === "activity" ? "Atividade" : source === "inspection" ? "Vistoria" : "Financeiro";
 const fmtMonth = (month: string) =>
-  new Date(`${month}-15T12:00:00Z`).toLocaleDateString("pt-BR", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  capitalize(
+    new Date(`${month}-15T12:00:00Z`).toLocaleDateString("pt-BR", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }),
+  );
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 const weekday = (date: string) =>
-  new Date(`${date}T12:00:00Z`).toLocaleDateString("pt-BR", { weekday: "long", timeZone: "UTC" });
+  new Date(`${date}T12:00:00Z`).toLocaleDateString("pt-BR", { weekday: "short", timeZone: "UTC" });

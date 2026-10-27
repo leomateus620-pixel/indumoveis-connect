@@ -46,6 +46,15 @@ describe("navigation registry", () => {
     expect(matchDestination("/mapas")).toBeUndefined();
   });
 
+  it("identifies Agenda consistently while preserving its route and permission", () => {
+    expect(matchDestination("/agenda")).toMatchObject({
+      to: "/agenda",
+      module: "agenda",
+      label: "Agenda Indumóveis",
+      title: "Agenda Indumóveis",
+    });
+  });
+
   it("keeps every destination behind its own permission", () => {
     const v = visibleCategories(perms("documentos", "comercial"));
     expect(v.map((c) => c.category.id)).toEqual(["mapa", "administracao"]);

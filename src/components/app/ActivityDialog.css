@@ -1,0 +1,299 @@
+.activity-editor.activity-editor {
+  display: flex;
+  width: calc(100% - 2rem);
+  max-width: 52rem;
+  max-height: calc(100dvh - 3rem);
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 1.25rem;
+  border-color: color-mix(in oklch, var(--brand-plum) 16%, var(--border));
+  background: var(--card);
+}
+
+.activity-editor__header {
+  flex-shrink: 0;
+  padding: 1.4rem 4.5rem 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(115deg, var(--plum-soft), var(--card) 78%);
+  text-align: left;
+}
+
+.activity-editor__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+  color: var(--brand-plum);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.activity-editor__eyebrow svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.activity-editor__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -0.04em;
+}
+
+.activity-editor__description {
+  margin-top: 0.4rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.activity-editor > button:last-child {
+  top: 1.1rem;
+  right: 1.1rem;
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--card);
+}
+
+.activity-editor__form {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.activity-editor__body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.5rem 1.75rem;
+  scrollbar-gutter: stable;
+}
+
+.activity-editor__group {
+  min-width: 0;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  border: 0;
+}
+
+.activity-editor__group:last-child {
+  margin-bottom: 0;
+}
+
+.activity-editor__legend {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+  padding: 0;
+  color: var(--foreground);
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.activity-editor__legend::after {
+  height: 1px;
+  flex: 1;
+  margin-left: 0.3rem;
+  background: var(--border);
+  content: "";
+}
+
+.activity-editor__section-icon {
+  display: inline-flex;
+  width: 1.85rem;
+  height: 1.85rem;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in oklch, var(--brand-plum) 12%, var(--border));
+  border-radius: 0.6rem;
+  background: var(--plum-soft);
+  color: var(--brand-plum);
+}
+
+.activity-editor__section-icon svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1.7;
+}
+
+.activity-editor__fields {
+  display: grid;
+  min-width: 0;
+  gap: 0.9rem;
+}
+
+.activity-editor__columns {
+  display: grid;
+  min-width: 0;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.activity-editor__columns > *,
+.activity-editor__fields > * {
+  min-width: 0;
+}
+
+.activity-editor__columns--related {
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+}
+
+.activity-editor__fields input:not([type="checkbox"]),
+.activity-editor__fields select,
+.activity-editor__multi-select {
+  min-width: 0;
+  min-height: 2.75rem;
+  border-radius: 0.65rem;
+  background: var(--card);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--brand-plum) 4%, transparent);
+}
+
+.activity-editor__fields textarea {
+  min-height: 6.25rem;
+  border-radius: 0.65rem;
+  background: var(--card);
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.activity-editor__all-day {
+  display: flex;
+  width: fit-content;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: var(--surface-subtle);
+  font-size: 0.8125rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.activity-editor__selection {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.3rem 0.15rem 0.65rem;
+  border: 1px solid color-mix(in oklch, var(--brand-plum) 15%, var(--border));
+  border-radius: 0.5rem;
+  background: var(--plum-soft);
+  color: var(--brand-plum);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.activity-editor__remove-selection {
+  display: inline-flex;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 0.35rem;
+  cursor: pointer;
+}
+
+.activity-editor__remove-selection:hover {
+  background: color-mix(in oklch, var(--brand-plum) 12%, transparent);
+}
+
+.activity-editor__remove-selection:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.activity-editor__choices {
+  max-width: calc(100vw - 2rem);
+}
+
+.activity-editor__footer.activity-editor__footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 1rem 1.75rem max(1rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--surface-subtle);
+}
+
+.activity-editor__footer button {
+  min-width: 6.5rem;
+  min-height: 2.75rem;
+  margin: 0;
+  border-radius: 0.65rem;
+}
+
+.activity-editor__saving {
+  animation: activity-editor-spin 900ms linear infinite;
+}
+
+@keyframes activity-editor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 580px) {
+  .activity-editor.activity-editor {
+    width: calc(100% - 1rem);
+    max-height: calc(100dvh - 1rem);
+    border-radius: 1rem;
+  }
+
+  .activity-editor__header {
+    padding: 1.1rem 4rem 1.1rem 1.15rem;
+  }
+
+  .activity-editor__body {
+    padding: 1.25rem 1.15rem;
+  }
+
+  .activity-editor__title {
+    font-size: 1.35rem;
+  }
+
+  .activity-editor__columns,
+  .activity-editor__columns--related {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .activity-editor__fields input,
+  .activity-editor__fields select,
+  .activity-editor__fields textarea {
+    font-size: 1rem;
+  }
+
+  .activity-editor__footer.activity-editor__footer {
+    padding-right: 1.15rem;
+    padding-left: 1.15rem;
+  }
+
+  .activity-editor__footer button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activity-editor *,
+  .activity-editor {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
