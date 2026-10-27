@@ -13,9 +13,11 @@ A comparação foi feita com screenshots reais dos componentes anteriores (`5904
 | Texto e conteúdo     | Agenda Indumóveis consistente, mês com capitalização natural, edição/período uma vez, Nova atividade uma vez. Descrição completa nos detalhes aparece uma vez.                         |
 | Interação            | Slot React tipado com cleanup, busca e filtros na URL, popover desktop/Sheet mobile, retorno de foco e transição detalhe→edição sem painéis sobrepostos.                               |
 
+O refinamento final dos cards foi comparado com a versão revisada pelo usuário em [antes/depois dos marcadores](docs/validation/agenda-indumoveis/refinement-comparison-1366.jpg). Nichos em arco maiores, materiais leves por CSS, números ampliados e rótulos Hoje/Amanhã separam temporalidade de situação. SVGs de relógio mostram o horário real exibido; dia inteiro e sem horário não inventam ponteiros. [Hoje/Amanhã](docs/validation/agenda-indumoveis/today-tomorrow-1366.jpg) e [evidência dos ângulos](docs/validation/agenda-indumoveis/clock-and-temporal.json) examinados, sem overflow nos três viewports.
+
 Não restam achados impeditivos nos estados examinados. Durante QA foram corrigidos overflow no breadcrumb com texto ampliado, cálculo de atraso pelo fim do intervalo, indicadores sem filtro correspondente, ação de cadastro duplicada no vazio, datas civis inválidas, mês adjacente no calendário e risco de refetch apagar rascunho/versão esperada. Os overlays portaled também passaram a respeitar redução de movimento.
 
-[Relatório, capturas, medidas e limites](docs/validation/agenda-indumoveis/README.md). Build, TypeScript e 275 testes passaram; lint dos arquivos alterados limpo. O lint global mantém 1.581 erros e 12 avisos já existentes. Os cenários usam fixture local e mocks de mutações; nenhum registro de produção foi criado nesta validação.
+[Relatório, capturas, medidas e limites](docs/validation/agenda-indumoveis/README.md). Build, TypeScript e 309 testes passaram; lint dos arquivos alterados limpo. O lint global mantém 1.581 erros e 12 avisos já existentes. Os cenários usam fixture local e mocks de mutações; nenhum registro de produção foi criado nesta validação.
 
 ---
 

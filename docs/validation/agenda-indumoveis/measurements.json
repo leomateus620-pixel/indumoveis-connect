@@ -1,9 +1,19 @@
 [
   {
     "commands": 1,
+    "dateBadge": {
+      "bottom": 339.59375,
+      "height": 134.59375,
+      "left": 303,
+      "right": 399,
+      "top": 205,
+      "width": 96,
+      "x": 303,
+      "y": 205
+    },
     "firstEvent": {
-      "bottom": 329.296875,
-      "height": 143.296875,
+      "bottom": 358.59375,
+      "height": 172.59375,
       "left": 280,
       "right": 1342,
       "top": 186,
@@ -21,9 +31,19 @@
   },
   {
     "commands": 1,
+    "dateBadge": {
+      "bottom": 339.59375,
+      "height": 134.59375,
+      "left": 303,
+      "right": 399,
+      "top": 205,
+      "width": 96,
+      "x": 303,
+      "y": 205
+    },
     "firstEvent": {
-      "bottom": 329.296875,
-      "height": 143.296875,
+      "bottom": 358.59375,
+      "height": 172.59375,
       "left": 280,
       "right": 1416,
       "top": 186,
@@ -41,9 +61,19 @@
   },
   {
     "commands": 1,
+    "dateBadge": {
+      "bottom": 441.7578125,
+      "height": 126.7578125,
+      "left": 29,
+      "right": 105,
+      "top": 315,
+      "width": 76,
+      "x": 29,
+      "y": 315
+    },
     "firstEvent": {
-      "bottom": 489,
-      "height": 189,
+      "bottom": 490.3984375,
+      "height": 190.3984375,
       "left": 14,
       "right": 376,
       "top": 300,

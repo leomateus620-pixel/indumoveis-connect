@@ -1,0 +1,66 @@
+[
+  {
+    "hour": "rotate(300 12 12)",
+    "label": null,
+    "minute": "rotate(0 12 12)",
+    "temporal": "past",
+    "time": "10:00",
+    "title": "Visita técnica preliminar"
+  },
+  {
+    "hour": "rotate(60 12 12)",
+    "label": null,
+    "minute": "rotate(0 12 12)",
+    "temporal": "past",
+    "time": "14:00",
+    "title": "Revisão dos contratos com expositores"
+  },
+  {
+    "hour": "rotate(60 12 12)",
+    "label": null,
+    "minute": "rotate(0 12 12)",
+    "temporal": "past",
+    "time": "14:00",
+    "title": "Reunião de fornecedores"
+  },
+  {
+    "hour": "rotate(270 12 12)",
+    "label": "Hoje",
+    "minute": "rotate(0 12 12)",
+    "temporal": "today",
+    "time": "09:00",
+    "title": "Alinhamento da operação e montagem"
+  },
+  {
+    "hour": null,
+    "label": "Amanhã",
+    "minute": null,
+    "temporal": "tomorrow",
+    "time": "Dia inteiro",
+    "title": "Validação da ocupação dos pavilhões"
+  },
+  {
+    "hour": null,
+    "label": "Amanhã",
+    "minute": null,
+    "temporal": "tomorrow",
+    "time": "Dia inteiro",
+    "title": "Vistoria de entrega · P01-12"
+  },
+  {
+    "hour": null,
+    "label": null,
+    "minute": null,
+    "temporal": "future",
+    "time": "Dia inteiro",
+    "title": "Vencimento 2ª parcela · Expositor demonstração"
+  },
+  {
+    "hour": null,
+    "label": null,
+    "minute": null,
+    "temporal": "unscheduled",
+    "time": "A definir",
+    "title": "Definir cronograma de comunicação"
+  }
+]

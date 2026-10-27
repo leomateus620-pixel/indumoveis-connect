@@ -37,10 +37,22 @@ Os anexos fornecidos e os componentes CronogramaModuleShell, CronogramaTimelineB
 - [Texto ampliado](text-200-390.jpg): raiz tipográfica a 200% em 390 px, sem overflow. O breadcrumb quebra linhas; não há corte de título nem compressão dos controles. O calendário usa contagens compactas em telas estreitas e detalhes abaixo.
 - Movimento reduzido conferido por emulação: animações do overlay e painel desativadas; `transition-property: none` nos primitivos portaled. Transições normais de filtros ficam em 180 ms. As fontes e tokens existentes Figtree/Plus Jakarta Sans, ameixa, vermelho e taupe foram preservados.
 
+## Refinamento arquitetônico dos eventos
+
+Após a revisão dos cards, os marcadores de data cresceram para **96 × 134,6 px** no desktop e **76 × 126,8 px** no celular. O nicho em arco reaproveita a linguagem do contador: profundidade por gradientes, iluminação lateral discreta, moldura interna e faixa metálica. O primeiro card desktop tem **172,6 px**, com crescimento natural pelo conteúdo. Títulos cresceram e superfícies ganharam arcos de fundo sutis e bordas refinadas. Nenhum recurso 3D ou dependência foi adicionado.
+
+[Comparação desta revisão](refinement-comparison-1366.jpg). As capturas gerais antes/depois acima já mostram a versão final.
+
+[Hoje e amanhã no desktop](today-tomorrow-1366.jpg) e [página mobile completa](today-tomorrow-390.jpg) mostram rótulos explícitos e superfícies distintas: ameixa/vermelho para hoje e taupe aquecido para amanhã. Intervalos abertos que já começaram recebem “Em andamento”; concluídas e canceladas mantêm suas situações. O cálculo usa os dias civis da edição e trata mudanças de mês/ano, anos bissextos e intervalos sem duplicar registros.
+
+O relógio é um SVG leve, decorativo e sem foco. Seus ponteiros usam o mesmo HH:mm convertido para o fuso da edição que aparece no HTML ao lado: hora = `(h % 12) × 30 + minuto × 0,5`; minutos = `minuto × 6`. A inspeção confirmou **09h → 270°**, **10h → 300°** e **14h → 60°** no ponteiro das horas; os testes também verificam **10h30 → 315°/180°**. Dia inteiro e horário a definir usam símbolo de calendário. [Valores observados no DOM](clock-and-temporal.json).
+
+As três capturas finais mantêm os mesmos limites horizontais do viewport. Texto ampliado a 200% continua sem overflow em 390 px. As 34 verificações novas cobrem relógio, horários inválidos, rótulos temporais e fronteiras civis de data.
+
 ## Checks e limites
 
 - Build de produção e TypeScript aprovados.
-- 45 arquivos de teste, 275 testes aprovados. Cobertura nova: composição/limpeza do cabeçalho, filtros controlados e parâmetros inválidos, Minhas atividades, foco desktop/mobile, detalhes/edição, duração/atraso de vários dias, permissões, concorrência e rascunho durante refetch.
+- 47 arquivos de teste, 309 testes aprovados. Cobertura nova: composição/limpeza do cabeçalho, filtros controlados e parâmetros inválidos, Minhas atividades, foco desktop/mobile, detalhes/edição, duração/atraso de vários dias, permissões, concorrência e rascunho durante refetch.
 - ESLint dos arquivos alterados aprovado. Lint global: 1.581 erros e 12 avisos preexistentes, mesmos diagnósticos do baseline; sem acréscimo.
 - Autorização no banco, funções atômicas, React Query, documentos e controle de versão permanecem nos acessos existentes de `src/lib/api.ts`. Nenhum schema, período da edição ou dado remoto foi alterado nesta etapa. A abertura oficial de 14/05/2027 às 15h e o portal da PR permanecem preservados.
 - Mutações e cenários de permissão foram verificados com testes controlados; não foram criados eventos nem pagamentos no banco de produção. A verificação visual não substitui uma auditoria completa de acessibilidade ou execução manual de todas as combinações de perfis reais.

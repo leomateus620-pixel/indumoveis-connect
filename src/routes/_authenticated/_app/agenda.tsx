@@ -11,7 +11,6 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
-  Clock3,
   MapPin,
   Plus,
   Users,
@@ -29,6 +28,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActivityDialog } from "@/components/app/ActivityDialog";
 import { ActivityDetails } from "@/components/app/ActivityDetails";
+import { AgendaClock } from "@/components/app/AgendaClock";
+import { agendaTemporalState } from "@/lib/agenda-presentation";
 import { AgendaCommands } from "@/components/app/AgendaCommands";
 import { useAppHeaderCommands } from "@/components/app/AppHeaderContext";
 import {
@@ -368,6 +369,7 @@ function Timeline({
             timeZone={timeZone}
             canWrite={canWrite}
             onSelect={onSelect}
+            today={today}
             overdue={!!item.date && (item.endDate ?? item.date) < today && item.status === "aberta"}
           />
         ))}
@@ -385,6 +387,7 @@ function Timeline({
                 timeZone={timeZone}
                 canWrite={canWrite}
                 onSelect={onSelect}
+                today={today}
                 overdue={false}
               />
             ))}
@@ -401,13 +404,25 @@ function TimelineRow({
   canWrite,
   onSelect,
   overdue,
+  today,
 }: {
   item: AgendaItem;
   timeZone: string;
   canWrite: boolean;
   onSelect: (item: AgendaItem) => void;
   overdue: boolean;
+  today: string;
 }) {
+  const temporal = agendaTemporalState(item, today);
+  const temporalLabel =
+    temporal === "today"
+      ? "Hoje"
+      : temporal === "tomorrow"
+        ? "Amanhã"
+        : temporal === "ongoing" && item.status === "aberta"
+          ? "Em andamento"
+          : null;
+  const clockTime = !item.allDay && item.startAt ? timeInZone(item.startAt, timeZone) : null;
   const activity = item.activity;
   const assignees = [...(activity?.activity_assignees ?? [])].sort(
     (a: any, b: any) => Number(b.is_primary) - Number(a.is_primary),
@@ -424,6 +439,7 @@ function TimelineRow({
     : item.status.replaceAll("_", " ");
   return (
     <article
+      data-temporal={temporal}
       className={cn(
         "agenda-event",
         overdue && "is-overdue",
@@ -440,18 +456,29 @@ function TimelineRow({
                 .toLocaleDateString("pt-BR", { month: "short", timeZone: "UTC" })
                 .replace(".", "")
             : "Sem data"}
+          {item.date && <small>{item.date.slice(0, 4)}</small>}
         </span>
-        <span className="agenda-date-time">
-          <Clock3 className="size-3" aria-hidden />
-          {item.allDay
-            ? "Dia inteiro"
-            : item.startAt
-              ? timeInZone(item.startAt, timeZone)
-              : "A definir"}
+        <span className="agenda-date-time" data-timed={!!clockTime}>
+          {clockTime ? (
+            <AgendaClock time={clockTime} />
+          ) : (
+            <CalendarDays className="agenda-date-symbol" aria-hidden />
+          )}
+          {clockTime ? (
+            <time dateTime={item.startAt!}>{clockTime}</time>
+          ) : (
+            <span>{item.allDay ? "Dia inteiro" : "A definir"}</span>
+          )}
         </span>
       </div>
       <div className="agenda-event-content">
         <div className="agenda-event-category">
+          {temporalLabel && (
+            <em className="agenda-temporal-label">
+              <i aria-hidden />
+              {temporalLabel}
+            </em>
+          )}
           <span>{activity?.activity_categories?.name ?? sourceLabel(item.source)}</span>
           {activity?.activity_categories?.name && <small>{sourceLabel(item.source)}</small>}
         </div>
