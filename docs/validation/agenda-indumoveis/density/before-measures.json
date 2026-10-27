@@ -1,0 +1,176 @@
+[
+  {
+    "events": [
+      {
+        "bottom": 358.59375,
+        "height": 172.59375,
+        "title": "Visita técnica preliminar",
+        "top": 186
+      },
+      {
+        "bottom": 543.1875,
+        "height": 172.59375,
+        "title": "Revisão dos contratos com expositores",
+        "top": 370.59375
+      },
+      {
+        "bottom": 727.78125,
+        "height": 172.59375,
+        "title": "Reunião de fornecedores",
+        "top": 555.1875
+      },
+      {
+        "bottom": 912.375,
+        "height": 172.59375,
+        "title": "Alinhamento da operação e montagem",
+        "top": 739.78125
+      },
+      {
+        "bottom": 1095.96875,
+        "height": 171.59375,
+        "title": "Validação da ocupação dos pavilhões",
+        "top": 924.375
+      },
+      {
+        "bottom": 1279.5625,
+        "height": 171.59375,
+        "title": "Vistoria de entrega · P01-12",
+        "top": 1107.96875
+      },
+      {
+        "bottom": 1463.15625,
+        "height": 171.59375,
+        "title": "Vencimento 2ª parcela · Expositor demonstração",
+        "top": 1291.5625
+      },
+      {
+        "bottom": 1695.75,
+        "height": 171.59375,
+        "title": "Definir cronograma de comunicação",
+        "top": 1524.15625
+      }
+    ],
+    "scrollY": 0,
+    "viewport": [
+      1366,
+      768
+    ],
+    "visible": 3
+  },
+  {
+    "events": [
+      {
+        "bottom": 358.59375,
+        "height": 172.59375,
+        "title": "Visita técnica preliminar",
+        "top": 186
+      },
+      {
+        "bottom": 543.1875,
+        "height": 172.59375,
+        "title": "Revisão dos contratos com expositores",
+        "top": 370.59375
+      },
+      {
+        "bottom": 727.78125,
+        "height": 172.59375,
+        "title": "Reunião de fornecedores",
+        "top": 555.1875
+      },
+      {
+        "bottom": 912.375,
+        "height": 172.59375,
+        "title": "Alinhamento da operação e montagem",
+        "top": 739.78125
+      },
+      {
+        "bottom": 1095.96875,
+        "height": 171.59375,
+        "title": "Validação da ocupação dos pavilhões",
+        "top": 924.375
+      },
+      {
+        "bottom": 1279.5625,
+        "height": 171.59375,
+        "title": "Vistoria de entrega · P01-12",
+        "top": 1107.96875
+      },
+      {
+        "bottom": 1463.15625,
+        "height": 171.59375,
+        "title": "Vencimento 2ª parcela · Expositor demonstração",
+        "top": 1291.5625
+      },
+      {
+        "bottom": 1695.75,
+        "height": 171.59375,
+        "title": "Definir cronograma de comunicação",
+        "top": 1524.15625
+      }
+    ],
+    "scrollY": 0,
+    "viewport": [
+      1440,
+      900
+    ],
+    "visible": 3
+  },
+  {
+    "events": [
+      {
+        "bottom": 490.3984375,
+        "height": 190.3984375,
+        "title": "Visita técnica preliminar",
+        "top": 300
+      },
+      {
+        "bottom": 715.1953125,
+        "height": 212.796875,
+        "title": "Revisão dos contratos com expositores",
+        "top": 502.3984375
+      },
+      {
+        "bottom": 923.09375,
+        "height": 195.8984375,
+        "title": "Reunião de fornecedores",
+        "top": 727.1953125
+      },
+      {
+        "bottom": 1159.890625,
+        "height": 224.796875,
+        "title": "Alinhamento da operação e montagem",
+        "top": 935.09375
+      },
+      {
+        "bottom": 1420.1875,
+        "height": 248.296875,
+        "title": "Validação da ocupação dos pavilhões",
+        "top": 1171.890625
+      },
+      {
+        "bottom": 1612.1875,
+        "height": 180,
+        "title": "Vistoria de entrega · P01-12",
+        "top": 1432.1875
+      },
+      {
+        "bottom": 1804.1875,
+        "height": 180,
+        "title": "Vencimento 2ª parcela · Expositor demonstração",
+        "top": 1624.1875
+      },
+      {
+        "bottom": 2045.1875,
+        "height": 180,
+        "title": "Definir cronograma de comunicação",
+        "top": 1865.1875
+      }
+    ],
+    "scrollY": 0,
+    "viewport": [
+      390,
+      844
+    ],
+    "visible": 2
+  }
+]

@@ -1,6 +1,6 @@
 # Agenda Indumóveis — reorganização da área de trabalho
 
-Validação em 27/10/2026. Implementação na branch `codex/portal-integrado`, destinada à PR #9, preservando as alterações anteriores do portal.
+Validação em 27/10/2026. A revisão final compacta a lista para mostrar seis eventos completos no notebook, preservando a identidade arquitetônica. [Relatório da densidade e comparação direta](density/README.md). Implementação na branch `codex/portal-integrado`, destinada à PR #9, preservando as alterações anteriores do portal.
 
 ## Comparação visual real
 
@@ -16,11 +16,11 @@ Os anexos fornecidos e os componentes CronogramaModuleShell, CronogramaTimelineB
 
 | Viewport CSS |       Cabeçalho principal | Primeiro evento (y) | Largura do evento | Overflow horizontal | Barras de comandos / Nova atividade |
 | ------------ | ------------------------: | ------------------: | ----------------: | ------------------- | ----------------------------------- |
-| 1366 × 768   |                     64 px |              186 px |           1062 px | Não                 | 1 / 1                               |
-| 1440 × 900   |                     64 px |              186 px |           1136 px | Não                 | 1 / 1                               |
-| 390 × 844    | 137 px, com reorganização |              300 px |            362 px | Não                 | 1 / 1                               |
+| 1366 × 768   |                     64 px |              158 px |           1062 px | Não                 | 1 / 1                               |
+| 1440 × 900   |                     64 px |              158 px |           1136 px | Não                 | 1 / 1                               |
+| 390 × 844    | 137 px, com reorganização |              296 px |            362 px | Não                 | 1 / 1                               |
 
-[Medidas brutas](measurements.json). A primeira lista no notebook começa aproximadamente 100 px acima do baseline. As capturas foram realizadas pelo navegador com zoom de página 100%; o Chrome foi utilizado para controlar o viewport com precisão, pois a superfície interna mantém zoom próprio. A prévia interna também foi aberta. Não foi usado Playwright externo ao Browser Use.
+[Medidas brutas](measurements.json). A primeira lista no notebook começa aproximadamente 125 px acima do baseline. As capturas foram realizadas pelo navegador com zoom de página 100%; o Chrome foi utilizado para controlar o viewport com precisão, pois a superfície interna mantém zoom próprio. A prévia interna também foi aberta. Não foi usado Playwright externo ao Browser Use.
 
 ## Superfícies e interações
 
@@ -39,9 +39,9 @@ Os anexos fornecidos e os componentes CronogramaModuleShell, CronogramaTimelineB
 
 ## Refinamento arquitetônico dos eventos
 
-Após a revisão dos cards, os marcadores de data cresceram para **96 × 134,6 px** no desktop e **76 × 126,8 px** no celular. O nicho em arco reaproveita a linguagem do contador: profundidade por gradientes, iluminação lateral discreta, moldura interna e faixa metálica. O primeiro card desktop tem **172,6 px**, com crescimento natural pelo conteúdo. Títulos cresceram e superfícies ganharam arcos de fundo sutis e bordas refinadas. Nenhum recurso 3D ou dependência foi adicionado.
+Os marcadores de data foram compactados para **82 × 81 px** no desktop, preservando o nicho e os ponteiros reais. No celular, o suporte usa 76 px de largura e a composição cresce conforme o conteúdo. O nicho em arco reaproveita a linguagem do contador: profundidade por gradientes, iluminação lateral discreta, moldura interna e faixa metálica. Os cards normais do desktop têm **94 px**, com crescimento natural pelo conteúdo e intervalo de 6 px. Títulos de 16 px e metadados de 12 px mantêm a leitura. Os suportes dos títulos foram refinados e superfícies ganharam arcos de fundo sutis e bordas refinadas. Nenhum recurso 3D ou dependência foi adicionado.
 
-[Comparação desta revisão](refinement-comparison-1366.jpg). As capturas gerais antes/depois acima já mostram a versão final.
+[Comparação da densidade final](density/comparison-1366.jpg). As capturas gerais antes/depois acima já mostram a versão final.
 
 [Hoje e amanhã no desktop](today-tomorrow-1366.jpg) e [página mobile completa](today-tomorrow-390.jpg) mostram rótulos explícitos e superfícies distintas: ameixa/vermelho para hoje e taupe aquecido para amanhã. Intervalos abertos que já começaram recebem “Em andamento”; concluídas e canceladas mantêm suas situações. O cálculo usa os dias civis da edição e trata mudanças de mês/ano, anos bissextos e intervalos sem duplicar registros.
 
