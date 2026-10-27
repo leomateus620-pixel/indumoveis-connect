@@ -1,6 +1,18 @@
-import { memo, useId, useState } from "react";
+import { memo, useId, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { ArrowRight, ChevronDown, X } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { NavCategory, NavDestination } from "@/lib/navigation";
 import { PortalEmblem } from "./PortalEmblem";
 
@@ -10,38 +22,59 @@ type Props = {
   destinations: NavDestination[];
 };
 
-function CardHead({
+function CardContents({
   category,
-  destinations,
-  only,
+  action,
+  group,
 }: {
   category: NavCategory;
-  destinations: NavDestination[];
-  only?: NavDestination;
+  action: string;
+  group?: boolean;
 }) {
-  const group = destinations.length > 1;
   return (
-    <span className="portal-card__head">
-      <PortalEmblem id={category.id} tone={category.tone} />
-      <span className="portal-card__copy">
-        <span className="portal-card__title">{category.title}</span>
-        <span className="portal-card__desc">{category.description}</span>
-        {group && (
-          <span className="portal-card__chips" aria-hidden="true">
-            {destinations.map((d) => (
-              <span key={d.to} className="portal-card__chip">
-                {d.label}
-              </span>
-            ))}
-          </span>
-        )}
-        {only && (
-          <span className="portal-card__chips">
-            <span className="portal-card__chip">{only.label}</span>
-          </span>
-        )}
+    <>
+      <span className="portal-card__head">
+        <PortalEmblem id={category.id} tone={category.tone} />
+        <span className="portal-card__copy">
+          <span className="portal-card__title">{category.title}</span>
+          <span className="portal-card__desc">{category.description}</span>
+        </span>
       </span>
-    </span>
+      <span className="portal-card__foot" aria-hidden="true">
+        <span className="portal-card__action">{action}</span>
+        <span className={`portal-card__cue portal-card__cue--${group ? "toggle" : "go"}`}>
+          {group ? <ChevronDown strokeWidth={2.25} /> : <ArrowRight strokeWidth={2.25} />}
+        </span>
+      </span>
+    </>
+  );
+}
+
+function DestinationLinks({
+  category,
+  destinations,
+  onNavigate,
+}: Props & { onNavigate: () => void }) {
+  return (
+    <ul className="portal-card__links" aria-label={`Destinos de ${category.title}`}>
+      {destinations.map((destination) => (
+        <li key={destination.to}>
+          <Link
+            to={destination.to}
+            className="portal-card__link"
+            onPointerDown={destination.prewarm}
+            onFocus={destination.prewarm}
+            onClick={onNavigate}
+          >
+            <span className="portal-card__link-icon" aria-hidden="true">
+              <destination.icon strokeWidth={1.9} />
+            </span>
+            <span className="portal-card__link-label">{destination.label}</span>
+            <ArrowRight className="portal-card__link-go" aria-hidden="true" />
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -49,83 +82,140 @@ export const PortalCategoryCard = memo(function PortalCategoryCard({
   category,
   destinations,
 }: Props) {
-  const [expanded, setExpanded] = useState(false);
-  const panelId = useId();
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
+  const isMobile = useIsMobile();
+
+  if (!destinations.length) return null;
 
   if (destinations.length === 1) {
-    const [dest] = destinations;
-    // Grupo reduzido a um destino: abre direto, com o destino identificado no card.
-    const only = category.destinations.length > 1 ? dest : undefined;
+    const [destination] = destinations;
+    const only = category.destinations.length > 1 ? destination : undefined;
     return (
       <Link
-        to={dest.to}
+        to={destination.to}
         className="portal-card portal-card__surface"
         data-kind="link"
         data-tone={category.tone}
         data-category={category.id}
-        aria-label={`${dest.openLabel}: ${category.title}${only ? ` — ${dest.label}` : ""}`}
-        onPointerDown={dest.prewarm}
-        onFocus={dest.prewarm}
+        aria-label={`${destination.openLabel}: ${category.title}${only ? ` — ${destination.label}` : ""}`}
+        onPointerDown={destination.prewarm}
+        onFocus={destination.prewarm}
       >
-        <CardHead category={category} destinations={destinations} only={only} />
-        <span className="portal-card__foot" aria-hidden="true">
-          <span className="portal-card__action">{dest.openLabel}</span>
-          <span className="portal-card__cue portal-card__cue--go">
-            <ArrowRight strokeWidth={2.25} />
-          </span>
-        </span>
+        <CardContents category={category} action={destination.openLabel} />
       </Link>
     );
   }
 
-  return (
-    <div
-      className="portal-card"
+  const trigger = (
+    <button
+      ref={triggerRef}
+      type="button"
+      className="portal-card portal-card__surface"
       data-kind="group"
       data-tone={category.tone}
       data-category={category.id}
-      data-expanded={expanded || undefined}
+      data-expanded={open || undefined}
+      aria-label={`Ver ${destinations.length} opções de ${category.title}`}
     >
-      <button
-        type="button"
-        className="portal-card__surface"
-        aria-expanded={expanded}
-        aria-controls={panelId}
-        onClick={() => setExpanded((v) => !v)}
+      <CardContents category={category} action={`Ver ${destinations.length} opções`} group />
+    </button>
+  );
+  const links = (
+    <DestinationLinks
+      category={category}
+      destinations={destinations}
+      onNavigate={() => setOpen(false)}
+    />
+  );
+  const focusDestination = (event: Event) => {
+    event.preventDefault();
+    if (event.target instanceof HTMLElement) {
+      event.target.querySelector<HTMLElement>(".portal-card__link")?.focus({ preventScroll: true });
+    }
+  };
+  // Mesmo ao fechar por clique externo, a seleção devolve o foco ao card de origem.
+  const returnFocus = (event: Event) => {
+    event.preventDefault();
+    // Ao mudar de breakpoint, o seletor anterior desmonta depois que o novo já
+    // recebeu foco. Sua limpeza não deve roubar o foco da nova apresentação.
+    const currentSelector = triggerRef.current?.getAttribute("aria-controls");
+    if (
+      !currentSelector ||
+      (event.target instanceof HTMLElement && currentSelector === event.target.id)
+    ) {
+      triggerRef.current?.focus({ preventScroll: true });
+    }
+  };
+  const closeIcon = <X aria-hidden="true" />;
+
+  if (isMobile) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+        <DialogPortal>
+          <DialogOverlay className="portal-destinations__overlay" />
+          <DialogPrimitive.Content
+            className="portal-destinations portal-destinations--dialog"
+            aria-modal="true"
+            onOpenAutoFocus={focusDestination}
+            onCloseAutoFocus={returnFocus}
+          >
+            <div className="portal-destinations__header">
+              <DialogTitle className="portal-destinations__title">{category.title}</DialogTitle>
+              <DialogDescription className="portal-destinations__description">
+                Escolha a área que deseja acessar.
+              </DialogDescription>
+            </div>
+            <DialogClose asChild>
+              <button
+                className="portal-destinations__close"
+                type="button"
+                aria-label="Fechar destinos"
+              >
+                {closeIcon}
+              </button>
+            </DialogClose>
+            {links}
+          </DialogPrimitive.Content>
+        </DialogPortal>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent
+        className="portal-destinations portal-destinations--popover"
+        align="start"
+        sideOffset={8}
+        collisionPadding={16}
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        onOpenAutoFocus={focusDestination}
+        onCloseAutoFocus={returnFocus}
       >
-        <CardHead category={category} destinations={destinations} />
-        <span className="portal-card__foot">
-          <span className="portal-card__action">
-            {expanded ? "Ocultar opções" : `Ver ${destinations.length} opções`}
-            <span className="sr-only"> de {category.title}</span>
-          </span>
-          <span className="portal-card__cue portal-card__cue--toggle" aria-hidden="true">
-            <ChevronDown strokeWidth={2.25} />
-          </span>
-        </span>
-      </button>
-      <div id={panelId} className="portal-card__panel" inert={!expanded}>
-        <div className="portal-card__panel-inner">
-          <ul className="portal-card__links" aria-label={`Destinos de ${category.title}`}>
-            {destinations.map((d) => (
-              <li key={d.to}>
-                <Link
-                  to={d.to}
-                  className="portal-card__link"
-                  onPointerDown={d.prewarm}
-                  onFocus={d.prewarm}
-                >
-                  <span className="portal-card__link-icon" aria-hidden="true">
-                    <d.icon strokeWidth={1.9} />
-                  </span>
-                  <span className="portal-card__link-label">{d.label}</span>
-                  <ArrowRight className="portal-card__link-go" aria-hidden="true" />
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="portal-destinations__header">
+          <h3 id={titleId} className="portal-destinations__title">
+            {category.title}
+          </h3>
+          <p id={descriptionId} className="portal-destinations__description">
+            Escolha a área que deseja acessar.
+          </p>
         </div>
-      </div>
-    </div>
+        <button
+          className="portal-destinations__close"
+          type="button"
+          onClick={() => setOpen(false)}
+          aria-label="Fechar destinos"
+        >
+          {closeIcon}
+        </button>
+        {links}
+      </PopoverContent>
+    </Popover>
   );
 });

@@ -15,7 +15,7 @@ import type { Edition } from "@/lib/api";
 import {
   countdownAt,
   formatEditionPeriod,
-  formatOpeningShort,
+  formatOpeningTime,
   nextTickDelay,
   pad2,
   resolveOpening,
@@ -352,7 +352,6 @@ function Frame({
         <h2 id="portal-count-title" className="portal-count__title">
           {title}
         </h2>
-        <p className="portal-count__eyebrow">Contagem para a abertura</p>
       </div>
       {children}
       <div className="portal-count__foot">
@@ -465,9 +464,9 @@ export const EditionCountdown = memo(function EditionCountdown({
         <>
           {period && <p className="portal-count__period">{period}</p>}
           <p className="portal-count__meta">
-            Abertura em{" "}
+            Abertura às{" "}
             <span className="portal-count__nowrap">
-              {formatOpeningShort(schedule.openingAt, schedule.timeZone)}
+              {formatOpeningTime(schedule.openingAt, schedule.timeZone)}
             </span>{" "}
             <span className="portal-count__nowrap">
               · {timeZoneShortLabel(schedule.timeZone, schedule.openingAt)}

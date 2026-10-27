@@ -1,3 +1,47 @@
+# Portal Indumóveis — Design QA, 27/10/2026
+
+final result: passed
+
+## Achados e resultado
+
+Não restam achados P0/P1/P2 nos estados e viewports examinados. A direção final segue as correções explícitas feitas pelo usuário durante a revisão: marca oficial com leitura de baixo para cima, sem o arco claro; ano dourado; conta acima do contador; informações secundárias discretas; frase institucional com contraste tipográfico editorial. A rotação, inicialmente proibida no briefing, foi posteriormente solicitada e confirmada pelo usuário.
+
+## Fonte e comparação visual
+
+As capturas anexadas pelo usuário orientaram a preservação da arquitetura, dos emblemas e da identidade. O baseline executável é o commit `597b459`, capturado com os mesmos componentes/dados locais de validação, no mesmo viewport CSS 1366 × 768 e zoom 100%. O relógio é real e os segundos diferem naturalmente entre capturas. O resultado foi aberto e examinado no combinado [antes/depois](docs/validation/portal-integrado/comparison-1366x768.jpg), além do [detalhe ampliado da assinatura](docs/validation/portal-integrado/signature-detail.jpg), das capturas responsivas e dos dois seletores.
+
+As mudanças de composição são intencionais, não desvios da referência: um único ambiente substitui os dois blocos verticais. O quadro comparativo contém duas capturas 1366 × 768, com faixas explicativas, total 1366 × 1600 px. As capturas finais usam DPR emulado 1; detalhes ampliados são identificados como tais. Todos os cinco viewports foram confirmados com `cssVisualViewport.zoom = 1` no navegador.
+
+## Superfícies obrigatórias
+
+| Superfície | Avaliação final |
+| --- | --- |
+| Fontes e tipografia | Figtree e Plus Jakarta Sans preservadas em controles, títulos e números tabulares. Datas recuam para 14 px e legenda 12 px. A frase mantém 15 px, com Cormorant Garamond itálica 600 somente nos termos de destaque, sem sublinhado ou brilho genérico. Fallback Georgia e carregamento sem bloqueio. |
+| Espaçamento e layout | Topo 378 px no desktop. No notebook, primeira linha termina em y=649,5 px. Cards 200 px, rodapés alinhados, sem sobreposição negativa. Duas colunas no tablet e uma no celular; marca em lateral compacta conforme a direção revisada. |
+| Cores e tokens | Ameixa, vermelho e taupe mantidos. Ano e detalhes da assinatura usam dourado fosco compatível com o metal da cena; a marca e a contagem pertencem à mesma superfície. Sem painel claro independente na logo. |
+| Imagens e qualidade | Mesmo PNG oficial; proporções mantidas, leitura rotacionada. Filtro de alfa remove o arco translúcido por solicitação, sem desenhar outro letreiro. Ano da edição permanece HTML. Nichos, luz, piso e mobiliário vetorial existentes foram reaproveitados. Emblemas personalizados preservados. |
+| Texto e conteúdo | Frase intacta, incluindo espaço após a vírgula. Subtítulo redundante removido. Período civil preservado e legenda final “Abertura às 15h · Brasília”, ambos derivados da configuração. Identificação do administrador acima da contagem. |
+
+## Iterações e correções verificadas
+
+- Chips e painéis internos removidos; links e botões têm a mesma estrutura e altura, com seletores portaled fora da grade.
+- Foco de abertura/fechamento usa `preventScroll`; limpeza de seletor antigo não rouba foco ao trocar breakpoint.
+- Conta pode quebrar linhas em telas estreitas e com texto a 200%, preservando identificação e saída.
+- Movimento reduzido abrange também o overlay portaled; conteúdo decorativo não recebe foco.
+- Marca foi integrada à superfície arquitetônica e o arco claro foi removido conforme revisão do usuário.
+- Subtítulo e data repetida da abertura removidos; hierarquia secundária reduzida.
+- Tratamento inicial de negrito/sublinhado foi substituído pela assinatura tipográfica em duas linhas, após feedback de que parecia genérico.
+
+## Evidências funcionais e limites
+
+[Relatório completo e capturas](docs/validation/portal-integrado/README.md), [medidas](docs/validation/portal-integrado/measurements.json), [grade antes/depois do seletor](docs/validation/portal-integrado/submenu-measurements.json), [texto a 200%](docs/validation/portal-integrado/text-zoom.json) e [movimento reduzido](docs/validation/portal-integrado/reduced-motion.json).
+
+Build, TypeScript e 238 testes aprovados. Lint geral tem exatamente os mesmos 1.581 erros/12 avisos do baseline; arquivos alterados passam. A edição de produção foi lida pela sessão existente e confirma 15:00, America/Sao_Paulo. Nenhum dado remoto foi alterado. As capturas usam dados locais e não representam implantação da PR.
+
+Checklist final: composição integrada, marca oficial, números protagonistas, conta acima, primeira linha visível, seis cards uniformes, foco/teclado, zoom de texto, redução de movimento e horário 15h verificados. Não há pendência visual P0/P1/P2 identificada.
+
+---
+
 # Mapa Comercial — Design QA
 
 Revisão visual de 16/10/2026, com o fluxo interno Product Design `design-qa`. O alvo é a evolução solicitada de uma maquete existente: preservar implantação e consulta, enriquecer materiais/vegetação e dar acabamento institucional à operação. As cores antigas e as placas de rua são problemas a corrigir, não um alvo de reprodução literal.

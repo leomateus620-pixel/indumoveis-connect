@@ -1,0 +1,627 @@
+[
+  {
+    "account": {
+      "bottom": 83.4453125,
+      "height": 66.4453125,
+      "left": 299.59375,
+      "right": 1322,
+      "top": 17,
+      "width": 1022.40625,
+      "x": 299.59375,
+      "y": 17
+    },
+    "brand": {
+      "bottom": 284.99609375,
+      "height": 256,
+      "left": 135.59765625,
+      "right": 207.99609375,
+      "top": 28.99609375,
+      "width": 72.3984375,
+      "x": 135.59765625,
+      "y": 28.99609375
+    },
+    "cards": [
+      {
+        "bottom": 649.5,
+        "category": "agenda",
+        "height": 200,
+        "left": 43,
+        "right": 457.6640625,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 43,
+        "y": 449.5
+      },
+      {
+        "bottom": 649.5,
+        "category": "mapa",
+        "height": 200,
+        "left": 475.6640625,
+        "right": 890.328125,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 475.6640625,
+        "y": 449.5
+      },
+      {
+        "bottom": 649.5,
+        "category": "empresas",
+        "height": 200,
+        "left": 908.328125,
+        "right": 1322.9921875,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 908.328125,
+        "y": 449.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "financeiro",
+        "height": 200,
+        "left": 43,
+        "right": 457.6640625,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 43,
+        "y": 667.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "vistorias",
+        "height": 200,
+        "left": 475.6640625,
+        "right": 890.328125,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 475.6640625,
+        "y": 667.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "administracao",
+        "height": 200,
+        "left": 908.328125,
+        "right": 1322.9921875,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 908.328125,
+        "y": 667.5
+      }
+    ],
+    "counter": {
+      "bottom": 357,
+      "height": 273.5546875,
+      "left": 299.59375,
+      "right": 1322,
+      "top": 83.4453125,
+      "width": 1022.40625,
+      "x": 299.59375,
+      "y": 83.4453125
+    },
+    "documentHeight": 915,
+    "horizontalOverflow": false,
+    "logo": {
+      "height": 372,
+      "width": 1452
+    },
+    "opening": "Abertura às 15h · Brasília",
+    "scrollY": 0,
+    "stage": {
+      "bottom": 378,
+      "height": 378,
+      "left": 0,
+      "right": 1366,
+      "top": 0,
+      "width": 1366,
+      "x": 0,
+      "y": 0
+    },
+    "viewport": {
+      "dpr": 1,
+      "height": 768,
+      "width": 1366
+    },
+    "zoom": 1,
+    "name": "after-1366x768"
+  },
+  {
+    "account": {
+      "bottom": 83.4453125,
+      "height": 66.4453125,
+      "left": 336.59375,
+      "right": 1359,
+      "top": 17,
+      "width": 1022.40625,
+      "x": 336.59375,
+      "y": 17
+    },
+    "brand": {
+      "bottom": 284.99609375,
+      "height": 256,
+      "left": 172.59765625,
+      "right": 244.99609375,
+      "top": 28.99609375,
+      "width": 72.3984375,
+      "x": 172.59765625,
+      "y": 28.99609375
+    },
+    "cards": [
+      {
+        "bottom": 649.5,
+        "category": "agenda",
+        "height": 200,
+        "left": 80,
+        "right": 494.6640625,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 80,
+        "y": 449.5
+      },
+      {
+        "bottom": 649.5,
+        "category": "mapa",
+        "height": 200,
+        "left": 512.6640625,
+        "right": 927.328125,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 512.6640625,
+        "y": 449.5
+      },
+      {
+        "bottom": 649.5,
+        "category": "empresas",
+        "height": 200,
+        "left": 945.328125,
+        "right": 1359.9921875,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 945.328125,
+        "y": 449.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "financeiro",
+        "height": 200,
+        "left": 80,
+        "right": 494.6640625,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 80,
+        "y": 667.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "vistorias",
+        "height": 200,
+        "left": 512.6640625,
+        "right": 927.328125,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 512.6640625,
+        "y": 667.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "administracao",
+        "height": 200,
+        "left": 945.328125,
+        "right": 1359.9921875,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 945.328125,
+        "y": 667.5
+      }
+    ],
+    "counter": {
+      "bottom": 357,
+      "height": 273.5546875,
+      "left": 336.59375,
+      "right": 1359,
+      "top": 83.4453125,
+      "width": 1022.40625,
+      "x": 336.59375,
+      "y": 83.4453125
+    },
+    "documentHeight": 915,
+    "horizontalOverflow": false,
+    "logo": {
+      "height": 372,
+      "width": 1452
+    },
+    "opening": "Abertura às 15h · Brasília",
+    "scrollY": 0,
+    "stage": {
+      "bottom": 378,
+      "height": 378,
+      "left": 0,
+      "right": 1440,
+      "top": 0,
+      "width": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "viewport": {
+      "dpr": 1,
+      "height": 900,
+      "width": 1440
+    },
+    "zoom": 1,
+    "name": "after-1440x900"
+  },
+  {
+    "account": {
+      "bottom": 83.4453125,
+      "height": 66.4453125,
+      "left": 576.59375,
+      "right": 1599,
+      "top": 17,
+      "width": 1022.40625,
+      "x": 576.59375,
+      "y": 17
+    },
+    "brand": {
+      "bottom": 284.99609375,
+      "height": 256,
+      "left": 412.59765625,
+      "right": 484.99609375,
+      "top": 28.99609375,
+      "width": 72.3984375,
+      "x": 412.59765625,
+      "y": 28.99609375
+    },
+    "cards": [
+      {
+        "bottom": 649.5,
+        "category": "agenda",
+        "height": 200,
+        "left": 320,
+        "right": 734.6640625,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 320,
+        "y": 449.5
+      },
+      {
+        "bottom": 649.5,
+        "category": "mapa",
+        "height": 200,
+        "left": 752.6640625,
+        "right": 1167.328125,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 752.6640625,
+        "y": 449.5
+      },
+      {
+        "bottom": 649.5,
+        "category": "empresas",
+        "height": 200,
+        "left": 1185.328125,
+        "right": 1599.9921875,
+        "top": 449.5,
+        "width": 414.6640625,
+        "x": 1185.328125,
+        "y": 449.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "financeiro",
+        "height": 200,
+        "left": 320,
+        "right": 734.6640625,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 320,
+        "y": 667.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "vistorias",
+        "height": 200,
+        "left": 752.6640625,
+        "right": 1167.328125,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 752.6640625,
+        "y": 667.5
+      },
+      {
+        "bottom": 867.5,
+        "category": "administracao",
+        "height": 200,
+        "left": 1185.328125,
+        "right": 1599.9921875,
+        "top": 667.5,
+        "width": 414.6640625,
+        "x": 1185.328125,
+        "y": 667.5
+      }
+    ],
+    "counter": {
+      "bottom": 357,
+      "height": 273.5546875,
+      "left": 576.59375,
+      "right": 1599,
+      "top": 83.4453125,
+      "width": 1022.40625,
+      "x": 576.59375,
+      "y": 83.4453125
+    },
+    "documentHeight": 1080,
+    "horizontalOverflow": false,
+    "logo": {
+      "height": 372,
+      "width": 1452
+    },
+    "opening": "Abertura às 15h · Brasília",
+    "scrollY": 0,
+    "stage": {
+      "bottom": 378,
+      "height": 378,
+      "left": 0,
+      "right": 1920,
+      "top": 0,
+      "width": 1920,
+      "x": 0,
+      "y": 0
+    },
+    "viewport": {
+      "dpr": 1,
+      "height": 1080,
+      "width": 1920
+    },
+    "zoom": 1,
+    "name": "after-1920x1080"
+  },
+  {
+    "account": {
+      "bottom": 109.6875,
+      "height": 92.6875,
+      "left": 203.109375,
+      "right": 740.890625,
+      "top": 17,
+      "width": 537.78125,
+      "x": 203.109375,
+      "y": 17
+    },
+    "brand": {
+      "bottom": 284.99609375,
+      "height": 256,
+      "left": 78.91015625,
+      "right": 151.30859375,
+      "top": 28.99609375,
+      "width": 72.3984375,
+      "x": 78.91015625,
+      "y": 28.99609375
+    },
+    "cards": [
+      {
+        "bottom": 669,
+        "category": "agenda",
+        "height": 200,
+        "left": 26.109375,
+        "right": 378,
+        "top": 469,
+        "width": 351.890625,
+        "x": 26.109375,
+        "y": 469
+      },
+      {
+        "bottom": 669,
+        "category": "mapa",
+        "height": 200,
+        "left": 390,
+        "right": 741.890625,
+        "top": 469,
+        "width": 351.890625,
+        "x": 390,
+        "y": 469
+      },
+      {
+        "bottom": 881,
+        "category": "empresas",
+        "height": 200,
+        "left": 26.109375,
+        "right": 378,
+        "top": 681,
+        "width": 351.890625,
+        "x": 26.109375,
+        "y": 681
+      },
+      {
+        "bottom": 881,
+        "category": "financeiro",
+        "height": 200,
+        "left": 390,
+        "right": 741.890625,
+        "top": 681,
+        "width": 351.890625,
+        "x": 390,
+        "y": 681
+      },
+      {
+        "bottom": 1093,
+        "category": "vistorias",
+        "height": 200,
+        "left": 26.109375,
+        "right": 378,
+        "top": 893,
+        "width": 351.890625,
+        "x": 26.109375,
+        "y": 893
+      },
+      {
+        "bottom": 1093,
+        "category": "administracao",
+        "height": 200,
+        "left": 390,
+        "right": 741.890625,
+        "top": 893,
+        "width": 351.890625,
+        "x": 390,
+        "y": 893
+      }
+    ],
+    "counter": {
+      "bottom": 381,
+      "height": 271.3125,
+      "left": 203.109375,
+      "right": 740.890625,
+      "top": 109.6875,
+      "width": 537.78125,
+      "x": 203.109375,
+      "y": 109.6875
+    },
+    "documentHeight": 1123,
+    "horizontalOverflow": false,
+    "logo": {
+      "height": 372,
+      "width": 1452
+    },
+    "opening": "Abertura às 15h · Brasília",
+    "scrollY": 0,
+    "stage": {
+      "bottom": 402,
+      "height": 402,
+      "left": 0,
+      "right": 768,
+      "top": 0,
+      "width": 768,
+      "x": 0,
+      "y": 0
+    },
+    "viewport": {
+      "dpr": 1,
+      "height": 1024,
+      "width": 768
+    },
+    "zoom": 1,
+    "name": "after-768x1024"
+  },
+  {
+    "account": {
+      "bottom": 77,
+      "height": 60,
+      "left": 17,
+      "right": 373,
+      "top": 17,
+      "width": 356,
+      "x": 17,
+      "y": 17
+    },
+    "brand": {
+      "bottom": 378.92578125,
+      "height": 272,
+      "left": 19.61328125,
+      "right": 92.38671875,
+      "top": 106.92578125,
+      "width": 72.7734375,
+      "x": 19.61328125,
+      "y": 106.92578125
+    },
+    "cards": [
+      {
+        "bottom": 772.859375,
+        "category": "agenda",
+        "height": 200,
+        "left": 16,
+        "right": 374,
+        "top": 572.859375,
+        "width": 358,
+        "x": 16,
+        "y": 572.859375
+      },
+      {
+        "bottom": 984.859375,
+        "category": "mapa",
+        "height": 200,
+        "left": 16,
+        "right": 374,
+        "top": 784.859375,
+        "width": 358,
+        "x": 16,
+        "y": 784.859375
+      },
+      {
+        "bottom": 1196.859375,
+        "category": "empresas",
+        "height": 200,
+        "left": 16,
+        "right": 374,
+        "top": 996.859375,
+        "width": 358,
+        "x": 16,
+        "y": 996.859375
+      },
+      {
+        "bottom": 1408.859375,
+        "category": "financeiro",
+        "height": 200,
+        "left": 16,
+        "right": 374,
+        "top": 1208.859375,
+        "width": 358,
+        "x": 16,
+        "y": 1208.859375
+      },
+      {
+        "bottom": 1620.859375,
+        "category": "vistorias",
+        "height": 200,
+        "left": 16,
+        "right": 374,
+        "top": 1420.859375,
+        "width": 358,
+        "x": 16,
+        "y": 1420.859375
+      },
+      {
+        "bottom": 1832.859375,
+        "category": "administracao",
+        "height": 200,
+        "left": 16,
+        "right": 374,
+        "top": 1632.859375,
+        "width": 358,
+        "x": 16,
+        "y": 1632.859375
+      }
+    ],
+    "counter": {
+      "bottom": 408.859375,
+      "height": 331.859375,
+      "left": 95,
+      "right": 373,
+      "top": 77,
+      "width": 278,
+      "x": 95,
+      "y": 77
+    },
+    "documentHeight": 1861,
+    "horizontalOverflow": false,
+    "logo": {
+      "height": 372,
+      "width": 1452
+    },
+    "opening": "Abertura às 15h · Brasília",
+    "scrollY": 0,
+    "stage": {
+      "bottom": 505.859375,
+      "height": 505.859375,
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "width": 390,
+      "x": 0,
+      "y": 0
+    },
+    "viewport": {
+      "dpr": 1,
+      "height": 844,
+      "width": 390
+    },
+    "zoom": 1,
+    "name": "after-390x844"
+  }
+]

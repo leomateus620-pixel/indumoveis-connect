@@ -1,58 +1,64 @@
-import { memo } from "react";
+import { memo, useEffect, useId, useRef, useState } from "react";
 import logoLight from "@/assets/logo-light.png.asset.json";
 
-const LOGO_WIDTH = 1452;
-const LOGO_HEIGHT = 372;
-
-// Arco com topo semicircular: a mesma forma do arco presente na marca.
-function arch(x: number, y: number, w: number, h: number) {
-  const r = w / 2;
-  return `M${x} ${y + h}V${y + r}A${r} ${r} 0 0 1 ${x + w} ${y + r}V${y + h}Z`;
-}
-
-export const PortalHero = memo(function PortalHero() {
+/** Letreiro oficial sem o arco translúcido, integrado à sala e lido de baixo para cima. */
+export const PortalHero = memo(function PortalHero({ year }: { year?: number }) {
+  const filterId = useId();
+  const typography = useRef<HTMLLinkElement>(null);
+  const [fontReady, setFontReady] = useState(false);
+  useEffect(() => {
+    if (typography.current?.sheet) setFontReady(true);
+  }, []);
   return (
     <div className="portal-hero">
-      <svg
-        className="portal-hero__decor"
-        viewBox="0 0 1200 420"
-        preserveAspectRatio="xMidYMax slice"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path d={arch(-60, 210, 260, 260)} fill="oklch(1 0 0 / 0.045)" />
-        <path
-          d={arch(-20, 250, 180, 220)}
-          fill="none"
-          stroke="oklch(1 0 0 / 0.08)"
-          strokeWidth="1.25"
-        />
-        <path d={arch(960, 120, 240, 340)} fill="oklch(1 0 0 / 0.04)" />
-        <path
-          d={arch(1000, 170, 160, 300)}
-          fill="none"
-          stroke="oklch(1 0 0 / 0.1)"
-          strokeWidth="1.25"
-        />
-        <circle cx="1080" cy="236" r="7" fill="var(--brand-red)" />
-        <circle cx="170" cy="168" r="3.5" fill="oklch(1 0 0 / 0.28)" />
+      <link
+        ref={typography}
+        rel="stylesheet"
+        media={fontReady ? "all" : "print"}
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&display=swap&text=sonhos%2Cneg%C3%B3cios"
+        onLoad={() => setFontReady(true)}
+      />
+      <svg className="portal-hero__filters" aria-hidden="true" focusable="false">
+        <defs>
+          <filter id={filterId} colorInterpolationFilters="sRGB">
+            {/* O arco tem alfa de ~20%; a tinta do letreiro permanece opaca. */}
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="1.4" intercept="-0.4" />
+            </feComponentTransfer>
+          </filter>
+        </defs>
       </svg>
       <div className="portal-hero__brand">
         <h1 id="portal-title" className="sr-only">
-          Portal Indumóveis 2027
+          Portal Indumóveis{year ? ` ${year}` : ""}
         </h1>
-        <img
-          className="portal-hero__logo"
-          src={logoLight.url}
-          width={LOGO_WIDTH}
-          height={LOGO_HEIGHT}
-          alt="Indumóveis 2027"
-          decoding="async"
-          fetchPriority="high"
-          draggable={false}
-        />
-        <p className="portal-hero__tagline">Inspiramos sonhos, impulsionamos negócios</p>
+        <div className="portal-hero__logo-slot">
+          <div className="portal-hero__lockup">
+            <span className="portal-hero__wordmark">
+              <img
+                className="portal-hero__logo"
+                src={logoLight.url}
+                width={1452}
+                height={372}
+                alt="Indumóveis"
+                style={{ filter: `url(#${filterId})` }}
+                decoding="async"
+                fetchPriority="high"
+                draggable={false}
+              />
+            </span>
+            {year && <span className="portal-hero__year">{year}</span>}
+          </div>
+        </div>
       </div>
+      <p className="portal-hero__tagline">
+        <span>
+          Inspiramos <em>sonhos,</em>
+        </span>{" "}
+        <span>
+          impulsionamos <em>negócios</em>
+        </span>
+      </p>
     </div>
   );
 });

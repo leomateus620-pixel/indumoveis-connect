@@ -120,7 +120,7 @@ export function nextTickDelay(now: number) {
   return 1000 - (((now % 1000) + 1000) % 1000) + 12;
 }
 
-function hourLabel(openingAt: number, timeZone: string) {
+export function formatOpeningTime(openingAt: number, timeZone: string) {
   const parts = new Intl.DateTimeFormat("pt-BR", {
     timeZone,
     hour: "2-digit",
@@ -139,17 +139,17 @@ export function formatOpeningLabel(openingAt: number, timeZone: string) {
     month: "long",
     year: "numeric",
   }).format(openingAt);
-  return `${date}, às ${hourLabel(openingAt, timeZone)}`;
+  return `${date}, às ${formatOpeningTime(openingAt, timeZone)}`;
 }
 
-/** "14/05, às 10h" — forma curta usada abaixo da contagem. */
+/** "14/05, às 15h" — forma curta usada abaixo da contagem. */
 export function formatOpeningShort(openingAt: number, timeZone: string) {
   const date = new Intl.DateTimeFormat("pt-BR", {
     timeZone,
     day: "2-digit",
     month: "2-digit",
   }).format(openingAt);
-  return `${date}, às ${hourLabel(openingAt, timeZone)}`;
+  return `${date}, às ${formatOpeningTime(openingAt, timeZone)}`;
 }
 
 /** Rótulo curto do fuso para o card ("Brasília" para America/Sao_Paulo). */
