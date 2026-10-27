@@ -1,25 +1,15 @@
 import { useMemo, type CSSProperties } from "react";
 import { LockKeyhole } from "lucide-react";
-import { useEdition, type Me } from "@/lib/api";
+import type { Me } from "@/lib/api";
 import { visibleCategories } from "@/lib/navigation";
-import { EditionCountdown } from "./EditionCountdown";
 import { PortalCategoryCard } from "./PortalCategoryCard";
 
 export function PortalPage({ me }: { me: Me }) {
-  const edition = useEdition();
   const perms = me.perms;
   const categories = useMemo(() => visibleCategories(perms), [perms]);
 
   return (
     <div className="portal-wrap portal-body">
-      <EditionCountdown
-        edition={edition.data}
-        isLoading={edition.isLoading}
-        isError={edition.isError && !edition.data}
-        onRetry={edition.refetch}
-        canConfigure={!!perms?.admin?.write}
-      />
-
       <section className="portal-modules" aria-labelledby="portal-modules-title">
         <div className="portal-modules__head">
           <h2 id="portal-modules-title" className="portal-modules__title">

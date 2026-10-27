@@ -1,3 +1,70 @@
+# Agenda Indumóveis — Design QA, 27/10/2026
+
+final result: passed
+
+A comparação foi feita com screenshots reais dos componentes anteriores (`5904289`) e novos, usando os mesmos dados de validação em 1366 × 768, 1440 × 900 e 390 × 844. Os combinados foram abertos e examinados juntos: [notebook](docs/validation/agenda-indumoveis/comparison-1366.jpg), [desktop](docs/validation/agenda-indumoveis/comparison-1440.jpg) e [mobile](docs/validation/agenda-indumoveis/comparison-390.jpg). A referência FenaSoja orienta organização e hierarquia, não clonagem de cores ou funções extras.
+
+| Superfície           | Resultado observado                                                                                                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fontes e tipografia  | Figtree e Plus Jakarta Sans existentes; título do evento domina, metadados secundários legíveis e data tabular em suporte próprio. Sem título grande duplicado.                        |
+| Espaçamento e layout | Cabeçalho desktop de 64 px, faixa de período de 56 px e eventos de largura de 1062/1136 px. Sem max-w-5xl. Mobile reorganiza cabeçalho e ações; rolagem natural.                       |
+| Cores e tokens       | Ameixa, vermelho de destaque, taupe e neutros. Situações indicadas por texto e símbolo; cancelamento com traço e conclusão com suporte discreto, sem opacidade que prejudique leitura. |
+| Imagens e ícones     | Logo oficial existente na sidebar. Sem fotos inventadas; responsáveis nos detalhes usam iniciais. Suportes de ícones leves e coerentes.                                                |
+| Texto e conteúdo     | Agenda Indumóveis consistente, mês com capitalização natural, edição/período uma vez, Nova atividade uma vez. Descrição completa nos detalhes aparece uma vez.                         |
+| Interação            | Slot React tipado com cleanup, busca e filtros na URL, popover desktop/Sheet mobile, retorno de foco e transição detalhe→edição sem painéis sobrepostos.                               |
+
+A densidade final foi comparada com a versão ampliada revisada pelo usuário em [antes/depois](docs/validation/agenda-indumoveis/density/comparison-1366.jpg). A composição mantém nichos em arco, materiais leves por CSS e rótulos Hoje/Amanhã, com **94 px por linha normal**, espaços de 6 px e primeira linha em y=158. São **seis eventos completos em 1366 × 768** (sexto termina em y=752) e **sete em 1440 × 900**. [Medidas e limites](docs/validation/agenda-indumoveis/density/README.md) verificados. Conteúdo longo e celular crescem naturalmente, sem altura máxima ou cortes; Concluir tem alvo de 44 px no celular. SVGs de relógio continuam mostrando o horário real exibido, e dia inteiro/sem horário usam calendário. Não há overflow nos três viewports, inclusive com texto ampliado em 390 px.
+
+Não restam achados impeditivos nos estados examinados. Durante QA foram corrigidos overflow no breadcrumb com texto ampliado, cálculo de atraso pelo fim do intervalo, indicadores sem filtro correspondente, ação de cadastro duplicada no vazio, datas civis inválidas, mês adjacente no calendário e risco de refetch apagar rascunho/versão esperada. Os overlays portaled também passaram a respeitar redução de movimento.
+
+[Relatório, capturas, medidas e limites](docs/validation/agenda-indumoveis/README.md). Build, TypeScript e 309 testes passaram; lint dos arquivos alterados limpo. O lint global mantém 1.581 erros e 12 avisos já existentes. Os cenários usam fixture local e mocks de mutações; nenhum registro de produção foi criado nesta validação.
+
+---
+
+# Portal Indumóveis — Design QA, 27/10/2026
+
+final result: passed
+
+## Achados e resultado
+
+Não restam achados P0/P1/P2 nos estados e viewports examinados. A direção final segue as correções explícitas feitas pelo usuário durante a revisão: marca oficial com leitura de baixo para cima, sem o arco claro; ano dourado; conta acima do contador; informações secundárias discretas; frase institucional com contraste tipográfico editorial. A rotação, inicialmente proibida no briefing, foi posteriormente solicitada e confirmada pelo usuário.
+
+## Fonte e comparação visual
+
+As capturas anexadas pelo usuário orientaram a preservação da arquitetura, dos emblemas e da identidade. O baseline executável é o commit `597b459`, capturado com os mesmos componentes/dados locais de validação, no mesmo viewport CSS 1366 × 768 e zoom 100%. O relógio é real e os segundos diferem naturalmente entre capturas. O resultado foi aberto e examinado no combinado [antes/depois](docs/validation/portal-integrado/comparison-1366x768.jpg), além do [detalhe ampliado da assinatura](docs/validation/portal-integrado/signature-detail.jpg), das capturas responsivas e dos dois seletores.
+
+As mudanças de composição são intencionais, não desvios da referência: um único ambiente substitui os dois blocos verticais. O quadro comparativo contém duas capturas 1366 × 768, com faixas explicativas, total 1366 × 1600 px. As capturas finais usam DPR emulado 1; detalhes ampliados são identificados como tais. Todos os cinco viewports foram confirmados com `cssVisualViewport.zoom = 1` no navegador.
+
+## Superfícies obrigatórias
+
+| Superfície           | Avaliação final                                                                                                                                                                                                                                                                                       |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fontes e tipografia  | Figtree e Plus Jakarta Sans preservadas em controles, títulos e números tabulares. Datas recuam para 14 px e legenda 12 px. A frase mantém 15 px, com Cormorant Garamond itálica 600 somente nos termos de destaque, sem sublinhado ou brilho genérico. Fallback Georgia e carregamento sem bloqueio. |
+| Espaçamento e layout | Topo 378 px no desktop. No notebook, primeira linha termina em y=649,5 px. Cards 200 px, rodapés alinhados, sem sobreposição negativa. Duas colunas no tablet e uma no celular; marca em lateral compacta conforme a direção revisada.                                                                |
+| Cores e tokens       | Ameixa, vermelho e taupe mantidos. Ano e detalhes da assinatura usam dourado fosco compatível com o metal da cena; a marca e a contagem pertencem à mesma superfície. Sem painel claro independente na logo.                                                                                          |
+| Imagens e qualidade  | Mesmo PNG oficial; proporções mantidas, leitura rotacionada. Filtro de alfa remove o arco translúcido por solicitação, sem desenhar outro letreiro. Ano da edição permanece HTML. Nichos, luz, piso e mobiliário vetorial existentes foram reaproveitados. Emblemas personalizados preservados.       |
+| Texto e conteúdo     | Frase intacta, incluindo espaço após a vírgula. Subtítulo redundante removido. Período civil preservado e legenda final “Abertura às 15h · Brasília”, ambos derivados da configuração. Identificação do administrador acima da contagem.                                                              |
+
+## Iterações e correções verificadas
+
+- Chips e painéis internos removidos; links e botões têm a mesma estrutura e altura, com seletores portaled fora da grade.
+- Foco de abertura/fechamento usa `preventScroll`; limpeza de seletor antigo não rouba foco ao trocar breakpoint.
+- Conta pode quebrar linhas em telas estreitas e com texto a 200%, preservando identificação e saída.
+- Movimento reduzido abrange também o overlay portaled; conteúdo decorativo não recebe foco.
+- Marca foi integrada à superfície arquitetônica e o arco claro foi removido conforme revisão do usuário.
+- Subtítulo e data repetida da abertura removidos; hierarquia secundária reduzida.
+- Tratamento inicial de negrito/sublinhado foi substituído pela assinatura tipográfica em duas linhas, após feedback de que parecia genérico.
+
+## Evidências funcionais e limites
+
+[Relatório completo e capturas](docs/validation/portal-integrado/README.md), [medidas](docs/validation/portal-integrado/measurements.json), [grade antes/depois do seletor](docs/validation/portal-integrado/submenu-measurements.json), [texto a 200%](docs/validation/portal-integrado/text-zoom.json) e [movimento reduzido](docs/validation/portal-integrado/reduced-motion.json).
+
+Build, TypeScript e 238 testes aprovados. Lint geral tem exatamente os mesmos 1.581 erros/12 avisos do baseline; arquivos alterados passam. A edição de produção foi lida pela sessão existente e confirma 15:00, America/Sao_Paulo. Nenhum dado remoto foi alterado. As capturas usam dados locais e não representam implantação da PR.
+
+Checklist final: composição integrada, marca oficial, números protagonistas, conta acima, primeira linha visível, seis cards uniformes, foco/teclado, zoom de texto, redução de movimento e horário 15h verificados. Não há pendência visual P0/P1/P2 identificada.
+
+---
+
 # Mapa Comercial — Design QA
 
 Revisão visual de 16/10/2026, com o fluxo interno Product Design `design-qa`. O alvo é a evolução solicitada de uma maquete existente: preservar implantação e consulta, enriquecer materiais/vegetação e dar acabamento institucional à operação. As cores antigas e as placas de rua são problemas a corrigir, não um alvo de reprodução literal.

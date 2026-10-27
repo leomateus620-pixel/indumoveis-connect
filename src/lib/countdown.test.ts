@@ -24,31 +24,31 @@ describe("edition countdown", () => {
   });
 
   it("converts the official civil time using the edition timezone", () => {
-    expect(zonedTimeToUtc("2027-05-14", "10:00", "America/Sao_Paulo")).toBe(
-      Date.UTC(2027, 4, 14, 13, 0, 0),
+    expect(zonedTimeToUtc("2027-05-14", "15:00", "America/Sao_Paulo")).toBe(
+      Date.UTC(2027, 4, 14, 18, 0, 0),
     );
-    expect(zonedTimeToUtc("2027-05-14", "10:00:00", "Europe/Lisbon")).toBe(
-      Date.UTC(2027, 4, 14, 9, 0, 0),
+    expect(zonedTimeToUtc("2027-05-14", "15:00:00", "Europe/Lisbon")).toBe(
+      Date.UTC(2027, 4, 14, 14, 0, 0),
     );
-    expect(zonedTimeToUtc("2027-02-30", "10:00", "America/Sao_Paulo")).toBeNull();
-    expect(zonedTimeToUtc("2027-05-14", "10:00", "Not/AZone")).toBeNull();
+    expect(zonedTimeToUtc("2027-02-30", "15:00", "America/Sao_Paulo")).toBeNull();
+    expect(zonedTimeToUtc("2027-05-14", "15:00", "Not/AZone")).toBeNull();
   });
 
   it("resolves opening and the end of the last civil day", () => {
-    const r = resolveOpening({ ...edition, opening_time: "10:00:00" });
+    const r = resolveOpening({ ...edition, opening_time: "15:00:00" });
     expect(r).toEqual({
       status: "configured",
-      openingAt: Date.UTC(2027, 4, 14, 13),
+      openingAt: Date.UTC(2027, 4, 14, 18),
       closingAt: Date.UTC(2027, 4, 24, 3),
       timeZone: "America/Sao_Paulo",
     });
     expect(
-      resolveOpening({ ...edition, ends_on: "2027-05-01", opening_time: "10:00" }).status,
+      resolveOpening({ ...edition, ends_on: "2027-05-01", opening_time: "15:00" }).status,
     ).toBe("invalid");
   });
 
   it("counts down from the clock and never goes negative", () => {
-    const open = Date.UTC(2027, 4, 14, 13);
+    const open = Date.UTC(2027, 4, 14, 18);
     const close = Date.UTC(2027, 4, 24, 3);
     expect(countdownAt(open - (2 * 86_400 + 3 * 3600 + 4 * 60 + 5) * 1000, open, close)).toEqual({
       phase: "countdown",
@@ -75,30 +75,35 @@ describe("edition countdown", () => {
   });
 
   it("formats dates in Brazilian Portuguese", () => {
-    expect(formatOpeningLabel(Date.UTC(2027, 4, 14, 13), "America/Sao_Paulo")).toBe(
-      "14 de maio de 2027, às 10h",
+    expect(formatOpeningLabel(Date.UTC(2027, 4, 14, 18), "America/Sao_Paulo")).toBe(
+      "14 de maio de 2027, às 15h",
     );
-    expect(formatOpeningLabel(Date.UTC(2027, 4, 14, 13, 30), "America/Sao_Paulo")).toBe(
-      "14 de maio de 2027, às 10h30",
+    expect(formatOpeningLabel(Date.UTC(2027, 4, 14, 18, 30), "America/Sao_Paulo")).toBe(
+      "14 de maio de 2027, às 15h30",
     );
-    expect(formatOpeningShort(Date.UTC(2027, 4, 14, 13), "America/Sao_Paulo")).toBe(
-      "14/05, às 10h",
+    expect(formatOpeningShort(Date.UTC(2027, 4, 14, 18), "America/Sao_Paulo")).toBe(
+      "14/05, às 15h",
     );
-    expect(formatOpeningShort(Date.UTC(2027, 4, 14, 13, 30), "America/Sao_Paulo")).toBe(
-      "14/05, às 10h30",
+    expect(formatOpeningShort(Date.UTC(2027, 4, 14, 18, 30), "America/Sao_Paulo")).toBe(
+      "14/05, às 15h30",
     );
     expect(formatEditionPeriod("2027-05-14", "2027-05-23")).toBe("14 a 23 de maio de 2027");
     expect(formatEditionPeriod("2027-05-30", "2027-06-02")).toBe("30 de maio a 2 de junho de 2027");
     expect(formatEditionPeriod(undefined, undefined)).toBeNull();
   });
 
-  it("uses the official Indumóveis 2027 opening: 14/05/2027 10h in Brasília", () => {
-    const r = resolveOpening({ ...edition, opening_time: "10:00:00" });
+  it("uses the official Indumóveis 2027 opening: 14/05/2027 15h in Brasília", () => {
+    const r = resolveOpening({ ...edition, opening_time: "15:00:00" });
     expect(r.status).toBe("configured");
     if (r.status !== "configured") return;
-    expect(r.openingAt).toBe(Date.parse("2027-05-14T10:00:00-03:00"));
-    expect(formatOpeningLabel(r.openingAt, r.timeZone)).toBe("14 de maio de 2027, às 10h");
+    expect(r.openingAt).toBe(Date.parse("2027-05-14T15:00:00-03:00"));
+    expect(formatOpeningLabel(r.openingAt, r.timeZone)).toBe("14 de maio de 2027, às 15h");
+    expect(formatOpeningShort(r.openingAt, r.timeZone)).toBe("14/05, às 15h");
     expect(timeZoneShortLabel(r.timeZone, r.openingAt)).toBe("Brasília");
+    // O horário anteriormente informado de 10h ainda deve estar em contagem.
+    expect(
+      countdownAt(Date.parse("2027-05-14T10:00:00-03:00"), r.openingAt, r.closingAt),
+    ).toMatchObject({ phase: "countdown", days: 0, hours: 5, minutes: 0, seconds: 0 });
     expect(countdownAt(r.openingAt - 1, r.openingAt, r.closingAt)).toMatchObject({
       phase: "countdown",
       days: 0,

@@ -1,0 +1,35 @@
+{
+  "durations": [
+    {
+      "animation": "1e-05s",
+      "class": "portal-count__digits",
+      "transition": "1e-05s"
+    },
+    {
+      "animation": "1e-05s",
+      "class": "portal-count__digits",
+      "transition": "1e-05s"
+    },
+    {
+      "animation": "1e-05s",
+      "class": "portal-count__digits",
+      "transition": "1e-05s"
+    },
+    {
+      "animation": "1e-05s",
+      "class": "portal-count__digits",
+      "transition": "1e-05s"
+    },
+    {
+      "animation": "1e-05s",
+      "class": "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 portal-destinations__overlay",
+      "transition": "1e-05s"
+    },
+    {
+      "animation": "1e-05s",
+      "class": "portal-destinations portal-destinations--dialog",
+      "transition": "1e-05s"
+    }
+  ],
+  "reveal": null
+}

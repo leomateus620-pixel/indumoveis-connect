@@ -15,15 +15,20 @@ export function PortalTopBar({ me, onSignOut }: { me: Me; onSignOut: () => void 
   const roles = me.roles.map((r) => ROLE_LABEL[r] ?? r).join(", ");
   return (
     <header className="portal-topbar">
-      <div className="portal-wrap portal-topbar__row">
-        <p className="portal-topbar__brand">Sistema Indumóveis</p>
+      <div className="portal-topbar__row">
         <div className="portal-account" role="group" aria-label="Conta conectada">
           <span className="portal-account__avatar" aria-hidden="true">
             {initials(display)}
           </span>
           <span className="portal-account__copy">
-            <span className="portal-account__name">{display}</span>
-            {roles && <span className="portal-account__role">{roles}</span>}
+            <span className="portal-account__name" title={display}>
+              {display}
+            </span>
+            {roles && (
+              <span className="portal-account__role" title={roles}>
+                {roles}
+              </span>
+            )}
           </span>
         </div>
         <button type="button" className="portal-signout" onClick={onSignOut}>

@@ -219,7 +219,7 @@ export function agendaMetrics(items: AgendaItem[], today: string) {
   return {
     upcoming: open.filter((item) => item.date && item.date >= today).length,
     open: open.length,
-    overdue: open.filter((item) => item.date && item.date < today).length,
+    overdue: open.filter((item) => item.date && (item.endDate ?? item.date) < today).length,
     completed: completed.length,
     completionRate: denominator ? Math.round((completed.length / denominator) * 100) : 0,
     unscheduled: open.filter((item) => !item.date).length,

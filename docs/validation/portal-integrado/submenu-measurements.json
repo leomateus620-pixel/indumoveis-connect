@@ -1,0 +1,96 @@
+{
+  "before": {
+    "cards": [
+      {
+        "category": "agenda",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 43,
+        "y": 449.5
+      },
+      {
+        "category": "mapa",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 475.6640625,
+        "y": 449.5
+      },
+      {
+        "category": "empresas",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 908.328125,
+        "y": 449.5
+      },
+      {
+        "category": "financeiro",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 43,
+        "y": 667.5
+      },
+      {
+        "category": "vistorias",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 475.6640625,
+        "y": 667.5
+      },
+      {
+        "category": "administracao",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 908.328125,
+        "y": 667.5
+      }
+    ],
+    "scrollY": 147.5
+  },
+  "after": {
+    "cards": [
+      {
+        "category": "agenda",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 43,
+        "y": 449.5
+      },
+      {
+        "category": "mapa",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 475.6640625,
+        "y": 449.5
+      },
+      {
+        "category": "empresas",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 908.328125,
+        "y": 449.5
+      },
+      {
+        "category": "financeiro",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 43,
+        "y": 667.5
+      },
+      {
+        "category": "vistorias",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 475.6640625,
+        "y": 667.5
+      },
+      {
+        "category": "administracao",
+        "height": 200,
+        "width": 414.6640625,
+        "x": 908.328125,
+        "y": 667.5
+      }
+    ],
+    "scrollY": 147.5
+  }
+}

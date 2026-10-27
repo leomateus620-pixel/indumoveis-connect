@@ -1,0 +1,257 @@
+[
+  {
+    "dateBadge": {
+      "bottom": 245.5,
+      "height": 81,
+      "left": 295,
+      "right": 377,
+      "top": 164.5,
+      "width": 82,
+      "x": 295,
+      "y": 164.5
+    },
+    "events": [
+      {
+        "bottom": 252,
+        "height": 94,
+        "title": "Visita t\u00e9cnica preliminar",
+        "top": 158,
+        "width": 1062
+      },
+      {
+        "bottom": 352,
+        "height": 94,
+        "title": "Revis\u00e3o dos contratos com expositores",
+        "top": 258,
+        "width": 1062
+      },
+      {
+        "bottom": 452,
+        "height": 94,
+        "title": "Reuni\u00e3o de fornecedores",
+        "top": 358,
+        "width": 1062
+      },
+      {
+        "bottom": 552,
+        "height": 94,
+        "title": "Alinhamento da opera\u00e7\u00e3o e montagem",
+        "top": 458,
+        "width": 1062
+      },
+      {
+        "bottom": 652,
+        "height": 94,
+        "title": "Valida\u00e7\u00e3o da ocupa\u00e7\u00e3o dos pavilh\u00f5es",
+        "top": 558,
+        "width": 1062
+      },
+      {
+        "bottom": 752,
+        "height": 94,
+        "title": "Vistoria de entrega \u00b7 P01-12",
+        "top": 658,
+        "width": 1062
+      },
+      {
+        "bottom": 852,
+        "height": 94,
+        "title": "Vencimento 2\u00aa parcela \u00b7 Expositor demonstra\u00e7\u00e3o",
+        "top": 758,
+        "width": 1062
+      },
+      {
+        "bottom": 997,
+        "height": 94,
+        "title": "Definir cronograma de comunica\u00e7\u00e3o",
+        "top": 903,
+        "width": 1062
+      }
+    ],
+    "mainTop": 64,
+    "scrollWidth": 1366,
+    "scrollY": 0,
+    "viewport": [
+      1366,
+      768
+    ],
+    "visible": 6,
+    "firstEvent": {
+      "bottom": 252,
+      "height": 94,
+      "title": "Visita t\u00e9cnica preliminar",
+      "top": 158,
+      "width": 1062
+    }
+  },
+  {
+    "dateBadge": {
+      "bottom": 245.5,
+      "height": 81,
+      "left": 295,
+      "right": 377,
+      "top": 164.5,
+      "width": 82,
+      "x": 295,
+      "y": 164.5
+    },
+    "events": [
+      {
+        "bottom": 252,
+        "height": 94,
+        "title": "Visita t\u00e9cnica preliminar",
+        "top": 158,
+        "width": 1136
+      },
+      {
+        "bottom": 352,
+        "height": 94,
+        "title": "Revis\u00e3o dos contratos com expositores",
+        "top": 258,
+        "width": 1136
+      },
+      {
+        "bottom": 452,
+        "height": 94,
+        "title": "Reuni\u00e3o de fornecedores",
+        "top": 358,
+        "width": 1136
+      },
+      {
+        "bottom": 552,
+        "height": 94,
+        "title": "Alinhamento da opera\u00e7\u00e3o e montagem",
+        "top": 458,
+        "width": 1136
+      },
+      {
+        "bottom": 652,
+        "height": 94,
+        "title": "Valida\u00e7\u00e3o da ocupa\u00e7\u00e3o dos pavilh\u00f5es",
+        "top": 558,
+        "width": 1136
+      },
+      {
+        "bottom": 752,
+        "height": 94,
+        "title": "Vistoria de entrega \u00b7 P01-12",
+        "top": 658,
+        "width": 1136
+      },
+      {
+        "bottom": 852,
+        "height": 94,
+        "title": "Vencimento 2\u00aa parcela \u00b7 Expositor demonstra\u00e7\u00e3o",
+        "top": 758,
+        "width": 1136
+      },
+      {
+        "bottom": 997,
+        "height": 94,
+        "title": "Definir cronograma de comunica\u00e7\u00e3o",
+        "top": 903,
+        "width": 1136
+      }
+    ],
+    "mainTop": 64,
+    "scrollWidth": 1440,
+    "scrollY": 0,
+    "viewport": [
+      1440,
+      900
+    ],
+    "visible": 7,
+    "firstEvent": {
+      "bottom": 252,
+      "height": 94,
+      "title": "Visita t\u00e9cnica preliminar",
+      "top": 158,
+      "width": 1136
+    }
+  },
+  {
+    "dateBadge": {
+      "bottom": 401,
+      "height": 90,
+      "left": 29,
+      "right": 105,
+      "top": 311,
+      "width": 76,
+      "x": 29,
+      "y": 311
+    },
+    "events": [
+      {
+        "bottom": 476,
+        "height": 180,
+        "title": "Visita t\u00e9cnica preliminar",
+        "top": 296,
+        "width": 362
+      },
+      {
+        "bottom": 671.234375,
+        "height": 189.234375,
+        "title": "Revis\u00e3o dos contratos com expositores",
+        "top": 482,
+        "width": 362
+      },
+      {
+        "bottom": 867.171875,
+        "height": 189.9375,
+        "title": "Reuni\u00e3o de fornecedores",
+        "top": 677.234375,
+        "width": 362
+      },
+      {
+        "bottom": 1086.15625,
+        "height": 212.984375,
+        "title": "Alinhamento da opera\u00e7\u00e3o e montagem",
+        "top": 873.171875,
+        "width": 362
+      },
+      {
+        "bottom": 1324.640625,
+        "height": 232.484375,
+        "title": "Valida\u00e7\u00e3o da ocupa\u00e7\u00e3o dos pavilh\u00f5es",
+        "top": 1092.15625,
+        "width": 362
+      },
+      {
+        "bottom": 1510.640625,
+        "height": 180,
+        "title": "Vistoria de entrega \u00b7 P01-12",
+        "top": 1330.640625,
+        "width": 362
+      },
+      {
+        "bottom": 1696.640625,
+        "height": 180,
+        "title": "Vencimento 2\u00aa parcela \u00b7 Expositor demonstra\u00e7\u00e3o",
+        "top": 1516.640625,
+        "width": 362
+      },
+      {
+        "bottom": 1927.640625,
+        "height": 180,
+        "title": "Definir cronograma de comunica\u00e7\u00e3o",
+        "top": 1747.640625,
+        "width": 362
+      }
+    ],
+    "mainTop": 137,
+    "scrollWidth": 390,
+    "scrollY": 0,
+    "viewport": [
+      390,
+      844
+    ],
+    "visible": 2,
+    "firstEvent": {
+      "bottom": 476,
+      "height": 180,
+      "title": "Visita t\u00e9cnica preliminar",
+      "top": 296,
+      "width": 362
+    }
+  }
+]

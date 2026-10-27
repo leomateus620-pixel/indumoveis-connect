@@ -1,0 +1,12 @@
+{
+  "baseline": {
+    "errors": 1581,
+    "warnings": 12
+  },
+  "current": {
+    "errors": 1581,
+    "warnings": 12
+  },
+  "newDiagnostics": [],
+  "removedDiagnostics": []
+}

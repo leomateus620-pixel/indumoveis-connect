@@ -1,0 +1,53 @@
+{
+  "account": [
+    {
+      "clipped": false,
+      "text": "Administrador Indumóveis",
+      "width": 168
+    },
+    {
+      "clipped": false,
+      "text": "Administração",
+      "width": 168
+    }
+  ],
+  "cards": [
+    {
+      "clipped": false,
+      "height": 591.09375,
+      "width": 326
+    },
+    {
+      "clipped": false,
+      "height": 591.09375,
+      "width": 326
+    },
+    {
+      "clipped": false,
+      "height": 591.09375,
+      "width": 326
+    },
+    {
+      "clipped": false,
+      "height": 591.09375,
+      "width": 326
+    },
+    {
+      "clipped": false,
+      "height": 591.09375,
+      "width": 326
+    },
+    {
+      "clipped": false,
+      "height": 591.09375,
+      "width": 326
+    }
+  ],
+  "font": "32px",
+  "outside": [],
+  "overflow": false,
+  "viewport": [
+    390,
+    844
+  ]
+}
