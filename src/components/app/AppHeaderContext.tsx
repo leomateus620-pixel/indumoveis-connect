@@ -13,6 +13,8 @@ export type AppHeaderCommands = {
   /** Rota proprietária: impede exibir comandos antigos durante uma navegação. */
   route: DestinationPath;
   commands: ReactNode;
+  /** Uma página pode compor todo o cabeçalho, mantendo os controles do menu. */
+  layout?: "commands" | "page";
 };
 
 type Entry = AppHeaderCommands & { owner: symbol };
@@ -59,12 +61,12 @@ function useHeaderStore() {
  * Registra os comandos da página e os remove ao sair dela. O store só atualiza o
  * slot consumidor; registrar JSX não provoca uma nova renderização da página.
  */
-export function useAppHeaderCommands({ route, commands }: AppHeaderCommands) {
+export function useAppHeaderCommands({ route, commands, layout }: AppHeaderCommands) {
   const store = useHeaderStore();
   const [owner] = useState(() => Symbol("app-header-page"));
   useLayoutEffect(
-    () => store.register(owner, { route, commands }),
-    [store, owner, route, commands],
+    () => store.register(owner, { route, commands, layout }),
+    [store, owner, route, commands, layout],
   );
 }
 

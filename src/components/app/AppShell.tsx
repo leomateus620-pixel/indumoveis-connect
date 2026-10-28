@@ -341,7 +341,41 @@ function ShellHeader({
   onOpenMenu: () => void;
   onToggleMenu: () => void;
 }) {
-  const slot = useAppHeaderSlot(current.to);
+  const entry = useAppHeaderSlot(current.to);
+  const path = useMatches({ select: (matches) => matches[matches.length - 1]?.pathname ?? "" });
+  // Full page headers belong only to the list route, never to its detail pages.
+  const slot = entry?.layout === "page" && path.replace(/\/$/, "") !== current.to ? null : entry;
+  const menuControls = (
+    <>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="min-h-11 min-w-11 md:hidden"
+        aria-label="Abrir menu"
+        onClick={onOpenMenu}
+      >
+        <Menu className="size-5" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="hidden md:inline-flex"
+        aria-label={compact ? "Expandir menu" : "Recolher menu"}
+        onClick={onToggleMenu}
+      >
+        {compact ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+      </Button>
+    </>
+  );
+  if (slot?.layout === "page")
+    return (
+      <header className="app-page-header relative border-b bg-card">
+        <div className="app-page-header-navigation">{menuControls}</div>
+        {slot.commands}
+      </header>
+    );
   return (
     <div
       className={cn(
@@ -352,26 +386,7 @@ function ShellHeader({
       )}
     >
       <div className={cn("flex min-w-0 items-center gap-2", slot && "shrink-0")}>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="min-h-11 min-w-11 md:hidden"
-          aria-label="Abrir menu"
-          onClick={onOpenMenu}
-        >
-          <Menu className="size-5" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="hidden md:inline-flex"
-          aria-label={compact ? "Expandir menu" : "Recolher menu"}
-          onClick={onToggleMenu}
-        >
-          {compact ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
-        </Button>
+        {menuControls}
         <nav aria-label="Localização" className="flex min-w-0 items-center gap-1.5">
           <Link
             to={PORTAL_PATH}
@@ -399,21 +414,23 @@ function ShellHeader({
           {slot.commands}
         </div>
       )}
-      <span
-        className={cn(
-          "tnum min-w-0 text-right text-xs text-muted-foreground",
-          slot ? "ml-auto max-w-full shrink-0" : "truncate",
-        )}
-      >
-        {edition ? (
-          <>
-            <span className="font-semibold text-foreground">{edition.name}</span> ·{" "}
-            {fmtDate(edition.starts_on)} a {fmtDate(edition.ends_on)}
-          </>
-        ) : (
-          "Nenhuma edição configurada"
-        )}
-      </span>
+      {current.to !== "/empresas" && (
+        <span
+          className={cn(
+            "tnum min-w-0 text-right text-xs text-muted-foreground",
+            slot ? "ml-auto max-w-full shrink-0" : "truncate",
+          )}
+        >
+          {edition ? (
+            <>
+              <span className="font-semibold text-foreground">{edition.name}</span> ·{" "}
+              {fmtDate(edition.starts_on)} a {fmtDate(edition.ends_on)}
+            </>
+          ) : (
+            "Nenhuma edição configurada"
+          )}
+        </span>
+      )}
     </div>
   );
 }

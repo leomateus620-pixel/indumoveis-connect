@@ -1,0 +1,203 @@
+/* A listagem de empresas compõe o próprio cabeçalho no slot do AppShell. */
+.app-page-header-navigation {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.5rem;
+  z-index: 1;
+}
+.companies-header {
+  padding: 1.25rem 1.5rem 1rem;
+}
+.companies-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.companies-header-identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 1.25rem;
+  padding-left: 3rem;
+}
+.companies-header-title {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  font-size: 1.65rem;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+.companies-header-title span:last-child {
+  color: var(--brand-plum);
+}
+.companies-header-edition {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+  width: 10.3rem;
+}
+.companies-header-edition > span {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.companies-header-edition select {
+  min-height: 2.5rem;
+  background: var(--surface-subtle);
+  border-color: transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.companies-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.companies-header-actions button {
+  min-height: 2.5rem;
+}
+.companies-header-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 1.125rem;
+}
+.companies-header-search {
+  position: relative;
+  flex: 1 1 15rem;
+  min-width: 0;
+  max-width: 32rem;
+}
+.companies-header-search > svg {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  pointer-events: none;
+}
+.companies-header-search input {
+  padding-left: 2.25rem;
+  background: var(--surface-subtle);
+  border-color: transparent;
+}
+.companies-header-area {
+  width: 12rem;
+  min-height: 2.75rem;
+  background: var(--surface-subtle);
+  border-color: transparent;
+}
+.companies-header-clear {
+  min-height: 2.75rem;
+  color: var(--muted-foreground);
+}
+.companies-header-count {
+  margin-left: auto;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.companies-header-count strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+@media (min-width: 1200px) {
+  .companies-header-title {
+    font-size: 1.9rem;
+  }
+}
+@media (min-width: 1440px) {
+  .companies-header {
+    padding-right: 2rem;
+    padding-left: 2rem;
+  }
+  .app-page-header-navigation {
+    left: 2rem;
+  }
+}
+@media (max-width: 767px) {
+  .app-page-header-navigation {
+    top: 0.75rem;
+    left: 0.65rem;
+  }
+  .companies-header {
+    padding: 0.875rem 1rem 1rem;
+  }
+  .companies-header-top {
+    gap: 0.875rem;
+  }
+  .companies-header-identity {
+    width: 100%;
+    gap: 0.75rem;
+    padding-left: 2.75rem;
+    justify-content: space-between;
+  }
+  .companies-header-title {
+    font-size: 1.5rem;
+  }
+  .companies-header-edition {
+    width: 9rem;
+  }
+  .companies-header-edition select {
+    padding-right: 1.25rem;
+    padding-left: 0.5rem;
+    font-size: 0.75rem;
+  }
+  .companies-header-actions {
+    width: 100%;
+  }
+  .companies-header-actions button {
+    flex: 1 1 auto;
+    padding-right: 0.625rem;
+    padding-left: 0.625rem;
+  }
+  .companies-header-filters {
+    gap: 0.5rem;
+    margin-top: 0.875rem;
+  }
+  .companies-header-search {
+    flex-basis: 10rem;
+  }
+  .companies-header-search input {
+    font-size: 0.875rem;
+  }
+  .companies-header-area {
+    width: 8.75rem;
+    font-size: 0.8rem;
+  }
+  .companies-header-clear {
+    padding: 0.5rem;
+  }
+  .companies-header-clear span {
+    display: none;
+  }
+  .companies-header-count {
+    flex: 1 0 100%;
+    margin-left: 0;
+    font-size: 0.7rem;
+  }
+}
+@media (max-width: 359px) {
+  .companies-header-title {
+    font-size: 1.3rem;
+  }
+  .companies-header-identity {
+    gap: 0.5rem;
+  }
+  .companies-header-edition {
+    width: 8.35rem;
+  }
+  .companies-header-search {
+    flex-basis: 8rem;
+  }
+  .companies-header-area {
+    width: 8rem;
+  }
+}

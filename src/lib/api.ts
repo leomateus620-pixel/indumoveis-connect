@@ -91,8 +91,9 @@ export type Edition = {
   id: string;
   name: string;
   year: number;
-  starts_on: string;
-  ends_on: string;
+  starts_on: string | null;
+  ends_on: string | null;
+  is_historical?: boolean;
   venue: string | null;
   is_active: boolean;
   reservation_hold_days: number | null;
@@ -159,6 +160,192 @@ export const useCompany = (id?: string) =>
       .eq("id", id)
       .maybeSingle(),
   );
+
+// O contexto do menu Empresas é local à URL, sem alterar a edição ativa do sistema.
+export const useCompanyEditions = () =>
+  useList<Edition>("company-editions", () =>
+    db.from("editions").select("*").order("year", { ascending: false }),
+  );
+
+export type CompanyRegistration = {
+  id: string;
+  legal_name: string;
+  trade_name: string;
+  tax_id: string | null;
+  tax_id_type?: string | null;
+  email: string | null;
+  phone: string | null;
+  city: string | null;
+  state: string | null;
+  street?: string | null;
+  address_number?: string | null;
+  neighborhood?: string | null;
+  postal_code?: string | null;
+  address_complement?: string | null;
+  representative_name?: string | null;
+  website?: string | null;
+  segment?: string | null;
+  notes?: string | null;
+  updated_at: string;
+};
+export type CompanyOccupation = {
+  id: string;
+  edition_id: string;
+  participation_id: string;
+  area_label: string;
+  module_codes: string[];
+  module_count: number;
+  area_total: number | null;
+  kind: "historical" | "declared";
+};
+export type CompanyEditionSummary = {
+  id: string;
+  company_id: string;
+  participation_id: string;
+  edition_id: string;
+  trade_name: string;
+  legal_name: string;
+  tax_id?: string | null;
+  city?: string | null;
+  state?: string | null;
+  area_labels: string[];
+  occupation_count: number;
+  total_area: number | null;
+  module_count: number;
+};
+export type CompanyParticipationDetail = {
+  company: CompanyRegistration;
+  participation: {
+    id: string;
+    company_id: string;
+    edition_id: string;
+    status: string;
+    version: number;
+    snapshot_locked: boolean;
+    registration_snapshot: Partial<CompanyRegistration> & { contacts?: any[] };
+  } | null;
+  occupations: CompanyOccupation[];
+  contacts: {
+    id: string;
+    name: string;
+    role: string | null;
+    email: string | null;
+    phone: string | null;
+    is_primary: boolean;
+  }[];
+};
+/** Identidades globais para reaproveitar cadastros sem participação, somente sob demanda. */
+export type CompanyCandidate = Pick<
+  CompanyRegistration,
+  "id" | "trade_name" | "legal_name" | "tax_id" | "city" | "state"
+>;
+export function useCompanyCandidates(enabled = false) {
+  const can = useCan("empresas");
+  return useQuery<CompanyCandidate[]>({
+    queryKey: qk.list("company-candidates"),
+    enabled: enabled && can.read,
+    staleTime: 60_000,
+    queryFn: ({ signal }) =>
+      run<CompanyCandidate[]>(
+        db
+          .from("companies")
+          .select("id,trade_name,legal_name,tax_id,city,state")
+          .order("trade_name")
+          .abortSignal(signal),
+      ),
+  });
+}
+export function useEditionCompanies(editionId?: string, enabled = true) {
+  const can = useCan("empresas");
+  return useQuery<CompanyEditionSummary[]>({
+    queryKey: qk.list("company-exhibitors", editionId),
+    enabled: enabled && !!editionId && can.read,
+    staleTime: 60_000,
+    queryFn: async ({ signal }) => {
+      const rows = await run<CompanyEditionSummary[]>(
+        db
+          .from("company_exhibitors_v")
+          .select("*")
+          .eq("edition_id", editionId)
+          .order("trade_name")
+          .abortSignal(signal),
+      );
+      return rows.map((row) => ({ ...row, company_id: row.id }));
+    },
+  });
+}
+export function useCompanyParticipation(companyId?: string, editionId?: string, enabled = true) {
+  const can = useCan("empresas");
+  return useQuery<CompanyParticipationDetail | null>({
+    queryKey: qk.list("company-participation", companyId, editionId),
+    enabled: enabled && !!companyId && !!editionId && can.read,
+    staleTime: 60_000,
+    gcTime: 30 * 60_000,
+    queryFn: ({ signal }) =>
+      run<CompanyParticipationDetail | null>(
+        db
+          .rpc("get_company_participation", { p_company_id: companyId, p_edition_id: editionId })
+          .abortSignal(signal),
+      ),
+  });
+}
+export function useCompanyDeals(companyId?: string, editionId?: string, enabled = true) {
+  const can = useCan("comercial");
+  return useList(
+    "company-deals",
+    () =>
+      db
+        .from("deals")
+        .select(DEAL_SELECT)
+        .eq("company_id", companyId)
+        .eq("edition_id", editionId)
+        .order("updated_at", { ascending: false }),
+    [companyId, editionId],
+    enabled && !!companyId && !!editionId && can.read,
+  );
+}
+export function useCompanyContracts(companyId?: string, editionId?: string, enabled = true) {
+  const can = useCan("contratos");
+  return useList(
+    "company-contracts",
+    () =>
+      db
+        .from("contracts")
+        .select(CONTRACT_SELECT)
+        .eq("company_id", companyId)
+        .eq("edition_id", editionId)
+        .order("created_at", { ascending: false }),
+    [companyId, editionId],
+    enabled && !!companyId && !!editionId && can.read,
+  );
+}
+export function useCompanyActivities(companyId?: string, editionId?: string, enabled = true) {
+  const can = useCan("agenda");
+  return useList(
+    "company-activities",
+    () =>
+      db
+        .from("activities")
+        .select("id,title,status,start_at,due_at")
+        .eq("related_type", "company")
+        .eq("related_id", companyId)
+        .eq("edition_id", editionId)
+        .order("start_at"),
+    [companyId, editionId],
+    enabled && !!companyId && !!editionId && can.read,
+  );
+}
+
+export type SaveCompanyParticipationInput = {
+  companyId?: string | null;
+  editionId?: string | null;
+  company: Record<string, unknown>;
+  occupations?:
+    { area_label: string; module_codes: string[]; area_total: number | string | null }[] | null;
+  expectedCompanyUpdatedAt?: string | null;
+  expectedParticipationVersion?: number | null;
+  idempotencyKey: string;
+};
 
 export const useSpaces = () => {
   const ed = useEditionId();
@@ -448,12 +635,20 @@ export const useDocumentSearch = (p: DocSearch, enabled = true) =>
     placeholderData: (prev) => prev,
   });
 /** Anexos de um registro: somente a versão vigente de cada documento (mesma regra da central). */
-export const useEntityDocuments = (type: string, id?: string) =>
+export const useEntityDocuments = (type: string, id?: string, editionId?: string) =>
   useQuery({
-    queryKey: qk.list("documents", "entity", type, id),
+    queryKey: qk.list("documents", "entity", type, id, editionId),
     enabled: !!id,
     queryFn: async () =>
-      (await searchDocs({ scope: "all", entityType: type, entityId: id, limit: 100 })).rows,
+      (
+        await searchDocs({
+          scope: editionId ? "edition" : "all",
+          editionId,
+          entityType: type,
+          entityId: id,
+          limit: 100,
+        })
+      ).rows,
   });
 /** Versão vigente de uma cadeia (para seleção fora da página atual). */
 export const useCurrentDocument = (rootId?: string) =>
@@ -556,6 +751,23 @@ export function useDbMutation<V, R = unknown>(
 }
 
 export const api = {
+  saveCompanyParticipation: (input: SaveCompanyParticipationInput) =>
+    run<{
+      id: string;
+      company_id: string;
+      participation_id: string | null;
+      version: number | null;
+    }>(
+      db.rpc("save_company_participation", {
+        p_company_id: input.companyId ?? null,
+        p_edition_id: input.editionId ?? null,
+        p_company: input.company,
+        p_occupations: input.occupations ?? null,
+        p_expected_company_updated_at: input.expectedCompanyUpdatedAt ?? null,
+        p_expected_participation_version: input.expectedParticipationVersion ?? null,
+        p_idempotency_key: input.idempotencyKey,
+      }),
+    ),
   insert: (table: string, row: any) => run<any>(db.from(table).insert(row).select().single()),
   update: (table: string, id: string, patch: any) =>
     run<any>(db.from(table).update(patch).eq("id", id).select().single()),

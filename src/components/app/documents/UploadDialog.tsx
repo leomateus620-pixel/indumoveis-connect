@@ -26,6 +26,8 @@ export function UploadDialog({
   defaultCategory = "geral",
   presetLinks = [],
   defaultGeneral = false,
+  editionId,
+  editionName,
   onUploaded,
 }: {
   open: boolean;
@@ -33,6 +35,9 @@ export function UploadDialog({
   defaultCategory?: string;
   presetLinks?: LinkTarget[];
   defaultGeneral?: boolean;
+  /** Contexto fixado pela ficha: mantém o novo arquivo na mesma edição da listagem. */
+  editionId?: string;
+  editionName?: string;
   onUploaded?: (doc: { id: string }) => void;
 }) {
   const { data: edition } = useEdition();
@@ -76,7 +81,7 @@ export function UploadDialog({
         category,
         title,
         description,
-        editionId: general ? null : (edition?.id ?? null),
+        editionId: editionId ?? (general ? null : (edition?.id ?? null)),
         links: links.map((l) => ({ type: l.type, id: l.id })),
         idempotencyKey: keyRef.current,
         onProgress: setProgress,
@@ -145,12 +150,21 @@ export function UploadDialog({
             <FormRow label="Edição" htmlFor="doc-ed">
               <NativeSelect
                 id="doc-ed"
-                value={general ? "geral" : "ativa"}
+                value={editionId ? "contexto" : general ? "geral" : "ativa"}
                 onChange={(e) => setGeneral(e.target.value === "geral")}
-                disabled={busy}
+                disabled={busy || !!editionId}
               >
-                <option value="ativa">{edition?.name ?? "Edição ativa"}</option>
-                <option value="geral">Geral (não pertence a uma edição)</option>
+                {editionId ? (
+                  <option value="contexto">
+                    {editionName ??
+                      (editionId === edition?.id ? edition.name : "Edição selecionada")}
+                  </option>
+                ) : (
+                  <>
+                    <option value="ativa">{edition?.name ?? "Edição ativa"}</option>
+                    <option value="geral">Geral (não pertence a uma edição)</option>
+                  </>
+                )}
               </NativeSelect>
             </FormRow>
           </div>

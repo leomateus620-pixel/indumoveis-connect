@@ -1,30 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
-import {
-  PageHeader,
-  FilterBar,
-  SearchInput,
-  DataList,
-  EmptyState,
-  Loading,
-  ErrorBox,
-  Restricted,
-} from "@/components/app/ui";
+import { useEffect, useMemo, useState } from "react";
+import { EmptyState, Loading, ErrorBox, Restricted } from "@/components/app/ui";
 import { Button } from "@/components/ui/button";
-import { useCompanies, useCan } from "@/lib/api";
+import {
+  useEditionCompanies,
+  useCompanyEditions,
+  useCan,
+  type CompanyParticipationDetail,
+} from "@/lib/api";
 import { CompanyDialog } from "@/components/app/CompanyDialog";
+import { CompanyCard } from "@/components/app/companies/CompanyCard";
+import { CompaniesHeader } from "@/components/app/companies/CompaniesHeader";
+import { useAppHeaderCommands } from "@/components/app/AppHeaderContext";
+import { ReuseCompanyDialog } from "@/components/app/companies/ReuseCompanyDialog";
+import { matchesCompanySearch, validateCompanySearch } from "@/lib/company-exhibitors";
 
 export const Route = createFileRoute("/_authenticated/_app/empresas/")({
+  validateSearch: validateCompanySearch,
   head: () => ({
     meta: [
       { title: "Empresas / Expositores — Sistema Indumóveis" },
-      { name: "description", content: "Cadastro central de empresas e contatos." },
-      { property: "og:title", content: "Empresas / Expositores — Sistema Indumóveis" },
-      { property: "og:description", content: "Cadastro central de empresas e contatos." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      {
+        name: "description",
+        content: "Empresas, participações e ocupações por edição da Indumóveis.",
+      },
     ],
   }),
   component: EmpresasPage,
@@ -32,80 +31,158 @@ export const Route = createFileRoute("/_authenticated/_app/empresas/")({
 
 function EmpresasPage() {
   const can = useCan("empresas");
-  const lq = useCompanies();
-  const { data = [], isLoading } = lq;
-  const [q, setQ] = useState("");
-  const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
-  const rows = useMemo(() => {
-    const t = q.toLowerCase().trim();
-    const digits = t.replace(/\D/g, "");
-    return data.filter(
-      (c: any) =>
-        !t ||
-        c.trade_name.toLowerCase().includes(t) ||
-        c.legal_name.toLowerCase().includes(t) ||
-        (digits && c.tax_id?.replace(/\D/g, "").includes(digits)),
-    );
-  }, [data, q]);
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const editionsQuery = useCompanyEditions();
+  const editions = editionsQuery.data ?? [];
+  const edition =
+    editions.find((item) => item.id === search.edition) ??
+    (!search.edition ? (editions.find((item) => item.is_active) ?? editions[0]) : undefined);
+  const query = useEditionCompanies(edition?.id);
+  const data = useMemo(() => query.data ?? [], [query.data]);
+  useEffect(() => {
+    if (!search.edition && edition?.id)
+      void navigate({ search: { ...search, edition: edition.id }, replace: true });
+  }, [search, edition?.id, navigate]);
+  const [create, setCreate] = useState(false);
+  const [reuse, setReuse] = useState(false);
+  const [edit, setEdit] = useState<CompanyParticipationDetail | null>(null);
+  const expanded = new Set(search.expanded?.split(",") ?? []);
+  const areas = useMemo(
+    () =>
+      [...new Set(data.flatMap((company) => company.area_labels ?? []))].sort((a, b) =>
+        a.localeCompare(b, "pt-BR", { numeric: true }),
+      ),
+    [data],
+  );
+  const rows = useMemo(
+    () =>
+      data.filter(
+        (company) =>
+          matchesCompanySearch(company, search.q ?? "") &&
+          (!search.area || company.area_labels?.includes(search.area)),
+      ),
+    [data, search.q, search.area],
+  );
+  const setSearch = (patch: Partial<typeof search>) =>
+    void navigate({
+      search: { ...search, edition: edition?.id, ...patch },
+      replace: true,
+      resetScroll: false,
+    });
+  const openCompany = (id: string) =>
+    void navigate({
+      to: "/empresas/$id",
+      params: { id },
+      search: { ...search, edition: edition?.id },
+    });
+  useAppHeaderCommands({
+    route: "/empresas",
+    layout: "page",
+    commands: (
+      <CompaniesHeader
+        editions={editions}
+        edition={edition}
+        search={search}
+        areas={areas}
+        count={rows.length}
+        loading={editionsQuery.isLoading || query.isLoading}
+        canWrite={can.write}
+        onChange={setSearch}
+        onCreate={() => setCreate(true)}
+        onReuse={() => setReuse(true)}
+      />
+    ),
+  });
   if (!can.read) return <Restricted />;
-  return (
-    <>
-      <PageHeader
-        title="Empresas / Expositores"
-        subtitle={`${data.length} empresas cadastradas`}
-        actions={
-          can.write && (
-            <Button size="sm" onClick={() => setOpen(true)}>
-              <Plus className="size-4" />
-              Nova empresa
-            </Button>
-          )
+  if (editionsQuery.isLoading) return <Loading />;
+  if (editionsQuery.isError)
+    return <ErrorBox error={editionsQuery.error} onRetry={() => void editionsQuery.refetch()} />;
+  if (!edition)
+    return (
+      <EmptyState
+        title="Edição não encontrada"
+        text="Selecione uma edição disponível para consultar os participantes."
+        action={
+          <Button
+            onClick={() =>
+              setSearch({ edition: editions.find((item) => item.is_active)?.id ?? editions[0]?.id })
+            }
+          >
+            Abrir edição disponível
+          </Button>
         }
       />
-      <FilterBar>
-        <SearchInput value={q} onChange={setQ} placeholder="Nome, razão social ou CNPJ" />
-      </FilterBar>
-      {isLoading ? (
+    );
+  return (
+    <>
+      {query.isLoading ? (
         <Loading />
-      ) : lq.isError ? (
-        <ErrorBox error={lq.error} onRetry={() => void lq.refetch()} />
-      ) : rows.length === 0 ? (
+      ) : query.isError ? (
+        <ErrorBox error={query.error} onRetry={() => void query.refetch()} />
+      ) : !rows.length ? (
         <EmptyState
-          title={data.length ? "Nenhuma empresa encontrada" : "Nenhuma empresa cadastrada"}
-          text="Comece cadastrando a empresa e seus contatos; ela poderá participar de negociações em qualquer edição."
+          title={
+            data.length ? "Nenhuma empresa encontrada" : `Nenhum participante em ${edition.year}`
+          }
+          text={
+            data.length
+              ? "Experimente outro nome, documento ou pavilhão."
+              : "Adicione uma empresa de outra edição ou cadastre uma nova empresa."
+          }
         />
       ) : (
-        <DataList
-          rows={rows}
-          rowKey={(c: any) => c.id}
-          onRowClick={(c: any) => navigate({ to: "/empresas/$id", params: { id: c.id } })}
-          columns={[
-            {
-              header: "Nome fantasia",
-              cell: (c: any) => <span className="font-semibold">{c.trade_name}</span>,
-            },
-            { header: "Razão social", cell: (c: any) => c.legal_name },
-            { header: "CNPJ", cell: (c: any) => <span className="tnum">{c.tax_id || "—"}</span> },
-            {
-              header: "Cidade",
-              cell: (c: any) => [c.city, c.state].filter(Boolean).join(" / ") || "—",
-              mobile: false,
-            },
-            {
-              header: "Contato principal",
-              cell: (c: any) =>
-                (c.contacts?.find((x: any) => x.is_primary) ?? c.contacts?.[0])?.name ?? "—",
-              mobile: false,
-            },
-          ]}
+        <div className="grid items-start gap-3 px-4 pt-4 pb-6 sm:grid-cols-2 md:px-6 lg:grid-cols-3 xl:px-8 2xl:grid-cols-4">
+          {rows.map((company) => (
+            <CompanyCard
+              key={`${edition.id}-${company.id}`}
+              company={company}
+              editionId={edition.id}
+              search={{ ...search, edition: edition.id }}
+              expanded={expanded.has(company.id)}
+              onExpandedChange={(value) => {
+                const next = new Set(expanded);
+                if (value) next.add(company.id);
+                else next.delete(company.id);
+                setSearch({ expanded: [...next].join(",") || undefined });
+              }}
+              canWrite={can.write}
+              onEdit={setEdit}
+            />
+          ))}
+        </div>
+      )}
+      {create && (
+        <CompanyDialog
+          open={create}
+          onOpenChange={setCreate}
+          edition={edition}
+          onSaved={openCompany}
         />
       )}
-      <CompanyDialog
-        open={open}
-        onOpenChange={setOpen}
-        onSaved={(id) => navigate({ to: "/empresas/$id", params: { id } })}
-      />
+      {edit && (
+        <CompanyDialog
+          open={!!edit}
+          onOpenChange={(open) => {
+            if (!open) setEdit(null);
+          }}
+          edition={edition}
+          company={{ ...edit.company, contacts: edit.contacts }}
+          participation={edit.participation}
+          occupations={edit.occupations}
+        />
+      )}
+      {reuse && (
+        <ReuseCompanyDialog
+          key={edition.id}
+          open={reuse}
+          onOpenChange={setReuse}
+          edition={edition}
+          editions={editions}
+          participants={data}
+          onSaved={openCompany}
+        />
+      )}
     </>
   );
 }
