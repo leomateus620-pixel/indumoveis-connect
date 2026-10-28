@@ -282,3 +282,11 @@
     transform: scaleY(0.6);
   }
 }
+
+/* Empresas: cartões uniformes com detalhes carregados apenas ao expandir. */
+.company-card { box-shadow: var(--shadow-panel); transition: border-color 160ms, box-shadow 160ms; }
+.company-card:hover { border-color: color-mix(in oklch, var(--primary) 35%, var(--border)); }
+.company-card[data-state="open"] { border-color: color-mix(in oklch, var(--primary) 45%, var(--border)); }
+.company-card-content[data-state="open"] { animation: company-expand 160ms ease-out; }
+@keyframes company-expand { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .company-card, .company-card-content { animation: none; transition: none; } }

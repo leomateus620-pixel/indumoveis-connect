@@ -25,6 +25,8 @@ export function AttachedDocuments({
   entityLabel,
   category,
   canWrite,
+  editionId,
+  editionName,
   extraLinks = [],
 }: {
   entityType: string;
@@ -32,9 +34,11 @@ export function AttachedDocuments({
   entityLabel?: string;
   category: string;
   canWrite: boolean;
+  editionId?: string;
+  editionName?: string;
   extraLinks?: { type: string; id: string; label?: string }[];
 }) {
-  const q = useEntityDocuments(entityType, entityId);
+  const q = useEntityDocuments(entityType, entityId, editionId);
   const docs = q.data ?? [];
   const [open, setOpen] = useState<string | undefined>();
   const [upload, setUpload] = useState(false);
@@ -80,19 +84,22 @@ export function AttachedDocuments({
         </div>
       )}
       <UploadDialog
-        open={upload}
+        open={upload && canWrite}
         onOpenChange={setUpload}
         defaultCategory={category}
+        editionId={editionId}
+        editionName={editionName}
         presetLinks={[
           { type: entityType, id: entityId, label: entityLabel ?? DOC_LINK_LABEL[entityType] },
           ...extraLinks.map((l) => ({ ...l, label: l.label ?? DOC_LINK_LABEL[l.type] })),
         ]}
       />
       <AttachExisting
-        open={attach}
+        open={attach && canWrite}
         onOpenChange={setAttach}
         entityType={entityType}
         entityId={entityId}
+        editionId={editionId}
         taken={docs.map((d: any) => d.root_id)}
       />
       <DocumentPanel rootId={open} onClose={() => setOpen(undefined)} />
@@ -105,21 +112,29 @@ function AttachExisting({
   onOpenChange,
   entityType,
   entityId,
+  editionId,
   taken,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   entityType: string;
   entityId: string;
+  editionId?: string;
   taken: string[];
 }) {
   const [q, setQ] = useState("");
-  const res = useDocumentSearch({ scope: "all", q, limit: 15 }, open);
+  const res = useDocumentSearch(
+    { scope: editionId ? "edition" : "all", editionId, q, limit: 15 },
+    open,
+  );
   const m = useDbMutation((id: string) => linkDocument(id, entityType, entityId), {
     success: "Documento associado (sem nova cópia do arquivo)",
     onSuccess: () => onOpenChange(false),
   });
-  const rows = (res.data?.rows ?? []).filter((d: any) => !taken.includes(d.root_id));
+  // A query may briefly keep its previous results while the edition changes.
+  const rows = (res.data?.rows ?? []).filter(
+    (d: any) => !taken.includes(d.root_id) && (!editionId || d.edition_id === editionId),
+  );
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">

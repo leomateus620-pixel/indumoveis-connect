@@ -16,6 +16,11 @@ dist-ssr
 .nitro
 *.local
 
+# Offline import artifacts contain customer data; never publish them.
+artifacts/import-*/
+__pycache__/
+*.py[cod]
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

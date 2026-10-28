@@ -152,7 +152,7 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
     id: "empresas",
     tone: "taupe",
     title: "Empresas / Expositores",
-    description: "Cadastro e gestão dos participantes.",
+    description: "Empresas, histórico e participações por edição.",
     icon: UsersRound,
     destinations: [
       {
