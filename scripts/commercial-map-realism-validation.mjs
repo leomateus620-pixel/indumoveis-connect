@@ -510,8 +510,12 @@ async function drag(page, dx, dy, { button = "left", steps = 18 } = {}) {
   return idle(page);
 }
 async function select(page, query, name) {
-  await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-  await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill(query);
+  await page
+    .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+    .fill(query);
   await page
     .locator(".im-map-result")
     .filter({ has: page.getByText(name, { exact: true }) })
@@ -968,8 +972,12 @@ async function automaticStress() {
       "Sustained 3D stress did not complete its duration",
     );
   } else {
-    await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-    await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill("70");
+    await page
+      .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+      .click();
+    await page
+      .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+      .fill("70");
     await page
       .locator(".im-map-result")
       .filter({ has: page.getByText("Lote 70", { exact: true }) })
@@ -1162,8 +1170,12 @@ async function preparationInteraction() {
     .locator(".im-map-stage")
     .getAttribute("data-representation");
   const inputStarted = performance.now();
-  await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-  await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill("70");
+  await page
+    .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+    .fill("70");
   await page
     .locator(".im-map-result")
     .filter({ has: page.getByText("Lote 70", { exact: true }) })
@@ -1225,8 +1237,12 @@ async function preparationPanHandoff(action = "pan") {
         `data:text/javascript;base64,${Buffer.from(stripTypeScriptTypes(source)).toString("base64")}`
       );
       expected = ENTITIES.find((entity) => entity.id === "indumoveis:external:lot:70").anchor;
-      await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-      await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill("70");
+      await page
+        .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+        .click();
+      await page
+        .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+        .fill("70");
       await page
         .locator(".im-map-result")
         .filter({ has: page.getByText("Lote 70", { exact: true }) })
@@ -1367,7 +1383,7 @@ async function hardwareSmoke() {
   await select(page, "70", "Lote 70");
   await closeDetail(page);
   for (const preset of ["Superior", "Oblíqua", "3D"]) await view(page, preset);
-  await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+  await page.getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true }).click();
   await idle(page);
   await page.getByRole("button", { name: "Tela cheia", exact: true }).click();
   await page.getByRole("button", { name: "Sair da tela cheia", exact: true }).waitFor();
@@ -1555,8 +1571,39 @@ async function openingSeries() {
         let page;
         try {
           page = await context.newPage();
+          await page.addInitScript(() => {
+            window.__mapOpeningLongTasks = [];
+            try {
+              new PerformanceObserver((list) => {
+                window.__mapOpeningLongTasks.push(
+                  ...list.getEntries().map(({ startTime, duration }) => ({ startTime, duration })),
+                );
+              }).observe({ type: "longtask", buffered: true });
+            } catch {
+              // The Long Tasks API is optional; an empty array is not proof of none.
+            }
+          });
           const coldStarted = performance.now();
           const cold = await open(page);
+          const coldTiming = await page.evaluate(() => ({
+            marks: performance
+              .getEntriesByType("mark")
+              .filter((entry) => entry.name.startsWith("indumoveis"))
+              .map(({ name, startTime }) => ({ name, startTime })),
+            resources: performance
+              .getEntriesByType("resource")
+              .filter((entry) => new URL(entry.name).origin === location.origin)
+              .map((entry) => ({
+                path: new URL(entry.name).pathname,
+                startTime: entry.startTime,
+                duration: entry.duration,
+                transferBytes: entry.transferSize,
+                encodedBodyBytes: entry.encodedBodySize,
+              })),
+            longTasks: window.__mapOpeningLongTasks,
+            longTasksSupported:
+              PerformanceObserver.supportedEntryTypes?.includes("longtask") ?? false,
+          }));
           await profile(page, "balanced");
           await page.waitForFunction(() => window.__indumoveisMap?.environmentBytes > 0, null, {
             timeout: 12000,
@@ -1662,6 +1709,7 @@ async function openingSeries() {
             iteration: iteration + 1,
             cold: {
               ...cold,
+              timing: coldTiming,
               first3DReadyAt: coldDiagnostic.readyAt,
               environmentReadySinceOpeningMs: coldDiagnostic.environmentReadyAt,
               assetTimings: coldAssets,
@@ -1744,6 +1792,63 @@ async function openingSeries() {
 try {
   if (process.env.MAP_REALISM_OPENINGS_ONLY === "1") {
     await openingSeries();
+  } else if (process.env.MAP_REALISM_LANDMARKS_ONLY === "1") {
+    await check("permanent park search and framing", async () => {
+      const layoutSource = await readFile(
+        "src/features/commercial-map/permanentParkLayout.ts",
+        "utf8",
+      );
+      // Avoid evaluating the module: it imports the road adapter and a data URL
+      // cannot resolve its relative dependencies. Only literal bounds are used.
+      const authoredBounds = new Map(
+        [
+          ...layoutSource.matchAll(
+            /name:\s*"([^"]+)"\s*,\s*source:\s*"[^"]+"\s*,\s*bounds:\s*\[([^\]]+)\]/g,
+          ),
+        ].map(([, name, values]) => [name, values.split(",").map((value) => Number(value.trim()))]),
+      );
+      const context = await newContext({ viewport: { width: 1366, height: 768 } });
+      try {
+        const page = await context.newPage();
+        await open(page);
+        await page.waitForFunction(() => window.__indumoveisMap?.realism?.ready === true, null, {
+          timeout: 30000,
+        });
+        const ready = await diagnostic(page);
+        assert(!ready.optionalFailures.includes("permanent-park-preparation"));
+        const frames = [];
+        for (const name of ["Arena", "Pavilhão 9", "Pavilhão 5"]) {
+          const bounds = authoredBounds.get(name);
+          assert(
+            bounds?.length === 4 && bounds.every(Number.isFinite),
+            `${name}: missing authored landmark`,
+          );
+          const [x0, z0, x1, z1] = bounds;
+          const center = [(x0 + x1) / 2, (z0 + z1) / 2];
+          await page
+            .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+            .click();
+          await page
+            .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+            .fill(name);
+          await page
+            .locator(".im-map-result")
+            .filter({ has: page.getByText(name, { exact: true }) })
+            .click();
+          const framed = await idle(page);
+          assert(
+            Math.hypot(framed.target[0] - center[0], framed.target[1] - center[1]) < 1,
+            `${name}: search did not frame the landmark`,
+          );
+          const filename = `landmark-${name === "Arena" ? "arena" : name === "Pavilhão 9" ? "p9" : "p5"}.png`;
+          await page.locator("canvas").screenshot({ path: path.join(artifactDir, filename) });
+          frames.push({ name, center, position: framed.position, target: framed.target, filename });
+        }
+        return { frames, optionalFailures: ready.optionalFailures };
+      } finally {
+        await context.close();
+      }
+    });
   } else if (process.env.MAP_REALISM_HARDWARE_SMOKE === "1") {
     await check(
       "available desktop GPU gestures selection fullscreen three warm reentries",
@@ -1845,7 +1950,7 @@ try {
     });
     await check("orbit pan zoom preserve commercial transforms", async () => {
       await view(page, "3D");
-      await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+      await page.getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true }).click();
       const before = await idle(page),
         samples = [];
       const baseline = reference?.checks.find(
@@ -1947,7 +2052,7 @@ try {
         }
         await closeDetail(page);
       }
-      await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+      await page.getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true }).click();
       await idle(page);
       const point = await page.evaluate(() =>
         window.__indumoveisMap.project("indumoveis:external:lot:70", 0),

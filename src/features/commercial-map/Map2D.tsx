@@ -263,6 +263,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
   }
   useImperativeHandle(ref, () => ({
     focus,
+    focusLandmark: () => false,
     zoom,
     pan: (dx, dy) => {
       current.current.onNavigate?.();
@@ -277,6 +278,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       box.current.y + box.current.height / 2,
     ],
     restoreOverview: () => focus(),
+    restoreCommercial: () => focus(),
   }));
   useEffect(() => {
     const priority = { pavilion: 1, road: 2, support: 3, lot: 4, landscape: 5 };

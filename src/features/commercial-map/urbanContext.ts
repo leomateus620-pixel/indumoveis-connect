@@ -213,18 +213,30 @@ function houseGeometry(house: UrbanHouse, index: number, batches: Record<Categor
     true,
   );
   const front = -d / 2;
-  localFloor(
-    local.garden,
-    rectangle(w * 0.27, (front - house.frontageDistance) / 2, 1.6, house.frontageDistance + front),
-    -0.095,
-    "#a9aaa1",
-  );
-  localFloor(
-    local.garden,
-    rectangle(-w * 0.2, (front - house.frontageDistance) / 2, 0.6, house.frontageDistance + front),
-    -0.09,
-    "#b7b6a9",
-  );
+  if (house.roadAccess) {
+    localFloor(
+      local.garden,
+      rectangle(
+        w * 0.27,
+        (front - house.frontageDistance) / 2,
+        1.6,
+        house.frontageDistance + front,
+      ),
+      -0.095,
+      "#a9aaa1",
+    );
+    localFloor(
+      local.garden,
+      rectangle(
+        -w * 0.2,
+        (front - house.frontageDistance) / 2,
+        0.6,
+        house.frontageDistance + front,
+      ),
+      -0.09,
+      "#b7b6a9",
+    );
+  }
   const localParcel = house.parcel.map(([x, z]): Point => {
     const dx = x - house.center[0],
       dz = z - house.center[1];
@@ -236,7 +248,7 @@ function houseGeometry(house: UrbanHouse, index: number, batches: Record<Categor
   for (let i = 0; i < localParcel.length; i++) {
     const a = localParcel[i],
       b = localParcel[(i + 1) % localParcel.length];
-    if (a[1] < -parcelDepth * 0.3 && b[1] < -parcelDepth * 0.3) continue; // open frontage
+    if (house.roadAccess && a[1] < -parcelDepth * 0.3 && b[1] < -parcelDepth * 0.3) continue; // open verified frontage
     const dx = b[0] - a[0],
       dz = b[1] - a[1],
       len = Math.hypot(dx, dz),

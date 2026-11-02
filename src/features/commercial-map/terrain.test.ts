@@ -255,7 +255,7 @@ describe("continuous source-protected commercial map terrain", () => {
       expect(disposed).toHaveBeenCalledTimes(2);
       expect(terrain.textures).toHaveLength(0);
       expect(terrain.material.map).toBeNull();
-      expect(terrain.material.color.getHexString()).toBe("aab78b");
+      expect(terrain.material.color.getHexString()).toBe("a4b787");
       expect(terrain.group.children).toHaveLength(2);
       terrain.dispose();
     } finally {
@@ -345,7 +345,7 @@ describe("continuous source-protected commercial map terrain", () => {
       expect(terrain.textures).toHaveLength(0);
       expect(terrain.textureBytes).toBe(4);
       expect(placeholder.colorSpace).toBe(THREE.SRGBColorSpace);
-      expect(Array.from(placeholder.image.data!)).toEqual([170, 183, 139, 255]);
+      expect(Array.from(placeholder.image.data!)).toEqual([164, 183, 135, 255]);
       expect(material.color.getHexString()).toBe("ffffff");
       expect(terrain.prepareMaps()).toBe(true);
       expect(allocations).toEqual([1, 512, 256]);

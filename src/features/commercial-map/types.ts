@@ -1,4 +1,5 @@
 import type { Point } from "./data/territory";
+import type { PermanentParkLandmark } from "./permanentParkLayout";
 
 export type MapView = "perspective" | "top" | "front";
 export type MapQuality = "auto" | "light" | "balanced" | "detailed";
@@ -10,11 +11,14 @@ export interface MapInsets {
 
 export interface MapHandle {
   focus(id?: string): void;
+  /** Returns false when the optional permanent park is not available. */
+  focusLandmark(id: PermanentParkLandmark["id"]): boolean;
   zoom(factor: number): void;
   pan(dx: number, dy: number): void;
   rotate(direction: number): void;
   getTarget(): Point;
   restoreOverview(): void;
+  restoreCommercial(): void;
 }
 
 export interface MapRendererProps {

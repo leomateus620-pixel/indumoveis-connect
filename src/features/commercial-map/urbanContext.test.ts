@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { describe, expect, it, vi } from "vitest";
 import { ENTITIES } from "./data/territory";
+import { DISTRICT_REFERENCE } from "./urbanDistrictReference";
 import { pointInPolygon } from "./geometry";
 import { URBAN_REFERENCE, REFERENCE_ROADS } from "./urbanReference";
 import { deriveRoadRibbon } from "./roadGeometry";
@@ -43,7 +44,11 @@ describe("approximate residential context outside the source park", () => {
     const a = deriveUrbanHouses(),
       b = deriveUrbanHouses();
     expect(a).toEqual(b);
-    expect(a).toHaveLength(32);
+    // The source counts built complexes, including two institutional volumes.
+    expect(a).toHaveLength(42);
+    expect([0, 1, 2, 3, 4].map((cluster) => a.filter((h) => h.cluster === cluster).length)).toEqual(
+      [9, 11, 12, 8, 2],
+    );
     expect(new Set(a.map((h) => h.roof))).toEqual(new Set(["hip", "gable", "flat"]));
     expect(a.filter((h) => h.pool).length).toBeGreaterThanOrEqual(8);
     for (const house of a) {
@@ -58,6 +63,24 @@ describe("approximate residential context outside the source park", () => {
         ).toBe(false);
       }
       expect(house.footprint.every((p) => pointInPolygon(p, house.parcel))).toBe(true);
+      // Check edges as well as vertices: a road can cross a parcel without
+      // enclosing any of its vertices. Include the presentation sidewalk.
+      const cross = (a: number[], b: number[], c: number[]) =>
+        (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+      for (const road of REFERENCE_ROADS) {
+        const ribbon = deriveRoadRibbon(road.path, road.width + 1.05);
+        const contains =
+          house.parcel.some((p) => pointInPolygon(p, ribbon)) ||
+          ribbon.some((p) => pointInPolygon(p, house.parcel));
+        const crosses = house.parcel.some((a, i) =>
+          ribbon.some((c, j) => {
+            const b = house.parcel[(i + 1) % house.parcel.length],
+              d = ribbon[(j + 1) % ribbon.length];
+            return cross(a, b, c) * cross(a, b, d) < 0 && cross(c, d, a) * cross(c, d, b) < 0;
+          }),
+        );
+        expect(contains || crosses, `${house.cluster} / ${road.id} / ${house.center}`).toBe(false);
+      }
     }
     expect(JSON.stringify(ENTITIES)).toBe(before);
     expect(urbanPolygonAllowed(ENTITIES[0].polygon)).toBe(false);
@@ -69,6 +92,58 @@ describe("approximate residential context outside the source park", () => {
         [70, 56],
       ]),
     ).toBe(false);
+  });
+  it("orients source frontages and draws direct entrances only where a clear road edge exists", () => {
+    const houses = deriveUrbanHouses();
+    const sectors = houses.filter((house) => house.cluster !== 4);
+    expect(sectors).toHaveLength(DISTRICT_REFERENCE.length);
+    for (const [index, house] of sectors.entries()) {
+      const frontage = DISTRICT_REFERENCE[index].frontage;
+      expect(house.heading).toBe(
+        frontage === "north" ? Math.PI / 2 : frontage === "south" ? -Math.PI / 2 : 0,
+      );
+      if (!house.roadAccess) continue;
+      expect(house.frontageDistance).toBeGreaterThan(house.depth / 2);
+      // Sample the full driveway and footpath width; neither may pass through
+      // any other parcel on its way to the sidewalk.
+      for (const side of [-0.2, 0.27])
+        for (let step = 0; step <= 24; step++) {
+          const z = -house.depth / 2 - ((house.frontageDistance - house.depth / 2) * step) / 24;
+          for (const inset of [-0.3, 0, 0.3]) {
+            const x = house.width * side + inset;
+            const world: [number, number] = [
+              house.center[0] + x * Math.cos(house.heading) - z * Math.sin(house.heading),
+              house.center[1] + x * Math.sin(house.heading) + z * Math.cos(house.heading),
+            ];
+            expect(
+              houses.some((other) => other !== house && pointInPolygon(world, other.parcel)),
+            ).toBe(false);
+          }
+        }
+      const endpoint: [number, number] = [
+        house.center[0] + Math.sin(house.heading) * house.frontageDistance,
+        house.center[1] - Math.cos(house.heading) * house.frontageDistance,
+      ];
+      const distanceToSegment = (p: [number, number], a: [number, number], b: [number, number]) => {
+        const dx = b[0] - a[0],
+          dz = b[1] - a[1];
+        const t = Math.max(
+          0,
+          Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / (dx * dx + dz * dz)),
+        );
+        return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dz);
+      };
+      const nearAvenue = Math.abs(endpoint[1] - (URBAN_REFERENCE.avenueSouth + 1.05)) < 1e-6;
+      const nearSidewalk = REFERENCE_ROADS.some((road) =>
+        road.path.slice(1).some((p, i) => {
+          const distance = distanceToSegment(endpoint, road.path[i], p);
+          return Math.abs(distance - (road.width / 2 + 0.525)) < 0.4;
+        }),
+      );
+      expect(nearAvenue || nearSidewalk).toBe(true);
+    }
+    expect(sectors.some((house) => house.roadAccess)).toBe(true);
+    expect(sectors.some((house) => !house.roadAccess)).toBe(true);
   });
   it("has finite south-side geometry and explicit noncommercial picking even when raycast recursively includes the whole context", () => {
     const context = createUrbanContext();
@@ -454,7 +529,7 @@ describe("approximate residential context outside the source park", () => {
         sourceId: "indumoveis:road:benvenuto",
         southEdge: 103.05,
       });
-      expect(context.houses.filter((h) => h.cluster === 3)).toHaveLength(6);
+      expect(context.houses.filter((h) => h.cluster === 3)).toHaveLength(8);
       expect(context.houses.filter((h) => h.cluster === 4)).toHaveLength(2);
       expect(new Set(context.houses.map((h) => h.form)).size).toBe(6);
       expect(JSON.stringify(ENTITIES)).toBe(before);

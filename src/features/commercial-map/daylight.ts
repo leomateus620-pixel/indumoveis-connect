@@ -5,9 +5,9 @@ import * as THREE from "three";
  * These are presentation choices, not a time/location solar simulation. */
 export const DAYLIGHT = {
   sunDirection: [-0.5, Math.SQRT1_2, 0.5] as readonly [number, number, number],
-  sunlight: { color: "#fff4e3", intensity: 2.8 },
-  hemisphere: { sky: "#d5e4ef", ground: "#b6b9a0", intensity: 1.55 },
-  fill: { color: "#dbe8f5", intensity: 0.45 },
+  sunlight: { color: "#fff4e3", intensity: 2.65 },
+  hemisphere: { sky: "#d5e4ef", ground: "#aab69a", intensity: 1.18 },
+  fill: { color: "#dbe8f5", intensity: 0.32 },
   sky: { zenith: "#6fa9d6", mid: "#9bc6e1", horizon: "#dce9ec" },
   ground: { nearHorizon: "#b9c4a6", nadir: "#879773" },
   horizonBandRadians: 0.02,

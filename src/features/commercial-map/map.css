@@ -942,7 +942,12 @@
     gap: 8px;
   }
 }
-@media (max-height: 500px) {
+@media (max-height: 500px) and (orientation: portrait) {
+  .im-map-detail {
+    max-height: 45%;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
   .im-map-header {
     min-height: 52px;
   }
