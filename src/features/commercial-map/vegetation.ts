@@ -3,6 +3,7 @@ import { TREES, type Point } from "./data/territory";
 import { auditPlanting } from "./planting";
 import { auditContextPlanting, CONTEXT_PLANTING, type ContextPlanting } from "./contextPlanting";
 import type { SurfaceQuality } from "./surfaceMaterials";
+import { P1_PHOTO_PLANTER, P1_PHOTO_TREE } from "./photoPavilionSetting";
 
 export { CONTEXT_WOODLAND } from "./contextPlanting";
 
@@ -88,6 +89,8 @@ export function createVegetation(
   options: {
     quality?: SurfaceQuality;
     additionalPlanting?: boolean;
+    /** One photo-confirmed P1 planter tree; appended to existing batches. */
+    photoPavilionTree?: boolean;
     /** Defined (including []) replaces internal planting for a separate context
      * instance. It never appends trees to the commercial audit or inventory. */
     contextPlanting?: readonly ContextPlanting[];
@@ -122,9 +125,27 @@ export function createVegetation(
   const time = { value: 0 },
     motion = { value: 0 };
   try {
+    const photographicTrees =
+      !approximateContext && options.photoPavilionTree
+        ? [
+            {
+              ...P1_PHOTO_TREE,
+              origin: "photograph" as const,
+              zone: "pavilion-frontage",
+              ownerEntityId: "indumoveis:pavilion:1",
+              sourceEntityIds: [P1_PHOTO_PLANTER.id],
+              confidence: "visible-tree-local-approximation" as const,
+              referenceImage: P1_PHOTO_PLANTER.sourcePhotograph,
+              referencePixel: null,
+              localRegistration: P1_PHOTO_PLANTER.condition,
+              decision:
+                "Photo 9: circular planter and tree on the interior front of P1; estimated centre, no surveyed species or height.",
+            },
+          ]
+        : [];
     const plantingAudit = approximateContext
       ? auditContextPlanting(options.contextPlanting!)
-      : auditPlanting(undefined, options.additionalPlanting !== false);
+      : [...auditPlanting(undefined, options.additionalPlanting !== false), ...photographicTrees];
     const additional = plantingAudit.filter((record) => record.origin === "satellite-crown"),
       points = plantingAudit.map((record) => record.world);
     const texture = own(leafAtlas());
@@ -437,6 +458,7 @@ export function createVegetation(
       metadata: {
         approvedTrees: approximateContext ? 0 : TREES.length,
         additionalTrees: additional.length,
+        photographicTrees: photographicTrees.length,
         contextTrees: approximateContext ? points.length : 0,
         totalTrees: points.length,
         species: VEGETATION.species,

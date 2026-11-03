@@ -1872,6 +1872,7 @@ async function parkRegistrationStudy() {
       buffer: d.buffer,
       textureBytes: d.textureBytes,
       contextLosses: d.contextLosses,
+      jsHeap: d.jsHeap,
     };
     for (let i = 0; i < 3; i++) {
       const oldInstance = (await diagnostic(page)).instance;
@@ -1964,6 +1965,48 @@ async function parkMaterialStudy() {
       ["p13", [109.6508, 76.973], [0, 12, -27]],
       ["p3", [123.3874, 78.4818], [0, 15, -33]],
     ];
+    if (process.env.MAP_PAVILION_PHOTOS_ONLY === "1") {
+      for (const [name, target, offset] of halls) {
+        const sideFront = offset[0] !== 0;
+        const frontDistance = name === "p12" || name === "p3" ? 31 : 22;
+        const poses = {
+          front: {
+            position: [
+              target[0] + (sideFront ? frontDistance : 0),
+              7,
+              target[1] + (sideFront ? 0 : -frontDistance),
+            ],
+            target,
+          },
+          oblique: {
+            position: [target[0] + (sideFront ? 24 : -19), 13, target[1] + (sideFront ? 19 : -25)],
+            target,
+          },
+          superior: { position: [target[0], 59, target[1] + 0.2], target },
+          close: {
+            position: [target[0] + (sideFront ? 22 : 3), 9, target[1] + (sideFront ? 3 : -24)],
+            target,
+          },
+          rear: {
+            position: [target[0] - (sideFront ? 25 : 0), 13, target[1] + (sideFront ? 0 : 29)],
+            target,
+          },
+        };
+        if (name === "p14") {
+          poses.front = { position: [68, 9, 61], target };
+          poses.close = { position: [67, 9, 67], target };
+        }
+        for (const [side, pose] of Object.entries(poses))
+          assert(
+            (await capture(page, `${name}-${side}`, pose)).samePose,
+            `${name}-${side}: camera clamped`,
+          );
+      }
+      return {
+        captures: report.captures.length,
+        renderer: await page.evaluate(() => window.__MAP_LAB__.rendererInfo()),
+      };
+    }
     for (const [name, target, offset] of halls)
       for (const side of [1, -1]) {
         const position = [target[0] + offset[0] * side, offset[1], target[1] + offset[2] * side];
@@ -1988,7 +2031,12 @@ async function parkMaterialStudy() {
 }
 
 try {
-  if (process.env.MAP_PARK_MATERIALS_ONLY === "1") {
+  if (process.env.MAP_PAVILION_PHOTOS_ONLY === "1") {
+    await check(
+      "six photographic pavilions in front oblique superior close and rear paired poses",
+      parkMaterialStudy,
+    );
+  } else if (process.env.MAP_PARK_MATERIALS_ONLY === "1") {
     await check("park material and each pavilion paired reference poses", parkMaterialStudy);
   } else if (process.env.MAP_PARK_REGISTRATION_ONLY === "1") {
     await check(

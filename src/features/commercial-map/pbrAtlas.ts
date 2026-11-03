@@ -92,15 +92,24 @@ export function bindPbrAtlas(
       ["aomap_fragment", "aoMap", "vAoMapUv"],
     ]) {
       const source = THREE.ShaderChunk[chunk as keyof typeof THREE.ShaderChunk];
-      const replacement = source.replaceAll(
+      let replacement = source.replaceAll(
         `texture2D( ${textureName}, ${uv} )`,
         `${family === "grass" && textureName === "normalMap" ? "surfaceAtlasReadNormal" : "surfaceAtlasRead"}( ${textureName}, ${uv} )`,
       );
+      if (family === "paintedMetal" && chunk === "map_fragment") {
+        // The atlas supplies fine mineral variation, while the authored paint
+        // supplies colour. Remove the old blue tint and strong ribbed albedo;
+        // actual sheet ribs are geometry/filtered normals, never stripes on steel.
+        replacement = replacement.replace(
+          "diffuseColor *= sampledDiffuseColor;",
+          "sampledDiffuseColor.rgb=vec3(mix(.93,dot(sampledDiffuseColor.rgb,vec3(.2126,.7152,.0722)),.22)); diffuseColor *= sampledDiffuseColor;",
+        );
+      }
       shader.fragmentShader = shader.fragmentShader.replace(`#include <${chunk}>`, replacement);
     }
   };
   material.customProgramCacheKey = () =>
-    `indumoveis-pbr-atlas-v3-${["grass", "asphalt", "concrete"].includes(family) ? family : "shared"}`;
+    `indumoveis-pbr-atlas-v4-${["grass", "asphalt", "concrete", "paintedMetal"].includes(family) ? family : "shared"}`;
   material.needsUpdate = true;
 }
 

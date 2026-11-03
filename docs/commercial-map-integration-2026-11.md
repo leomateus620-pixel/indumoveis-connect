@@ -1,5 +1,7 @@
 # Parque integrado, materiais e navegação — revisão de 02–03/11/2026
 
+Este relatório descreve a etapa territorial consolidada no commit `a10053b`. A continuação baseada nas dez fotografias, com P3/Brigada e os outros cinco pavilhões, está no [inventário e implementação fotográfica](commercial-map-pavilion-photos-2026-11.md), com [comparativos e medições atuais](validation/pavilion-photos-2026-11/README.md). As medições históricas abaixo pertencem à etapa territorial.
+
 A implantação passa a usar as mesmas quadras físicas do parque, registradas pela planta A2, com os 59 envelopes e 70 números comerciais Indumóveis preservados. A ampliação anterior por setores afastados foi substituída por uma rede física contínua. A [conferência territorial](validation/park-registration-2026-11-02/park-correspondence.md) contém a correspondência das 22 quadras e 37 peças, o inventário de 32 estruturas/11 portões, larguras, frentes, resíduos e percursos verificados. A [prévia técnica](validation/park-registration-2026-11-02/park-technical.webp) e o SVG incluem os caminhos apoiados na implantação, sem raster ou parcelamento comercial FENASOJA.
 
 Os 73 acessos examinados alcançam o eixo do núcleo comercial. A demonstração abrange cada peça física, os seis pavilhões, os equipamentos e os portões. Portão 2 tem conexão pedonal; os outros dez também alcançam a rede geométrica de veículos. Isso descreve continuidade física na planta, sem afirmar autorização operacional de tráfego, cotas ou funcionamento de portões em campo.

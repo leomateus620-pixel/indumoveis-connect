@@ -2,6 +2,10 @@ import * as THREE from "three";
 import type { MapEntity, Point } from "./data/territory";
 import { getPavilionPresentation, isPavilionFrontEdge } from "./architectureOrientation";
 import { signedPolygonArea } from "./geometry";
+import { createPhotoBuilder } from "./photoArchitectureKit";
+import { buildPhotoP3Facade } from "./photoP3Facade";
+import { buildPhotoHallFacade } from "./photoHallFacades";
+import { buildPhotoFrameFacade } from "./photoFrameFacades";
 import {
   createSurfaceMaterials,
   type SurfaceMaterials,
@@ -11,6 +15,8 @@ import {
 /** Presentation only: no value in this module is a metre or a surveyed elevation. */
 export type RoofProfile =
   | "broad-gable"
+  | "p1-parapet"
+  | "p14-low-gable"
   | "twin-offset-gables"
   | "northlight-sawtooth"
   | "p8-gable"
@@ -21,8 +27,8 @@ export type RoofProfile =
   | "support-shed";
 
 const PAVILION_PROFILES: Record<string, RoofProfile> = {
-  "indumoveis:pavilion:1": "broad-gable",
-  "indumoveis:pavilion:14": "twin-offset-gables",
+  "indumoveis:pavilion:1": "p1-parapet",
+  "indumoveis:pavilion:14": "p14-low-gable",
   "indumoveis:pavilion:12": "northlight-sawtooth",
   "indumoveis:pavilion:8": "p8-gable",
   "indumoveis:pavilion:13": "p13-gable",
@@ -79,6 +85,7 @@ export interface MapArchitecture {
   pickables: THREE.Mesh[];
   visualBounds: Map<string, ArchitectureBounds>;
   textureBytes: number;
+  updateLod(distance: number): void;
   dispose(): void;
 }
 
@@ -121,17 +128,34 @@ function localFrame(entity: MapEntity): Frame {
   };
 }
 
+function worldPoint(p: Point, frame: Frame): Point {
+  return [
+    frame.origin[0] + p[0] * frame.ux[0] + p[1] * frame.uz[0],
+    frame.origin[1] + p[0] * frame.ux[1] + p[1] * frame.uz[1],
+  ];
+}
+
 export function getArchitectureDefinition(entity: MapEntity): ArchitectureDefinition | null {
   const profile = PAVILION_PROFILES[entity.id] ?? SUPPORT_PROFILES[entity.id];
   if (!profile) return null;
   const frame = localFrame(entity);
   const span = Math.min(frame.width, frame.depth);
-  const eaveHeight = entity.height ?? 2.2;
+  // Photo-derived aspect correction belongs to the presentation, never the
+  // cadastral entity. The source footprints remain exactly registered.
+  const eaveHeight = entity.id === "indumoveis:pavilion:1" ? 4.6 : (entity.height ?? 2.2);
   // P1's roof sits low behind the photographed facade; P8 and P13 have
   // moderate gables. All pitches remain estimates in drawing units.
   const roofRise =
     (FOOD_HALL_IDS.has(entity.id) ? frame.width : span) *
-    (entity.id === "indumoveis:pavilion:1" ? 0.055 : entity.kind === "pavilion" ? 0.11 : 0.085);
+    (entity.id === "indumoveis:pavilion:1"
+      ? 0.018
+      : entity.id === "indumoveis:pavilion:14"
+        ? 0.045
+        : entity.id === "indumoveis:pavilion:3"
+          ? 0.035
+          : entity.kind === "pavilion"
+            ? 0.11
+            : 0.085);
   const roofThickness = span * 0.013;
   return {
     profile,
@@ -140,7 +164,10 @@ export function getArchitectureDefinition(entity: MapEntity): ArchitectureDefini
     roofRise,
     roofThickness,
     wallThickness: span * 0.014,
-    height: eaveHeight + roofRise + (entity.kind === "pavilion" ? roofThickness * 0.12 : 0),
+    height: Math.max(
+      eaveHeight + roofRise + (entity.kind === "pavilion" ? roofThickness * 0.12 : 0),
+      entity.id === "indumoveis:pavilion:1" ? eaveHeight * 1.06 : 0,
+    ),
   };
 }
 
@@ -428,6 +455,14 @@ export function buildArchitecture(
   const pickables: THREE.Mesh[] = [];
   const visualBounds = new Map<string, ArchitectureBounds>();
   const geometries = new Set<THREE.BufferGeometry>();
+  const ownedTextures = new Set<THREE.Texture>();
+  const ownedMaterials = new Set<THREE.Material>();
+  let signBytes = 0;
+  const fineBuckets = new Map<SurfaceFamily, Bucket>();
+  const photoBuckets = new Map<SurfaceFamily, Bucket>();
+  const photoBounds = new Map<string, { min: number[]; max: number[] }>();
+  const fineGroup = new THREE.Group();
+  fineGroup.name = "photographic-fine-relief-lod";
   const pickMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
   const floors = bucket(),
     walls = bucket(),
@@ -468,7 +503,8 @@ export function buildArchitecture(
     // boundary produced coplanar facade flicker, especially at oblique angles.
     const panelOuter = insetPolygon(polygon, definition.wallThickness * 0.12);
     const structuralInner = insetPolygon(polygon, definition.wallThickness * 1.8);
-    const foundationTop = definition.eaveHeight * 0.095;
+    const photographed = entity.kind === "pavilion";
+    const foundationTop = photographed ? 0.06 : definition.eaveHeight * 0.095;
     const openingTop = definition.eaveHeight * 0.72;
     // The roof fascia occupies this last thickness band. Walls end exactly at
     // its underside instead of competing with it on the same facade plane.
@@ -549,6 +585,24 @@ export function buildArchitecture(
         world(a),
         world(b),
       );
+      // One facade owner: photo-specific construction replaces the estimated
+      // wall/windows/door recipe. P1/P14 also own their documented side skins.
+      const photoSide =
+        photographed &&
+        ["indumoveis:pavilion:1", "indumoveis:pavilion:14"].includes(entity.id) &&
+        presentation &&
+        Math.abs(
+          (world(b)[0] - world(a)[0]) * presentation.frontNormal[0] +
+            (world(b)[1] - world(a)[1]) * presentation.frontNormal[1],
+        ) >
+          length * 0.8;
+      if (
+        photographed &&
+        (front ||
+          photoSide ||
+          ["indumoveis:pavilion:1", "indumoveis:pavilion:14"].includes(entity.id))
+      )
+        continue;
       const doorHalf = Math.min((span * 0.075) / length, 0.14);
       const entries = localAccesses
         .filter((access) => access.edge === i)
@@ -836,23 +890,27 @@ export function buildArchitecture(
           );
           // Close thickness only on the true outer perimeter. A separate dark
           // slab on each shared ridge/valley caused redundant internal stripes.
-          quad(
-            roof,
-            [a[0], height(a), a[1]],
-            [b[0], height(b), b[1]],
-            [b[0], height(b) - definition.roofThickness, b[1]],
-            [a[0], height(a) - definition.roofThickness, a[1]],
-            "#a3adb6",
-          );
-          quad(
-            roofWalls,
-            [a[0], definition.eaveHeight - definition.roofThickness, a[1]],
-            [b[0], definition.eaveHeight - definition.roofThickness, b[1]],
-            [b[0], height(b) - definition.roofThickness, b[1]],
-            [a[0], height(a) - definition.roofThickness, a[1]],
-            "#f0f3f2",
-            [b[1] - a[1], 0, a[0] - b[0]],
-          );
+          const photoFront =
+            photographed && isPavilionFrontEdge(entity, worldPoint(a, frame), worldPoint(b, frame));
+          if (!photoFront)
+            quad(
+              roof,
+              [a[0], height(a), a[1]],
+              [b[0], height(b), b[1]],
+              [b[0], height(b) - definition.roofThickness, b[1]],
+              [a[0], height(a) - definition.roofThickness, a[1]],
+              "#a3adb6",
+            );
+          if (!photoFront)
+            quad(
+              roofWalls,
+              [a[0], definition.eaveHeight - definition.roofThickness, a[1]],
+              [b[0], definition.eaveHeight - definition.roofThickness, b[1]],
+              [b[0], height(b) - definition.roofThickness, b[1]],
+              [a[0], height(a) - definition.roofThickness, a[1]],
+              "#f0f3f2",
+              [b[1] - a[1], 0, a[0] - b[0]],
+            );
         }
       }
       const next = segments[index + 1];
@@ -916,6 +974,22 @@ export function buildArchitecture(
       triangle(roofGlass, a, d, f, "#ffffff", [-1, 0, 0]);
       triangle(picking, a, d, f, "#ffffff", [-1, 0, 0]);
     }
+    if (entity.id === "indumoveis:pavilion:1" && presentation) {
+      const [a, b] = presentation.frontEdge.map((p): Point => [
+        (p[0] - frame.origin[0]) * frame.ux[0] + (p[1] - frame.origin[1]) * frame.ux[1],
+        (p[0] - frame.origin[0]) * frame.uz[0] + (p[1] - frame.origin[1]) * frame.uz[1],
+      ]);
+      // The photographed solid parapet is selectable above the low roof;
+      // this proxy follows that facade only, never an empty ridge-height box.
+      quad(
+        picking,
+        [a[0], definition.eaveHeight * 0.84, a[1]],
+        [b[0], definition.eaveHeight * 0.84, b[1]],
+        [b[0], definition.eaveHeight * 1.06, b[1]],
+        [a[0], definition.eaveHeight * 1.06, a[1]],
+        "#ffffff",
+      );
+    }
     const pickGeometry = geometryFrom(picking, frame);
     geometries.add(pickGeometry);
     const pick = new THREE.Mesh(pickGeometry, pickMaterial);
@@ -937,15 +1011,118 @@ export function buildArchitecture(
     if (roofGlass.positions.length) roofGroup.add(mesh(roofGlass, "glass", frame));
     roofs.set(entity.id, roofGroup);
     group.add(roofGroup);
+    if (photographed) {
+      const photo = createPhotoBuilder(entity, definition.eaveHeight, definition.roofRise);
+      const pavilion = Number(entity.id.split(":").at(-1));
+      if (pavilion === 3) buildPhotoP3Facade(photo.builder);
+      else if (pavilion === 1 || pavilion === 14) buildPhotoFrameFacade(photo.builder, pavilion);
+      else if (pavilion === 8 || pavilion === 13 || pavilion === 12)
+        buildPhotoHallFacade(photo.builder, pavilion);
+      for (const [source, destination] of [
+        [photo.main, photoBuckets],
+        [photo.fine, fineBuckets],
+      ] as const)
+        for (const [family, data] of source) {
+          let target = destination.get(family);
+          if (!target) {
+            target = bucket();
+            destination.set(family, target);
+          }
+          // Static preparation: no buffers or materials are allocated in gestures.
+          for (let i = 0; i < data.positions.length; i++) target.positions.push(data.positions[i]);
+          for (let i = 0; i < data.colors.length; i++) target.colors.push(data.colors[i]);
+          for (let i = 0; i < data.uvs.length; i++) target.uvs.push(data.uvs[i]);
+        }
+      photoBounds.set(entity.id, photo);
+      if (pavilion === 3 && typeof CanvasRenderingContext2D !== "undefined") {
+        const canvas = document.createElement("canvas");
+        canvas.width = 512;
+        canvas.height = 64;
+        const context = canvas.getContext("2d");
+        if (context) {
+          context.fillStyle = "#eeeee6";
+          context.fillRect(0, 0, 512, 64);
+          context.fillStyle = "#242c2c";
+          context.font = "bold 38px Arial, sans-serif";
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText("BRIGADA MILITAR", 256, 34, 488);
+          const texture = new THREE.CanvasTexture(canvas);
+          texture.colorSpace = THREE.SRGBColorSpace;
+          texture.name = "permanent-brigada-identification";
+          ownedTextures.add(texture);
+          signBytes = Math.ceil((512 * 64 * 4 * 4) / 3);
+          const material = new THREE.MeshStandardMaterial({
+            map: texture,
+            roughness: 0.88,
+            metalness: 0,
+          });
+          ownedMaterials.add(material);
+          const { w, h } = photo.builder;
+          const corners = [
+            [w * 0.031, h * 0.615 - 0.12, -0.081],
+            [w * 0.269, h * 0.615 - 0.12, -0.081],
+            [w * 0.269, h * 0.615 + 0.12, -0.081],
+            [w * 0.031, h * 0.615 + 0.12, -0.081],
+          ] as Vertex[];
+          const geometry = new THREE.BufferGeometry();
+          geometry.setAttribute(
+            "position",
+            new THREE.Float32BufferAttribute(
+              [0, 1, 2, 0, 2, 3].flatMap((i) => photo.world(corners[i])),
+              3,
+            ),
+          );
+          geometry.setAttribute(
+            "uv",
+            new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1], 2),
+          );
+          geometry.computeVertexNormals();
+          geometries.add(geometry);
+          const sign = new THREE.Mesh(geometry, material);
+          sign.name = "p3-integrated-brigada-sign";
+          sign.raycast = () => {};
+          group.add(sign);
+        }
+      }
+    }
+    const extra = photoBounds.get(entity.id);
     visualBounds.set(entity.id, {
-      minX: Math.min(...entity.polygon.map((p) => p[0])),
-      maxX: Math.max(...entity.polygon.map((p) => p[0])),
-      minZ: Math.min(...entity.polygon.map((p) => p[1])),
-      maxZ: Math.max(...entity.polygon.map((p) => p[1])),
-      height: definition.height,
+      minX: Math.min(...entity.polygon.map((p) => p[0]), extra?.min[0] ?? Infinity),
+      maxX: Math.max(...entity.polygon.map((p) => p[0]), extra?.max[0] ?? -Infinity),
+      minZ: Math.min(...entity.polygon.map((p) => p[1]), extra?.min[2] ?? Infinity),
+      maxZ: Math.max(...entity.polygon.map((p) => p[1]), extra?.max[2] ?? -Infinity),
+      height: Math.max(definition.height, extra?.max[1] ?? 0),
       roofProfile: definition.profile,
     });
   }
+  const destinations: Partial<Record<SurfaceFamily, Bucket>> = {
+    paintedWall: walls,
+    concrete: structure,
+    architecturalFrame: frames,
+    glass: glazing,
+    masonryBrick: brick,
+    exposedMetal: metal,
+    warmAccent: accents,
+  };
+  for (const [family, data] of photoBuckets) {
+    const target = destinations[family];
+    if (target) {
+      target.positions.push(...data.positions);
+      target.colors.push(...data.colors);
+      target.uvs.push(...data.uvs);
+    } else {
+      const layer = mesh(data, family);
+      layer.name = `photo-${family}`;
+      group.add(layer);
+    }
+  }
+  for (const [family, data] of fineBuckets) {
+    const layer = mesh(data, family);
+    layer.name = `photo-fine-${family}`;
+    fineGroup.add(layer);
+  }
+  group.add(fineGroup);
   for (const [name, data, family] of [
     ["floors-contact", floors, "concrete"],
     ["walls", walls, "paintedWall"],
@@ -966,9 +1143,17 @@ export function buildArchitecture(
     roofs,
     pickables,
     visualBounds,
-    textureBytes: sharedSurfaces ? 0 : surfaces.textureBytes,
+    textureBytes: (sharedSurfaces ? 0 : surfaces.textureBytes) + signBytes,
+    updateLod(distance) {
+      // Hysteresis affects only sub-pixel sheet/gate ribs. Canopies, trusses,
+      // portals and the full silhouette never disappear on the light profile.
+      if (distance > 75) fineGroup.visible = false;
+      else if (distance < 64) fineGroup.visible = true;
+    },
     dispose() {
       for (const geometry of geometries) geometry.dispose();
+      for (const texture of ownedTextures) texture.dispose();
+      for (const material of ownedMaterials) material.dispose();
       if (!sharedSurfaces) surfaces.dispose();
       pickMaterial.dispose();
       group.clear();

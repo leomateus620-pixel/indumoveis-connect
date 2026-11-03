@@ -12,37 +12,37 @@ const PAVILION_ORIENTATION: Record<
     frontNormal: [1, 0],
     ridgeDirection: [1, 0],
     frontStreetId: "indumoveis:road:mercosul",
-    entryFractions: [0.5082],
+    entryFractions: [0.39],
   },
   "indumoveis:pavilion:14": {
     frontNormal: [1, 0],
     ridgeDirection: [1, 0],
     frontStreetId: "indumoveis:road:mercosul",
-    entryFractions: [0.29, 0.71],
+    entryFractions: [0.8825, 0.6075, 0.275],
   },
   "indumoveis:pavilion:12": {
     frontNormal: [0, -1],
     ridgeDirection: [1, 0],
     frontStreetId: "indumoveis:road:argentina",
-    entryFractions: [0.25, 0.75],
+    entryFractions: [0.37],
   },
   "indumoveis:pavilion:8": {
     frontNormal: [0, -1],
     ridgeDirection: [0, 1],
     frontStreetId: "indumoveis:road:argentina",
-    entryFractions: [0.26, 0.74],
+    entryFractions: [0.6375, 0.175],
   },
   "indumoveis:pavilion:13": {
     frontNormal: [0, -1],
     ridgeDirection: [0, 1],
     frontStreetId: "indumoveis:road:argentina",
-    entryFractions: [0.26, 0.74],
+    entryFractions: [0.68, 0.325],
   },
   "indumoveis:pavilion:3": {
     frontNormal: [0, -1],
     ridgeDirection: [0, 1],
     frontStreetId: "indumoveis:road:argentina",
-    entryFractions: [1 / 6, 0.5, 5 / 6],
+    entryFractions: [0.355, 0.1935],
   },
 };
 
@@ -104,16 +104,13 @@ export function getPavilionPresentation(entity: MapEntity): PavilionPresentation
   const frontEdge = edgeFacing(entity.polygon, authored.frontNormal);
   const rearEdge = edgeFacing(entity.polygon, [-authored.frontNormal[0], -authored.frontNormal[1]]);
   const [a, b] = frontEdge;
-  // Mostra's existing documented access is retained exactly. For the other
-  // halls, the source family's portal rhythm is presentation only. Original
-  // side/rear exits remain service doors; they do not determine the facade.
-  const mainEntries =
-    entity.id === "indumoveis:pavilion:1" && entity.accesses?.length
-      ? entity.accesses.map((p): Point => [...p])
-      : authored.entryFractions.map((t): Point => [
-          a[0] + (b[0] - a[0]) * t,
-          a[1] + (b[1] - a[1]) * t,
-        ]);
+  // Main presentation portals follow the photographed facade. Cadastral
+  // access points (including Mostra's interior drawing) are retained in the
+  // original entity; their old fractional position does not move a real pier.
+  const mainEntries = authored.entryFractions.map((t): Point => [
+    a[0] + (b[0] - a[0]) * t,
+    a[1] + (b[1] - a[1]) * t,
+  ]);
   return {
     frontNormal: [...authored.frontNormal],
     ridgeDirection: [...authored.ridgeDirection],
@@ -124,7 +121,7 @@ export function getPavilionPresentation(entity: MapEntity): PavilionPresentation
     serviceEntries: (entity.accesses ?? [])
       .filter((p) => distanceToEdge(p, frontEdge) > 0.025)
       .map((p): Point => [...p]),
-    estimatedEntries: entity.id !== "indumoveis:pavilion:1",
+    estimatedEntries: true,
   };
 }
 

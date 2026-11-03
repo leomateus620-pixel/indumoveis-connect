@@ -19,10 +19,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 69,
-        "triangles": 45383,
-        "geometries": 55,
-        "textures": 8,
+        "draws": 76,
+        "triangles": 55494,
+        "geometries": 62,
+        "textures": 9,
         "optionalFailures": []
       },
       "after": {
@@ -41,10 +41,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 74,
-        "triangles": 46487,
-        "geometries": 60,
-        "textures": 9,
+        "draws": 81,
+        "triangles": 56653,
+        "geometries": 67,
+        "textures": 10,
         "optionalFailures": []
       }
     },
@@ -66,10 +66,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 74,
-        "triangles": 46487,
-        "geometries": 60,
-        "textures": 9,
+        "draws": 81,
+        "triangles": 56653,
+        "geometries": 67,
+        "textures": 10,
         "optionalFailures": []
       },
       "after": {
@@ -88,10 +88,10 @@
         "cameraState": "manual",
         "selectedId": null,
         "contexts": 1,
-        "draws": 83,
-        "triangles": 56128,
-        "geometries": 69,
-        "textures": 10,
+        "draws": 90,
+        "triangles": 66294,
+        "geometries": 76,
+        "textures": 11,
         "optionalFailures": []
       }
     },
@@ -113,32 +113,32 @@
         "cameraState": "manual",
         "selectedId": null,
         "contexts": 1,
-        "draws": 83,
-        "triangles": 56128,
-        "geometries": 69,
-        "textures": 10,
+        "draws": 90,
+        "triangles": 66294,
+        "geometries": 76,
+        "textures": 11,
         "optionalFailures": []
       },
       "after": {
         "position": [
-          47.26359185295645,
-          272.7393753773771,
-          52.09546598424464
+          47.26359185295607,
+          272.73937537737703,
+          52.09546598424478
         ],
         "target": [
           86.02005224727378,
           38.75173540679159
         ],
-        "polar": 0.1491708515510994,
-        "azimuth": -1.2392111945258175,
+        "polar": 0.14917085155110069,
+        "azimuth": -1.2392111945258173,
         "distance": 275.8022575129902,
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 139,
-        "triangles": 223903,
-        "geometries": 105,
-        "textures": 11,
+        "draws": 146,
+        "triangles": 234069,
+        "geometries": 112,
+        "textures": 12,
         "optionalFailures": []
       }
     },
@@ -160,10 +160,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 123,
-        "triangles": 202381,
-        "geometries": 106,
-        "textures": 11,
+        "draws": 130,
+        "triangles": 212547,
+        "geometries": 113,
+        "textures": 12,
         "optionalFailures": []
       },
       "after": {
@@ -182,10 +182,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 131,
-        "triangles": 219098,
-        "geometries": 106,
-        "textures": 11,
+        "draws": 138,
+        "triangles": 229264,
+        "geometries": 113,
+        "textures": 12,
         "optionalFailures": []
       }
     },
@@ -207,10 +207,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 144,
-        "triangles": 232595,
-        "geometries": 112,
-        "textures": 11,
+        "draws": 151,
+        "triangles": 242761,
+        "geometries": 119,
+        "textures": 12,
         "optionalFailures": []
       },
       "A": {
@@ -229,10 +229,10 @@
         "cameraState": "idle",
         "selectedId": "indumoveis:external:lot:01",
         "contexts": 1,
-        "draws": 50,
-        "triangles": 61728,
-        "geometries": 116,
-        "textures": 12,
+        "draws": 53,
+        "triangles": 80736,
+        "geometries": 124,
+        "textures": 13,
         "optionalFailures": []
       },
       "B": {
@@ -251,10 +251,10 @@
         "cameraState": "idle",
         "selectedId": "indumoveis:pavilion:12",
         "contexts": 1,
-        "draws": 63,
-        "triangles": 65032,
-        "geometries": 116,
-        "textures": 12,
+        "draws": 67,
+        "triangles": 84180,
+        "geometries": 124,
+        "textures": 13,
         "optionalFailures": []
       },
       "after": {
@@ -273,10 +273,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 144,
-        "triangles": 232595,
-        "geometries": 116,
-        "textures": 12,
+        "draws": 151,
+        "triangles": 242761,
+        "geometries": 124,
+        "textures": 13,
         "optionalFailures": []
       }
     },
@@ -298,10 +298,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 144,
-        "triangles": 232595,
-        "geometries": 116,
-        "textures": 12,
+        "draws": 151,
+        "triangles": 242761,
+        "geometries": 124,
+        "textures": 13,
         "optionalFailures": []
       }
     },
@@ -323,10 +323,10 @@
         "cameraState": "idle",
         "selectedId": "indumoveis:external:lot:01",
         "contexts": 1,
-        "draws": 50,
-        "triangles": 61728,
-        "geometries": 116,
-        "textures": 12,
+        "draws": 53,
+        "triangles": 80736,
+        "geometries": 124,
+        "textures": 13,
         "optionalFailures": []
       },
       "later": {
@@ -345,10 +345,10 @@
         "cameraState": "idle",
         "selectedId": "indumoveis:external:lot:01",
         "contexts": 1,
-        "draws": 50,
-        "triangles": 61728,
-        "geometries": 116,
-        "textures": 12,
+        "draws": 53,
+        "triangles": 80736,
+        "geometries": 124,
+        "textures": 13,
         "optionalFailures": []
       }
     },
@@ -370,10 +370,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 69,
-        "triangles": 45373,
-        "geometries": 55,
-        "textures": 8,
+        "draws": 76,
+        "triangles": 55484,
+        "geometries": 62,
+        "textures": 9,
         "optionalFailures": []
       },
       "one": {
@@ -392,10 +392,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 74,
-        "triangles": 46477,
-        "geometries": 60,
-        "textures": 9,
+        "draws": 81,
+        "triangles": 56643,
+        "geometries": 67,
+        "textures": 10,
         "optionalFailures": []
       },
       "two": {
@@ -411,13 +411,13 @@
         "polar": 0.4454709428603192,
         "azimuth": -0.32583586984400337,
         "distance": 401.455917273743,
-        "cameraState": "idle",
+        "cameraState": "manual",
         "selectedId": null,
         "contexts": 1,
-        "draws": 80,
-        "triangles": 56120,
-        "geometries": 69,
-        "textures": 10,
+        "draws": 87,
+        "triangles": 66286,
+        "geometries": 76,
+        "textures": 11,
         "optionalFailures": []
       },
       "restored": {
@@ -436,10 +436,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 138,
-        "triangles": 225230,
-        "geometries": 113,
-        "textures": 12,
+        "draws": 145,
+        "triangles": 235396,
+        "geometries": 121,
+        "textures": 13,
         "optionalFailures": []
       }
     },
@@ -461,10 +461,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 69,
-        "triangles": 45373,
-        "geometries": 55,
-        "textures": 8,
+        "draws": 76,
+        "triangles": 55484,
+        "geometries": 62,
+        "textures": 9,
         "optionalFailures": []
       },
       "one": {
@@ -483,10 +483,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 74,
-        "triangles": 46477,
-        "geometries": 60,
-        "textures": 9,
+        "draws": 81,
+        "triangles": 56643,
+        "geometries": 67,
+        "textures": 10,
         "optionalFailures": []
       },
       "two": {
@@ -505,10 +505,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 83,
-        "triangles": 56118,
-        "geometries": 69,
-        "textures": 10,
+        "draws": 90,
+        "triangles": 66284,
+        "geometries": 76,
+        "textures": 11,
         "optionalFailures": []
       },
       "restored": {
@@ -527,10 +527,10 @@
         "cameraState": "idle",
         "selectedId": null,
         "contexts": 1,
-        "draws": 119,
-        "triangles": 189632,
-        "geometries": 96,
-        "textures": 12,
+        "draws": 126,
+        "triangles": 199798,
+        "geometries": 104,
+        "textures": 13,
         "optionalFailures": []
       }
     }
@@ -538,63 +538,63 @@
   "errors": [],
   "consoleErrors": [
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
-      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
-    },
-    {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     },
     {
-      "url": "http://127.0.0.1:4218/mapa?mapDiagnostics=1",
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
       "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
     }
   ]

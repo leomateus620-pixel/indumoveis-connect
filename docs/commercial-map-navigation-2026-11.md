@@ -8,7 +8,7 @@ O SVG independente aplica a mesma sessão de seleção, possui navegação e bus
 
 ## Evidência de comportamento
 
-O laboratório utilizou o build de produção local servido em `127.0.0.1:4218`, dados interceptados de edição/usuário de teste, perfil Leve, DPR 1 e Chromium do ambiente Windows. Nenhuma requisição de escrita foi enviada ao backend. Os [registros antes/depois](validation/commercial-map-navigation/navigation-production.json) contêm nove cenários aprovados:
+O laboratório utilizou o build de produção local servido em `127.0.0.1:4221`, dados interceptados de edição/usuário de teste, perfil Leve, DPR 1 e Chromium do ambiente Windows. Nenhuma requisição de escrita foi enviada ao backend. Repetido após a reconstrução fotográfica de 03/11/2026, o [registro de comportamento](validation/commercial-map-navigation/navigation-production.json) contém nove cenários aprovados:
 
 | Cenário                      | Resultado observado                                                                              |
 | ---------------------------- | ------------------------------------------------------------------------------------------------ |

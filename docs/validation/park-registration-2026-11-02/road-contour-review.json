@@ -44,10 +44,65 @@
   "displayVertices": 2287,
   "allValid": true,
   "maxHausdorffWorld": 0.19312995043784154,
-  "generatedAt": "2026-11-03T03:36:02.345290+00:00",
+  "generatedAt": "2026-11-03T05:01:52.417989+00:00",
   "tool": {
     "Shapely": "2.2.0",
     "GEOS": "3.14.1"
   },
-  "technicalDataSha256": "7e7d536e21d6c812b3159aeb9fdaf0f83e25202fb638b58a93131014ac0ba1a8"
+  "technicalDataSha256": "06d1078b5eedd553962b4bd951eb4f3be25dc582391c0e988197c36968584773",
+  "rdpEvidenceTechnicalDataSha256": "7e7d536e21d6c812b3159aeb9fdaf0f83e25202fb638b58a93131014ac0ba1a8",
+  "rdpScope": "The original three raster-derived A2 components and 39 holes before protected-footprint clipping. Counts, raw/display rings and Hausdorff metrics above are unchanged. The photographed P1 island below is a separate presentation subtraction and is not part of the RDP maximum-deviation metric.",
+  "photographicPresentationChange": {
+    "source": "Photograph 9 / Imagem do ChatGPT 3 de nov. de 2026, 01_02_03.jpg",
+    "reference": "../../commercial-map-pavilion-photos-2026-11.md",
+    "owner": "photoPavilionSetting.ts / photo:p1-front-planter",
+    "center": [
+      61.25,
+      59.5
+    ],
+    "radius": 0.55,
+    "ringVertices": 64,
+    "condition": "The photograph establishes the raised planter and tree identity. Local centre, radius and levels are estimated presentation values in drawing units, not surveyed measurements. Raw A2, its fit and RDP evidence remain unchanged.",
+    "sourceA2Holes": 39,
+    "currentPresentationHoles": 40,
+    "notIncludedInRdpMaximumDeviation": true
+  },
+  "currentSurfaceParityReview": {
+    "scope": "Current presentation envelope components before protected-footprint clipping; the added island is a hole rather than a second road or a cadastral edit.",
+    "components": [
+      {
+        "index": 0,
+        "valid": true,
+        "reason": "Valid Geometry",
+        "allRingsSimple": true,
+        "outerVertices": 899,
+        "holes": 40
+      },
+      {
+        "index": 1,
+        "valid": true,
+        "reason": "Valid Geometry",
+        "allRingsSimple": true,
+        "outerVertices": 136,
+        "holes": 0
+      },
+      {
+        "index": 2,
+        "valid": true,
+        "reason": "Valid Geometry",
+        "allRingsSimple": true,
+        "outerVertices": 13,
+        "holes": 0
+      }
+    ],
+    "holes": 40,
+    "crossComponentPositiveArea": [],
+    "planterHoleIndex": 39,
+    "planterHoleVertices": 64,
+    "planterAreaDrawingUnits2": 0.9488059183901476,
+    "planterSymmetricDifferenceAreaDrawingUnits2": 0.0,
+    "actualRenderedFloorCommercialClear": true,
+    "actualRenderedFloorPlanterClear": true,
+    "relatedProof": "geometry-review.json"
+  }
 }

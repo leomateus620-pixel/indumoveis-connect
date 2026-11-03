@@ -1,5 +1,6 @@
 import { ENTITIES, type MapEntity, type Point } from "./data/territory";
-import { polygonBounds, signedPolygonArea } from "./geometry";
+import { pointInPolygon, polygonBounds, signedPolygonArea } from "./geometry";
+import { PHOTO_P1_COURTYARD } from "./photoPavilionSetting";
 import { deriveRoadRibbon } from "./roadGeometry";
 import { subtractPolygons } from "./parkGeometry";
 import {
@@ -242,7 +243,17 @@ export const PARK_CONTEXT_ROADS: MapEntity[] = [
       "Circulação interna do parque",
       registerA2Polygon(simplifyRoadContour(surface.polygon)),
     ),
-    holes: surface.holes.map((ring) => registerA2Polygon(simplifyRoadContour(ring))),
+    holes: [
+      ...surface.holes.map((ring) => registerA2Polygon(simplifyRoadContour(ring))),
+      // Photo 9 resolves a small raised tree island inside the broad A2 white
+      // corridor. Source rings remain unchanged; this is one presentation hole.
+      ...(pointInPolygon(PHOTO_P1_COURTYARD.center, registerA2Polygon(surface.polygon)) &&
+      !surface.holes.some((ring) =>
+        pointInPolygon(PHOTO_P1_COURTYARD.center, registerA2Polygon(ring)),
+      )
+        ? [PHOTO_P1_COURTYARD.polygon]
+        : []),
+    ],
     source: surface.sourceCondition,
   })),
   ...PARK_A2_GATE_PAVEMENT_REPAIRS.map((repair) => ({

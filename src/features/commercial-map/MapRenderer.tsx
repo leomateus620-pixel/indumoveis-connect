@@ -6,6 +6,7 @@ import { createReflectionEnvironment } from "./reflectionEnvironment";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 import { createSoftwareMaterials } from "./softwareMaterials";
 import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
+import { createPhotoPavilionSetting } from "./photoPavilionSettingGeometry";
 import { getRegisteredParkWoodland, PARK_WOODLAND_MASSES } from "./parkPlanting";
 import { createTerrain, TERRAIN } from "./terrain";
 import { DAYLIGHT, createDaylightSky, createDaylightBackground } from "./daylight";
@@ -450,6 +451,7 @@ function initializeMapRuntime(
   let environmentResource: ReturnType<typeof createReflectionEnvironment> | null = null;
   let environmentAttempted = false;
   let vegetation: ReturnType<typeof createVegetation> | null = null;
+  let photoPavilionSetting: ReturnType<typeof createPhotoPavilionSetting> | null = null;
   let contextVegetation: ReturnType<typeof createVegetation> | null = null;
   let lotGrass: ReturnType<typeof createLotGrass> | null = null;
   let urban: ReturnType<typeof createUrbanContext> | null = null;
@@ -870,6 +872,7 @@ function initializeMapRuntime(
     surfaces,
   );
   commercialGroup.add(architecture.group);
+  diag.textureBytes += architecture.textureBytes;
   pickables.push(...architecture.pickables);
   const sedeEntity = ENTITY_BY_ID.get("indumoveis:support:mao-na-massa")!;
   const sedePick = new THREE.Mesh(
@@ -1287,12 +1290,23 @@ function initializeMapRuntime(
       return;
     }
     try {
-      vegetation = createVegetation({ quality: tier, additionalPlanting: true });
+      vegetation = createVegetation({
+        quality: tier,
+        additionalPlanting: true,
+        photoPavilionTree: true,
+      });
+      rollback.push(() => vegetation?.dispose());
+      try {
+        photoPavilionSetting = createPhotoPavilionSetting(surfaces);
+        vegetation.group.add(photoPavilionSetting.group);
+        rollback.push(() => photoPavilionSetting?.dispose());
+      } catch {
+        diag.optionalFailures.push("p1-planter-preparation");
+      }
       vegetation.group.visible = false;
       commercialGroup.add(vegetation.group);
       diag.realism.planting = vegetation.metadata;
       diag.textureBytes += vegetation.textureBytes;
-      rollback.push(() => vegetation?.dispose());
       softwareMaterials.sync(vegetation.group);
       await renderer.compileAsync(vegetation.group, camera, scene);
       if (disposed || failed) return;
@@ -1901,6 +1915,7 @@ function initializeMapRuntime(
       tier === "detailed" && !reduceMotion.matches && !ambientDisabled,
     );
     const lodDistance = camera.position.distanceTo(controls.target);
+    architecture.updateLod(lodDistance);
     const lodTarget: Point = [controls.target.x, controls.target.z];
     vegetation?.updateLod(lodDistance, lodTarget);
     contextVegetation?.updateLod(lodDistance, lodTarget);
@@ -2617,6 +2632,7 @@ function initializeMapRuntime(
       controls.dispose();
       softwareMaterials.dispose();
       vegetation?.dispose();
+      photoPavilionSetting?.dispose();
       contextVegetation?.dispose();
       lotGrass?.dispose();
       urban?.dispose();

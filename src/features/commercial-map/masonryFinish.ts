@@ -3,7 +3,7 @@ import type { MeshStandardMaterial } from "three";
 /** Estimated brick coursing on P12's documented masonry only. Screen-space
  * filtering removes joints below a pixel instead of producing moire. Shared
  * mineral maps continue to provide relief; no additional texture is allocated. */
-export function applyMasonryFinish(material: MeshStandardMaterial) {
+export function applyMasonryFinish(material: MeshStandardMaterial, painted = false) {
   const compile = material.onBeforeCompile,
     cache = material.customProgramCacheKey;
   material.onBeforeCompile = (shader, renderer) => {
@@ -21,9 +21,9 @@ export function applyMasonryFinish(material: MeshStandardMaterial) {
       vec2 brickEdge=min(fract(brickGrid),1.0-fract(brickGrid));
       vec2 mortar=1.0-smoothstep(vec2(.025)-brickWidth*.5,vec2(.025)+brickWidth*.5,brickEdge);
       float brickVisible=1.0-smoothstep(.25,.9,max(brickWidth.x,brickWidth.y));
-      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.42,.41,.36),max(mortar.x,mortar.y)*brickVisible*.7);
+      diffuseColor.rgb=mix(diffuseColor.rgb,${painted ? "diffuseColor.rgb*.82" : "vec3(.42,.41,.36)"},max(mortar.x,mortar.y)*brickVisible*${painted ? ".4" : ".7"});
     `,
     );
   };
-  material.customProgramCacheKey = () => `${cache.call(material)}:mineral-masonry-v1`;
+  material.customProgramCacheKey = () => `${cache.call(material)}:mineral-masonry-v2:${painted}`;
 }

@@ -27,17 +27,30 @@ function assertPortals(entity: MapEntity) {
   const model = buildArchitecture([entity]);
   try {
     model.group.updateMatrixWorld(true);
+    const gates = model.group.getObjectByName("photo-paintedSheet")!;
+    const wallLayers = ["walls", "photo-paintedMasonry", "brick-front", "photo-whitePaint"]
+      .map((name) => model.group.getObjectByName(name))
+      .filter((object): object is THREE.Object3D => object !== undefined);
+    expect(gates, entity.id).toBeDefined();
     for (const [x, z] of presentation.mainEntries) {
       const ray = new THREE.Raycaster(
-        new THREE.Vector3(x + presentation.frontNormal[0], 1.4, z + presentation.frontNormal[1]),
+        new THREE.Vector3(
+          x + presentation.frontNormal[0],
+          entity.id === "indumoveis:pavilion:14" ? 0.55 : 1.4,
+          z + presentation.frontNormal[1],
+        ),
         new THREE.Vector3(-presentation.frontNormal[0], 0, -presentation.frontNormal[1]),
         0,
         3,
       );
+      const gate = ray.intersectObject(gates)[0];
+      expect(gate, `${entity.id} opaque portal ${x},${z}`).toBeDefined();
+      expect(gate.distance, `${entity.id} recessed portal`).toBeGreaterThan(1.05);
+      expect(gate.distance, entity.id).toBeLessThan(1.5);
       expect(
-        ray.intersectObject(model.group.getObjectByName("entry-glazing")!).length,
-        `${entity.id} portal ${x},${z}`,
-      ).toBeGreaterThan(0);
+        ray.intersectObjects(wallLayers)[0]?.distance ?? Infinity,
+        `${entity.id} masonry must not cover the metal gate`,
+      ).toBeGreaterThan(gate.distance - 0.00001);
       expect(ray.intersectObjects(model.pickables)[0]?.object.userData.entityId).toBe(entity.id);
     }
   } finally {
@@ -116,8 +129,40 @@ describe("architecture integrated with the normalized physical A2 footprints", (
       }
     }
   });
-  it("puts real recessed portals on the public side of all six physical shells", () => {
+  it("puts photographed opaque recessed gates on the public side of all six physical shells", () => {
     for (const entity of pavilions) assertPortals(entity);
+  });
+  it("selects P1's visible parapet above the low roof without extending the proxy into air above it", () => {
+    const entity = pavilions.find((entry) => entry.id === "indumoveis:pavilion:1")!;
+    const presentation = getPavilionPresentation(entity)!;
+    const definition = getArchitectureDefinition(entity)!;
+    const model = buildArchitecture([entity]);
+    try {
+      model.group.updateMatrixWorld(true);
+      const [a, b] = presentation.frontEdge;
+      for (const fraction of [0.05, 0.95]) {
+        const x = a[0] + (b[0] - a[0]) * fraction;
+        const z = a[1] + (b[1] - a[1]) * fraction;
+        const ray = new THREE.Raycaster(
+          new THREE.Vector3(
+            x + presentation.frontNormal[0],
+            definition.eaveHeight * 1.025,
+            z + presentation.frontNormal[1],
+          ),
+          new THREE.Vector3(-presentation.frontNormal[0], 0, -presentation.frontNormal[1]),
+          0,
+          2,
+        );
+        expect(
+          ray.intersectObject(model.group.getObjectByName("architectural-frames")!),
+        ).not.toHaveLength(0);
+        expect(ray.intersectObjects(model.pickables)[0]?.object.userData.entityId).toBe(entity.id);
+        ray.ray.origin.y = model.visualBounds.get(entity.id)!.height + 0.05;
+        expect(ray.intersectObjects(model.pickables)).toHaveLength(0);
+      }
+    } finally {
+      model.dispose();
+    }
   });
   it("keeps public portal placement after a cyclic or reversed footprint representation", () => {
     for (const entity of pavilions.filter((entry) =>

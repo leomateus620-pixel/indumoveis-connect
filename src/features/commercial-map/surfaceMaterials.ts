@@ -15,6 +15,7 @@ export type SurfaceFamily =
   | "glass"
   | "warmAccent"
   | "masonryBrick"
+  | "paintedMasonry"
   | "architecturalFrame"
   | "grass";
 
@@ -31,6 +32,7 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   glass: VISUAL_THEME.glass,
   warmAccent: VISUAL_THEME.warm,
   masonryBrick: "#a9604c",
+  paintedMasonry: "#e6e5db",
   architecturalFrame: "#40504a",
   // The commercial floor stays lighter than surrounding landscape so thin
   // parcel borders and status bands keep their contrast in overview.
@@ -144,15 +146,17 @@ export function createSurfaceMaterials(
     concrete: make("concrete", 0.95),
     asphalt: make("asphalt", 0.98),
     whitePaint: make("whitePaint", 0.87),
-    paintedSheet: make("paintedSheet", 0.76, 0.14),
+    paintedSheet: make("paintedSheet", 0.81, 0.035),
     exposedMetal: make("exposedMetal", 0.42, 0.72),
     glass: make("glass", 0.25, 0.08),
     warmAccent: make("warmAccent", 0.84),
     masonryBrick: make("masonryBrick", 0.94),
+    paintedMasonry: make("paintedMasonry", 0.91),
     architecturalFrame: make("architecturalFrame", 0.7, 0.1),
     grass: make("grass", 0.98),
   };
-  applyMasonryFinish(materials.masonryBrick);
+  applyMasonryFinish(materials.masonryBrick, true);
+  applyMasonryFinish(materials.paintedMasonry, true);
   for (const family of ["grass", "asphalt", "concrete"] as const) {
     materials[family].onBeforeCompile = (shader) => patchGroundVariation(shader, family);
     materials[family].customProgramCacheKey = () => `indumoveis-procedural-ground-v2-${family}`;
@@ -165,6 +169,7 @@ export function createSurfaceMaterials(
       "asphalt",
       "warmAccent",
       "masonryBrick",
+      "paintedMasonry",
     ] as const) {
       materials[family].map = mineralAlbedo;
       materials[family].bumpMap = mineralData;
@@ -220,6 +225,7 @@ export function createSurfaceMaterials(
     paintedSheet: 0.008,
     warmAccent: 0.006,
     masonryBrick: 0.012,
+    paintedMasonry: 0.008,
     grass: 0.008,
   };
   let quality: SurfaceQuality = "balanced";
@@ -232,10 +238,12 @@ export function createSurfaceMaterials(
     // The atlas normal already encodes corrugations. A large multiplier turns
     // them into dark blue stripes on curved and oblique roofs; retain a subtle
     // filtered relief without a new texture, shader or extra draw.
-    paintedSheet: 0.11,
+    paintedSheet: 0.055,
     exposedMetal: 0.22,
     warmAccent: 0.16,
     masonryBrick: 0.18,
+    paintedMasonry: 0.14,
+    architecturalFrame: 0.035,
     grass: 0.28,
   };
   function updateDetail(distance: number) {
@@ -262,6 +270,7 @@ export function createSurfaceMaterials(
       glass: 0.72,
       warmAccent: 0.14,
       masonryBrick: 0.08,
+      paintedMasonry: 0.1,
       architecturalFrame: 0.2,
       grass: 0,
     };
@@ -347,13 +356,17 @@ export function createSurfaceMaterials(
             exposedMetal: "paintedMetal",
             warmAccent: "mineral",
             masonryBrick: "mineral",
-            architecturalFrame: "paintedMetal",
+            paintedMasonry: "mineral",
+            // Painted structural members are smooth; corrugated roof relief
+            // must not turn beams, jambs and lattice columns into striped tubes.
+            architecturalFrame: "mineral",
             grass: "grass",
           };
           for (const [family, cell] of Object.entries(families)) {
             const material = materials[family as SurfaceFamily];
             bindPbrAtlas(material, cell, atlas);
-            if (family === "masonryBrick") applyMasonryFinish(material);
+            if (family === "masonryBrick") applyMasonryFinish(material, true);
+            if (family === "paintedMasonry") applyMasonryFinish(material, true);
             const full = fullMaps.get(material)!;
             for (const key of detailMapKeys) full[key] = material[key];
             // Environment may have arrived while software maps were omitted;
