@@ -1,0 +1,654 @@
+{
+  "baselineCommit": "980d1dc69c392c9a7737a00f53d0765a8e3080a4",
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [
+      "/assets/MapRenderer-DKwXjHM-.js"
+    ],
+    "optionalContextAssets": [
+      "/assets/urbanContext-Dqn4RM8d.js"
+    ],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "httpCache": "Disabled by Playwright request routing; warm means SPA/module reentry in the same document, not a cached HTTP load",
+    "browser": "153.0.8010.12",
+    "fixedCanvasCSS": [
+      1520,
+      880
+    ],
+    "profile": "light; DPR1; identical buffer/preset/camera; no automatic quality"
+  },
+  "method": "Production build, intercepted read-only lab data, same camera/CSS/buffer/profile on the same host. PNG to WebP quality92 only; no resize/crop/retouch.",
+  "performance": {
+    "before": {
+      "distance": 201.56636624198975,
+      "polar": 0.7891024479418646,
+      "azimuth": 0.027964735969865775,
+      "drawCalls": 142,
+      "triangles": 233137,
+      "geometries": 127,
+      "textures": 14,
+      "programs": 31,
+      "textureBytes": 12495645,
+      "dpr": 0.8646430798325934,
+      "buffer": [
+        1314,
+        760
+      ],
+      "cameraState": "manual",
+      "contextLosses": 0,
+      "optionalFailures": [],
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "durationMs": 15261.454399999999,
+      "frames": 912,
+      "medianMs": 16.69999999999891,
+      "p95Ms": 16.700000000000728,
+      "over200Ms": 0,
+      "submissionP95Ms": 2.400000002235174,
+      "zoom": [
+        {
+          "name": "park",
+          "sign": -1,
+          "initial": 201.5663662419899,
+          "at32ms": 196.88636414560762,
+          "final": 173.4897792034952,
+          "firstRatio": 0.9767818303041504,
+          "finalRatio": 0.8607079764250578,
+          "settledMs": 356.66599999999744,
+          "cameraState": "idle"
+        },
+        {
+          "name": "park",
+          "sign": 1,
+          "initial": 201.5663662419899,
+          "at32ms": 207.32014267349018,
+          "final": 234.1867064822541,
+          "firstRatio": 1.0285453200291987,
+          "finalRatio": 1.161834242728283,
+          "settledMs": 366.9746000000014,
+          "cameraState": "idle"
+        },
+        {
+          "name": "lot",
+          "sign": -1,
+          "initial": 22.02271554554524,
+          "at32ms": 21.47259260913967,
+          "final": 18.9551269325909,
+          "firstRatio": 0.9750202042401239,
+          "finalRatio": 0.8607079764250576,
+          "settledMs": 342.0818999999974,
+          "cameraState": "idle"
+        },
+        {
+          "name": "lot",
+          "sign": 1,
+          "initial": 22.02271554554524,
+          "at32ms": 23.35036903107926,
+          "final": 25.58674503867894,
+          "firstRatio": 1.0602856392885927,
+          "finalRatio": 1.161834242728283,
+          "settledMs": 378.5300999999963,
+          "cameraState": "idle"
+        }
+      ],
+      "openingMs": 2930.487,
+      "cycles": [
+        {
+          "geometries": 127,
+          "textures": 14,
+          "textureBytes": 12495645,
+          "contexts": {
+            "created": 1,
+            "active": 1
+          }
+        },
+        {
+          "geometries": 127,
+          "textures": 14,
+          "textureBytes": 12495645,
+          "contexts": {
+            "created": 1,
+            "active": 1
+          }
+        },
+        {
+          "geometries": 127,
+          "textures": 14,
+          "textureBytes": 12495645,
+          "contexts": {
+            "created": 1,
+            "active": 1
+          }
+        }
+      ],
+      "renderer": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "gpuTimerQueryAvailable": true,
+        "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+      }
+    },
+    "after": {
+      "distance": 201.56636624198975,
+      "polar": 0.7891024479418646,
+      "azimuth": 0.027964735969865775,
+      "drawCalls": 143,
+      "triangles": 234771,
+      "geometries": 129,
+      "textures": 13,
+      "programs": 30,
+      "textureBytes": 11927665,
+      "dpr": 0.8646430798325934,
+      "buffer": [
+        1314,
+        760
+      ],
+      "cameraState": "manual",
+      "contextLosses": 0,
+      "optionalFailures": [],
+      "contexts": {
+        "created": 1,
+        "active": 1
+      },
+      "durationMs": 15558.176800000001,
+      "frames": 931,
+      "medianMs": 16.700000000000728,
+      "p95Ms": 16.700000000000728,
+      "over200Ms": 0,
+      "submissionP95Ms": 1.699999999254942,
+      "zoom": [
+        {
+          "name": "park",
+          "sign": -1,
+          "initial": 201.5663662419899,
+          "at32ms": 153.2476227403615,
+          "final": 146.36722275306388,
+          "firstRatio": 0.7602837000910188,
+          "finalRatio": 0.7261490370736909,
+          "settledMs": 389.58380000000034,
+          "cameraState": "idle"
+        },
+        {
+          "name": "park",
+          "sign": 1,
+          "initial": 201.5663662419899,
+          "at32ms": 268.9825382548147,
+          "final": 277.5826393081542,
+          "firstRatio": 1.334461414717813,
+          "finalRatio": 1.3771277643359567,
+          "settledMs": 360.737000000001,
+          "cameraState": "idle"
+        },
+        {
+          "name": "lot",
+          "sign": -1,
+          "initial": 22.02271554554524,
+          "at32ms": 16.67408429444966,
+          "final": 15.991773687145482,
+          "firstRatio": 0.7571311657713573,
+          "finalRatio": 0.726149037073691,
+          "settledMs": 355.1477999999988,
+          "cameraState": "idle"
+        },
+        {
+          "name": "lot",
+          "sign": 1,
+          "initial": 22.02271554554524,
+          "at32ms": 29.3377493363174,
+          "final": 30.328093023843444,
+          "firstRatio": 1.3321585739798492,
+          "finalRatio": 1.3771277643359572,
+          "settledMs": 358.97849999999744,
+          "cameraState": "idle"
+        }
+      ],
+      "openingMs": 2488.9197,
+      "cycles": [
+        {
+          "geometries": 129,
+          "textures": 13,
+          "textureBytes": 11927665,
+          "contexts": {
+            "created": 1,
+            "active": 1
+          }
+        },
+        {
+          "geometries": 129,
+          "textures": 13,
+          "textureBytes": 11927665,
+          "contexts": {
+            "created": 1,
+            "active": 1
+          }
+        },
+        {
+          "geometries": 129,
+          "textures": 13,
+          "textureBytes": 11927665,
+          "contexts": {
+            "created": 1,
+            "active": 1
+          }
+        }
+      ],
+      "renderer": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Intel)",
+        "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "gpuTimerQueryAvailable": true,
+        "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+      }
+    }
+  },
+  "pairs": [
+    {
+      "name": "overview",
+      "pose": {
+        "position": [
+          110.00000000000001,
+          142,
+          186
+        ],
+        "target": [
+          106.00000000000001,
+          43
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/overview.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 142946,
+          "pngSha256": "90a7455e5f71e414beeae66396030237c01e5ea16511275a8ce5d96b4c80034b",
+          "webpSha256": "203a259ba4b5dc829df7709d816b55920df0d9f4c9f6662c2a8580ac80e8d748"
+        },
+        "after": {
+          "file": "after/overview.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 140100,
+          "pngSha256": "0ed09f297228b8a329c737bc771085d964f2a6560ec3b5582dffe895a23862d1",
+          "webpSha256": "e86aaa615175d12b504fd85bf30049c8d8e15a807b96bd90dc8a47fd58963896"
+        }
+      }
+    },
+    {
+      "name": "superior",
+      "pose": {
+        "position": [
+          110,
+          440,
+          -9.544809387307396e-12
+        ],
+        "target": [
+          110,
+          -4
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/superior.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 91478,
+          "pngSha256": "c40980494aceeb8075f3215f119fe5bc6edd28f7cc83ff94f292c63039851ba0",
+          "webpSha256": "6b8bbef4a15488e7d4c8ef9edd44b1e99c4a669bb564fdadfc5b03aa9457c2a5"
+        },
+        "after": {
+          "file": "after/superior.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 79268,
+          "pngSha256": "4d28d768197e312a07584dd4e0a5c4d3d69830661c6a7057bb003316f4b0ea5f",
+          "webpSha256": "5fd3d69c8b748d5e6f523f80e344a3b1244845c71a581f415715a2d02c4f5103"
+        }
+      }
+    },
+    {
+      "name": "lots",
+      "pose": {
+        "position": [
+          103.00000000000001,
+          55,
+          107
+        ],
+        "target": [
+          106.00000000000001,
+          43
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/lots.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 111978,
+          "pngSha256": "304046d73fc8051809d000949bfab734bd023356aed48b6b3fb37d5ad8a7e1e7",
+          "webpSha256": "d77b2cf8ac4670cb653765714f21326a1cdd11b467584279a61ca2f4f3660eb5"
+        },
+        "after": {
+          "file": "after/lots.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 123856,
+          "pngSha256": "8b435bf1ae50ac12cdd0f7b00cda2da87f7886d93bc862b610eb9f19cb316999",
+          "webpSha256": "0be240817c32e3cfb1791f248057621e9bc69ece60b4342d2a445d74abfa646e"
+        }
+      }
+    },
+    {
+      "name": "lots-close",
+      "pose": {
+        "position": [
+          92,
+          15,
+          58
+        ],
+        "target": [
+          94,
+          42
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/lots-close.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 87714,
+          "pngSha256": "e7b05d1846d7a7b00272e97718b3d39b43482636b1114b2d009d89b33a80aec0",
+          "webpSha256": "d961e173eb48b366c903a755615c9c1ce2c88a7753dbc0c2c724c36bd7098728"
+        },
+        "after": {
+          "file": "after/lots-close.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 89482,
+          "pngSha256": "e3fc2fed7e4861b79cf100a257f1ceb89c4f325d42d42056a39b90c506bf5b7c",
+          "webpSha256": "c2d8c447bf60ee77a528fd8596fed25556b26803b8ce490e01d742b6d3b3cc95"
+        }
+      }
+    },
+    {
+      "name": "p1-rear",
+      "pose": {
+        "position": [
+          22.884699999999995,
+          12.999999999999996,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p1-rear.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 114586,
+          "pngSha256": "e1111b486ef91772a5661188f5e1c028b03a383183bebaed05f796da34331276",
+          "webpSha256": "974a8fc6cc6f70e47df33dcf2b321b956d662c3fc8a4aadd9b4d4c49319547ff"
+        },
+        "after": {
+          "file": "after/p1-rear.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 120854,
+          "pngSha256": "ef2da65f6a47635ce8e145e1afd754ad933e6c93e6cb5431fead360e86b23a43",
+          "webpSha256": "23e0a556cad4b5117a032fe1556b1ffe0c16c74643aa62abbf9078f66af3dba7"
+        }
+      }
+    },
+    {
+      "name": "p14-rear",
+      "pose": {
+        "position": [
+          27.147,
+          13.000000000000002,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p14-rear.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 111702,
+          "pngSha256": "baa89a0d08cda4474a471739c6851a2a9a4bcd15fbe223f1df5f599d51c6710d",
+          "webpSha256": "8ecbbba5399732f273cd6764de41d1086d7adf46ed45f2ea505d817e12caa11b"
+        },
+        "after": {
+          "file": "after/p14-rear.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 119708,
+          "pngSha256": "5c6595e6996def0fc52c0f93b0c4b86a384367d3aaf9d87fc7d9175036e71915",
+          "webpSha256": "fa00a835eb423a24fdeac04349c1b0030b49bcba67dcda007e43ca19f19d3fd2"
+        }
+      }
+    },
+    {
+      "name": "avenue-rear",
+      "pose": {
+        "position": [
+          106,
+          38,
+          134
+        ],
+        "target": [
+          103,
+          83
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/avenue-rear.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 127564,
+          "pngSha256": "f00e608fdb8dd4e253e7c2e018e587679cace0df19ac722b11ab6cc3c08128aa",
+          "webpSha256": "d3d2bc33dac08c064e414dde026419a9de1422713bded34062b789f27698083f"
+        },
+        "after": {
+          "file": "after/avenue-rear.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 132718,
+          "pngSha256": "b716186e08e5446d71f85d1ff5b3adee1c83c041355c2c3b370c9505ad41eaec",
+          "webpSha256": "5579494d6fea0d8dedbd8b27a98065846848330e480691c6214759164779c334"
+        }
+      }
+    },
+    {
+      "name": "p3-front",
+      "pose": {
+        "position": [
+          123.3874,
+          12.999999999999991,
+          45.48180000000002
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p3-front.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 111714,
+          "pngSha256": "6a95b9966eb929ca7d7e70ac1d35c19a764486eab889701224135a2b8dcd147f",
+          "webpSha256": "3a117cad8e5b5305e1c8f11fb0265ee05bd359cfb400bdb3fd467953194042b6"
+        },
+        "after": {
+          "file": "after/p3-front.webp",
+          "width": 1520,
+          "height": 880,
+          "bytes": 109032,
+          "pngSha256": "dd38d6421778315944134a354fc6373e4f73b5c4f69be104a130a890e3d0c0c0",
+          "webpSha256": "24ee12b827383a075ef6ca112e5352eb8dca12b01400b96ab6d584a5d135cc35"
+        }
+      }
+    },
+    {
+      "name": "startup-workspace",
+      "pose": {
+        "position": [
+          21.62770176704589,
+          224.35290574452708,
+          193.16855780608088
+        ],
+        "target": [
+          95.5,
+          55
+        ]
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/startup-workspace.webp",
+          "width": 1600,
+          "height": 1000,
+          "bytes": 188454,
+          "pngSha256": "e9f04aa6743db8cdc8c02adf954a5d83c46112236e09caefeeb8abb502a04896",
+          "webpSha256": "96af6f243384e396018bab0d318f53ea36cf5518424628296bab10ff56b53712"
+        },
+        "after": {
+          "file": "after/startup-workspace.webp",
+          "width": 1600,
+          "height": 1000,
+          "bytes": 188434,
+          "pngSha256": "238bfcba5271690aa062b78b2c63e54c6d78b0242e8504ceef0c4a6507920df8",
+          "webpSha256": "7a50a94bffb98d1ad5a70704954e32091f34d80abcac3ec35cf028c3a9277158"
+        }
+      }
+    }
+  ],
+  "navigation": {
+    "scenarios": [
+      "primary-orbit-help-closed",
+      "secondary-pan",
+      "shift-primary-pan",
+      "top-primary-orbit-help-closed",
+      "cursor-wheel-single-owner",
+      "wheel-equivalent-deltaModes-first-response",
+      "precision-trackpad-stream-no-tail",
+      "rapid-wheel-and-trackpad-direction-reversal",
+      "zoom-buttons-immediate-reversal",
+      "horizon-stable-target",
+      "A-B-Escape-return",
+      "close-button-return",
+      "repeat-selection-and-hover-leave",
+      "manual-cancels-live-focus",
+      "wheel-cancels-live-focus",
+      "touch-and-panel-390x844",
+      "touch-and-panel-844x390"
+    ],
+    "errors": [],
+    "consoleMessages": 15,
+    "kind": "local production build with intercepted fixtures; simulated touch, not physical-device or performance certification"
+  },
+  "interactionImages": [
+    {
+      "file": "interaction/desktop-production-navigation.webp",
+      "width": 1366,
+      "height": 768,
+      "pngSha256": "9f14b79afe8760b651cb941115abf1df5b0e35617beb6cef79618165838f69a9",
+      "webpSha256": "b4b8d56f29c5f5ea9d827db04790b8cf124daf3f78e29b1afa985bcb5415610b"
+    },
+    {
+      "file": "interaction/desktop-selected-lot01.webp",
+      "width": 1366,
+      "height": 768,
+      "pngSha256": "40869a9700ad5cfcbed5eed64f180da0dba08ac67edfb8249c5843b6a9bcfb5b",
+      "webpSha256": "db8d96b747827d14ca63eb0aa527be78f81a76fce55d8bd1c32d58f8183a7735"
+    },
+    {
+      "file": "interaction/desktop-selected-pavilion12.webp",
+      "width": 1366,
+      "height": 768,
+      "pngSha256": "fd8a888b03644a38df931ec01fb6cb653c542b302807044ed6b0b95e90ac30b6",
+      "webpSha256": "af426b7e9d87680959c8f60a30025e4edd78a75ee9d165575ceb54ebf47c1a01"
+    },
+    {
+      "file": "interaction/touch-production-390x844.webp",
+      "width": 390,
+      "height": 844,
+      "pngSha256": "5e7770b4f6e352f36d015fe7f16b6a7c774691d290d131dd36886a2cbb88f7dd",
+      "webpSha256": "def8f035c80dc3fe3c7e219e370128291654af664b4c4b0f1e625678ce533f83"
+    },
+    {
+      "file": "interaction/touch-production-844x390.webp",
+      "width": 844,
+      "height": 390,
+      "pngSha256": "7a0add0b33f4283b501863d8dcb11d62d5182a7dd50564e9dcb842f41ee14bfc",
+      "webpSha256": "c5753ddfa016ee18e0642dcefe277baac24cdea1335a8aff1f612cabf6bd6a54"
+    },
+    {
+      "file": "interaction/touch-selected-lot01-390x844.webp",
+      "width": 390,
+      "height": 844,
+      "pngSha256": "a25841ed2cd63093536ef0fa56e3604bdbf7a99f9b60e1839102df3845f2cf16",
+      "webpSha256": "ded74cd99d579030dcd68331c12fb2c5595d0a1f38031b73ebdd2559ec8ca984"
+    },
+    {
+      "file": "interaction/touch-selected-lot01-844x390.webp",
+      "width": 844,
+      "height": 390,
+      "pngSha256": "4f35a9e855cb933dd465177af994c4b501b4c9200d313e98c5e750de30ce5885",
+      "webpSha256": "4d9b3f6afe2b1dc19ebe62f9abe558495114bddad32cfc37b244819574608768"
+    },
+    {
+      "file": "interaction/touch-selected-pavilion12-390x844.webp",
+      "width": 390,
+      "height": 844,
+      "pngSha256": "09e718fbe707e4ef1065af6d300816490bdb2b520ee4bb73f001f51bb93171dc",
+      "webpSha256": "bd53ac85187a74dea18a72d6f997d74b59c9390903bcd806cd8ce9840fb9e80c"
+    },
+    {
+      "file": "interaction/touch-selected-pavilion12-844x390.webp",
+      "width": 844,
+      "height": 390,
+      "pngSha256": "b90cac814c1bf92e185a1c4bdce96ff388e2b8c35218e68061a200903991472b",
+      "webpSha256": "99a213f8dc080ba148019e868810e22562f9ccc91f6364cbb7b03708beee5263"
+    }
+  ]
+}

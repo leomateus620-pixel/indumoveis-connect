@@ -4,9 +4,9 @@
 export const VISUAL_THEME = {
   background: "#f1f2ed",
   ground: "#dce2d7",
-  road: "#414c58",
+  road: "#394651",
   walk: "#e3e1d7",
-  landscape: "#89a675",
+  landscape: "#83ad70",
   lot: "#e4e8e2",
   lotEdge: "#536a59",
   plum: "#623c50",

@@ -4,6 +4,7 @@ import { polygonBounds, type Bounds } from "./geometry";
 import { pavementUnionCells } from "./pavement";
 import { SURFACE_PALETTE, type SurfaceQuality } from "./surfaceMaterials";
 import { GROUND_VARIATION_GLSL } from "./groundVariation";
+import { subtractPolygons } from "./parkGeometry";
 
 /** All distances use drawing units (10 PDF points), not surveyed metres.
  * The former board already sat at -0.15. Keeping its elevation preserves the
@@ -21,7 +22,7 @@ export const TERRAIN = {
   detailTile: 3.1,
   roughness: 0.94,
   bump: 0.009,
-  palette: ["#a4b787", "#789b68", "#b5b48b", "#a58f71", "#806f59"],
+  palette: ["#93b580", "#739d67", "#a3b38a", "#8ea078", "#788e69"],
 } as const;
 
 export type TerrainTopology = {
@@ -185,7 +186,7 @@ function terrainPixels(kind: "albedo" | "detail") {
         const dry = THREE.MathUtils.smoothstep(broad * 0.58 + organic * 0.42, 0.48, 0.82);
         sample.copy(palette[0]).lerp(palette[1], broad * 0.58 + middle * 0.22);
         soil.copy(palette[2]).lerp(palette[3], organic * 0.38);
-        sample.lerp(soil, dry * 0.5).lerp(palette[4], small * dry * 0.055);
+        sample.lerp(soil, dry * 0.16).lerp(palette[4], small * dry * 0.035);
         // Colour data is stored in sRGB; all mixing above happens in linear light.
         sample.convertLinearToSRGB();
         pixels.set(
@@ -236,6 +237,8 @@ export function createTerrain(
     maps?: boolean;
     deferMaps?: boolean;
     foundationMaterial?: THREE.Material;
+    /** Presentation green cells cut the obsolete neutral floor at its origin. */
+    foundationExclusions?: readonly Point[][];
   },
 ) {
   const group = new THREE.Group();
@@ -279,6 +282,19 @@ export function createTerrain(
       color: { value: new THREE.Color("#dce9ec") },
       fine: { value: null as THREE.Texture | null },
       detail: { value: 0 },
+      parkCenter: {
+        value: new THREE.Vector2(
+          (topology.protectedBounds.minX + topology.protectedBounds.maxX) / 2,
+          (topology.protectedBounds.minY + topology.protectedBounds.maxY) / 2,
+        ),
+      },
+      parkRadius: {
+        value: new THREE.Vector2(
+          (topology.protectedBounds.maxX - topology.protectedBounds.minX) * 1.15,
+          (topology.protectedBounds.maxY - topology.protectedBounds.minY) * 1.45,
+        ),
+      },
+      distantSoil: { value: new THREE.Color("#9dac8c") },
     };
     material.onBeforeCompile = (shader) => {
       shader.uniforms.terrainHorizonCenter = atmosphere.center;
@@ -286,6 +302,9 @@ export function createTerrain(
       shader.uniforms.terrainHorizonColor = atmosphere.color;
       shader.uniforms.terrainFineMap = atmosphere.fine;
       shader.uniforms.terrainFineAmount = atmosphere.detail;
+      shader.uniforms.terrainParkCenter = atmosphere.parkCenter;
+      shader.uniforms.terrainParkRadius = atmosphere.parkRadius;
+      shader.uniforms.terrainDistantSoil = atmosphere.distantSoil;
       shader.vertexShader = `varying vec2 terrainWorld;\n${shader.vertexShader}`.replace(
         "#include <worldpos_vertex>",
         "#include <worldpos_vertex>\nterrainWorld = (modelMatrix * vec4(transformed, 1.0)).xz;",
@@ -302,14 +321,16 @@ export function createTerrain(
     material.onBeforeCompile = function (shader, renderer) {
       horizonCompile.call(this, shader, renderer);
       shader.fragmentShader =
-        `uniform sampler2D terrainFineMap;\nuniform float terrainFineAmount;\n${GROUND_VARIATION_GLSL}\n${shader.fragmentShader}`.replace(
+        `uniform sampler2D terrainFineMap;\nuniform float terrainFineAmount;\nuniform vec2 terrainParkCenter;\nuniform vec2 terrainParkRadius;\nuniform vec3 terrainDistantSoil;\n${GROUND_VARIATION_GLSL}\n${shader.fragmentShader}`.replace(
           "#include <color_fragment>",
           `#include <color_fragment>
-         diffuseColor.rgb *= parkGrassVariation(terrainWorld);
+         float parkImportance = 1.0 - smoothstep(0.9, 2.2, length((terrainWorld - terrainParkCenter) / terrainParkRadius));
+         diffuseColor.rgb *= mix(vec3(1.0), parkGrassVariation(terrainWorld), mix(0.15, 0.7, parkImportance));
+         diffuseColor.rgb = mix(terrainDistantSoil, diffuseColor.rgb, mix(0.13, 1.0, parkImportance));
          if (terrainFineAmount > 0.001) diffuseColor.rgb *= 1.0 + (texture2D(terrainFineMap, terrainWorld / 3.1).r - 0.894) * terrainFineAmount;`,
         );
     };
-    material.customProgramCacheKey = () => "indumoveis-ground-horizon-v2";
+    material.customProgramCacheKey = () => "indumoveis-ground-horizon-v3-soft-context";
     if (options.maps !== false && options.deferMaps) {
       // Compile USE_MAP in the first useful frame without generating the full
       // deterministic field. Keeping a map on both sides avoids a later shader
@@ -352,7 +373,9 @@ export function createTerrain(
       );
     const ground = new THREE.Mesh(own(baseGeometry(topology.extent)), material);
     ground.name = "external-soil";
-    const floorGeometry = own(surfaceGeometry(protectedCells));
+    const floorGeometry = own(
+      surfaceGeometry(subtractPolygons(protectedCells, options.foundationExclusions ?? [])),
+    );
     floorGeometry.setAttribute(
       "color",
       new THREE.Float32BufferAttribute(

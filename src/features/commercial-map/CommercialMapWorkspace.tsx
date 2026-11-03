@@ -485,6 +485,14 @@ export function CommercialMapWorkspace({
     >
       {tool("Aproximar", <Plus />, () => handle()?.zoom(1.2))}
       {tool("Afastar", <Minus />, () => handle()?.zoom(1 / 1.2))}
+      {representation === "ready" && (
+        <>
+          {tool("Girar à esquerda", <RotateCw style={{ transform: "scaleX(-1)" }} />, () =>
+            handle()?.rotate(-1),
+          )}
+          {tool("Girar à direita", <RotateCw />, () => handle()?.rotate(1))}
+        </>
+      )}
       {tool(inspectedId ? "Reenquadrar pavilhão" : "Reenquadrar área Indumóveis", <Scan />, () =>
         inspectedId ? handle()?.focus(inspectedId) : handle()?.restoreCommercial(),
       )}
@@ -836,7 +844,7 @@ export function CommercialMapWorkspace({
                 <>
                   <p>
                     3D, Superior e Oblíqua orientam a mesma cena. Arraste com o botão esquerdo para
-                    mover; com o direito ou Shift + esquerdo para orbitar e inclinar. Uma órbita
+                    orbitar e inclinar; com o direito ou Shift + esquerdo para mover. Uma órbita
                     manual ativa a orientação livre; escolher um preset conserva o alvo.
                   </p>
                   <p>
@@ -845,20 +853,14 @@ export function CommercialMapWorkspace({
                     órbita fica disponível no 3D.
                   </p>
                   <p>
-                    Toque em uma área para consultar. A busca também permite selecionar pelo
-                    teclado. Esc fecha primeiro o menu ou a ficha.
+                    Clique ou toque sem arrastar para consultar. A busca e os controles visíveis
+                    também permitem operar pelo teclado. Esc fecha primeiro o menu ou a ficha.
                   </p>
                   <div className="im-map-pan">
                     {tool("Mover para cima", <ArrowUp />, () => handle()?.pan(0, -1))}
                     {tool("Mover para esquerda", <ArrowLeft />, () => handle()?.pan(-1, 0))}
                     {tool("Mover para direita", <ArrowRight />, () => handle()?.pan(1, 0))}
                     {tool("Mover para baixo", <ArrowDown />, () => handle()?.pan(0, 1))}
-                    {tool(
-                      "Girar à esquerda",
-                      <RotateCw style={{ transform: "scaleX(-1)" }} />,
-                      () => handle()?.rotate(-1),
-                    )}
-                    {tool("Girar à direita", <RotateCw />, () => handle()?.rotate(1))}
                   </div>
                 </>
               ) : (

@@ -6,6 +6,8 @@ import { markRoadLanes } from "./roadGeometry";
 import type { SurfaceMaterials } from "./surfaceMaterials";
 import { getPavilionPresentation } from "./architectureOrientation";
 import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
+import { derivePavilionGround, type PavilionGround } from "./pavilionGround";
+import { subtractPolygons } from "./parkGeometry";
 
 const rect = (x0: number, z0: number, x1: number, z1: number): Point[] => [
   [x0, z0],
@@ -48,7 +50,7 @@ export function subtractGround(subject: Point[], blocker: Point[]): Point[][] {
   return result;
 }
 
-function geometry(polygons: Point[][], y: number) {
+function geometry(polygons: Point[][], y: number, edgeBottom?: number) {
   const positions: number[] = [],
     uv: number[] = [];
   for (const polygon of polygons) {
@@ -63,6 +65,25 @@ function geometry(polygons: Point[][], y: number) {
         positions.push(x, y, z);
         uv.push(x / 2.8, z / 2.8);
       }
+    }
+    if (edgeBottom !== undefined) {
+      const clockwise = signedPolygonArea(polygon) > 0;
+      polygon.forEach((a, i) => {
+        const b = polygon[(i + 1) % polygon.length];
+        const p = clockwise ? a : b,
+          q = clockwise ? b : a;
+        for (const v of [
+          [p[0], y, p[1]],
+          [q[0], y, q[1]],
+          [q[0], edgeBottom, q[1]],
+          [p[0], y, p[1]],
+          [q[0], edgeBottom, q[1]],
+          [p[0], edgeBottom, p[1]],
+        ]) {
+          positions.push(...v);
+          uv.push(v[0] / 2.8, v[2] / 2.8);
+        }
+      });
     }
   }
   const result = new THREE.BufferGeometry();
@@ -245,7 +266,7 @@ export function deriveCommercialLanePaint(entities: readonly MapEntity[]) {
 
 /** Presentation aprons and white parking paint from the satellite's functional
  * arrangement, not a surveyed parking inventory. Never modifies source roads. */
-export function deriveParkDetails(entities: readonly MapEntity[]) {
+export function deriveParkDetails(entities: readonly MapEntity[], pavilionGround?: PavilionGround) {
   const laneSources = deriveCommercialLanePaint(entities),
     lanePaint = laneSources.flatMap((s) => s.centerDashes),
     laneArrows = laneSources.flatMap((s) => s.directionArrows);
@@ -262,11 +283,13 @@ export function deriveParkDetails(entities: readonly MapEntity[]) {
       lanePaint,
       laneArrows,
       laneSources,
+      pavilionGround: undefined,
     };
   const av = polygonBounds(avenue.polygon);
   const candidates: Point[][] = [rect(av.minX + 0.05, av.minY - 1.7, av.maxX - 0.3, av.minY - 0.1)];
   const physicalRoads = entities.filter((entity) => entity.kind === "road");
   const registeredRoads = physicalRoads.some((entity) => entity.id.includes("a2-network"));
+  const ground = registeredRoads ? (pavilionGround ?? derivePavilionGround(entities)) : undefined;
   for (const building of entities.filter((e) => e.kind === "pavilion")) {
     const b = polygonBounds(building.polygon);
     const presentation = getPavilionPresentation(building);
@@ -366,7 +389,8 @@ export function deriveParkDetails(entities: readonly MapEntity[]) {
       ]);
     }
   }
-  let concrete = pavementUnionCells(candidates);
+  let concrete = pavementUnionCells([...candidates, ...(ground?.servicePaths ?? [])]);
+  if (ground) concrete = subtractPolygons(concrete, ground.green);
   const permanentBlockers: { polygon: Point[]; holes?: Point[][] }[] = registeredRoads
     ? PERMANENT_PARK_LANDMARKS.map((item) => ({ polygon: item.polygon }))
     : [];
@@ -415,11 +439,15 @@ export function deriveParkDetails(entities: readonly MapEntity[]) {
     const joint = rect(x, av.minY - 1.66, x + 0.014, av.minY - 0.14);
     if (joint.every((p) => concrete.some((c) => pointInPolygon(p, c)))) joints.push(joint);
   }
-  return { concrete, paint, joints, lanePaint, laneArrows, laneSources };
+  return { concrete, paint, joints, lanePaint, laneArrows, laneSources, pavilionGround: ground };
 }
 
-export function createParkDetails(entities: readonly MapEntity[], surfaces: SurfaceMaterials) {
-  const topology = deriveParkDetails(entities),
+export function createParkDetails(
+  entities: readonly MapEntity[],
+  surfaces: SurfaceMaterials,
+  pavilionGround?: PavilionGround,
+) {
+  const topology = deriveParkDetails(entities, pavilionGround),
     group = new THREE.Group();
   group.name = "indumoveis-park-surface-details";
   const owned: (THREE.BufferGeometry | THREE.Material)[] = [];
@@ -435,6 +463,18 @@ export function createParkDetails(entities: readonly MapEntity[], surfaces: Surf
     [topology.concrete, 0.005, surfaces.materials.concrete, "indumoveis-pavilion-aprons"],
     [topology.paint, -0.008, surfaces.materials.whitePaint, "indumoveis-parking-paint"],
     [topology.joints, 0.008, jointMaterial, "indumoveis-concrete-joints"],
+    [
+      topology.pavilionGround?.green ?? [],
+      -0.15,
+      surfaces.materials.grass,
+      "indumoveis-pavilion-back-lawns",
+    ],
+    [
+      topology.pavilionGround?.curb ?? [],
+      0.018,
+      surfaces.materials.concrete,
+      "indumoveis-avenue-curb",
+    ],
     [topology.lanePaint, -0.007, laneMaterial, "indumoveis-commercial-lane-paint"],
     [
       topology.laneArrows,
@@ -443,7 +483,11 @@ export function createParkDetails(entities: readonly MapEntity[], surfaces: Surf
       "indumoveis-commercial-direction-arrows",
     ],
   ] as const) {
-    const shape = geometry(polygons as Point[][], y);
+    const shape = geometry(
+      polygons as Point[][],
+      y,
+      name === "indumoveis-avenue-curb" ? -0.025 : undefined,
+    );
     owned.push(shape);
     const mesh = new THREE.Mesh(shape, material);
     mesh.name = name;

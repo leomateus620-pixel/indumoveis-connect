@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { PerspectiveCamera, Vector3 } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { configureMapInput, prepareSecondaryOrbit } from "./mapInput";
+import { configureMapInput, prepareSecondaryPan } from "./mapInput";
 
 function pointer(
   type: string,
@@ -40,39 +40,47 @@ function scene() {
   configureMapInput(controls);
   controls.enableDamping = false;
   controls.update();
-  canvas.addEventListener("pointerdown", (event) => prepareSecondaryOrbit(controls, event), true);
+  canvas.addEventListener("pointerdown", (event) => prepareSecondaryPan(controls, event), true);
   cleanups.push(() => {
     controls.dispose();
     canvas.remove();
   });
   return { canvas, camera, controls };
 }
-function drag(canvas: HTMLCanvasElement, options: { button?: number; shiftKey?: boolean } = {}) {
+function drag(
+  canvas: HTMLCanvasElement,
+  options: { button?: number; shiftKey?: boolean } = {},
+  dy = 60,
+) {
   canvas.dispatchEvent(pointer("pointerdown", 300, 250, options));
-  canvas.dispatchEvent(pointer("pointermove", 380, 310, options));
-  canvas.dispatchEvent(pointer("pointerup", 380, 310, options));
+  canvas.dispatchEvent(pointer("pointermove", 380, 250 + dy, options));
+  canvas.dispatchEvent(pointer("pointerup", 380, 250 + dy, options));
 }
 describe("stable actual OrbitControls gestures", () => {
-  it("moves camera and target together for primary drag, preserving the orbit vector", () => {
-    const { canvas, camera, controls } = scene();
-    const before = camera.position.clone().sub(controls.target);
-    drag(canvas);
-    expect(controls.target.length()).toBeGreaterThan(1);
-    expect(camera.position.clone().sub(controls.target).distanceTo(before)).toBeLessThan(1e-8);
-  });
   it.each([{ button: 2 }, { button: 0, shiftKey: true }, { button: 2, shiftKey: true }])(
-    "orbits and inclines with %j while preserving the target",
+    "pans with %j while preserving the orbit vector",
     (options) => {
       const { canvas, camera, controls } = scene();
-      const before = camera.position.clone(),
-        polar = controls.getPolarAngle();
+      const before = camera.position.clone().sub(controls.target);
       drag(canvas, options);
-      expect(controls.target.distanceTo(new Vector3())).toBeLessThan(1e-8);
-      expect(camera.position.distanceTo(before)).toBeGreaterThan(1);
-      expect(Math.abs(controls.getPolarAngle() - polar)).toBeGreaterThan(0.01);
-      expect(camera.position.length()).toBeCloseTo(before.length(), 6);
+      expect(controls.target.length()).toBeGreaterThan(1);
+      expect(camera.position.clone().sub(controls.target).distanceTo(before)).toBeLessThan(1e-8);
     },
   );
+  it.each([false, true])("orbits on primary drag immediately, including from top=%s", (top) => {
+    const { canvas, camera, controls } = scene();
+    if (top) {
+      camera.position.set(0, 30, 0.09);
+      controls.update();
+    }
+    const before = camera.position.clone(),
+      polar = controls.getPolarAngle();
+    drag(canvas, {}, top ? -60 : 60);
+    expect(controls.target.distanceTo(new Vector3())).toBeLessThan(1e-8);
+    expect(camera.position.distanceTo(before)).toBeGreaterThan(1);
+    expect(Math.abs(controls.getPolarAngle() - polar)).toBeGreaterThan(0.01);
+    expect(camera.position.length()).toBeCloseTo(before.length(), 6);
+  });
   it("pans with one touch, then permits simultaneous pinch and two-finger inclination", () => {
     const { canvas, camera, controls } = scene();
     canvas.dispatchEvent(pointer("pointerdown", 300, 250, { touch: true, id: 1 }));

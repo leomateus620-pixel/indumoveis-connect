@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ENTITIES } from "./data/territory";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 import { createPermanentPark } from "./permanentPark";
-import { createPermanentParkLabels, visiblePermanentParkLabels } from "./permanentParkLabels";
+import { searchLandmarks } from "./search";
 import {
   PARK_CORE_ENTITIES,
   PARK_GATES,
@@ -141,6 +141,10 @@ describe("one registered physical park with protected commercial cadastre", () =
     const geometries: THREE.BufferGeometry[] = [];
     try {
       expect(context.metadata.drawBatches).toBeLessThanOrEqual(8);
+      expect(context.metadata.labelCount).toBe(0);
+      expect(context.metadata.textureBytes).toBe(0);
+      expect(context.group.getObjectByName("permanent-park-labels")).toBeUndefined();
+      expect(getContext).not.toHaveBeenCalled();
       context.group.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
         geometries.push(object.geometry);
@@ -168,49 +172,16 @@ describe("one registered physical park with protected commercial cadastre", () =
       getContext.mockRestore();
     }
   });
-  it("suppresses distant and overlapping contextual labels", () => {
-    const camera = new THREE.PerspectiveCamera(45, 390 / 844, 0.1, 1000);
-    camera.position.set(0, 0, 150);
-    camera.lookAt(0, 0, 0);
-    camera.updateMatrixWorld();
-    camera.updateProjectionMatrix();
-    const labels = [
-      { text: "Arena", position: [0, 0, 0] as [number, number, number], mode: 0 as const },
-      { text: "Mirante", position: [0.1, 0, 0] as [number, number, number], mode: 0 as const },
-    ];
-    expect(visiblePermanentParkLabels(labels, camera, 390, 844)).toEqual([false, false]);
-    camera.position.z = 50;
-    camera.updateMatrixWorld();
-    expect(visiblePermanentParkLabels(labels, camera, 390, 844)).toEqual([true, false]);
-  });
-  it("shares one label atlas with names and releases it independently", () => {
-    const fillText = vi.fn(),
-      drawing = { beginPath: vi.fn(), roundRect: vi.fn(), fill: vi.fn(), fillText };
-    const getContext = vi
-      .spyOn(HTMLCanvasElement.prototype, "getContext")
-      .mockReturnValue(drawing as never);
-    const labels = createPermanentParkLabels()!;
-    try {
-      expect(labels.labels).toBe(
-        PERMANENT_PARK_LANDMARKS.length + 1 + PARK_GATES.filter((g) => !g.existingOwner).length,
-      );
-      expect(fillText.mock.calls.map((args) => args[0])).toContain("Palco Cultural Lactalis");
-      expect(
-        fillText.mock.calls
-          .map((args) => args[0])
-          .some((name) => /^(A\d|B\d|Quadra [A-Z])$/.test(name)),
-      ).toBe(false);
-      const material = labels.mesh.material as THREE.ShaderMaterial;
-      const texture = material.uniforms.atlas.value as THREE.CanvasTexture;
-      const owned = [labels.mesh.geometry, material, texture].map((resource) =>
-        vi.spyOn(resource, "dispose"),
-      );
-      labels.dispose();
-      labels.dispose();
-      expect(owned.every((spy) => spy.mock.calls.length === 1)).toBe(true);
-    } finally {
-      labels.dispose();
-      getContext.mockRestore();
-    }
+  it("keeps contextual destinations and names searchable without above-building labels", () => {
+    const before = JSON.stringify(PERMANENT_PARK_LANDMARKS);
+    const arena = searchLandmarks(PERMANENT_PARK_LANDMARKS, "arena")[0];
+    const mirante = searchLandmarks(PERMANENT_PARK_LANDMARKS, "mirante")[0];
+    expect(arena.id).toBe("arena");
+    expect(mirante.id).toBe("mirante");
+    expect(arena.name).toBeTruthy();
+    expect(mirante.name).toBeTruthy();
+    expect(arena.polygon.length).toBeGreaterThanOrEqual(3);
+    expect(mirante.polygon.length).toBeGreaterThanOrEqual(3);
+    expect(JSON.stringify(PERMANENT_PARK_LANDMARKS)).toBe(before);
   });
 });

@@ -3,6 +3,8 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { CommercialMapWorkspace } from "./CommercialMapWorkspace";
 import type { MapHandle, MapRendererProps } from "./types";
 
+const commands = vi.hoisted(() => ({ rotate: vi.fn(), zoom: vi.fn() }));
+
 vi.mock("./Map2D", () => ({ Map2D: () => null }));
 vi.mock("./MapRenderer", async () => {
   const { forwardRef, useEffect, useImperativeHandle, useRef } = await import("react");
@@ -12,9 +14,9 @@ vi.mock("./MapRenderer", async () => {
       useImperativeHandle(ref, () => ({
         focus: () => {},
         focusLandmark: () => true,
-        zoom: () => {},
+        zoom: commands.zoom,
         pan: () => {},
-        rotate: () => {},
+        rotate: commands.rotate,
         getTarget: () => [95, 55],
         restoreOverview: () => {},
         restoreCommercial: () => {},
@@ -39,6 +41,7 @@ vi.mock("./MapRenderer", async () => {
 });
 
 beforeEach(() => {
+  vi.clearAllMocks();
   vi.stubGlobal(
     "ResizeObserver",
     class {
@@ -66,6 +69,18 @@ afterEach(() => {
 });
 
 describe("selection presentation session", () => {
+  it("exposes keyboard-focusable rotation and zoom controls while help is closed", async () => {
+    render(<CommercialMapWorkspace />);
+    const right = await screen.findByRole("button", { name: "Girar à direita" });
+    expect(screen.queryByText("Como navegar")).toBeNull();
+    right.focus();
+    expect(right).toHaveFocus();
+    fireEvent.click(right);
+    fireEvent.click(screen.getByRole("button", { name: "Girar à esquerda" }));
+    fireEvent.click(screen.getByRole("button", { name: "Aproximar" }));
+    expect(commands.rotate.mock.calls).toEqual([[1], [-1]]);
+    expect(commands.zoom).toHaveBeenCalledWith(1.2);
+  });
   it("restores the pre-A view after A to B to Escape without changing the gesture scheme", async () => {
     render(<CommercialMapWorkspace />);
     await waitFor(() => expect(screen.getByRole("button", { name: "Superior" })).toBeEnabled());

@@ -12,6 +12,7 @@ import { PARK_REFERENCE_REVISION, parkSourceRect, type ParkSourcePolygon } from 
 import { registerParkPoint, registerParkPolygon } from "./parkRegistration";
 import { registerA2Polygon } from "./parkRegistration";
 import { PARK_A2_BUILDING_FOOTPRINTS, PARK_A2_ROAD_SURFACES } from "./parkA2Reference";
+import { PAVILION_GROVE_A2 } from "./pavilionGround";
 
 export const PARK_PLANTING = {
   referenceRevision: PARK_REFERENCE_REVISION,
@@ -39,21 +40,7 @@ type WoodlandMassInput = {
 const massInputs: readonly WoodlandMassInput[] = [
   {
     id: "lunar-woodland",
-    a2Polygon: [
-      [232, 652],
-      [440, 648],
-      [618, 653],
-      [618, 745],
-      [609, 746],
-      [608, 818],
-      [650, 818],
-      [649, 860],
-      [410, 861],
-      [337, 835],
-      [271, 804],
-      [238, 770],
-      [220, 711],
-    ],
+    a2Polygon: PAVILION_GROVE_A2,
     sourcePolygon: [
       [930, 3160],
       [2020, 3160],
