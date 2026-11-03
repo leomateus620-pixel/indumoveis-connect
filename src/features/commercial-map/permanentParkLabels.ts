@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
+import { PERMANENT_PARK_LANDMARKS, PARK_GATES, PARK_PHYSICAL_BLOCKS } from "./permanentParkLayout";
 
 type Label = {
   text: string;
@@ -63,29 +63,33 @@ export function createPermanentParkLabels() {
     if (typeof document === "undefined") return null;
     const canvas = document.createElement("canvas");
     canvas.width = 512;
-    canvas.height = 448;
-    const context = canvas.getContext("2d");
-    if (!context) return null;
     const positionOf = (id: string, height: number): [number, number, number] => {
       const [x0, z0, x1, z1] = PERMANENT_PARK_LANDMARKS.find((item) => item.id === id)!.bounds;
       return [(x0 + x1) / 2, height, (z0 + z1) / 2];
     };
-    const labels: Label[] = [
-      { text: "Pavilhão 9", position: positionOf("pavilhao-9", 4.8), mode: 0 },
-      { text: "Pavilhão 7", position: positionOf("pavilhao-7", 4.4), mode: 0 },
-      { text: "Pavilhões 6, 10 e 11", position: positionOf("pavilhoes-6-10-11", 4.4), mode: 0 },
-      { text: "Pavilhão 5", position: positionOf("pavilhao-5", 4.4), mode: 0 },
-      { text: "Exporural", position: [120, 3, -56], mode: 0 },
-      { text: "Alameda Gastronômica", position: positionOf("alameda", 4), mode: 0, offsetY: 12 },
-      { text: "Mirante", position: positionOf("mirante", 5.1), mode: 0, offsetY: -12 },
-      { text: "Arena", position: positionOf("arena", 8.1), mode: 0 },
-      { text: "Casa / Sede", position: positionOf("sede", 5.2), mode: 0 },
-      { text: "Etnia Polonesa", position: positionOf("etnia-polonesa", 5), mode: -1 },
-      { text: "Etnia Italiana", position: positionOf("etnia-italiana", 5), mode: -1 },
-      { text: "Etnia Alemã", position: positionOf("etnia-alema", 5), mode: -1 },
-      { text: "Etnia Afro", position: positionOf("etnia-afro", 5), mode: -1 },
-      { text: "Casas das Etnias", position: [208, 5.2, 78.5], mode: 1 },
+    const rural = PARK_PHYSICAL_BLOCKS.find((b) => b.id === "R")!.referencePolygon;
+    const ruralCenter: [number, number, number] = [
+      rural.reduce((s, p) => s + p[0], 0) / rural.length,
+      3,
+      rural.reduce((s, p) => s + p[1], 0) / rural.length,
     ];
+    const labels: Label[] = [
+      ...PERMANENT_PARK_LANDMARKS.map((item) => ({
+        text: item.name.replace("Casa da Etnia", "Etnia").replace(" · Pavilhão 4", ""),
+        position: positionOf(item.id, item.id === "arena" ? 8.1 : 5.2),
+        mode: 0 as const,
+      })),
+      { text: "Exporural", position: ruralCenter, mode: 0 },
+      ...PARK_GATES.filter((g) => !g.existingOwner).map((g) => ({
+        text: g.name,
+        position: [g.point[0], 1.8, g.point[1]] as [number, number, number],
+        mode: 0 as const,
+      })),
+    ];
+    const rows = Math.ceil(labels.length / 2);
+    canvas.height = rows * 64;
+    const context = canvas.getContext("2d");
+    if (!context) return null;
     const positions: number[] = [],
       uvs: number[] = [],
       offsets: number[] = [],
@@ -107,8 +111,8 @@ export function createPermanentParkLabels() {
       context.fillText(label.text, x + 128, y + 32, 230);
       const u0 = column / 2,
         u1 = (column + 1) / 2,
-        v0 = 1 - (row + 1) / 7,
-        v1 = 1 - row / 7;
+        v0 = 1 - (row + 1) / rows,
+        v1 = 1 - row / rows;
       const vertices = [
         [-47, -11, u0, v0],
         [47, -11, u1, v0],

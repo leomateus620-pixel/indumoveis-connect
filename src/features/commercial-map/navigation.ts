@@ -27,6 +27,46 @@ export type NavigationPose = {
   target: readonly [number, number, number];
 };
 
+/** One return pose for a whole A → B → close inspection session. Changes to
+ * status data, repeated selection of A and manual camera moves do not replace
+ * it. Both the SVG and WebGL controllers use the same session semantics. */
+export function createSelectionNavigationSession<T>(clone: (value: T) => T) {
+  let selectedId: string | null = null;
+  let origin: T | null = null;
+  return {
+    change(
+      id: string | null,
+      capture: () => T,
+    ): { kind: "none" } | { kind: "focus"; id: string } | { kind: "restore"; destination: T } {
+      if (id === selectedId) return { kind: "none" };
+      selectedId = id;
+      if (id) {
+        if (origin === null) origin = clone(capture());
+        return { kind: "focus", id };
+      }
+      if (origin === null) return { kind: "none" };
+      const destination = clone(origin);
+      origin = null;
+      return { kind: "restore", destination };
+    },
+  };
+}
+
+/** Normalize scroll units, not guessed mouse/trackpad identities. Browsers
+ * expose precision touchpad and pinch-generated wheels through the same API. */
+export function normalizedWheelDelta(delta: number, mode: number, viewportHeight: number) {
+  const unit = mode === 1 ? 16 : mode === 2 ? viewportHeight : 1;
+  return Math.max(-120, Math.min(120, delta * unit));
+}
+
+/** Incremental two-finger twist, with the shortest angular difference across
+ * ±π. OrbitControls owns pinch and two-finger inclination/midpoint rotation. */
+export function touchTwistDelta(before: Point, after: Point, other: Point) {
+  const from = Math.atan2(before[1] - other[1], before[0] - other[0]);
+  const to = Math.atan2(after[1] - other[1], after[0] - other[0]);
+  return Math.atan2(Math.sin(to - from), Math.cos(to - from));
+}
+
 type NavigationRegion = { polygon: readonly Point[]; bounds: Bounds };
 
 export type NavigationEnvelope = {

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ENTITIES } from "./data/territory";
 import { DISTRICT_REFERENCE } from "./urbanDistrictReference";
 import { pointInPolygon } from "./geometry";
-import { URBAN_REFERENCE, REFERENCE_ROADS } from "./urbanReference";
+import { URBAN_REFERENCE, ACTIVE_REFERENCE_ROADS } from "./urbanReference";
 import { deriveRoadRibbon } from "./roadGeometry";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 import { deriveUrbanContact } from "./urbanContact";
@@ -55,7 +55,7 @@ describe("approximate residential context outside the source park", () => {
       expect(urbanPolygonAllowed(house.footprint)).toBe(true);
       expect(urbanPolygonAllowed(house.parcel)).toBe(true);
       expect(house.parcel.every(([, z]) => z >= URBAN_CONTEXT.minimumZ)).toBe(true);
-      for (const road of REFERENCE_ROADS) {
+      for (const road of ACTIVE_REFERENCE_ROADS) {
         const ribbon = deriveRoadRibbon(road.path, road.width + 1.05);
         expect(
           house.footprint.some((p) => pointInPolygon(p, ribbon)),
@@ -67,7 +67,7 @@ describe("approximate residential context outside the source park", () => {
       // enclosing any of its vertices. Include the presentation sidewalk.
       const cross = (a: number[], b: number[], c: number[]) =>
         (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
-      for (const road of REFERENCE_ROADS) {
+      for (const road of ACTIVE_REFERENCE_ROADS) {
         const ribbon = deriveRoadRibbon(road.path, road.width + 1.05);
         const contains =
           house.parcel.some((p) => pointInPolygon(p, ribbon)) ||
@@ -134,7 +134,7 @@ describe("approximate residential context outside the source park", () => {
         return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dz);
       };
       const nearAvenue = Math.abs(endpoint[1] - (URBAN_REFERENCE.avenueSouth + 1.05)) < 1e-6;
-      const nearSidewalk = REFERENCE_ROADS.some((road) =>
+      const nearSidewalk = ACTIVE_REFERENCE_ROADS.some((road) =>
         road.path.slice(1).some((p, i) => {
           const distance = distanceToSegment(endpoint, road.path[i], p);
           return Math.abs(distance - (road.width / 2 + 0.525)) < 0.4;

@@ -627,6 +627,12 @@ export const REFERENCE_ROADS: ReferenceRoad[] = [
   ),
 ];
 
+/** Internal OSM ribbons are retained as evidence only. The registered park
+ * plans now own these same streets, including their intersections and widths. */
+export const ACTIVE_REFERENCE_ROADS = REFERENCE_ROADS.filter(
+  (road) => !["park-brasil", "park-buenos-aires"].includes(road.id),
+);
+
 function corridor(a: Point, b: Point, width: number): Point[] {
   const distance = Math.hypot(b[0] - a[0], b[1] - a[1]);
   const dx = ((b[0] - a[0]) * 2.5) / distance;
@@ -640,7 +646,9 @@ function corridor(a: Point, b: Point, width: number): Point[] {
     [a[0] - dx - nx, a[1] - dz - nz],
   ];
 }
-const deadEndPaths = REFERENCE_ROADS.filter((road) => road.terminal).flatMap((road) => road.path);
+const deadEndPaths = ACTIVE_REFERENCE_ROADS.filter((road) => road.terminal).flatMap(
+  (road) => road.path,
+);
 const residentialMinX = Math.min(
   projectReferenceNode(CAMPEIRA_BENVENUTO_ID)[0],
   ...deadEndPaths.map((p) => p[0]),
@@ -655,7 +663,7 @@ export const RESIDENTIAL_REFERENCE_BOUNDS = {
   maxY: residentialMaxZ,
 } as const;
 export const EXPLORATION_POLYGONS: Point[][] = [
-  ...REFERENCE_ROADS.flatMap((road) =>
+  ...ACTIVE_REFERENCE_ROADS.flatMap((road) =>
     road.path.slice(1).map((point, i) => corridor(road.path[i], point, road.width + 5)),
   ),
   Array.from({ length: 40 }, (_, i): Point => [

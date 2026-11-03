@@ -3,6 +3,7 @@ import { pointInPolygon } from "./geometry";
 import { distanceToPolygon, type PlantingAuditRecord } from "./planting";
 import { EXPLORATION_POLYGONS } from "./urbanReference";
 import { TERRAIN } from "./terrain";
+import { parkRegisteredPlantingAllowed, PARK_PLANTING } from "./parkPlanting";
 
 export type ContextPlanting = { id: string; world: Point; scale: number };
 export type ContextPlantingAuditRecord = Omit<PlantingAuditRecord, "origin" | "confidence"> & {
@@ -20,7 +21,9 @@ export const CONTEXT_PLANTING = {
 /** Context roots and their conservative crown radius remain outside every
  * commercial source polygon and the explicit urban road/parcel corridors.
  * This is an exclusion guard, not inference of individual photographed trees. */
-export function contextPlantingAllowed({ world, scale }: ContextPlanting) {
+export function contextPlantingAllowed(record: ContextPlanting) {
+  if (record.id.startsWith("park-registered:")) return parkRegisteredPlantingAllowed(record);
+  const { world, scale } = record;
   if (!world.every(Number.isFinite) || !Number.isFinite(scale) || scale <= 0) return false;
   return ![...ENTITIES.map((entity) => entity.polygon), ...EXPLORATION_POLYGONS].some(
     (polygon) =>
@@ -75,13 +78,18 @@ export function auditContextPlanting(
       scale: record.scale,
       origin: "satellite-mass",
       confidence: "approximate-woodland-mass",
-      zone: "external-woodland-before-P14",
+      zone: record.id.startsWith("park-registered:")
+        ? "registered-park-woodland"
+        : "external-woodland-before-P14",
       ownerEntityId: null,
       sourceEntityIds: [],
-      referenceImage: CONTEXT_PLANTING.reference,
+      referenceImage: record.id.startsWith("park-registered:")
+        ? PARK_PLANTING.reference
+        : CONTEXT_PLANTING.reference,
       referencePixel: null,
-      localRegistration:
-        "Massa arbórea visível no lado do parque antes do P14, alinhada aproximadamente à avenida; centros individuais não identificados na fotografia.",
+      localRegistration: record.id.startsWith("park-registered:")
+        ? "Maciço documentado na planta, registrado no referencial comum A2; centros determinísticos de apresentação, sem levantamento individual de troncos."
+        : "Massa arbórea visível no lado do parque antes do P14, alinhada aproximadamente à avenida; centros individuais não identificados na fotografia.",
       decision:
         "Ambientação externa aproximada, fora dos polígonos comerciais e corredores viários. Não é uma árvore auditada da planta nem confirmação de tronco individual.",
     }));

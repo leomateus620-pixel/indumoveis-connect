@@ -1,0 +1,10 @@
+{
+  "algorithm": "sha256",
+  "sourceSha256": "946fc28529aa32df18d30ebc0eb20f66b60b7396742a572b52cc44389b144314",
+  "protectedSha256": "c6d2ecb439fc39dd9ac449267472d99cf62b6e6fe50e9b7b7eed8668c70bb88b",
+  "commercialSha256": "01b9fc09a1a915761dbb9334e90c83e58b4dd9bab2436552cf10fff307ad563b",
+  "commercialScope": "all lot identity, geometry, anchors, numbering, groups, declared areas and source attributes; persisted associations use unchanged application/API paths",
+  "envelopes": 59,
+  "numbers": 70,
+  "matchesBaseline": true
+}

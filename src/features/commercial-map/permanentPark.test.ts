@@ -1,180 +1,162 @@
 import * as THREE from "three";
+import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import { ENTITIES } from "./data/territory";
-import { pointInPolygon, polygonBounds } from "./geometry";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 import { createPermanentPark } from "./permanentPark";
 import { createPermanentParkLabels, visiblePermanentParkLabels } from "./permanentParkLabels";
 import {
-  EXPORURAL_GROUND,
-  EXPORURAL_ROADS,
-  EXPORURAL_EDGE_TREES,
-  ARENA_APPROACH,
+  PARK_CORE_ENTITIES,
+  PARK_GATES,
+  PARK_PHYSICAL_BLOCKS,
+  PARK_RENDER_ENTITIES,
   PERMANENT_PARK_LANDMARKS,
-  permanentParkPolygon,
 } from "./permanentParkLayout";
-import { pavementUnionCells } from "./pavement";
-import { deriveRoadRibbon } from "./roadGeometry";
-import { REFERENCE_ROADS } from "./urbanReference";
+import {
+  PARK_REGISTRATION_RESIDUALS,
+  PARK_REGISTRATION,
+  registerA2Point,
+} from "./parkRegistration";
+import { PARK_A2_GATES } from "./parkA2Reference";
+import { polygonsOverlap } from "./parkGeometry";
+import { footprintClipper } from "./architectureClip";
+import { pointInPolygon } from "./geometry";
 
-describe("schematic permanent park presentation", () => {
-  it("retains distinct landmark identities outside all source territory, without parking or commercial inventory", () => {
-    expect(PERMANENT_PARK_LANDMARKS.map((landmark) => landmark.id)).toEqual([
-      "pavilhao-9",
-      "pavilhao-7",
-      "pavilhoes-6-10-11",
-      "pavilhao-5",
-      "alameda",
-      "mirante",
-      "arena",
-      "sede",
-      "etnia-polonesa",
-      "etnia-italiana",
-      "etnia-alema",
-      "etnia-afro",
-    ]);
-    const polygons = PERMANENT_PARK_LANDMARKS.map(permanentParkPolygon);
-    for (const [i, polygon] of polygons.entries()) {
-      const a = polygonBounds(polygon);
-      for (const other of [...ENTITIES.map((entity) => entity.polygon), ...polygons.slice(i + 1)]) {
-        const b = polygonBounds(other);
-        expect(a.minX < b.maxX && a.maxX > b.minX && a.minY < b.maxY && a.maxY > b.minY).toBe(
-          false,
-        );
-        expect(polygon.some((point) => pointInPolygon(point, other))).toBe(false);
-      }
-    }
-  });
-  it("keeps the rural ground and source-derived roads clear of all protected entities and unions crossings", () => {
-    const ground = polygonBounds(EXPORURAL_GROUND);
-    expect(EXPORURAL_ROADS).toHaveLength(9);
-    const cells = pavementUnionCells(EXPORURAL_ROADS.map((road) => road.polygon));
-    const overlaps = (a: ReturnType<typeof polygonBounds>, b: ReturnType<typeof polygonBounds>) =>
-      a.minX < b.maxX - 1e-8 &&
-      a.maxX > b.minX + 1e-8 &&
-      a.minY < b.maxY - 1e-8 &&
-      a.maxY > b.minY + 1e-8;
-    for (const entity of ENTITIES)
-      expect(overlaps(ground, polygonBounds(entity.polygon))).toBe(false);
-    for (const [x, z] of EXPORURAL_EDGE_TREES) {
-      for (const polygon of [
-        ...EXPORURAL_ROADS.map((road) => road.polygon),
-        ...ENTITIES.map((entity) => entity.polygon),
-        ...PERMANENT_PARK_LANDMARKS.map(permanentParkPolygon),
-      ]) {
-        const bounds = polygonBounds(polygon);
-        const dx = Math.max(bounds.minX - x, 0, x - bounds.maxX);
-        const dz = Math.max(bounds.minY - z, 0, z - bounds.maxY);
-        expect(Math.hypot(dx, dz)).toBeGreaterThan(1.25);
-      }
-    }
-    for (const [index, cell] of cells.entries()) {
-      for (const other of cells.slice(index + 1))
-        expect(overlaps(polygonBounds(cell), polygonBounds(other))).toBe(false);
-      for (const entity of ENTITIES)
-        expect(overlaps(polygonBounds(cell), polygonBounds(entity.polygon))).toBe(false);
-    }
-  });
-  it("joins source-proven roads and the Mirante-to-Arena approach without crossing protected entities", () => {
-    const road = (name: string) => EXPORURAL_ROADS.find((item) => item.name === name)!.polygon;
-    const pastor = road("Rua Pastor Albert Lehenbauer"),
-      east = road("Rua Ubiretama");
-    for (const name of ["Rua Bruno Schwartz", "Rua Johan Muller", "Rua Gustavo Bessel"]) {
-      const bounds = polygonBounds(road(name));
-      const z = (bounds.minY + bounds.maxY) / 2;
-      expect(pointInPolygon([bounds.minX - 0.05, z], pastor)).toBe(true);
-      expect(pointInPolygon([bounds.maxX + 0.05, z], east)).toBe(true);
-    }
-    const buenos = REFERENCE_ROADS.find((item) => item.id === "park-buenos-aires")!;
-    const ribbon = deriveRoadRibbon(buenos.path, buenos.width);
-    const onBoundary = (p: [number, number]) =>
-      ribbon.some((a, i) => {
-        const b = ribbon[(i + 1) % ribbon.length];
-        return (
-          Math.abs(
-            Math.hypot(p[0] - a[0], p[1] - a[1]) +
-              Math.hypot(p[0] - b[0], p[1] - b[1]) -
-              Math.hypot(b[0] - a[0], b[1] - a[1]),
-          ) < 1e-7
-        );
-      });
-    // Brasília's source strip bridges the Paraguay/Pastor intersection.
-    const brasilia = road("Rua Brasília — recorte norte");
-    expect(pointInPolygon([80.65, -32.94], brasilia)).toBe(true);
-    expect(pointInPolygon([80.65, -32.94], pastor)).toBe(true);
-    const paraguay = road("Rua Paraguai");
-    expect(pointInPolygon([80.6, -32.94], brasilia)).toBe(true);
-    expect(pointInPolygon([80.6, -32.94], paraguay)).toBe(true);
-    expect(onBoundary(paraguay[0])).toBe(true);
-    expect(onBoundary(paraguay[3])).toBe(true);
-    const mirante = PERMANENT_PARK_LANDMARKS.find((item) => item.id === "mirante")!;
-    const arena = PERMANENT_PARK_LANDMARKS.find((item) => item.id === "arena")!;
-    const alameda = PERMANENT_PARK_LANDMARKS.find((item) => item.id === "alameda")!;
-    expect(
-      (alameda.bounds[3] - alameda.bounds[1]) / (alameda.bounds[2] - alameda.bounds[0]),
-    ).toBeCloseTo(210 / 150);
-    expect(ARENA_APPROACH.landing[0]).toBe(alameda.bounds[2]);
-    expect(ARENA_APPROACH.landing[2]).toBe(ARENA_APPROACH.stairs[0]);
-    expect(
-      (ARENA_APPROACH.canopy[3] - ARENA_APPROACH.canopy[1]) /
-        (ARENA_APPROACH.canopy[2] - ARENA_APPROACH.canopy[0]),
-    ).toBeCloseTo(196 / 80);
-    const approachCells = pavementUnionCells(
-      [ARENA_APPROACH.landing, ARENA_APPROACH.canopy].map(([x0, z0, x1, z1]) => [
-        [x0, z0],
-        [x1, z0],
-        [x1, z1],
-        [x0, z1],
-      ]),
+describe("one registered physical park with protected commercial cadastre", () => {
+  it("preserves every commercial field and original object while allowing structural registration", () => {
+    const lots = ENTITIES.filter((e) => e.kind === "lot");
+    const snapshot = lots.map(
+      ({
+        id,
+        kind,
+        polygon,
+        anchor,
+        numbers,
+        declaredAreaM2,
+        label,
+        location,
+        source,
+        confidence,
+        notes,
+      }) => ({
+        id,
+        kind,
+        polygon,
+        anchor,
+        numbers,
+        declaredAreaM2,
+        label,
+        location,
+        source,
+        confidence,
+        notes,
+      }),
     );
-    for (const [index, cell] of approachCells.entries())
-      for (const other of approachCells.slice(index + 1)) {
-        const a = polygonBounds(cell),
-          b = polygonBounds(other);
-        expect(
-          a.minX < b.maxX - 1e-8 &&
-            a.maxX > b.minX + 1e-8 &&
-            a.minY < b.maxY - 1e-8 &&
-            a.maxY > b.minY + 1e-8,
-        ).toBe(false);
-      }
-    expect(ARENA_APPROACH.stairs[0]).toBe(mirante.bounds[2]);
-    expect(ARENA_APPROACH.stairs[2]).toBe(ARENA_APPROACH.plaza[0]);
-    expect(ARENA_APPROACH.plaza[2]).toBe(arena.bounds[0]);
-    for (const box of [
-      ARENA_APPROACH.stairs,
-      ARENA_APPROACH.plaza,
-      ARENA_APPROACH.landing,
-      ARENA_APPROACH.canopy,
-    ])
-      for (const entity of ENTITIES) {
-        const b = polygonBounds(entity.polygon);
-        expect(box[0] < b.maxX && box[2] > b.minX && box[1] < b.maxY && box[3] > b.minY).toBe(
+    expect(createHash("sha256").update(JSON.stringify(snapshot)).digest("hex")).toBe(
+      "01b9fc09a1a915761dbb9334e90c83e58b4dd9bab2436552cf10fff307ad563b",
+    );
+    expect(lots).toHaveLength(59);
+    expect(lots.flatMap((e) => e.numbers ?? [])).toHaveLength(70);
+    for (const lot of lots) expect(PARK_CORE_ENTITIES.find((e) => e.id === lot.id)).toBe(lot);
+    for (const block of PARK_PHYSICAL_BLOCKS.filter(
+      (b) => b.coverage === "whole-commercial-envelope",
+    ))
+      expect(block.polygons).toEqual(
+        lots.filter((e) => block.commercialIds.includes(e.id)).map((e) => e.polygon),
+      );
+  });
+  it("uses primary A2 controls and independent checks within a corridor-proportional review tolerance", () => {
+    expect(PARK_REGISTRATION_RESIDUALS.filter((c) => c.role === "fit")).toHaveLength(16);
+    expect(PARK_REGISTRATION_RESIDUALS.filter((c) => c.role === "holdout")).toHaveLength(3);
+    for (const control of PARK_REGISTRATION_RESIDUALS)
+      expect(control.residual).toBeLessThanOrEqual(PARK_REGISTRATION.edgeReviewTolerance);
+    expect(PARK_REGISTRATION.primaryFrame).toBe("a2-normalized");
+  });
+  it("retains single building owners and checks actual polygons instead of disjoint bounds", () => {
+    expect(new Set(PERMANENT_PARK_LANDMARKS.map((l) => l.sourceId)).size).toBe(
+      PERMANENT_PARK_LANDMARKS.length,
+    );
+    const lots = ENTITIES.filter((e) => e.kind === "lot");
+    for (const landmark of PERMANENT_PARK_LANDMARKS) {
+      for (const lot of lots)
+        expect(polygonsOverlap(landmark.polygon, lot.polygon), `${landmark.id} / ${lot.id}`).toBe(
           false,
         );
-      }
+      if (landmark.existingOwner)
+        expect(PARK_CORE_ENTITIES.find((e) => e.id === landmark.existingOwner)!.polygon).toEqual(
+          landmark.polygon,
+        );
+      expect(landmark).not.toHaveProperty("numbers");
+      expect(landmark).not.toHaveProperty("status");
+    }
+    expect(PERMANENT_PARK_LANDMARKS.some((l) => l.sourceId === "C1")).toBe(false);
+    expect(PERMANENT_PARK_LANDMARKS.some((l) => l.sourceId === "B11")).toBe(false);
+    expect(
+      PARK_RENDER_ENTITIES.filter((e) => e.id.includes("a2-network")).some(
+        (e) => (e.holes?.length ?? 0) > 0,
+      ),
+    ).toBe(true);
+    expect(
+      PARK_RENDER_ENTITIES.some((e) => /parking|estacionamento|fenasoja.*lot/i.test(e.id)),
+    ).toBe(false);
   });
-  it("uses bounded static batches, avoids picking, and disposes only owned buffers", () => {
+  it("uses verified gate openings, preserving source code versus public-name distinction", () => {
+    expect(PARK_GATES).toHaveLength(11);
+    for (const gate of PARK_GATES) {
+      expect(gate.point).toEqual(registerA2Point(PARK_A2_GATES[gate.id].passagePoint));
+      expect(Math.hypot(...gate.axis)).toBeCloseTo(1, 8);
+      expect(gate.width).toBeGreaterThan(2);
+      expect(gate.condition).toMatch(/White|white|Threshold|threshold|Visitor/);
+    }
+  });
+  it("clips sloping architectural triangles to concave footprints while preserving height", () => {
+    const footprint: [number, number][] = [
+      [0, 0],
+      [4, 0],
+      [4, 1],
+      [1, 1],
+      [1, 4],
+      [0, 4],
+    ];
+    const triangles = footprintClipper(footprint)([
+      [0, 0, 0],
+      [4, 4, 0],
+      [0, 0, 4],
+    ]);
+    expect(triangles.length).toBeGreaterThan(1);
+    for (const triangle of triangles) {
+      for (const p of triangle) expect(p[1]).toBeCloseTo(p[0], 8);
+      const center: [number, number] = [
+        triangle.reduce((s, p) => s + p[0], 0) / 3,
+        triangle.reduce((s, p) => s + p[2], 0) / 3,
+      ];
+      expect(pointInPolygon(center, footprint)).toBe(true);
+    }
+  });
+  it("prepares static non-pickable batches and releases owned resources once", () => {
     const getContext = vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
     const surfaces = createSurfaceMaterials({ maps: false });
     const materialDispose = vi.spyOn(surfaces.materials.paintedSheet, "dispose");
     const context = createPermanentPark(surfaces);
     const geometries: THREE.BufferGeometry[] = [];
     try {
-      expect(context.metadata.schematic).toBe(true);
       expect(context.metadata.drawBatches).toBeLessThanOrEqual(8);
       context.group.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
         geometries.push(object.geometry);
         expect(object.userData.commercialPickable).toBe(false);
         expect(object.userData.entityId).toBeUndefined();
-        expect(object.castShadow).toBe(false);
-        const positions = object.geometry.getAttribute("position");
-        expect(Array.from(positions.array).every(Number.isFinite)).toBe(true);
+        expect(
+          Array.from(object.geometry.getAttribute("position").array).every(Number.isFinite),
+        ).toBe(true);
       });
       context.group.updateMatrixWorld(true);
-      const ray = new THREE.Raycaster(new THREE.Vector3(200, 30, -5), new THREE.Vector3(0, -1, 0));
-      expect(ray.intersectObject(context.group, true)).toHaveLength(0);
+      expect(
+        new THREE.Raycaster(
+          new THREE.Vector3(200, 30, -5),
+          new THREE.Vector3(0, -1, 0),
+        ).intersectObject(context.group, true),
+      ).toHaveLength(0);
       const spies = geometries.map((geometry) => vi.spyOn(geometry, "dispose"));
       context.dispose();
       context.dispose();
@@ -186,7 +168,7 @@ describe("schematic permanent park presentation", () => {
       getContext.mockRestore();
     }
   });
-  it("suppresses distant and overlapping context labels while allowing close exploration", () => {
+  it("suppresses distant and overlapping contextual labels", () => {
     const camera = new THREE.PerspectiveCamera(45, 390 / 844, 0.1, 1000);
     camera.position.set(0, 0, 150);
     camera.lookAt(0, 0, 0);
@@ -201,49 +183,33 @@ describe("schematic permanent park presentation", () => {
     camera.updateMatrixWorld();
     expect(visiblePermanentParkLabels(labels, camera, 390, 844)).toEqual([true, false]);
   });
-  it("builds one optional label atlas, preserves the group overview and disposes its own resources", () => {
-    const fillText = vi.fn();
-    const drawing = { beginPath: vi.fn(), roundRect: vi.fn(), fill: vi.fn(), fillText };
+  it("shares one label atlas with names and releases it independently", () => {
+    const fillText = vi.fn(),
+      drawing = { beginPath: vi.fn(), roundRect: vi.fn(), fill: vi.fn(), fillText };
     const getContext = vi
       .spyOn(HTMLCanvasElement.prototype, "getContext")
       .mockReturnValue(drawing as never);
-    const labels = createPermanentParkLabels();
+    const labels = createPermanentParkLabels()!;
     try {
-      expect(labels).not.toBeNull();
-      expect(labels!.labels).toBe(14);
-      expect(labels!.textureBytes).toBe(512 * 448 * 4);
-      expect(fillText.mock.calls.map((args) => args[0])).toEqual([
-        "Pavilhão 9",
-        "Pavilhão 7",
-        "Pavilhões 6, 10 e 11",
-        "Pavilhão 5",
-        "Exporural",
-        "Alameda Gastronômica",
-        "Mirante",
-        "Arena",
-        "Casa / Sede",
-        "Etnia Polonesa",
-        "Etnia Italiana",
-        "Etnia Alemã",
-        "Etnia Afro",
-        "Casas das Etnias",
-      ]);
-      const mesh = labels!.mesh;
-      expect(mesh.userData.commercialPickable).toBe(false);
-      expect(mesh.geometry.getAttribute("position").count).toBe(56);
-      expect(mesh.geometry.index!.count).toBe(84);
-      const material = mesh.material as THREE.ShaderMaterial;
+      expect(labels.labels).toBe(
+        PERMANENT_PARK_LANDMARKS.length + 1 + PARK_GATES.filter((g) => !g.existingOwner).length,
+      );
+      expect(fillText.mock.calls.map((args) => args[0])).toContain("Palco Cultural Lactalis");
+      expect(
+        fillText.mock.calls
+          .map((args) => args[0])
+          .some((name) => /^(A\d|B\d|Quadra [A-Z])$/.test(name)),
+      ).toBe(false);
+      const material = labels.mesh.material as THREE.ShaderMaterial;
       const texture = material.uniforms.atlas.value as THREE.CanvasTexture;
-      const disposeGeometry = vi.spyOn(mesh.geometry, "dispose");
-      const disposeMaterial = vi.spyOn(material, "dispose");
-      const disposeTexture = vi.spyOn(texture, "dispose");
-      labels!.dispose();
-      labels!.dispose();
-      expect(disposeGeometry).toHaveBeenCalledTimes(1);
-      expect(disposeMaterial).toHaveBeenCalledTimes(1);
-      expect(disposeTexture).toHaveBeenCalledTimes(1);
+      const owned = [labels.mesh.geometry, material, texture].map((resource) =>
+        vi.spyOn(resource, "dispose"),
+      );
+      labels.dispose();
+      labels.dispose();
+      expect(owned.every((spy) => spy.mock.calls.length === 1)).toBe(true);
     } finally {
-      labels?.dispose();
+      labels.dispose();
       getContext.mockRestore();
     }
   });

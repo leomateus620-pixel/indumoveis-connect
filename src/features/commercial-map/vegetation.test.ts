@@ -17,6 +17,7 @@ vi.mock("three", async (importOriginal) => {
     "IcosahedronGeometry",
     "PlaneGeometry",
     "MeshLambertMaterial",
+    "MeshStandardMaterial",
     "MeshBasicMaterial",
     "InstancedMesh",
     "DataTexture",

@@ -1,4 +1,6 @@
-/** Focused realism/browser laboratory. Baseline commit 930088e, prior terrain/daylight PR. Local intercepted fixtures only.
+/** Local browser laboratory. Park studies use baseline f0d5650 and the
+ * MAP_PARK_REGISTRATION_ONLY / MAP_PARK_MATERIALS_ONLY flags. Other studies
+ * retain their historical terrain/daylight baselines. Intercepted fixtures only.
  * Build before and after from the same source revision boundary, then:
  * MAP_BASE_URL=http://127.0.0.1:4190 MAP_REALISM_PHASE=before node scripts/commercial-map-realism-validation.mjs
  * MAP_BASE_URL=http://127.0.0.1:4206 MAP_REALISM_PHASE=after MAP_REALISM_REFERENCE=artifacts.local/commercial-map-realism/before/realism-validation.json node scripts/commercial-map-realism-validation.mjs
@@ -494,12 +496,17 @@ async function view(page, label) {
   else await page.getByRole("button", { name: label, exact: true }).click();
   return idle(page);
 }
+let navigationGestureButton = "left";
 async function gesture(page, label) {
   const select = page.getByRole("combobox", { name: "Gesto de navegação", exact: true });
   if (await select.isVisible()) await select.selectOption({ label });
-  else await page.getByRole("button", { name: `${label} mapa`, exact: true }).click();
+  else {
+    const legacy = page.getByRole("button", { name: `${label} mapa`, exact: true });
+    if (await legacy.isVisible()) await legacy.click();
+    else navigationGestureButton = label === "Girar" ? "right" : "left";
+  }
 }
-async function drag(page, dx, dy, { button = "left", steps = 18 } = {}) {
+async function drag(page, dx, dy, { button = navigationGestureButton, steps = 18 } = {}) {
   const rect = await page.locator("canvas").boundingBox();
   const x = rect.x + rect.width * 0.45,
     y = rect.y + rect.height * 0.5;
@@ -541,6 +548,11 @@ async function capture(page, name, requested) {
       },
     );
   if (requested) {
+    assert.equal(
+      requested.target.length,
+      2,
+      "Reference target uses drawing [x,z], not a world 3-vector",
+    );
     await page.evaluate(
       ({ position, target }) => window.__indumoveisMap.setReferencePose(position, target),
       requested,
@@ -1789,8 +1801,249 @@ async function openingSeries() {
   }
 }
 
+async function normalizeParkStudyCanvas(page) {
+  await page
+    .locator(".im-map-stage")
+    .evaluate((stage) =>
+      Object.assign(stage.style, { flex: "none", width: "1520px", height: "880px" }),
+    );
+  await page.waitForTimeout(200);
+  report.conditions.fixedCanvasCSS = [1520, 880];
+}
+async function parkRegistrationStudy() {
+  const context = await newContext({ viewport: { width: 1600, height: 1000 } });
+  try {
+    const page = await context.newPage();
+    const opening = await open(page);
+    await profile(page, "light");
+    await page.waitForFunction(() => window.__indumoveisMap?.realism?.ready === true, null, {
+      timeout: 60000,
+    });
+    await normalizeParkStudyCanvas(page);
+    report.park = {
+      opening,
+      renderer: await page.evaluate(() => window.__MAP_LAB__.rendererInfo()),
+      poses: [],
+      cycles: [],
+    };
+    const poses = {
+      commercial: { position: [110, 142, 186], target: [106, 43] },
+      superior: { position: [110, 440, 0], target: [110, -4] },
+      oblique: { position: [330, 275, 292], target: [110, -3] },
+      front: { position: [107, 24, 18], target: [106, 75] },
+      reverse: { position: [107, 26, 139], target: [106, 74] },
+      close: { position: [127, 17, 44], target: [108, 76] },
+      rural: { position: [123, 128, -4], target: [129, -64] },
+      arena: { position: [290, 83, 65], target: [207, -2] },
+    };
+    for (const [name, pose] of Object.entries(poses)) {
+      await capture(page, `park-${name}`, pose);
+      report.park.poses.push({ name, ...(await diagnostic(page)) });
+    }
+    await page.evaluate(
+      ({ position, target }) => window.__indumoveisMap.setReferencePose(position, target),
+      poses.commercial,
+    );
+    await idle(page);
+    const legacyOrbit = await page
+      .getByRole("button", { name: "Girar mapa", exact: true })
+      .isVisible();
+    if (legacyOrbit) await gesture(page, "Girar");
+    const orbitButton = legacyOrbit ? "left" : "right";
+    await page.evaluate(() => window.__indumoveisMap.resetSamples());
+    const started = performance.now();
+    while (performance.now() - started < 15000) {
+      await drag(page, 90, 18, { button: orbitButton });
+      await drag(page, -90, -18, { button: orbitButton });
+    }
+    const d = await diagnostic(page);
+    report.park.navigation = {
+      durationMs: performance.now() - started,
+      frames: d.frameIntervals.length,
+      medianMs: percentile(d.frameIntervals, 0.5),
+      p95Ms: percentile(d.frameIntervals, 0.95),
+      over200Ms: d.frameIntervals.filter((v) => v > 200).length,
+      drawCalls: d.drawCalls,
+      triangles: d.triangles,
+      geometries: d.geometries,
+      textures: d.textures,
+      programs: d.programs,
+      dpr: d.dpr,
+      buffer: d.buffer,
+      textureBytes: d.textureBytes,
+      contextLosses: d.contextLosses,
+      jsHeap: d.jsHeap,
+    };
+    for (let i = 0; i < 3; i++) {
+      const oldInstance = (await diagnostic(page)).instance;
+      await navigateModule(page, "/dashboard");
+      await page.locator(".im-map-stage").waitFor({ state: "detached" });
+      await navigateModule(page, "/mapa");
+      await page.waitForFunction(
+        (old) =>
+          window.__indumoveisMap?.instance !== old &&
+          window.__indumoveisMap?.realism?.ready === true,
+        oldInstance,
+        { timeout: 60000 },
+      );
+      await profile(page, "light");
+      await normalizeParkStudyCanvas(page);
+      // GPU memory counts include only buffers uploaded in a visible pose.
+      // Warm the same geometry/LOD path in each fresh renderer before comparing.
+      for (const pose of [poses.superior, poses.close, poses.commercial]) {
+        await page.evaluate(
+          ({ position, target }) => window.__indumoveisMap.setReferencePose(position, target),
+          pose,
+        );
+        await idle(page);
+        await page.waitForTimeout(250);
+      }
+      const cycle = await idle(page);
+      report.park.cycles.push({
+        geometries: cycle.geometries,
+        textures: cycle.textures,
+        textureBytes: cycle.textureBytes,
+        contexts: await page.evaluate(() => window.__MAP_LAB__.contexts()),
+      });
+    }
+    assert(
+      report.park.cycles.every((c) => c.contexts.active === 1),
+      "Expected one live WebGL context",
+    );
+    assert(
+      report.park.cycles
+        .slice(1)
+        .every(
+          (c) =>
+            c.geometries === report.park.cycles[0].geometries &&
+            c.textures === report.park.cycles[0].textures &&
+            c.textureBytes === report.park.cycles[0].textureBytes,
+        ),
+      "Resources grow across reopening",
+    );
+    for (const label of ["Superior", "Oblíqua", "3D"]) {
+      await view(page, label);
+      const before = await diagnostic(page);
+      await drag(page, 65, 18, { button: orbitButton });
+      const after = await diagnostic(page);
+      assert(Math.abs(after.azimuth - before.azimuth) > 0.01, `${label}: orbit blocked`);
+    }
+    await select(page, "14", "Lote 14");
+    assert.equal((await diagnostic(page)).inspectedId, null);
+    await closeDetail(page);
+  } finally {
+    await context.close();
+  }
+  const fallback = await newContext({ viewport: { width: 390, height: 844 }, noWebGL: true });
+  try {
+    const page = await fallback.newPage();
+    await page.goto(`${baseURL}/mapa?mapDiagnostics=1`);
+    await page.locator('.im-map-stage[data-representation="2d"]').waitFor({ timeout: 30000 });
+    await page.screenshot({ path: path.join(artifactDir, "park-fallback-mobile.png") });
+    assert(await page.locator(".im-map-svg").isVisible());
+  } finally {
+    await fallback.close();
+  }
+  return report.park.navigation;
+}
+
+async function parkMaterialStudy() {
+  const context = await newContext({ viewport: { width: 1600, height: 1000 } });
+  try {
+    const page = await context.newPage();
+    await open(page);
+    await profile(page, "light");
+    await page.waitForFunction(() => window.__indumoveisMap?.realism?.ready === true, null, {
+      timeout: 60000,
+    });
+    await normalizeParkStudyCanvas(page);
+    const halls = [
+      ["p1", [47.8847, 61.0987], [24, 10, 0]],
+      ["p14", [52.147, 79.4933], [25, 12, 0]],
+      ["p12", [81.306, 79.6708], [0, 14, -29]],
+      ["p8", [99.6431, 78.6699], [0, 13, -29]],
+      ["p13", [109.6508, 76.973], [0, 12, -27]],
+      ["p3", [123.3874, 78.4818], [0, 15, -33]],
+    ];
+    if (process.env.MAP_PAVILION_PHOTOS_ONLY === "1") {
+      for (const [name, target, offset] of halls) {
+        const sideFront = offset[0] !== 0;
+        const frontDistance = name === "p12" || name === "p3" ? 31 : 22;
+        const poses = {
+          front: {
+            position: [
+              target[0] + (sideFront ? frontDistance : 0),
+              7,
+              target[1] + (sideFront ? 0 : -frontDistance),
+            ],
+            target,
+          },
+          oblique: {
+            position: [target[0] + (sideFront ? 24 : -19), 13, target[1] + (sideFront ? 19 : -25)],
+            target,
+          },
+          superior: { position: [target[0], 59, target[1] + 0.2], target },
+          close: {
+            position: [target[0] + (sideFront ? 22 : 3), 9, target[1] + (sideFront ? 3 : -24)],
+            target,
+          },
+          rear: {
+            position: [target[0] - (sideFront ? 25 : 0), 13, target[1] + (sideFront ? 0 : 29)],
+            target,
+          },
+        };
+        if (name === "p14") {
+          poses.front = { position: [68, 9, 61], target };
+          poses.close = { position: [67, 9, 67], target };
+        }
+        for (const [side, pose] of Object.entries(poses))
+          assert(
+            (await capture(page, `${name}-${side}`, pose)).samePose,
+            `${name}-${side}: camera clamped`,
+          );
+      }
+      return {
+        captures: report.captures.length,
+        renderer: await page.evaluate(() => window.__MAP_LAB__.rendererInfo()),
+      };
+    }
+    for (const [name, target, offset] of halls)
+      for (const side of [1, -1]) {
+        const position = [target[0] + offset[0] * side, offset[1], target[1] + offset[2] * side];
+        await capture(page, `${name}-${side === 1 ? "front" : "rear"}`, { position, target });
+      }
+    for (const [name, position, target] of [
+      ["lot-grass", [103, 16, 50], [94, 35]],
+      ["park-grass", [-12, 13, 73], [-24, 64]],
+      ["trees-near", [-25, 12, 78], [-29, 62]],
+      ["trees-far", [-23, 85, 136], [-25, 62]],
+      ["asphalt-internal", [109, 16, 60], [109, 46]],
+      ["asphalt-external", [107, 9, 109], [107, 95]],
+    ])
+      await capture(page, name, { position, target });
+    return {
+      captures: report.captures.length,
+      renderer: await page.evaluate(() => window.__MAP_LAB__.rendererInfo()),
+    };
+  } finally {
+    await context.close();
+  }
+}
+
 try {
-  if (process.env.MAP_REALISM_OPENINGS_ONLY === "1") {
+  if (process.env.MAP_PAVILION_PHOTOS_ONLY === "1") {
+    await check(
+      "six photographic pavilions in front oblique superior close and rear paired poses",
+      parkMaterialStudy,
+    );
+  } else if (process.env.MAP_PARK_MATERIALS_ONLY === "1") {
+    await check("park material and each pavilion paired reference poses", parkMaterialStudy);
+  } else if (process.env.MAP_PARK_REGISTRATION_ONLY === "1") {
+    await check(
+      "park territorial poses navigation resources presets selection and fallback",
+      parkRegistrationStudy,
+    );
+  } else if (process.env.MAP_REALISM_OPENINGS_ONLY === "1") {
     await openingSeries();
   } else if (process.env.MAP_REALISM_LANDMARKS_ONLY === "1") {
     await check("permanent park search and framing", async () => {

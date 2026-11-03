@@ -1,0 +1,1635 @@
+{
+  "generatedAt": "2026-11-03T05:06:46.674Z",
+  "baselineCommit": "a10053b11e985a663fd547d4ce84f3b5e77ea34f",
+  "conditions": {
+    "before": {
+      "os": "win32 10.0.26200",
+      "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+      "logicalCores": 4,
+      "systemMemoryGiB": 8,
+      "renderer": "host GPU requested; inspect renderer evidence",
+      "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+      "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+      "rendererAssets": [
+        "/assets/MapRenderer-cglvSjjx.js"
+      ],
+      "optionalContextAssets": [
+        "/assets/urbanContext-EQHJs7Wm.js"
+      ],
+      "usabilityParticipants": "None; scripted objective journeys only",
+      "httpCache": "Disabled by Playwright request routing; warm means SPA/module reentry in the same document, not a cached HTTP load",
+      "browser": "153.0.8010.12",
+      "note": "Same local host, browser executable, CSS viewport/DPR, scripted gestures and intercepted local data before/after. Submitted frames, not input-to-photon. No physical mobile device.",
+      "fixedCanvasCSS": [
+        1520,
+        880
+      ]
+    },
+    "after": {
+      "os": "win32 10.0.26200",
+      "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+      "logicalCores": 4,
+      "systemMemoryGiB": 8,
+      "renderer": "host GPU requested; inspect renderer evidence",
+      "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+      "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+      "rendererAssets": [
+        "/assets/MapRenderer-EKhTcM4f.js"
+      ],
+      "optionalContextAssets": [
+        "/assets/urbanContext-LQOHZJjt.js"
+      ],
+      "usabilityParticipants": "None; scripted objective journeys only",
+      "httpCache": "Disabled by Playwright request routing; warm means SPA/module reentry in the same document, not a cached HTTP load",
+      "browser": "153.0.8010.12",
+      "note": "Same local host, browser executable, CSS viewport/DPR, scripted gestures and intercepted local data before/after. Submitted frames, not input-to-photon. No physical mobile device.",
+      "fixedCanvasCSS": [
+        1520,
+        880
+      ]
+    },
+    "rendererBefore": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Intel)",
+      "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuTimerQueryAvailable": true,
+      "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+    },
+    "rendererAfter": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Intel)",
+      "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuTimerQueryAvailable": true,
+      "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+    }
+  },
+  "performance": {
+    "before": {
+      "durationMs": 15919.998400000004,
+      "frames": 751,
+      "medianMs": 16.69999999999709,
+      "p95Ms": 16.700000000004366,
+      "over200Ms": 0,
+      "drawCalls": 135,
+      "triangles": 222971,
+      "geometries": 116,
+      "textures": 12,
+      "programs": 29,
+      "dpr": 0.8646430798325934,
+      "buffer": [
+        1314,
+        760
+      ],
+      "textureBytes": 12320882,
+      "contextLosses": 0,
+      "jsHeap": {
+        "usedBytes": 37300000,
+        "totalBytes": 64000000,
+        "limitBytes": 3760000000,
+        "method": "browser performance.memory; may be coarsened; not GPU memory"
+      }
+    },
+    "after": {
+      "durationMs": 15964.971000000001,
+      "frames": 753,
+      "medianMs": 16.69999999999709,
+      "p95Ms": 16.799999999999272,
+      "over200Ms": 0,
+      "drawCalls": 142,
+      "triangles": 233137,
+      "geometries": 124,
+      "textures": 13,
+      "programs": 31,
+      "dpr": 0.8646430798325934,
+      "buffer": [
+        1314,
+        760
+      ],
+      "textureBytes": 12495645,
+      "contextLosses": 0,
+      "jsHeap": {
+        "usedBytes": 42100000,
+        "totalBytes": 109000000,
+        "limitBytes": 3760000000,
+        "method": "browser performance.memory; may be coarsened; not GPU memory"
+      }
+    },
+    "openingBefore": {
+      "usefulMs": 2708.9629,
+      "ready3DMs": 3148.1818
+    },
+    "openingAfter": {
+      "usefulMs": 1990.6213,
+      "ready3DMs": 2947.5507
+    },
+    "cyclesBefore": [
+      {
+        "geometries": 107,
+        "textures": 11,
+        "textureBytes": 12320882,
+        "contexts": {
+          "created": 2,
+          "active": 1
+        }
+      },
+      {
+        "geometries": 107,
+        "textures": 11,
+        "textureBytes": 12320882,
+        "contexts": {
+          "created": 3,
+          "active": 1
+        }
+      },
+      {
+        "geometries": 107,
+        "textures": 11,
+        "textureBytes": 12320882,
+        "contexts": {
+          "created": 4,
+          "active": 1
+        }
+      }
+    ],
+    "cyclesAfter": [
+      {
+        "geometries": 114,
+        "textures": 12,
+        "textureBytes": 12495645,
+        "contexts": {
+          "created": 2,
+          "active": 1
+        }
+      },
+      {
+        "geometries": 114,
+        "textures": 12,
+        "textureBytes": 12495645,
+        "contexts": {
+          "created": 3,
+          "active": 1
+        }
+      },
+      {
+        "geometries": 114,
+        "textures": 12,
+        "textureBytes": 12495645,
+        "contexts": {
+          "created": 4,
+          "active": 1
+        }
+      }
+    ]
+  },
+  "encoding": "Full-size PNG captures -> WebP quality90. No resize, crop, retouch, image generation or object removal.",
+  "pairs": [
+    {
+      "group": "pavilion",
+      "name": "p1-front",
+      "pose": {
+        "position": [
+          69.88470000000001,
+          7.000000000000001,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 23.0867927612304,
+        "polar": 1.2627435457711202,
+        "azimuth": 1.5707963267948966
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p1-front.webp",
+          "pngSha256": "58bcd6750838a59d008cb561433ad0d45f9cc16e03cefc1ee04e090b076b0abe",
+          "webpSha256": "536cfc099abdd32e9c06360364918c3a943ddeff5a0304e354573abefdccda31",
+          "bytes": 92922,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p1-front.webp",
+          "pngSha256": "01efef49f5314f11a57757228c81e6ee36380529db1112247faef170d8bd0dff",
+          "webpSha256": "2ac024bc1b76a39bde7a33194c6384986edf981fe906535e30b7375c6f373647",
+          "bytes": 109812,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p1-oblique",
+      "pose": {
+        "position": [
+          71.88470000000001,
+          13.000000000000002,
+          80.09870000000001
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 33.256578296631794,
+        "polar": 1.1691870206010382,
+        "azimuth": 0.9011573811182589
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p1-oblique.webp",
+          "pngSha256": "2e38fb61569b6bf330af16cfea2880e50232903265670ed0d4da2bc709747341",
+          "webpSha256": "0e15697cdfc5ab1deb8d6a4d55b74a86e4c97c2009a4e489980576b194b9ea77",
+          "bytes": 137914,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p1-oblique.webp",
+          "pngSha256": "15057c8dfd1f68956bd28aab94afea428efe3ba827c24ba18db5af00fe24a05b",
+          "webpSha256": "7380536be0691dab3672be2775dee4aa2e4f6c9a22156f5fa37a8a7bcb0ad6b8",
+          "bytes": 151490,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p1-superior",
+      "pose": {
+        "position": [
+          47.8847,
+          59,
+          61.29870000000324
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 59.000338982077054,
+        "polar": 0.003389817524460896,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p1-superior.webp",
+          "pngSha256": "f72ee5f40b07ae44e9244c0ab434ba586020b13416494fdfce6dc6874eef4058",
+          "webpSha256": "462144fe552bd80976f6a88a030bbaee896799ee8cc700c12332cd73cb0b8db2",
+          "bytes": 64378,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p1-superior.webp",
+          "pngSha256": "ac4760525d905bd68e71edd51c883ad8b726b7db95457c48fc1335d6d1e3e7cb",
+          "webpSha256": "d84218fbfc3f8ef0ef8fc832b02006ecf4fe159e137843511a5f4142c60c4d8f",
+          "bytes": 58336,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p1-close",
+      "pose": {
+        "position": [
+          69.88470000000001,
+          8.999999999999998,
+          64.09870000000001
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 23.958297101421884,
+        "polar": 1.1856953262177743,
+        "azimuth": 1.4352686128093957
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p1-close.webp",
+          "pngSha256": "d0ec8d7bd6430e4dd97a7dca84664e9fba2de9ab1cfe50e5c5aed8db6a8668fe",
+          "webpSha256": "a50bb17e84eb31e02fa7a526e1ddee5b91ac738a46fc919a3ded8e48bf9a0ffb",
+          "bytes": 114624,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p1-close.webp",
+          "pngSha256": "d53baff0e5a36cb408d946e266feb13e8a25fd1c4db64f515141d072334283da",
+          "webpSha256": "3beb7655cc65bc8c5f5179d93afa5a575333871576c169291ed828040f501ee2",
+          "bytes": 121460,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p1-rear",
+      "pose": {
+        "position": [
+          22.884700000000002,
+          13.000000000000002,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 28.178005607210743,
+        "polar": 1.0912770348023004,
+        "azimuth": -1.5707963267948966
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p1-rear.webp",
+          "pngSha256": "35eb7b89e08ec5fb12405d580ab539fa4f553546c129133adaa46f3e65e8a22f",
+          "webpSha256": "9dc7dff0f41c366ae2c40e3bfcba8c059488ee10893cc0c63ca62091d9cd359f",
+          "bytes": 101550,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p1-rear.webp",
+          "pngSha256": "d671dee1d3a41cb25fa06e6b2ee52ee2e0cffc04fa62ccf37d8f1b45df0e260c",
+          "webpSha256": "c8ca35492a974b6014c6d6ceb598ba5b001f7cf93d6993acbdf64f5746327493",
+          "bytes": 99422,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p14-front",
+      "pose": {
+        "position": [
+          68,
+          9.000000000000002,
+          61
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 25.967667471107223,
+        "polar": 1.2168685015045433,
+        "azimuth": 2.432916508615658
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p14-front.webp",
+          "pngSha256": "c4a5bba8b4f7da4124714e8f1bca3716d3af6e2828b9d0f3575e82ec36d5cf97",
+          "webpSha256": "a266334e5b6cc952cbd56e9d35a5b6cfa4c644f63ef99df625d5ad59bd499f21",
+          "bytes": 101118,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p14-front.webp",
+          "pngSha256": "e19379bd61549b7baae07eb0f449999e1c12162084b357cfd0ec4c0ebcf50f69",
+          "webpSha256": "62a7da3252bdacac68bfde87714f10b464c0ebe0d17faf6075c5d25d665bfa26",
+          "bytes": 91106,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p14-oblique",
+      "pose": {
+        "position": [
+          76.14699999999999,
+          13.000000000000005,
+          98.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 33.25657829663178,
+        "polar": 1.169187020601038,
+        "azimuth": 0.9011573811182589
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p14-oblique.webp",
+          "pngSha256": "0e9688a0957032ec8b8415d6138d210700baefef6a96bf367228ca62e3dfeeda",
+          "webpSha256": "a4b2594c09572945521435a61afbe7f640e580bc3514869592bd224641277bd5",
+          "bytes": 147554,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p14-oblique.webp",
+          "pngSha256": "e84e00345a75a7a03848468d42494b0d0d3facd412142440acf4dde5cf0459ef",
+          "webpSha256": "188ed335baa4db4fc5a233af6f97c83adaf71b8d9c9f1f8b353954b642221485",
+          "bytes": 158668,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p14-superior",
+      "pose": {
+        "position": [
+          52.147,
+          59,
+          79.69330000000323
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 59.000338982077054,
+        "polar": 0.003389817524460896,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p14-superior.webp",
+          "pngSha256": "e329ca53689b7a85bec774595e7f2cc694cbbb782a34e9dd98cc4f3cda2a5c38",
+          "webpSha256": "a1799295b8d37fb3c6139bb90b2e2883d425663736d418387e507e815a3bffd2",
+          "bytes": 61694,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p14-superior.webp",
+          "pngSha256": "71632737a3f2cfbe76f23cd984429aa6721c7b120c9baf799520680bad9928df",
+          "webpSha256": "a3b2c7599f98c6fb2f5b619cabcf8f733a79bed606418b80478a819fd1d2b7a5",
+          "bytes": 52798,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p14-close",
+      "pose": {
+        "position": [
+          67,
+          8.999999999999995,
+          67
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 21.39378774060358,
+        "polar": 1.1365984231356547,
+        "azimuth": 2.270118152987311
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p14-close.webp",
+          "pngSha256": "2106cdd2158a2e9b7f0cd7e013898b6116dc9b5dfc0e335fea28d585b57ca1a9",
+          "webpSha256": "0e9f0ee05a3f0a5978aa92c7a13260135dc117d15dd0f1dbb5db0096d8a3b119",
+          "bytes": 101240,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p14-close.webp",
+          "pngSha256": "b78dfee4c277c8d4f4a01d57a161246ff2300c1f47aabe62fbf6ca3ae18bd472",
+          "webpSha256": "58c73c32f52b47247a9652ffb0ed84de9d4ee1f54fc0f7ac10402394b6135eea",
+          "bytes": 84530,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p14-rear",
+      "pose": {
+        "position": [
+          27.147,
+          13.000000000000002,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 28.178005607210743,
+        "polar": 1.0912770348023004,
+        "azimuth": -1.5707963267948966
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p14-rear.webp",
+          "pngSha256": "8f9c8666a816447ad23947c0287028c1bd4d27de7b033835ddf8b0c90f831bbd",
+          "webpSha256": "e1b2f9702076d9265b228f5f41626842cc31355bc309abf29f771b26162ffcf9",
+          "bytes": 98812,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p14-rear.webp",
+          "pngSha256": "baa89a0d08cda4474a471739c6851a2a9a4bcd15fbe223f1df5f599d51c6710d",
+          "webpSha256": "cbe8ffc812a8fb3277fc985bf2d6a7c3b0bc099777bfbd66ca8ad424134ad1ef",
+          "bytes": 94812,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p12-front",
+      "pose": {
+        "position": [
+          81.306,
+          6.999999999999998,
+          48.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.3487144248894165,
+        "azimuth": 3.141592653589793
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p12-front.webp",
+          "pngSha256": "de4841aa41fc22fc369737ccb62ebaa17e4006c2795b79b681e053893aaad0d2",
+          "webpSha256": "771f201f4b133bb2dd1cdc683bf19d8de5b4a94b2d26559d603726c38298ea06",
+          "bytes": 83756,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p12-front.webp",
+          "pngSha256": "d408230f475617837580a8fb72c68f22131180aa2d4017ae3d9f1d835c606198",
+          "webpSha256": "3e1d7e9f675cd06aeb79dc515173ab3857d25b0be2f0883dc21338617302e37f",
+          "bytes": 58480,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p12-oblique",
+      "pose": {
+        "position": [
+          62.306,
+          13,
+          54.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 33.98529093593286,
+        "polar": 1.1782758399652826,
+        "azimuth": -2.4917222041778455
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p12-oblique.webp",
+          "pngSha256": "958bdc6d2b2263b385a2589c29df6122dab1e75cbb1db4e5709002548c83b855",
+          "webpSha256": "3ac13cf45c0262a0226124645f6cc004650e009c0695a52d04fb51143291a67b",
+          "bytes": 129500,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p12-oblique.webp",
+          "pngSha256": "8460b7c70e718fcba5f98e0a73633007fa8be03e0b733d0a3fc6eff5c0f1a331",
+          "webpSha256": "a1faf5a4d0fd12ba22f362c82878356f794ff9b33b26f97535d23315bab32c5f",
+          "bytes": 111356,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p12-superior",
+      "pose": {
+        "position": [
+          81.306,
+          59,
+          79.87080000000323
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 59.000338982077054,
+        "polar": 0.003389817524460896,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p12-superior.webp",
+          "pngSha256": "1dbb469e6e08960ae692c0e87bbddd35a05c488f6866b73e843dcdd0b22800eb",
+          "webpSha256": "57fac9c566a94f4d8a1ac25d407b852442800c058d695d2b6d6325237b918810",
+          "bytes": 69748,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p12-superior.webp",
+          "pngSha256": "7e0fdabfa4d032e77a0a9a6108fe2575d5764d3b53ae972324bf1eb2c34cd198",
+          "webpSha256": "74c869b3189d084c190c37e09d33b30e250cb01f0d0e1e96c7e0401dc7cc2846",
+          "bytes": 53262,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p12-close",
+      "pose": {
+        "position": [
+          84.306,
+          9,
+          55.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 25.80697580112788,
+        "polar": 1.214566850643024,
+        "azimuth": 3.017237659043032
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p12-close.webp",
+          "pngSha256": "71f36baf3cb17b0d99b34d884284012ccfe39a93507f9fb80614d2b1f364d715",
+          "webpSha256": "a848ca51bc7ce3536828f4b8f36ad2d6c1c1a7bad84e8eeec04d7885d4657393",
+          "bytes": 119928,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p12-close.webp",
+          "pngSha256": "c17a4534a4e174551ddc7701c9ca1422fc0621dd912de7a476a6d2053a9ea3a1",
+          "webpSha256": "a895e5ea7aa7ce52a1a05106f4c93dcc17f2a052fdcbb3b91445124628c86140",
+          "bytes": 72570,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p12-rear",
+      "pose": {
+        "position": [
+          81.306,
+          13.000000000000004,
+          108.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.1493771199070923,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p12-rear.webp",
+          "pngSha256": "cc5e65577f38353494c264b0d1fbfcd578c163707dc73eab577dd8d7a63fa8b8",
+          "webpSha256": "a35c46084d9147a73958cd11d706c2cd13ac6c38b3e3cdfb80238d2004f95e75",
+          "bytes": 106426,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p12-rear.webp",
+          "pngSha256": "26e3839f8863c2bbb3fd6db83d358b64038bb2bcbbba4158125df7e08443fafc",
+          "webpSha256": "2a08ecdf5f9cc359f3558f537adb35dcf86b71d47dbe54c2e22d7bce02342b68",
+          "bytes": 107970,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p8-front",
+      "pose": {
+        "position": [
+          99.6431,
+          6.999999999999999,
+          56.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 23.08679276123039,
+        "polar": 1.2627435457711202,
+        "azimuth": 3.141592653589793
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p8-front.webp",
+          "pngSha256": "2b70c6b21126d1c53a37616629a5ab27b96f71c92e5358d9df3f90fae509981f",
+          "webpSha256": "7bd88e717ad5b3e8720e3c589f2220c3192e502bd2a80ddfb610e1d787fcb43d",
+          "bytes": 74776,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p8-front.webp",
+          "pngSha256": "41bf02096b921486c7f03d265f68dd454882e09891d58a3e4b047c63acb6d764",
+          "webpSha256": "de8699f068ff0641a4c7087ea5dbb787aaae03d7e13d11b622986189eae80186",
+          "bytes": 81674,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p8-oblique",
+      "pose": {
+        "position": [
+          80.6431,
+          13,
+          53.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 33.98529093593286,
+        "polar": 1.1782758399652826,
+        "azimuth": -2.4917222041778455
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p8-oblique.webp",
+          "pngSha256": "c72697bf933c20da190d91f625e0f383df276117e59400fc8b83d7f830e89ee2",
+          "webpSha256": "ce57a31cb03b70022bb9219f5fdc872844f3d07358ad3473ad50c2294b4e4526",
+          "bytes": 144740,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p8-oblique.webp",
+          "pngSha256": "a05e6d60276ef7a3c057bb6219151d4bc2ef881ea9eaef6700bd731ca5cd2183",
+          "webpSha256": "76dbed3c862572950727cc70f19cb26aaf5a708a5f462fa48cd9b9b89e350ab0",
+          "bytes": 120532,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p8-superior",
+      "pose": {
+        "position": [
+          99.6431,
+          59,
+          78.86990000000323
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 59.000338982077054,
+        "polar": 0.003389817524460896,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p8-superior.webp",
+          "pngSha256": "f06e3d7f3ee2b10f8ea32b7046c20ed5f57f0718da2e6848a2db6fb8b400e0aa",
+          "webpSha256": "3f3e99a7576f0672ffd02b56ff1656856c53ae72872ef9dfb95016fd9415092d",
+          "bytes": 73968,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p8-superior.webp",
+          "pngSha256": "4d8a17c535175a003a7140f9509d3b2246eef496170291d228adef9f65cb96fb",
+          "webpSha256": "d6afe2ac47eb4fdc5dad709e44b276fcdc864d2af9b98b9256897a7420372b86",
+          "bytes": 50440,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p8-close",
+      "pose": {
+        "position": [
+          102.6431,
+          9,
+          54.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 25.80697580112788,
+        "polar": 1.214566850643024,
+        "azimuth": 3.017237659043032
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p8-close.webp",
+          "pngSha256": "415913d715018229945bc7c1b40f9c46c462602b58ff7f952de539af59310bd5",
+          "webpSha256": "1af3d32729ef58da499498428e4f9f7a99ced10c62c9871bb9f9cd938da11eff",
+          "bytes": 94198,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p8-close.webp",
+          "pngSha256": "fed0894539ae032d4a4feb57e644afe430e417444941bcccf486d23d3cde9af3",
+          "webpSha256": "b35acb2ee59fbda2c5a63f4a4c991c3662dc6058750416c89aed7b70fd0fffd6",
+          "bytes": 104606,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p8-rear",
+      "pose": {
+        "position": [
+          99.6431,
+          13.000000000000004,
+          107.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.1493771199070923,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p8-rear.webp",
+          "pngSha256": "aebba7604d1959e5434084bd705d56f8e779ba755f206a80c02f492d341584a2",
+          "webpSha256": "13deaa9775a3637ca6e6c47ef67cfce7aea4f25ea1b27b923ef5e90503eae1d9",
+          "bytes": 118008,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p8-rear.webp",
+          "pngSha256": "3e9ee33edbb388a491dad43bf0ceaffbf81ee9187532ace50118734903ff0700",
+          "webpSha256": "7d7545933e5dbef62cd7d4ed3a1c58d9d2eacd7285fa5e6f9a46f34a7cba6f34",
+          "bytes": 112424,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p13-front",
+      "pose": {
+        "position": [
+          109.6508,
+          6.999999999999999,
+          54.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 23.08679276123039,
+        "polar": 1.2627435457711202,
+        "azimuth": 3.141592653589793
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p13-front.webp",
+          "pngSha256": "13585ba179c30d3cb4897432adcac35adb8d712a175d0b1f2d022e56785dbe7a",
+          "webpSha256": "4d3b650eea2d10ed213ad59a0a8e1ba57104699e15cae03343d65cc439cf6ed0",
+          "bytes": 65686,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p13-front.webp",
+          "pngSha256": "362655ce9f9b767d397dc7e4aacedeeb0dd15e011989732f605cba2293265a9e",
+          "webpSha256": "02f296002a2ddfe59e1266a428a4db558b60c0052aaae0b752a0f8943822e3fb",
+          "bytes": 94352,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p13-oblique",
+      "pose": {
+        "position": [
+          90.6508,
+          13,
+          51.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 33.98529093593286,
+        "polar": 1.1782758399652826,
+        "azimuth": -2.4917222041778455
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p13-oblique.webp",
+          "pngSha256": "4b461d0f5dc8dfcf51d083030b86ecbbd896598b0fcd4e9dcffb18049ef143da",
+          "webpSha256": "6535f33f14544b16fbc440acbf8040f94501927f83d287e3e33f72eb0b1f76e3",
+          "bytes": 127930,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p13-oblique.webp",
+          "pngSha256": "7125b56ab0db76446172b4d35cc3dddf1f5475e5f63edb0c52ff9fac57d1b495",
+          "webpSha256": "0bd06f8dbca4534563631c36150a26d35fdb4e9d319f63f76e1909372892ff18",
+          "bytes": 139854,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p13-superior",
+      "pose": {
+        "position": [
+          109.6508,
+          59,
+          77.17300000000323
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 59.000338982077054,
+        "polar": 0.003389817524460896,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p13-superior.webp",
+          "pngSha256": "8d9f8e381fa7af9aa705947674cc975c8c3c973b293d28c30516a671b8a982f0",
+          "webpSha256": "14e4097db41dc0364658721628c9340c42247793eb1af21f307e9f7dab533203",
+          "bytes": 74430,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p13-superior.webp",
+          "pngSha256": "3feffa04f5caa37184ddae3949ad8f21afb4c25dea6c385fd1e3d4cb3f946e68",
+          "webpSha256": "4476b086e6e554f907ab8ff0be99cebeef5e237e9b55831bde42f683b1555453",
+          "bytes": 54202,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p13-close",
+      "pose": {
+        "position": [
+          112.6508,
+          9,
+          52.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 25.80697580112788,
+        "polar": 1.214566850643024,
+        "azimuth": 3.017237659043032
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p13-close.webp",
+          "pngSha256": "8f8ff4cc4febe50e7a7833ef4e98e834706dba1756ef1cb8c1ecd6baf58ec1d3",
+          "webpSha256": "d0c8b607a30933d58c13323fd034d6056f67613a12f32acbcee795047779dcb9",
+          "bytes": 81150,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p13-close.webp",
+          "pngSha256": "781d5277c0eab187e8192e81bbddbca67421f9a88676e064114c2f6b4a1a8c48",
+          "webpSha256": "7f160dfd8b945d3ecb7adb44ee2108a6e44bf0477cec4f33aac4f905fe35ebc9",
+          "bytes": 114020,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p13-rear",
+      "pose": {
+        "position": [
+          109.6508,
+          13.000000000000004,
+          105.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.1493771199070923,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p13-rear.webp",
+          "pngSha256": "a3f8d95cdede993135ff075a79df3f7e45bfbc94d23b2378d616a45f0abcea5d",
+          "webpSha256": "4c1c28ba682072ea26e8e603a2868c6fbfab1686ae10c3c3827023b45efb97a7",
+          "bytes": 128348,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p13-rear.webp",
+          "pngSha256": "7d66b85b3b636219f0cecea57b26d2bfc89f67cc98dc16800c1ef1a591ffa2d5",
+          "webpSha256": "1d421fbfe6049b4aca88958d26cff46aab8805e19cfd0882b3f0d2bee6bf0862",
+          "bytes": 111876,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p3-front",
+      "pose": {
+        "position": [
+          123.3874,
+          6.999999999999998,
+          47.48180000000001
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.3487144248894165,
+        "azimuth": 3.141592653589793
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p3-front.webp",
+          "pngSha256": "1a7bab706ab515c5227bfdc94d1c718050c76e43b9344e42db763ff285a6b8ad",
+          "webpSha256": "d3ebd0b3b88d13779b33d4750b6508478c6f3e5b8589309aebd50c4975da5bf4",
+          "bytes": 64346,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p3-front.webp",
+          "pngSha256": "6520fdbd11f00ef50ccdfabb9932637078f1e89d0a2656ff795a028b393bc6fc",
+          "webpSha256": "eee87fc302e52b01c89ecb27ee83937da5c42dafe2a7902e4003fcda0b366b24",
+          "bytes": 75982,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p3-oblique",
+      "pose": {
+        "position": [
+          104.3874,
+          13,
+          53.48180000000001
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 33.98529093593286,
+        "polar": 1.1782758399652826,
+        "azimuth": -2.4917222041778455
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p3-oblique.webp",
+          "pngSha256": "314e35a0476755f236f68734f177e6af6bb8f737a296d8a635743c4d34b867af",
+          "webpSha256": "52f205d5ff771268e4f657ff97f957a132e4ca4fc03f699b0884457155259616",
+          "bytes": 106794,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p3-oblique.webp",
+          "pngSha256": "1cbcbc57d93337579f44ebe89d927ae7c94f1e2a2f86829bc271bbaf8aa659c7",
+          "webpSha256": "b8926b8393f2b55b9085f63383afb2be7ea8547f93705ba5cecaab3f31335986",
+          "bytes": 127944,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p3-superior",
+      "pose": {
+        "position": [
+          123.3874,
+          59,
+          78.68180000000324
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 59.000338982077054,
+        "polar": 0.003389817524460896,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p3-superior.webp",
+          "pngSha256": "255e24e01bf02e7336ed3d874fbeb12ff84a14f819c2adf0a0bf75e411365a4f",
+          "webpSha256": "3f024fac431437fe3efc606c23789c029f15ecbbe00fe349de6e1556d1a2cfab",
+          "bytes": 68156,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p3-superior.webp",
+          "pngSha256": "56abd315846d75909c2dd14ad10d6a3b85662190350af0c107917362f3e80bad",
+          "webpSha256": "668e572872623e577f102e31d523cda9937beb7a9c4bdd48b1e2fb687663be73",
+          "bytes": 54150,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p3-close",
+      "pose": {
+        "position": [
+          126.3874,
+          9,
+          54.48180000000001
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 25.80697580112788,
+        "polar": 1.214566850643024,
+        "azimuth": 3.017237659043032
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p3-close.webp",
+          "pngSha256": "aa1b6fa2ca92fc948ff16bf83ee559ab88372c8ed748e07614091ace9e86bff3",
+          "webpSha256": "ec2f03c9af7e495ac99f6897d53663656f52650acd047b446a3a36a1da3db934",
+          "bytes": 89720,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p3-close.webp",
+          "pngSha256": "37ad65313c408194258fa72f07054e3861b192379290adc0c04a6684c7a16ee6",
+          "webpSha256": "1eb7bb5652ae14e52200dc36fe3d9eeb3195af57cd87a48b8b645615b32996de",
+          "bytes": 97584,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "pavilion",
+      "name": "p3-rear",
+      "pose": {
+        "position": [
+          123.3874,
+          13.000000000000004,
+          107.4818
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.1493771199070923,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/p3-rear.webp",
+          "pngSha256": "1f92b0ef9193961f5c88da5fb6b39d98a301a0bb85e4183e5abd2b0e5d846b26",
+          "webpSha256": "f9793a6f9eddd2b747e639b78accbaf70fc5a21e56bed5cc855072ede7db3713",
+          "bytes": 120044,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/p3-rear.webp",
+          "pngSha256": "c1beca609a550603e05177c51ffa92eff9d8d318f3ba7f619298654db1c16b5e",
+          "webpSha256": "f338e55f88d8c86ff246b39b5679c7e266536db155cbcc04a17206c7ab2d72b7",
+          "bytes": 107280,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "park",
+      "name": "park-commercial",
+      "pose": {
+        "position": [
+          110.00000000000001,
+          142,
+          186
+        ],
+        "target": [
+          106.00000000000001,
+          43
+        ],
+        "distance": 201.5663662419899,
+        "polar": 0.7891024479418655,
+        "azimuth": 0.027964735969865488
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/park-commercial.webp",
+          "pngSha256": "c6bdc270a4ebed6a416643ddcb6d57654014fd1e19cbee438eeaee0598765367",
+          "webpSha256": "1b55964864befb6bf4db696e3be99518f55ecd5b4bc22c35bfdb42620a5c5067",
+          "bytes": 126254,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/park-commercial.webp",
+          "pngSha256": "90a7455e5f71e414beeae66396030237c01e5ea16511275a8ce5d96b4c80034b",
+          "webpSha256": "f773fc828e5b4c2b0ba872b8ff80f020d622687b659319552b9f698db959f416",
+          "bytes": 126034,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "park",
+      "name": "park-superior",
+      "pose": {
+        "position": [
+          110,
+          440,
+          -9.544809387307396e-12
+        ],
+        "target": [
+          110,
+          -4
+        ],
+        "distance": 440.01818144253986,
+        "polar": 0.009090658665050337,
+        "azimuth": 0
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/park-superior.webp",
+          "pngSha256": "a40b01131872fe654d5c6b103a88156126d1d02fd098fe5cf50661914bd77491",
+          "webpSha256": "ef806ce587ec95f72068ec896e56bf5ddf7f8ff934d3a4bae6b5ee7e809ffff5",
+          "bytes": 77514,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/park-superior.webp",
+          "pngSha256": "c40980494aceeb8075f3215f119fe5bc6edd28f7cc83ff94f292c63039851ba0",
+          "webpSha256": "0cfc0a326de69e912d399379a21e3ffab561f08381371c823b38484442ca31d3",
+          "bytes": 77730,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "park",
+      "name": "park-oblique",
+      "pose": {
+        "position": [
+          330,
+          275,
+          291.99999999999994
+        ],
+        "target": [
+          110,
+          -3
+        ],
+        "distance": 459.4017849334066,
+        "polar": 0.9290383884631024,
+        "azimuth": 0.6407837241775081
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/park-oblique.webp",
+          "pngSha256": "45ce911470a362d6c465b206d3504c7413296916a50c9796066dd593350dac36",
+          "webpSha256": "81f73f4aaa0a7c80cf9a7c5469555294d42614742cbfaba7cb9b57732b7c14ff",
+          "bytes": 108380,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/park-oblique.webp",
+          "pngSha256": "4412f2b9bb139c462519fca7b0859ce1cda09b9fd299543da351b4b3d6b07dea",
+          "webpSha256": "fcfce3651d507e3f69b47422f27be8df47dde9e250873994813d70dad70b2175",
+          "bytes": 107004,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "park",
+      "name": "park-front",
+      "pose": {
+        "position": [
+          107,
+          23.99999999999999,
+          18.00000000000003
+        ],
+        "target": [
+          106,
+          75
+        ],
+        "distance": 61.85466837676843,
+        "polar": 1.172328909260974,
+        "azimuth": 3.124050593532391
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/park-front.webp",
+          "pngSha256": "b21018eaf102d78de025aabb26744c8308da3a4fc91a55959e1ac6e8e3b57aeb",
+          "webpSha256": "67bf927542aacd14860f44d0a93c02b69d6488d0dd769b9211c4968b2358f185",
+          "bytes": 110620,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/park-front.webp",
+          "pngSha256": "9121c11457080bb64b7e4ee62379394f3252bc41161a1879b2188d83ba708500",
+          "webpSha256": "aee693590772a50d1298f1c00646deda49aab4667ab19482eb60ef7bc4c913e7",
+          "bytes": 108242,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "park",
+      "name": "park-reverse",
+      "pose": {
+        "position": [
+          107,
+          26,
+          139
+        ],
+        "target": [
+          106,
+          74
+        ],
+        "distance": 70.01428425685718,
+        "polar": 1.1903307511041734,
+        "azimuth": 0.01538340178059515
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/park-reverse.webp",
+          "pngSha256": "a6fa03ab9ea657eb0d4e853d67ad48d7eb5993b39b501aa17af4c6088ea568dd",
+          "webpSha256": "8cb06d79a3ff2847777a151965d5f75c72e0424c35f616c073e2c517b84297c8",
+          "bytes": 109118,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/park-reverse.webp",
+          "pngSha256": "c8b1539fc1a20694f49cf550d2369b41f139aa81c3c5bdf40f00375bc54287f4",
+          "webpSha256": "887088e95c4bff0a03b387dc216ae9fef3b7feefb62e7d73633939ecf838587a",
+          "bytes": 106314,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "park",
+      "name": "park-close",
+      "pose": {
+        "position": [
+          127,
+          17.000000000000004,
+          44.00000000000002
+        ],
+        "target": [
+          108.00000000000001,
+          76
+        ],
+        "distance": 40.914545090957546,
+        "polar": 1.142303721442655,
+        "azimuth": 2.6057814156293295
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/park-close.webp",
+          "pngSha256": "052032341f11693af665b203c7e266e0da79a5fb5d2cfa8da763ad6c651e22fe",
+          "webpSha256": "9b6c570f632356e497f460b587f6c876bf8b0b457f0307691c4d2eb448d2ed0b",
+          "bytes": 123276,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/park-close.webp",
+          "pngSha256": "b2629c8fa8a9343bdd3ee010fd491d32d339ff748cbbee393bb241768b1b12d9",
+          "webpSha256": "89d17b7118820a6acb1ec712559437807a9ecd180eb37eb2fa2e009ab5ca0cdd",
+          "bytes": 130306,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "park",
+      "name": "park-rural",
+      "pose": {
+        "position": [
+          123,
+          128,
+          -4.000000000000014
+        ],
+        "target": [
+          129,
+          -64
+        ],
+        "distance": 141.49204924659193,
+        "polar": 0.4402515941517173,
+        "azimuth": -0.09966865249116205
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/park-rural.webp",
+          "pngSha256": "7a1e4fdda4dc65dd19590be9067615fe3c4a617742977559536a7638e8ed220a",
+          "webpSha256": "f10d5fa5eb2fa6668bad5fd53ef4d56e2f4436f911810337bfbe95457dc22fcd",
+          "bytes": 48642,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/park-rural.webp",
+          "pngSha256": "3f04461826d3117822a084c65d85b6b768cbbaa12ef26b0e4abdccd0a59a267f",
+          "webpSha256": "34ef831317f4e6e41b0759ad35857aef28035553fefec08d1af9ceeabed7c0f5",
+          "bytes": 48332,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    },
+    {
+      "group": "park",
+      "name": "park-arena",
+      "pose": {
+        "position": [
+          290,
+          83,
+          65.00000000000001
+        ],
+        "target": [
+          207,
+          -2
+        ],
+        "distance": 135.1554660381888,
+        "polar": 0.9095415812317613,
+        "azimuth": 0.8916630262885271
+      },
+      "positionError": 0,
+      "targetError": 0,
+      "images": {
+        "before": {
+          "file": "before/park-arena.webp",
+          "pngSha256": "0b6ffea3324b5fe421744b4e249dab4fa50f06a0b6fa2f770aad16b3c33ac2b3",
+          "webpSha256": "852fdec4b187f868219b3d3c351062bac9e0b43d4a648531b3b6d42b8360f4c4",
+          "bytes": 84122,
+          "width": 1520,
+          "height": 880
+        },
+        "after": {
+          "file": "after/park-arena.webp",
+          "pngSha256": "7213dcd4a4db1302f3a994130f176a63cc77e21ec77b751ccd47f76837a2637d",
+          "webpSha256": "674a06e7d734100d88979b30ca7af88df45b8b604f561b90d9ab2c990ca27301",
+          "bytes": 83178,
+          "width": 1520,
+          "height": 880
+        }
+      }
+    }
+  ]
+}

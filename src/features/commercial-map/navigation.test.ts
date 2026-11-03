@@ -18,9 +18,35 @@ import {
   smoothStep,
   smallestSelectableSpan,
   viewDirection,
+  createSelectionNavigationSession,
+  normalizedWheelDelta,
+  touchTwistDelta,
+  type NavigationPose,
 } from "./navigation";
 
 describe("map navigation decisions", () => {
+  it("normalizes wheel units without mouse/trackpad inference and bounds a two-touch twist", () => {
+    expect(normalizedWheelDelta(2, 1, 600)).toBe(32);
+    expect(normalizedWheelDelta(0.05, 2, 600)).toBe(30);
+    expect(normalizedWheelDelta(2000, 0, 600)).toBe(120);
+    expect(normalizedWheelDelta(-2000, 0, 600)).toBe(-120);
+    expect(touchTwistDelta([-1, 0.01], [-1, -0.01], [0, 0])).toBeCloseTo(0.02, 3);
+  });
+  it("restores the exact original pose after A to B, despite repeat selection and manual navigation", () => {
+    const session = createSelectionNavigationSession<NavigationPose>((pose) => ({
+      position: [...pose.position],
+      target: [...pose.target],
+    }));
+    const original: NavigationPose = { position: [25, 50, 75], target: [10, 0, 20] };
+    const moved: NavigationPose = { position: [100, 20, 50], target: [80, 0, 20] };
+    expect(session.change("A", () => original)).toEqual({ kind: "focus", id: "A" });
+    expect(session.change("A", () => moved)).toEqual({ kind: "none" });
+    expect(session.change("B", () => moved)).toEqual({ kind: "focus", id: "B" });
+    expect(session.change(null, () => moved)).toEqual({ kind: "restore", destination: original });
+    expect(session.change(null, () => moved)).toEqual({ kind: "none" });
+    expect(session.change("C", () => moved)).toEqual({ kind: "focus", id: "C" });
+    expect(session.change(null, () => original)).toEqual({ kind: "restore", destination: moved });
+  });
   it("caps the drawing buffer by actual container pixels, including ultrawide layouts", () => {
     for (const [width, height] of [
       [360, 800],

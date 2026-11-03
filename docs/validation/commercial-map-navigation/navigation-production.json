@@ -1,0 +1,601 @@
+{
+  "kind": "local production build with intercepted fixtures; simulated touch, not physical-device or performance certification",
+  "findings": [
+    {
+      "name": "primary-pan",
+      "before": {
+        "position": [
+          21.045488346763932,
+          226.1211094653837,
+          194.25751253660823
+        ],
+        "target": [
+          95.5,
+          55
+        ],
+        "polar": 0.6096180191001339,
+        "azimuth": -0.49098454725863044,
+        "distance": 275.80225751298974,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 76,
+        "triangles": 55494,
+        "geometries": 62,
+        "textures": 9,
+        "optionalFailures": []
+      },
+      "after": {
+        "position": [
+          11.56554059403777,
+          226.1211094653837,
+          178.00924794339986
+        ],
+        "target": [
+          86.02005224727378,
+          38.75173540679159
+        ],
+        "polar": 0.6096180191001339,
+        "azimuth": -0.49098454725863006,
+        "distance": 275.80225751298974,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 81,
+        "triangles": 56653,
+        "geometries": 67,
+        "textures": 10,
+        "optionalFailures": []
+      }
+    },
+    {
+      "name": "secondary-orbit",
+      "before": {
+        "position": [
+          11.56554059403777,
+          226.1211094653837,
+          178.00924794339986
+        ],
+        "target": [
+          86.02005224727378,
+          38.75173540679159
+        ],
+        "polar": 0.6096180191001339,
+        "azimuth": -0.49098454725863006,
+        "distance": 275.80225751298974,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 81,
+        "triangles": 56653,
+        "geometries": 67,
+        "textures": 10,
+        "optionalFailures": []
+      },
+      "after": {
+        "position": [
+          8.27104935716062,
+          256.1897056903575,
+          104.99984856590504
+        ],
+        "target": [
+          86.02005224727378,
+          38.75173540679159
+        ],
+        "polar": 0.37939443532561495,
+        "azimuth": -0.8650978708922239,
+        "distance": 275.8022575129898,
+        "cameraState": "manual",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 90,
+        "triangles": 66294,
+        "geometries": 76,
+        "textures": 11,
+        "optionalFailures": []
+      }
+    },
+    {
+      "name": "shift-primary-orbit",
+      "before": {
+        "position": [
+          8.27104935716062,
+          256.1897056903575,
+          104.99984856590504
+        ],
+        "target": [
+          86.02005224727378,
+          38.75173540679159
+        ],
+        "polar": 0.37939443532561495,
+        "azimuth": -0.8650978708922239,
+        "distance": 275.8022575129898,
+        "cameraState": "manual",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 90,
+        "triangles": 66294,
+        "geometries": 76,
+        "textures": 11,
+        "optionalFailures": []
+      },
+      "after": {
+        "position": [
+          47.26359185295607,
+          272.73937537737703,
+          52.09546598424478
+        ],
+        "target": [
+          86.02005224727378,
+          38.75173540679159
+        ],
+        "polar": 0.14917085155110069,
+        "azimuth": -1.2392111945258173,
+        "distance": 275.8022575129902,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 146,
+        "triangles": 234069,
+        "geometries": 112,
+        "textures": 12,
+        "optionalFailures": []
+      }
+    },
+    {
+      "name": "cursor-wheel-single-owner",
+      "before": {
+        "position": [
+          78,
+          120,
+          135
+        ],
+        "target": [
+          95,
+          55
+        ],
+        "polar": 0.5982375423150978,
+        "azimuth": -0.2093853929534955,
+        "distance": 145.2205219657332,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 130,
+        "triangles": 212547,
+        "geometries": 113,
+        "textures": 12,
+        "optionalFailures": []
+      },
+      "after": {
+        "position": [
+          73.18384129248007,
+          139.42010912739397,
+          148.33371955268032
+        ],
+        "target": [
+          92.93502341886088,
+          55.38698013441776
+        ],
+        "polar": 0.5982375423150975,
+        "azimuth": -0.20938539295349562,
+        "distance": 168.7221751666636,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 138,
+        "triangles": 229264,
+        "geometries": 113,
+        "textures": 12,
+        "optionalFailures": []
+      }
+    },
+    {
+      "name": "A-B-Escape-return",
+      "before": {
+        "position": [
+          92.93502341886088,
+          168.46756038860377,
+          64.6526959557915
+        ],
+        "target": [
+          92.93502341886088,
+          55.38698013441776
+        ],
+        "polar": 0.05494464210656454,
+        "azimuth": 0,
+        "distance": 168.7221751666636,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 151,
+        "triangles": 242761,
+        "geometries": 119,
+        "textures": 12,
+        "optionalFailures": []
+      },
+      "A": {
+        "position": [
+          73.55227500000001,
+          15.823945517828438,
+          61.07860200348061
+        ],
+        "target": [
+          73.55227500000001,
+          60.208285
+        ],
+        "polar": 0.05494464210656454,
+        "azimuth": 0,
+        "distance": 15.847861162874635,
+        "cameraState": "idle",
+        "selectedId": "indumoveis:external:lot:01",
+        "contexts": 1,
+        "draws": 53,
+        "triangles": 80736,
+        "geometries": 124,
+        "textures": 13,
+        "optionalFailures": []
+      },
+      "B": {
+        "position": [
+          87.56169343569485,
+          36.225877934462595,
+          81.6632337246115
+        ],
+        "target": [
+          87.56169343569485,
+          79.67081043821602
+        ],
+        "polar": 0.05494464210656251,
+        "azimuth": 0,
+        "distance": 36.28062820121442,
+        "cameraState": "idle",
+        "selectedId": "indumoveis:pavilion:12",
+        "contexts": 1,
+        "draws": 67,
+        "triangles": 84180,
+        "geometries": 124,
+        "textures": 13,
+        "optionalFailures": []
+      },
+      "after": {
+        "position": [
+          92.93502341886088,
+          168.46756038860377,
+          64.6526959557915
+        ],
+        "target": [
+          92.93502341886088,
+          55.38698013441776
+        ],
+        "polar": 0.05494464210656454,
+        "azimuth": 0,
+        "distance": 168.7221751666636,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 151,
+        "triangles": 242761,
+        "geometries": 124,
+        "textures": 13,
+        "optionalFailures": []
+      }
+    },
+    {
+      "name": "close-button-return",
+      "after": {
+        "position": [
+          92.93502341886088,
+          168.46756038860377,
+          64.6526959557915
+        ],
+        "target": [
+          92.93502341886088,
+          55.38698013441776
+        ],
+        "polar": 0.05494464210656454,
+        "azimuth": 0,
+        "distance": 168.7221751666636,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 151,
+        "triangles": 242761,
+        "geometries": 124,
+        "textures": 13,
+        "optionalFailures": []
+      }
+    },
+    {
+      "name": "manual-cancels-live-focus",
+      "after": {
+        "position": [
+          73.55227500000001,
+          15.823945517828438,
+          61.07860200348061
+        ],
+        "target": [
+          73.55227500000001,
+          60.208285
+        ],
+        "polar": 0.05494464210656454,
+        "azimuth": 0,
+        "distance": 15.847861162874635,
+        "cameraState": "idle",
+        "selectedId": "indumoveis:external:lot:01",
+        "contexts": 1,
+        "draws": 53,
+        "triangles": 80736,
+        "geometries": 124,
+        "textures": 13,
+        "optionalFailures": []
+      },
+      "later": {
+        "position": [
+          73.55227500000001,
+          15.823945517828438,
+          61.07860200348061
+        ],
+        "target": [
+          73.55227500000001,
+          60.208285
+        ],
+        "polar": 0.05494464210656454,
+        "azimuth": 0,
+        "distance": 15.847861162874635,
+        "cameraState": "idle",
+        "selectedId": "indumoveis:external:lot:01",
+        "contexts": 1,
+        "draws": 53,
+        "triangles": 80736,
+        "geometries": 124,
+        "textures": 13,
+        "optionalFailures": []
+      }
+    },
+    {
+      "name": "touch-and-panel-390x844",
+      "before": {
+        "position": [
+          -71.33023396715572,
+          506.6695994558064,
+          367.03432649412457
+        ],
+        "target": [
+          95.5,
+          55
+        ],
+        "polar": 0.6096180191001341,
+        "azimuth": -0.49098454725863055,
+        "distance": 617.990154362418,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 76,
+        "triangles": 55484,
+        "geometries": 62,
+        "textures": 9,
+        "optionalFailures": []
+      },
+      "one": {
+        "position": [
+          -80.26947113864979,
+          506.6695994558064,
+          350.34775044066896
+        ],
+        "target": [
+          86.56076282850593,
+          38.31342394654438
+        ],
+        "polar": 0.6096180191001341,
+        "azimuth": -0.49098454725863055,
+        "distance": 617.990154362418,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 81,
+        "triangles": 56643,
+        "geometries": 67,
+        "textures": 10,
+        "optionalFailures": []
+      },
+      "two": {
+        "position": [
+          30.347131507828905,
+          362.27696886619503,
+          192.60085294328206
+        ],
+        "target": [
+          85.71832378840588,
+          28.721987897627827
+        ],
+        "polar": 0.4454709428603192,
+        "azimuth": -0.32583586984400337,
+        "distance": 401.455917273743,
+        "cameraState": "manual",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 87,
+        "triangles": 66286,
+        "geometries": 76,
+        "textures": 11,
+        "optionalFailures": []
+      },
+      "restored": {
+        "position": [
+          30.34713150782894,
+          362.27696886619503,
+          192.60085294328198
+        ],
+        "target": [
+          85.71832378840588,
+          28.72198789762783
+        ],
+        "polar": 0.445470942860319,
+        "azimuth": -0.3258358698440029,
+        "distance": 401.455917273743,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 145,
+        "triangles": 235396,
+        "geometries": 121,
+        "textures": 13,
+        "optionalFailures": []
+      }
+    },
+    {
+      "name": "touch-and-panel-844x390",
+      "before": {
+        "position": [
+          17.986282716228033,
+          235.41203026923344,
+          199.97936010483275
+        ],
+        "target": [
+          95.5,
+          55
+        ],
+        "polar": 0.6096180191001339,
+        "azimuth": -0.49098454725863055,
+        "distance": 287.1344897761984,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 76,
+        "triangles": 55484,
+        "geometries": 62,
+        "textures": 9,
+        "optionalFailures": []
+      },
+      "one": {
+        "position": [
+          8.084220634994935,
+          235.41203026923344,
+          181.49551088653095
+        ],
+        "target": [
+          85.5979379187669,
+          36.5161507816982
+        ],
+        "polar": 0.6096180191001339,
+        "azimuth": -0.49098454725863055,
+        "distance": 287.1344897761984,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 81,
+        "triangles": 56643,
+        "geometries": 67,
+        "textures": 10,
+        "optionalFailures": []
+      },
+      "two": {
+        "position": [
+          73.35410017661609,
+          185.60376468752997,
+          60.40490753998195
+        ],
+        "target": [
+          86.5323602628596,
+          21.4019853116379
+        ],
+        "polar": 0.218277757753309,
+        "azimuth": -0.3258358698440036,
+        "distance": 190.11483884072524,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 90,
+        "triangles": 66284,
+        "geometries": 76,
+        "textures": 11,
+        "optionalFailures": []
+      },
+      "restored": {
+        "position": [
+          73.35410017661609,
+          185.60376468752997,
+          60.40490753998195
+        ],
+        "target": [
+          86.5323602628596,
+          21.4019853116379
+        ],
+        "polar": 0.21827775775330996,
+        "azimuth": -0.32583586984400353,
+        "distance": 190.11483884072524,
+        "cameraState": "idle",
+        "selectedId": null,
+        "contexts": 1,
+        "draws": 126,
+        "triangles": 199798,
+        "geometries": 104,
+        "textures": 13,
+        "optionalFailures": []
+      }
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4221/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ]
+}

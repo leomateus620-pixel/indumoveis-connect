@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { patchGroundVariation } from "./groundVariation";
 
 export type AtlasFamily = "mineral" | "concrete" | "asphalt" | "paintedMetal" | "grass";
 export type PbrTexture = THREE.DataTexture | THREE.CompressedTexture;
@@ -42,13 +43,46 @@ export function bindPbrAtlas(
   material.aoMapIntensity = family === "paintedMetal" ? 0.25 : 0.55;
   const rect = { value: atlasRect(family) };
   material.onBeforeCompile = (shader) => {
+    patchGroundVariation(shader, family);
     shader.uniforms.surfaceAtlasRect = rect;
-    shader.fragmentShader = `uniform vec4 surfaceAtlasRect;
-      vec4 surfaceAtlasRead(sampler2D atlasMap, vec2 worldUv) {
+    const sample =
+      family === "grass"
+        ? `
+        vec2 a = mat2(.8,.6,-.6,.8) * worldUv * .79;
+        vec2 b = mat2(.384,-.923,.923,.384) * worldUv * 1.173 + vec2(.37,.61);
+        vec4 first = textureGrad(atlasMap, surfaceAtlasRect.xy + fract(a) * surfaceAtlasRect.zw,
+          dFdx(a) * surfaceAtlasRect.zw, dFdy(a) * surfaceAtlasRect.zw);
+        vec4 second = textureGrad(atlasMap, surfaceAtlasRect.xy + fract(b) * surfaceAtlasRect.zw,
+          dFdx(b) * surfaceAtlasRect.zw, dFdy(b) * surfaceAtlasRect.zw);
+        return mix(first, second, .5);
+      `
+        : `
         return textureGrad(atlasMap,
           surfaceAtlasRect.xy + fract(worldUv) * surfaceAtlasRect.zw,
           dFdx(worldUv) * surfaceAtlasRect.zw,
           dFdy(worldUv) * surfaceAtlasRect.zw);
+      `;
+    // Incommensurate, rotated grass samples remove the short tile grid while
+    // reusing the same atlas/mips and stable explicit texture gradients.
+    shader.fragmentShader = `uniform vec4 surfaceAtlasRect;
+      vec4 surfaceAtlasRead(sampler2D atlasMap, vec2 worldUv) {
+        ${sample}
+      }
+      ${
+        family === "grass"
+          ? `
+      vec4 surfaceAtlasReadNormal(sampler2D atlasMap, vec2 worldUv) {
+        vec2 a = mat2(.8,.6,-.6,.8) * worldUv * .79;
+        vec2 b = mat2(.384,-.923,.923,.384) * worldUv * 1.173 + vec2(.37,.61);
+        vec3 n1=textureGrad(atlasMap, surfaceAtlasRect.xy+fract(a)*surfaceAtlasRect.zw,
+          dFdx(a)*surfaceAtlasRect.zw,dFdy(a)*surfaceAtlasRect.zw).xyz*2.0-1.0;
+        vec3 n2=textureGrad(atlasMap, surfaceAtlasRect.xy+fract(b)*surfaceAtlasRect.zw,
+          dFdx(b)*surfaceAtlasRect.zw,dFdy(b)*surfaceAtlasRect.zw).xyz*2.0-1.0;
+        n1.xy=mat2(.8,-.6,.6,.8)*n1.xy;
+        n2.xy=mat2(.384,.923,-.923,.384)*n2.xy;
+        return vec4(normalize(mix(n1,n2,.5))*.5+.5,1.0);
+      }`
+          : ""
       }
       ${shader.fragmentShader}`;
     for (const [chunk, textureName, uv] of [
@@ -58,14 +92,24 @@ export function bindPbrAtlas(
       ["aomap_fragment", "aoMap", "vAoMapUv"],
     ]) {
       const source = THREE.ShaderChunk[chunk as keyof typeof THREE.ShaderChunk];
-      const replacement = source.replaceAll(
+      let replacement = source.replaceAll(
         `texture2D( ${textureName}, ${uv} )`,
-        `surfaceAtlasRead( ${textureName}, ${uv} )`,
+        `${family === "grass" && textureName === "normalMap" ? "surfaceAtlasReadNormal" : "surfaceAtlasRead"}( ${textureName}, ${uv} )`,
       );
+      if (family === "paintedMetal" && chunk === "map_fragment") {
+        // The atlas supplies fine mineral variation, while the authored paint
+        // supplies colour. Remove the old blue tint and strong ribbed albedo;
+        // actual sheet ribs are geometry/filtered normals, never stripes on steel.
+        replacement = replacement.replace(
+          "diffuseColor *= sampledDiffuseColor;",
+          "sampledDiffuseColor.rgb=vec3(mix(.93,dot(sampledDiffuseColor.rgb,vec3(.2126,.7152,.0722)),.22)); diffuseColor *= sampledDiffuseColor;",
+        );
+      }
       shader.fragmentShader = shader.fragmentShader.replace(`#include <${chunk}>`, replacement);
     }
   };
-  material.customProgramCacheKey = () => "indumoveis-pbr-atlas-v1";
+  material.customProgramCacheKey = () =>
+    `indumoveis-pbr-atlas-v4-${["grass", "asphalt", "concrete", "paintedMetal"].includes(family) ? family : "shared"}`;
   material.needsUpdate = true;
 }
 

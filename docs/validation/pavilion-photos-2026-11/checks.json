@@ -1,0 +1,57 @@
+{
+  "baselineCommit": "a10053b11e985a663fd547d4ce84f3b5e77ea34f",
+  "branch": "codex/parque-registro-territorial",
+  "tests": {
+    "exitCode": 0,
+    "durationSeconds": 249.58,
+    "passed": 437,
+    "command": "npm test -- --maxWorkers=1 --testTimeout=30000",
+    "files": 72
+  },
+  "types": {
+    "command": "npx tsc --noEmit",
+    "exitCode": 0
+  },
+  "lint": {
+    "endOfLine": "auto (preserve repository CRLF/LF baseline)",
+    "scope": "src/features/commercial-map and changed commercial-map scripts",
+    "exitCode": 0
+  },
+  "build": {
+    "exitCode": 0,
+    "command": "npm run build",
+    "adapter": "existing Nitro/Cloudflare output; no deployment"
+  },
+  "commercial": {
+    "sha256": "01b9fc09a1a915761dbb9334e90c83e58b4dd9bab2436552cf10fff307ad563b",
+    "envelopes": 59,
+    "numbers": 70,
+    "matchesBaseline": true
+  },
+  "connectivity": {
+    "photoPlanterExcluded": true,
+    "verified": 73,
+    "pending": 0
+  },
+  "browser": {
+    "applicationErrors": 0,
+    "pairedParkPoses": 8,
+    "shaderErrors": 0,
+    "warmReopenings": 3,
+    "contextLosses": 0,
+    "physicalMobileTested": false,
+    "pairedPavilionPoses": 30,
+    "navigationCases": 9,
+    "physicalTrackpadTested": false
+  },
+  "publication": {
+    "productionDeployed": false,
+    "fenasojaModified": false
+  },
+  "evidence": {
+    "buildLog": "artifacts.local/pavilion-photo-build-delivery.log",
+    "testsLog": "artifacts.local/pavilion-photo-tests-release.log",
+    "typesLog": "artifacts.local/pavilion-photo-types-release.log",
+    "lintLog": "artifacts.local/pavilion-photo-lint-release.log"
+  }
+}

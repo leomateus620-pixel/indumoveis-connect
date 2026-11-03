@@ -3,6 +3,7 @@ import type { MapEntity, Point } from "./data/territory";
 import { polygonBounds, type Bounds } from "./geometry";
 import { pavementUnionCells } from "./pavement";
 import { SURFACE_PALETTE, type SurfaceQuality } from "./surfaceMaterials";
+import { GROUND_VARIATION_GLSL } from "./groundVariation";
 
 /** All distances use drawing units (10 PDF points), not surveyed metres.
  * The former board already sat at -0.15. Keeping its elevation preserves the
@@ -301,9 +302,10 @@ export function createTerrain(
     material.onBeforeCompile = function (shader, renderer) {
       horizonCompile.call(this, shader, renderer);
       shader.fragmentShader =
-        `uniform sampler2D terrainFineMap;\nuniform float terrainFineAmount;\n${shader.fragmentShader}`.replace(
+        `uniform sampler2D terrainFineMap;\nuniform float terrainFineAmount;\n${GROUND_VARIATION_GLSL}\n${shader.fragmentShader}`.replace(
           "#include <color_fragment>",
           `#include <color_fragment>
+         diffuseColor.rgb *= parkGrassVariation(terrainWorld);
          if (terrainFineAmount > 0.001) diffuseColor.rgb *= 1.0 + (texture2D(terrainFineMap, terrainWorld / 3.1).r - 0.894) * terrainFineAmount;`,
         );
     };

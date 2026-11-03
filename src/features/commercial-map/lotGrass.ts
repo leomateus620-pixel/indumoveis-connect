@@ -12,10 +12,10 @@ export const LOT_GRASS = {
   cellSize: 42,
   capacity: 7200,
   budgets: { light: 2200, balanced: 4400, detailed: 7200 },
-  closeDistances: { light: 80, balanced: 110, detailed: 145 },
+  closeDistances: { light: 42, balanced: 65, detailed: 90 },
   // The largest authored scale is 1.27×1.2: tips stay below y=.20,
   // leaving the existing lot numbers at y=.23 and status borders readable.
-  bladeHeight: 0.095,
+  bladeHeight: 0.055,
   maximumTipDrift: 0.018,
 } as const;
 

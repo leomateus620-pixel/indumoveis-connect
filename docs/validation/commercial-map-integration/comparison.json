@@ -1,0 +1,2364 @@
+{
+  "baseline": "f0d565096c07523dd209db288f764cfeda7b32b7",
+  "conditions": {
+    "os": "win32 10.0.26200",
+    "cpu": "Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz",
+    "logicalCores": 4,
+    "systemMemoryGiB": 8,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [
+      "/assets/MapRenderer-cglvSjjx.js"
+    ],
+    "optionalContextAssets": [
+      "/assets/urbanContext-EQHJs7Wm.js"
+    ],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "httpCache": "Disabled by Playwright request routing; warm means SPA/module reentry in the same document, not a cached HTTP load",
+    "browser": "153.0.8010.12",
+    "note": "Same local host, browser executable, CSS viewport/DPR, scripted gestures and intercepted local data before/after. Submitted frames, not input-to-photon. No physical mobile device.",
+    "fixedCanvasCSS": [
+      1520,
+      880
+    ]
+  },
+  "fixedCanvasCSS": [
+    1520,
+    880
+  ],
+  "profile": "light",
+  "before": {
+    "opening": {
+      "usefulMs": 1558.2167000000002,
+      "ready3DMs": 1817.4208
+    },
+    "renderer": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Intel)",
+      "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuTimerQueryAvailable": true,
+      "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+    },
+    "poses": [
+      {
+        "name": "commercial",
+        "position": [
+          110.00000000000001,
+          142,
+          186
+        ],
+        "target": [
+          106.00000000000001,
+          43
+        ],
+        "drawCalls": 132,
+        "triangles": 90490
+      },
+      {
+        "name": "superior",
+        "position": [
+          110,
+          440,
+          -9.544809387307396e-12
+        ],
+        "target": [
+          110,
+          -4
+        ],
+        "drawCalls": 141,
+        "triangles": 94019
+      },
+      {
+        "name": "oblique",
+        "position": [
+          330,
+          275,
+          291.99999999999994
+        ],
+        "target": [
+          110,
+          -3
+        ],
+        "drawCalls": 141,
+        "triangles": 93999
+      },
+      {
+        "name": "front",
+        "position": [
+          107,
+          23.99999999999999,
+          18.00000000000003
+        ],
+        "target": [
+          106,
+          75
+        ],
+        "drawCalls": 89,
+        "triangles": 73311
+      },
+      {
+        "name": "reverse",
+        "position": [
+          107,
+          26,
+          139
+        ],
+        "target": [
+          106,
+          74
+        ],
+        "drawCalls": 97,
+        "triangles": 59032
+      },
+      {
+        "name": "close",
+        "position": [
+          127,
+          17.000000000000004,
+          44.00000000000002
+        ],
+        "target": [
+          108.00000000000001,
+          76
+        ],
+        "drawCalls": 88,
+        "triangles": 79814
+      },
+      {
+        "name": "rural",
+        "position": [
+          123,
+          128,
+          -4.000000000000014
+        ],
+        "target": [
+          129,
+          -64
+        ],
+        "drawCalls": 20,
+        "triangles": 9544
+      },
+      {
+        "name": "arena",
+        "position": [
+          290,
+          83,
+          65.00000000000001
+        ],
+        "target": [
+          207,
+          -2
+        ],
+        "drawCalls": 52,
+        "triangles": 29947
+      }
+    ],
+    "cycles": [
+      {
+        "geometries": 110,
+        "textures": 11,
+        "textureBytes": 11272306,
+        "contexts": {
+          "created": 2,
+          "active": 1
+        }
+      },
+      {
+        "geometries": 110,
+        "textures": 11,
+        "textureBytes": 11272306,
+        "contexts": {
+          "created": 3,
+          "active": 1
+        }
+      },
+      {
+        "geometries": 110,
+        "textures": 11,
+        "textureBytes": 11272306,
+        "contexts": {
+          "created": 4,
+          "active": 1
+        }
+      }
+    ],
+    "navigation": {
+      "durationMs": 15955.5881,
+      "frames": 797,
+      "medianMs": 16.69999999999709,
+      "p95Ms": 16.799999999999272,
+      "over200Ms": 0,
+      "drawCalls": 132,
+      "triangles": 90490,
+      "geometries": 119,
+      "textures": 12,
+      "programs": 22,
+      "dpr": 0.8646430798325934,
+      "buffer": [
+        1314,
+        760
+      ],
+      "textureBytes": 11272306,
+      "contextLosses": 0
+    }
+  },
+  "after": {
+    "opening": {
+      "usefulMs": 2859.5827999999997,
+      "ready3DMs": 3783.4082999999996
+    },
+    "renderer": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Intel)",
+      "unmaskedRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00008A56) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "gpuTimerQueryAvailable": true,
+      "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+    },
+    "poses": [
+      {
+        "name": "commercial",
+        "position": [
+          110.00000000000001,
+          142,
+          186
+        ],
+        "target": [
+          106.00000000000001,
+          43
+        ],
+        "drawCalls": 135,
+        "triangles": 222971
+      },
+      {
+        "name": "superior",
+        "position": [
+          110,
+          440,
+          -9.544809387307396e-12
+        ],
+        "target": [
+          110,
+          -4
+        ],
+        "drawCalls": 150,
+        "triangles": 236666
+      },
+      {
+        "name": "oblique",
+        "position": [
+          330,
+          275,
+          291.99999999999994
+        ],
+        "target": [
+          110,
+          -3
+        ],
+        "drawCalls": 148,
+        "triangles": 234574
+      },
+      {
+        "name": "front",
+        "position": [
+          107,
+          23.99999999999999,
+          18.00000000000003
+        ],
+        "target": [
+          106,
+          75
+        ],
+        "drawCalls": 84,
+        "triangles": 80823
+      },
+      {
+        "name": "reverse",
+        "position": [
+          107,
+          26,
+          139
+        ],
+        "target": [
+          106,
+          74
+        ],
+        "drawCalls": 90,
+        "triangles": 77313
+      },
+      {
+        "name": "close",
+        "position": [
+          127,
+          17.000000000000004,
+          44.00000000000002
+        ],
+        "target": [
+          108.00000000000001,
+          76
+        ],
+        "drawCalls": 89,
+        "triangles": 85978
+      },
+      {
+        "name": "rural",
+        "position": [
+          123,
+          128,
+          -4.000000000000014
+        ],
+        "target": [
+          129,
+          -64
+        ],
+        "drawCalls": 23,
+        "triangles": 20767
+      },
+      {
+        "name": "arena",
+        "position": [
+          290,
+          83,
+          65.00000000000001
+        ],
+        "target": [
+          207,
+          -2
+        ],
+        "drawCalls": 58,
+        "triangles": 122008
+      }
+    ],
+    "cycles": [
+      {
+        "geometries": 107,
+        "textures": 11,
+        "textureBytes": 12320882,
+        "contexts": {
+          "created": 2,
+          "active": 1
+        }
+      },
+      {
+        "geometries": 107,
+        "textures": 11,
+        "textureBytes": 12320882,
+        "contexts": {
+          "created": 3,
+          "active": 1
+        }
+      },
+      {
+        "geometries": 107,
+        "textures": 11,
+        "textureBytes": 12320882,
+        "contexts": {
+          "created": 4,
+          "active": 1
+        }
+      }
+    ],
+    "navigation": {
+      "durationMs": 15872.005100000002,
+      "frames": 749,
+      "medianMs": 16.69999999999709,
+      "p95Ms": 16.700000000004366,
+      "over200Ms": 0,
+      "drawCalls": 135,
+      "triangles": 222971,
+      "geometries": 116,
+      "textures": 12,
+      "programs": 29,
+      "dpr": 0.8646430798325934,
+      "buffer": [
+        1314,
+        760
+      ],
+      "textureBytes": 12320882,
+      "contextLosses": 0
+    }
+  },
+  "encoding": "Actual canvas PNG captures recoded as WebP quality90 without resizing, retouching or image generation. Source PNG hashes retained.",
+  "images": [
+    {
+      "group": "park",
+      "phase": "before",
+      "name": "park-commercial",
+      "file": "before/park-commercial.webp",
+      "source_png_sha256": "8ac1b954dfec016b1ffb3dd2d4c6aabbef53d18395ce0fece921238807f9baae",
+      "sha256": "bdf6aed068fe6f042695ff7729695db036b9157f85c306eed29da842982ddcd7",
+      "pose": {
+        "position": [
+          110.00000000000001,
+          142,
+          186
+        ],
+        "target": [
+          106.00000000000001,
+          43
+        ],
+        "distance": 201.5663662419899,
+        "polar": 0.7891024479418655,
+        "azimuth": 0.027964735969865488
+      },
+      "requested": {
+        "position": [
+          110,
+          142,
+          186
+        ],
+        "target": [
+          106,
+          43
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "before",
+      "name": "park-superior",
+      "file": "before/park-superior.webp",
+      "source_png_sha256": "be20dd03180864f6e51e03f8b21456a6843def7207134ae9d8193668206df571",
+      "sha256": "2739c4a9eeae1eecdf57812d1c828f2fa2c970a36974f201451faf716cf9d1e6",
+      "pose": {
+        "position": [
+          110,
+          440,
+          -9.544809387307396e-12
+        ],
+        "target": [
+          110,
+          -4
+        ],
+        "distance": 440.01818144253986,
+        "polar": 0.009090658665050337,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          110,
+          440,
+          0
+        ],
+        "target": [
+          110,
+          -4
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "before",
+      "name": "park-oblique",
+      "file": "before/park-oblique.webp",
+      "source_png_sha256": "7cfca6f5fff26067a6072a52646daf90feb2302f857efb337d8ffd0dce80a9fd",
+      "sha256": "b5304f4a2e7f7c628238d95e5f2a96b3a9a2d3b6d08732faec0c2767b5b71041",
+      "pose": {
+        "position": [
+          330,
+          275,
+          291.99999999999994
+        ],
+        "target": [
+          110,
+          -3
+        ],
+        "distance": 459.4017849334066,
+        "polar": 0.9290383884631024,
+        "azimuth": 0.6407837241775081
+      },
+      "requested": {
+        "position": [
+          330,
+          275,
+          292
+        ],
+        "target": [
+          110,
+          -3
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "before",
+      "name": "park-front",
+      "file": "before/park-front.webp",
+      "source_png_sha256": "92078fa06e88152eac2cb78e7cd2b40d5f0d26c391d45eae279757cb641419e3",
+      "sha256": "2a055a3ca5aed9a3759fdcd932c33bc982751c0e5a5df6e2a5df9615a4eab219",
+      "pose": {
+        "position": [
+          107,
+          23.99999999999999,
+          18.00000000000003
+        ],
+        "target": [
+          106,
+          75
+        ],
+        "distance": 61.85466837676843,
+        "polar": 1.172328909260974,
+        "azimuth": 3.124050593532391
+      },
+      "requested": {
+        "position": [
+          107,
+          24,
+          18
+        ],
+        "target": [
+          106,
+          75
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "before",
+      "name": "park-reverse",
+      "file": "before/park-reverse.webp",
+      "source_png_sha256": "0b02d2f4071de0bb95c899e3100cc21526bd3f8d74ba9c68b05e3c9772ccd62c",
+      "sha256": "de0f3937af88107a6a4b238360e64090b309cc76dfe8daee8c772038385bb6ee",
+      "pose": {
+        "position": [
+          107,
+          26,
+          139
+        ],
+        "target": [
+          106,
+          74
+        ],
+        "distance": 70.01428425685718,
+        "polar": 1.1903307511041734,
+        "azimuth": 0.01538340178059515
+      },
+      "requested": {
+        "position": [
+          107,
+          26,
+          139
+        ],
+        "target": [
+          106,
+          74
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "before",
+      "name": "park-close",
+      "file": "before/park-close.webp",
+      "source_png_sha256": "e58815794fe3c2228a421e0231f65768398878c1f7440f2ffa39386acb9f3bcf",
+      "sha256": "04110b59875d15fd1ae910e2caad8d474ed201f58f158b75394745001bb519c9",
+      "pose": {
+        "position": [
+          127,
+          17.000000000000004,
+          44.00000000000002
+        ],
+        "target": [
+          108.00000000000001,
+          76
+        ],
+        "distance": 40.914545090957546,
+        "polar": 1.142303721442655,
+        "azimuth": 2.6057814156293295
+      },
+      "requested": {
+        "position": [
+          127,
+          17,
+          44
+        ],
+        "target": [
+          108,
+          76
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "before",
+      "name": "park-rural",
+      "file": "before/park-rural.webp",
+      "source_png_sha256": "a76f95639dbad3156da345173f5d9bf9920dd17a80ce1b7bc3a1820faa96c9a2",
+      "sha256": "d867116a900dd50b8055728a01dee37c72f8847023cf4e5f98cc35345f5d8fcb",
+      "pose": {
+        "position": [
+          123,
+          128,
+          -4.000000000000014
+        ],
+        "target": [
+          129,
+          -64
+        ],
+        "distance": 141.49204924659193,
+        "polar": 0.4402515941517173,
+        "azimuth": -0.09966865249116205
+      },
+      "requested": {
+        "position": [
+          123,
+          128,
+          -4
+        ],
+        "target": [
+          129,
+          -64
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "before",
+      "name": "park-arena",
+      "file": "before/park-arena.webp",
+      "source_png_sha256": "d8d819ccef56e46c3adcaab392462ecb9145f8121bbf48f79ca9e94d33c63cf1",
+      "sha256": "1a8b25d8ec3e62751c9ac990eec364e6c4b56781c4c286587e85c0293873b069",
+      "pose": {
+        "position": [
+          290,
+          83,
+          65.00000000000001
+        ],
+        "target": [
+          207,
+          -2
+        ],
+        "distance": 135.1554660381888,
+        "polar": 0.9095415812317613,
+        "azimuth": 0.8916630262885271
+      },
+      "requested": {
+        "position": [
+          290,
+          83,
+          65
+        ],
+        "target": [
+          207,
+          -2
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "after",
+      "name": "park-commercial",
+      "file": "after/park-commercial.webp",
+      "source_png_sha256": "c6bdc270a4ebed6a416643ddcb6d57654014fd1e19cbee438eeaee0598765367",
+      "sha256": "73dd826d3660743464bda262000f68c1a7423f93e63dfbd2dfdab33fb185f511",
+      "pose": {
+        "position": [
+          110.00000000000001,
+          142,
+          186
+        ],
+        "target": [
+          106.00000000000001,
+          43
+        ],
+        "distance": 201.5663662419899,
+        "polar": 0.7891024479418655,
+        "azimuth": 0.027964735969865488
+      },
+      "requested": {
+        "position": [
+          110,
+          142,
+          186
+        ],
+        "target": [
+          106,
+          43
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "after",
+      "name": "park-superior",
+      "file": "after/park-superior.webp",
+      "source_png_sha256": "a40b01131872fe654d5c6b103a88156126d1d02fd098fe5cf50661914bd77491",
+      "sha256": "098c36db03f82b0ae222a350921823dfccd8c1d25972eee9211c7b46624f5c5d",
+      "pose": {
+        "position": [
+          110,
+          440,
+          -9.544809387307396e-12
+        ],
+        "target": [
+          110,
+          -4
+        ],
+        "distance": 440.01818144253986,
+        "polar": 0.009090658665050337,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          110,
+          440,
+          0
+        ],
+        "target": [
+          110,
+          -4
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "after",
+      "name": "park-oblique",
+      "file": "after/park-oblique.webp",
+      "source_png_sha256": "45ce911470a362d6c465b206d3504c7413296916a50c9796066dd593350dac36",
+      "sha256": "1973585c533b2b8431e2ba2fbdba49829443ada9e2b380de7e18d19569cda64d",
+      "pose": {
+        "position": [
+          330,
+          275,
+          291.99999999999994
+        ],
+        "target": [
+          110,
+          -3
+        ],
+        "distance": 459.4017849334066,
+        "polar": 0.9290383884631024,
+        "azimuth": 0.6407837241775081
+      },
+      "requested": {
+        "position": [
+          330,
+          275,
+          292
+        ],
+        "target": [
+          110,
+          -3
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "after",
+      "name": "park-front",
+      "file": "after/park-front.webp",
+      "source_png_sha256": "b21018eaf102d78de025aabb26744c8308da3a4fc91a55959e1ac6e8e3b57aeb",
+      "sha256": "7c9770c84f8ae6d76dbd7d2350774dd2246033898d85a99066bf6ed23cd80b0f",
+      "pose": {
+        "position": [
+          107,
+          23.99999999999999,
+          18.00000000000003
+        ],
+        "target": [
+          106,
+          75
+        ],
+        "distance": 61.85466837676843,
+        "polar": 1.172328909260974,
+        "azimuth": 3.124050593532391
+      },
+      "requested": {
+        "position": [
+          107,
+          24,
+          18
+        ],
+        "target": [
+          106,
+          75
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "after",
+      "name": "park-reverse",
+      "file": "after/park-reverse.webp",
+      "source_png_sha256": "a6fa03ab9ea657eb0d4e853d67ad48d7eb5993b39b501aa17af4c6088ea568dd",
+      "sha256": "7a0fc6a63fbf90e98281cdb9439905153bb505d8a80ace690d5a6593ae686086",
+      "pose": {
+        "position": [
+          107,
+          26,
+          139
+        ],
+        "target": [
+          106,
+          74
+        ],
+        "distance": 70.01428425685718,
+        "polar": 1.1903307511041734,
+        "azimuth": 0.01538340178059515
+      },
+      "requested": {
+        "position": [
+          107,
+          26,
+          139
+        ],
+        "target": [
+          106,
+          74
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "after",
+      "name": "park-close",
+      "file": "after/park-close.webp",
+      "source_png_sha256": "052032341f11693af665b203c7e266e0da79a5fb5d2cfa8da763ad6c651e22fe",
+      "sha256": "b0413909f7e6e4751430b27ce2cba32591f8f60f8b2a4c29ab2dd6700bb8a27d",
+      "pose": {
+        "position": [
+          127,
+          17.000000000000004,
+          44.00000000000002
+        ],
+        "target": [
+          108.00000000000001,
+          76
+        ],
+        "distance": 40.914545090957546,
+        "polar": 1.142303721442655,
+        "azimuth": 2.6057814156293295
+      },
+      "requested": {
+        "position": [
+          127,
+          17,
+          44
+        ],
+        "target": [
+          108,
+          76
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "after",
+      "name": "park-rural",
+      "file": "after/park-rural.webp",
+      "source_png_sha256": "7a1e4fdda4dc65dd19590be9067615fe3c4a617742977559536a7638e8ed220a",
+      "sha256": "9ef19c1c5eb8660512ae202a55c1e6d57dafa88644eee13164f41b4d7dec9c4c",
+      "pose": {
+        "position": [
+          123,
+          128,
+          -4.000000000000014
+        ],
+        "target": [
+          129,
+          -64
+        ],
+        "distance": 141.49204924659193,
+        "polar": 0.4402515941517173,
+        "azimuth": -0.09966865249116205
+      },
+      "requested": {
+        "position": [
+          123,
+          128,
+          -4
+        ],
+        "target": [
+          129,
+          -64
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "park",
+      "phase": "after",
+      "name": "park-arena",
+      "file": "after/park-arena.webp",
+      "source_png_sha256": "0b6ffea3324b5fe421744b4e249dab4fa50f06a0b6fa2f770aad16b3c33ac2b3",
+      "sha256": "c7dcdcab4f55c8785fe43d27d7d52737b9dcb2637452c6d4d1c8f0befdc753c8",
+      "pose": {
+        "position": [
+          290,
+          83,
+          65.00000000000001
+        ],
+        "target": [
+          207,
+          -2
+        ],
+        "distance": 135.1554660381888,
+        "polar": 0.9095415812317613,
+        "azimuth": 0.8916630262885271
+      },
+      "requested": {
+        "position": [
+          290,
+          83,
+          65
+        ],
+        "target": [
+          207,
+          -2
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p1-front",
+      "file": "before/p1-front.webp",
+      "source_png_sha256": "d65539ebf70de813a5116ea416bdf661e852f1b6924ca429f251904568a3933d",
+      "sha256": "fca75768b70a493ae26d9384541e646ba867f7a3489a3e9b914c6381af0906a3",
+      "pose": {
+        "position": [
+          71.88470000000001,
+          9.999999999999998,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 26.000000000000007,
+        "polar": 1.1760052070951352,
+        "azimuth": 1.5707963267948966
+      },
+      "requested": {
+        "position": [
+          71.88470000000001,
+          10,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p1-rear",
+      "file": "before/p1-rear.webp",
+      "source_png_sha256": "bbd65b692234fb338290ac23b24b61be36050bf61df4e7a004217d7398f4b294",
+      "sha256": "de99884e844c239bf772afe1d1d64d0ee90b52c12274dfac3b6ed1b2c464165d",
+      "pose": {
+        "position": [
+          23.884700000000002,
+          10.000000000000002,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 26,
+        "polar": 1.176005207095135,
+        "azimuth": -1.5707963267948966
+      },
+      "requested": {
+        "position": [
+          23.884700000000002,
+          10,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p14-front",
+      "file": "before/p14-front.webp",
+      "source_png_sha256": "d5be708c8d1edec7e5aff8fc294dc54b49903a68c1060088020e18068e112e7b",
+      "sha256": "50d555415ed5da1bbdaf6cc352df503474737334cc0dc534f9eca80825fd3ee1",
+      "pose": {
+        "position": [
+          77.14699999999999,
+          11.999999999999996,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 27.730849247724088,
+        "polar": 1.1232763516377267,
+        "azimuth": 1.5707963267948966
+      },
+      "requested": {
+        "position": [
+          77.14699999999999,
+          12,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p14-rear",
+      "file": "before/p14-rear.webp",
+      "source_png_sha256": "9aec8351051269251e8b0f0068ffb59da976dbe5807739dd050807839513f93e",
+      "sha256": "7077835ed016cfccd5d0f9b295178541ba1970b5917d0d88408e2d2e90ed06ed",
+      "pose": {
+        "position": [
+          27.14699999999999,
+          12.000000000000005,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 27.7308492477241,
+        "polar": 1.1232763516377267,
+        "azimuth": -1.5707963267948966
+      },
+      "requested": {
+        "position": [
+          27.147,
+          12,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p12-front",
+      "file": "before/p12-front.webp",
+      "source_png_sha256": "0565a65383d87203e39575865e41201b60477847b58169a6828d267bb195d49c",
+      "sha256": "d52f634fdd647024d8833c03f0ab3de9049f0aeebf7f95887b0f6c3bb4ba6dc3",
+      "pose": {
+        "position": [
+          81.306,
+          13.999999999999996,
+          50.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 32.202484376209235,
+        "polar": 1.1210367137250576,
+        "azimuth": 3.141592653589793
+      },
+      "requested": {
+        "position": [
+          81.306,
+          14,
+          50.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p12-rear",
+      "file": "before/p12-rear.webp",
+      "source_png_sha256": "ed6af48ee6a56324d8c2b5a2bb5519d82d11f234e4daef111605da6c3dcd606e",
+      "sha256": "142436d617d00ff8d9838fdcb0d2154dd1e852e86e821504630deb3647882a55",
+      "pose": {
+        "position": [
+          81.306,
+          13.999999999999996,
+          108.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 32.202484376209235,
+        "polar": 1.1210367137250576,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          81.306,
+          14,
+          108.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p8-front",
+      "file": "before/p8-front.webp",
+      "source_png_sha256": "381d58cef10be490f7989c13e424928636157cb874561cdfeb828f855e98228a",
+      "sha256": "35a5e2401bc561f14042d70e1ee6f30a91edfa28525d3d0e6a41334e91fc7eab",
+      "pose": {
+        "position": [
+          99.6431,
+          13.000000000000004,
+          49.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.1493771199070923,
+        "azimuth": 3.141592653589793
+      },
+      "requested": {
+        "position": [
+          99.6431,
+          13,
+          49.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p8-rear",
+      "file": "before/p8-rear.webp",
+      "source_png_sha256": "bbde591dc380dea1587742ce893e5a8a1149c430e8f6f10dda6953e4ce8feda2",
+      "sha256": "61d3b3a3f2f74ca24a79cca0edd4b73fc3006406acafc125a35cee1244d0126d",
+      "pose": {
+        "position": [
+          99.6431,
+          13.000000000000004,
+          107.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.1493771199070923,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          99.6431,
+          13,
+          107.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p13-front",
+      "file": "before/p13-front.webp",
+      "source_png_sha256": "c6ed942817f021d08f0d792e4919887629b95842b3f0b414282a6cca591ee237",
+      "sha256": "792b6aae71c0ec709301adc269c87013dd1d400c9dde30004d57b05cf3aadabe",
+      "pose": {
+        "position": [
+          109.6508,
+          11.999999999999998,
+          49.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 29.546573405388315,
+        "polar": 1.1525719972156676,
+        "azimuth": 3.141592653589793
+      },
+      "requested": {
+        "position": [
+          109.6508,
+          12,
+          49.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p13-rear",
+      "file": "before/p13-rear.webp",
+      "source_png_sha256": "303ce4c718451749e6b9fe08ae14680a30ffcb6c65a50e44926c31a8aa3ff4c8",
+      "sha256": "dfa7cf831a060c31f7b7ef553c2c9e4aba7c4543532e74b0d606f306f9844912",
+      "pose": {
+        "position": [
+          109.6508,
+          11.999999999999998,
+          103.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 29.546573405388315,
+        "polar": 1.1525719972156676,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          109.6508,
+          12,
+          103.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p3-front",
+      "file": "before/p3-front.webp",
+      "source_png_sha256": "66497e2faa2576718685eea78268662eb0f40d925f7c0b0d8bbe492512be2084",
+      "sha256": "883fb5a43e3ee478da4294f421b2a84d7b90fc842168bd4ed2011c5b539d023f",
+      "pose": {
+        "position": [
+          123.3874,
+          15.000000000000005,
+          45.481800000000035
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 36.249137920783696,
+        "polar": 1.1441688336680205,
+        "azimuth": 3.141592653589793
+      },
+      "requested": {
+        "position": [
+          123.3874,
+          15,
+          45.48180000000001
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "p3-rear",
+      "file": "before/p3-rear.webp",
+      "source_png_sha256": "a52dd65644ca958700c82868c90e3be073c7255d208eec3874980f1ce11a97bd",
+      "sha256": "42c0fb7eab69b97fddad2756635dc310246c349f88d897c2569882ebec34ef6b",
+      "pose": {
+        "position": [
+          123.3874,
+          15.000000000000004,
+          111.48179999999999
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 36.2491379207837,
+        "polar": 1.1441688336680202,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          123.3874,
+          15,
+          111.4818
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "lot-grass",
+      "file": "before/lot-grass.webp",
+      "source_png_sha256": "f547e65106d4e56db09870c0f5ed3e8d74a3b114c5149633f7747f74ca1bd948",
+      "sha256": "1204a027e0d8d7185634475ef56a1491ae2625eed42637e915213c5677f3f8c0",
+      "pose": {
+        "position": [
+          103,
+          15.999999999999998,
+          50
+        ],
+        "target": [
+          94,
+          35
+        ],
+        "distance": 23.706539182259394,
+        "polar": 0.8299410431935544,
+        "azimuth": 0.5404195002705842
+      },
+      "requested": {
+        "position": [
+          103,
+          16,
+          50
+        ],
+        "target": [
+          94,
+          35
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "park-grass",
+      "file": "before/park-grass.webp",
+      "source_png_sha256": "f910c35bd0d16f744614246bb06b3c2b6c65bdd45ec7d32b81e02bec75d4a27f",
+      "sha256": "2892bb5f4232644737320e2b65dc794683e54333bea3eb530c4bade329ca21e1",
+      "pose": {
+        "position": [
+          -12.000000000000004,
+          13,
+          73
+        ],
+        "target": [
+          -24,
+          63.99999999999999
+        ],
+        "distance": 19.849433241279208,
+        "polar": 0.8567056281827387,
+        "azimuth": 0.9272952180016122
+      },
+      "requested": {
+        "position": [
+          -12,
+          13,
+          73
+        ],
+        "target": [
+          -24,
+          64
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "trees-near",
+      "file": "before/trees-near.webp",
+      "source_png_sha256": "784bfba569414aef9c5175d0e7a9d4b1519186681b5103f821d6fa9987ce623f",
+      "sha256": "16d0f2eeb9ce681ff46100a16ae6b7c7b82c993200b79dee3f1be60507fb18c3",
+      "pose": {
+        "position": [
+          -25,
+          12,
+          78
+        ],
+        "target": [
+          -29,
+          62
+        ],
+        "distance": 20.396078054371138,
+        "polar": 0.9417815243682207,
+        "azimuth": 0.24497866312686414
+      },
+      "requested": {
+        "position": [
+          -25,
+          12,
+          78
+        ],
+        "target": [
+          -29,
+          62
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "trees-far",
+      "file": "before/trees-far.webp",
+      "source_png_sha256": "ed2ab8cd38666982fb182832ca30bd6f2f3c9fb1a12d98ec045b498f607e520d",
+      "sha256": "1649dc1fd7a5521bb8718946cfc18bd7246add7e090187ee66fe80c308ca4e08",
+      "pose": {
+        "position": [
+          -23,
+          85,
+          136
+        ],
+        "target": [
+          -25,
+          61.99999999999999
+        ],
+        "distance": 112.71645842555559,
+        "polar": 0.7165066450545368,
+        "azimuth": 0.02702044918726479
+      },
+      "requested": {
+        "position": [
+          -23,
+          85,
+          136
+        ],
+        "target": [
+          -25,
+          62
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "asphalt-internal",
+      "file": "before/asphalt-internal.webp",
+      "source_png_sha256": "13a8c5f2bbc5f3dbd57de8fc7808e28e1b636332760ca49d958b1dd4a8666265",
+      "sha256": "ec4ca7cc0ae971ee0a8bacacfdf8e70dcad0961601b3ae85d60cd206e973c098",
+      "pose": {
+        "position": [
+          109,
+          16,
+          60.00000000000001
+        ],
+        "target": [
+          109,
+          46.00000000000001
+        ],
+        "distance": 21.2602916254693,
+        "polar": 0.7188299996216245,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          109,
+          16,
+          60
+        ],
+        "target": [
+          109,
+          46
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "before",
+      "name": "asphalt-external",
+      "file": "before/asphalt-external.webp",
+      "source_png_sha256": "38f908160445687fc543d4eafef2ac677d7f1dc8635aace0515336c6814f4521",
+      "sha256": "45eae993d3d00b5ed6ec5fe43d677ec212812df3bca674b311ebf61867f62c9c",
+      "pose": {
+        "position": [
+          107,
+          9,
+          109
+        ],
+        "target": [
+          107,
+          95
+        ],
+        "distance": 16.64331697709324,
+        "polar": 0.9994588469612699,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          107,
+          9,
+          109
+        ],
+        "target": [
+          107,
+          95
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p1-front",
+      "file": "after/p1-front.webp",
+      "source_png_sha256": "5a67a99fde2b8a8e59d57417716956b2e04281d578fe7fba93c2ac8bb660ab8b",
+      "sha256": "cdb54739e5a2360e1c16e848595c39146a7e460d3ef26d93439245e8411b8c5e",
+      "pose": {
+        "position": [
+          71.88470000000001,
+          9.999999999999998,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 26.000000000000007,
+        "polar": 1.1760052070951352,
+        "azimuth": 1.5707963267948966
+      },
+      "requested": {
+        "position": [
+          71.88470000000001,
+          10,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p1-rear",
+      "file": "after/p1-rear.webp",
+      "source_png_sha256": "b62d1cff87169f1da3333e771a22b97c1b3ccbac56c5e4e4b289bed887965d94",
+      "sha256": "bcba7853e1eb3effebefabb65040e4ef540759f8dbb461acb5f084bc961eb7cd",
+      "pose": {
+        "position": [
+          23.884700000000002,
+          10.000000000000002,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ],
+        "distance": 26,
+        "polar": 1.176005207095135,
+        "azimuth": -1.5707963267948966
+      },
+      "requested": {
+        "position": [
+          23.884700000000002,
+          10,
+          61.0987
+        ],
+        "target": [
+          47.8847,
+          61.0987
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p14-front",
+      "file": "after/p14-front.webp",
+      "source_png_sha256": "d83cb4c54da948758f106d01163441942d513a35313a692d1b25bc76a1be3d43",
+      "sha256": "04f0e817a09802fcc5c421d32fdc03716e50f9d6a04c78bd5db210ed9bca29b1",
+      "pose": {
+        "position": [
+          77.14699999999999,
+          11.999999999999996,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 27.730849247724088,
+        "polar": 1.1232763516377267,
+        "azimuth": 1.5707963267948966
+      },
+      "requested": {
+        "position": [
+          77.14699999999999,
+          12,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p14-rear",
+      "file": "after/p14-rear.webp",
+      "source_png_sha256": "11ee34b79c9d6a0230bb1cb93e2744c204cfe8d4d6b3d2443e74a36d7752d2e6",
+      "sha256": "68e1355194027b99410361c3132200b5edfecea2d8686230be8f6a1f7fa63436",
+      "pose": {
+        "position": [
+          27.14699999999999,
+          12.000000000000005,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ],
+        "distance": 27.7308492477241,
+        "polar": 1.1232763516377267,
+        "azimuth": -1.5707963267948966
+      },
+      "requested": {
+        "position": [
+          27.147,
+          12,
+          79.4933
+        ],
+        "target": [
+          52.147,
+          79.4933
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p12-front",
+      "file": "after/p12-front.webp",
+      "source_png_sha256": "5c88d8f91386d801ba32011a137e6fadf2662a7711713bdfbb8fb3b74b802ac5",
+      "sha256": "662232b4f48d1dd848331660109148459e0ecf66f72df08afe38fdbca0809b0a",
+      "pose": {
+        "position": [
+          81.306,
+          13.999999999999996,
+          50.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 32.202484376209235,
+        "polar": 1.1210367137250576,
+        "azimuth": 3.141592653589793
+      },
+      "requested": {
+        "position": [
+          81.306,
+          14,
+          50.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p12-rear",
+      "file": "after/p12-rear.webp",
+      "source_png_sha256": "bbbc7f5009223b26fac4b3e9ee87b6ed010e928f540abb420765656afb06f161",
+      "sha256": "bd987d63a9ec0e878752b0824960c3fafbd4b378d91c6494eac24adf46c4bb77",
+      "pose": {
+        "position": [
+          81.306,
+          13.999999999999996,
+          108.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ],
+        "distance": 32.202484376209235,
+        "polar": 1.1210367137250576,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          81.306,
+          14,
+          108.6708
+        ],
+        "target": [
+          81.306,
+          79.6708
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p8-front",
+      "file": "after/p8-front.webp",
+      "source_png_sha256": "d3420f36bd5ca2c4bea28b6bd7b038ff2c9f6fd4423c8b962620d46f32e913f4",
+      "sha256": "5c83dc6e0a3cbc0e76c594240b07b5f48dad0c9c8e9c6fa8ae9d6d84bc55e5ca",
+      "pose": {
+        "position": [
+          99.6431,
+          13.000000000000004,
+          49.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.1493771199070923,
+        "azimuth": 3.141592653589793
+      },
+      "requested": {
+        "position": [
+          99.6431,
+          13,
+          49.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p8-rear",
+      "file": "after/p8-rear.webp",
+      "source_png_sha256": "aebba7604d1959e5434084bd705d56f8e779ba755f206a80c02f492d341584a2",
+      "sha256": "7b01d36a809eeabcf65d3b911e2b770ca772b0b65a780972097af031afad4b69",
+      "pose": {
+        "position": [
+          99.6431,
+          13.000000000000004,
+          107.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ],
+        "distance": 31.78049716414141,
+        "polar": 1.1493771199070923,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          99.6431,
+          13,
+          107.6699
+        ],
+        "target": [
+          99.6431,
+          78.6699
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p13-front",
+      "file": "after/p13-front.webp",
+      "source_png_sha256": "8c2513aa6f56cec60fd39fa2be6aa9777d69d2d575b1d43a8c7037d5999be28f",
+      "sha256": "5145a602fbb694a9783377ab8ca23f62eba5ae69e70d2e4ae110190b2d52f9cd",
+      "pose": {
+        "position": [
+          109.6508,
+          11.999999999999998,
+          49.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 29.546573405388315,
+        "polar": 1.1525719972156676,
+        "azimuth": 3.141592653589793
+      },
+      "requested": {
+        "position": [
+          109.6508,
+          12,
+          49.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p13-rear",
+      "file": "after/p13-rear.webp",
+      "source_png_sha256": "d626c9349f5c5efdee6f943bf39c613a94eca42b26d69eca7a3a56a5a7dd8f05",
+      "sha256": "1d5c2c070ff2ba3e8a93717502042cbf2de0017cfd22efb6a0f6d550dfdd89e4",
+      "pose": {
+        "position": [
+          109.6508,
+          11.999999999999998,
+          103.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ],
+        "distance": 29.546573405388315,
+        "polar": 1.1525719972156676,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          109.6508,
+          12,
+          103.973
+        ],
+        "target": [
+          109.6508,
+          76.973
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p3-front",
+      "file": "after/p3-front.webp",
+      "source_png_sha256": "6710c763cd650755d41bc2dd0e3a58848baf9136ceace5e633b9976c6aa8da6f",
+      "sha256": "25375b8377180d6f54d49214680c18207c4ff08b671386db31034b12bab4c5fa",
+      "pose": {
+        "position": [
+          123.3874,
+          15.000000000000005,
+          45.481800000000035
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 36.249137920783696,
+        "polar": 1.1441688336680205,
+        "azimuth": 3.141592653589793
+      },
+      "requested": {
+        "position": [
+          123.3874,
+          15,
+          45.48180000000001
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "p3-rear",
+      "file": "after/p3-rear.webp",
+      "source_png_sha256": "3f274b110d2489b346f54ae7a630fbc62ed83f665c7c21cfd3c222e3a6350840",
+      "sha256": "c65415558fa751d4ca0f8057a2f9cc8dd6beb4efb3e0b192c167e928aceba6c1",
+      "pose": {
+        "position": [
+          123.3874,
+          15.000000000000004,
+          111.48179999999999
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ],
+        "distance": 36.2491379207837,
+        "polar": 1.1441688336680202,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          123.3874,
+          15,
+          111.4818
+        ],
+        "target": [
+          123.3874,
+          78.4818
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "lot-grass",
+      "file": "after/lot-grass.webp",
+      "source_png_sha256": "a89a44b1cbceef5ff8184892452c62b4c9cf432c89260ac79a0a6282bd109471",
+      "sha256": "12341d010d1036166e9a39ce40b3349dbc0111108549d025ed752559e8ad9f6f",
+      "pose": {
+        "position": [
+          103,
+          15.999999999999998,
+          50
+        ],
+        "target": [
+          94,
+          35
+        ],
+        "distance": 23.706539182259394,
+        "polar": 0.8299410431935544,
+        "azimuth": 0.5404195002705842
+      },
+      "requested": {
+        "position": [
+          103,
+          16,
+          50
+        ],
+        "target": [
+          94,
+          35
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "park-grass",
+      "file": "after/park-grass.webp",
+      "source_png_sha256": "a254240d18a6ae60310bd136d97a68f8bb95e54022143c296e5141167782a25a",
+      "sha256": "a9663a57eacba4d816e0ce5b03483485c2c84e09041fdc8855cd6b076bf291bf",
+      "pose": {
+        "position": [
+          -12.000000000000004,
+          13,
+          73
+        ],
+        "target": [
+          -24,
+          63.99999999999999
+        ],
+        "distance": 19.849433241279208,
+        "polar": 0.8567056281827387,
+        "azimuth": 0.9272952180016122
+      },
+      "requested": {
+        "position": [
+          -12,
+          13,
+          73
+        ],
+        "target": [
+          -24,
+          64
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "trees-near",
+      "file": "after/trees-near.webp",
+      "source_png_sha256": "f4f5e452dd6c44ec89b73ac7370a4f76315471260bbf8a737c483043b9772382",
+      "sha256": "4199e38a1fffb7a4e1cd38a4e4709adf726014d3222afa0f84cfa9f1e68c060d",
+      "pose": {
+        "position": [
+          -25,
+          12,
+          78
+        ],
+        "target": [
+          -29,
+          62
+        ],
+        "distance": 20.396078054371138,
+        "polar": 0.9417815243682207,
+        "azimuth": 0.24497866312686414
+      },
+      "requested": {
+        "position": [
+          -25,
+          12,
+          78
+        ],
+        "target": [
+          -29,
+          62
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "trees-far",
+      "file": "after/trees-far.webp",
+      "source_png_sha256": "ddfbf1681469ebd549595ef9275f2acb31b678fb21f5560234920e764a9ae9d9",
+      "sha256": "a9fcdbccf7988dd4994bad90f0aec4c96563390d7f661220f4582e3ddd1a08f6",
+      "pose": {
+        "position": [
+          -23,
+          85,
+          136
+        ],
+        "target": [
+          -25,
+          61.99999999999999
+        ],
+        "distance": 112.71645842555559,
+        "polar": 0.7165066450545368,
+        "azimuth": 0.02702044918726479
+      },
+      "requested": {
+        "position": [
+          -23,
+          85,
+          136
+        ],
+        "target": [
+          -25,
+          62
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "asphalt-internal",
+      "file": "after/asphalt-internal.webp",
+      "source_png_sha256": "914a2431af25b94233c5957f3a4728c8a80b573de3cd471d26b0633092ccd7cb",
+      "sha256": "aeb287c52db5ca370680b0f46f000177502b329b236de3cf40a33739b0758c80",
+      "pose": {
+        "position": [
+          109,
+          16,
+          60.00000000000001
+        ],
+        "target": [
+          109,
+          46.00000000000001
+        ],
+        "distance": 21.2602916254693,
+        "polar": 0.7188299996216245,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          109,
+          16,
+          60
+        ],
+        "target": [
+          109,
+          46
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    },
+    {
+      "group": "materials",
+      "phase": "after",
+      "name": "asphalt-external",
+      "file": "after/asphalt-external.webp",
+      "source_png_sha256": "c13e781c2654136ace140d0ce29429aa5032a486a8c33f5493b10de236bef2de",
+      "sha256": "c34978aa6ae94ce3394575e3d99b1ea9da9c61d4887dbbde7efb0f0f21aca46e",
+      "pose": {
+        "position": [
+          107,
+          9,
+          109
+        ],
+        "target": [
+          107,
+          95
+        ],
+        "distance": 16.64331697709324,
+        "polar": 0.9994588469612699,
+        "azimuth": 0
+      },
+      "requested": {
+        "position": [
+          107,
+          9,
+          109
+        ],
+        "target": [
+          107,
+          95
+        ]
+      },
+      "samePose": true,
+      "pixels": [
+        1520,
+        880
+      ]
+    }
+  ]
+}

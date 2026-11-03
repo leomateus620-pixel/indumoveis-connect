@@ -11,7 +11,6 @@ import {
   Settings2,
   HelpCircle,
   Layers,
-  Move,
   RotateCw,
   ArrowLeft,
   ArrowRight,
@@ -26,14 +25,7 @@ import {
 } from "lucide-react";
 import { ENTITIES } from "./data/territory";
 import type { Point } from "./data/territory";
-import type {
-  MapGesture,
-  MapHandle,
-  MapInsets,
-  MapQuality,
-  MapRendererProps,
-  MapView,
-} from "./types";
+import type { MapHandle, MapInsets, MapQuality, MapRendererProps, MapView } from "./types";
 import { Map2D } from "./Map2D";
 import { searchEntities, searchLandmarks } from "./search";
 import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
@@ -102,11 +94,11 @@ export function CommercialMapWorkspace({
   const [view, setView] = useState<MapView>("perspective");
   const [viewRevision, setViewRevision] = useState(0);
   const [orientationFree, setOrientationFree] = useState(false);
-  const externalView = useRef<MapView>("perspective");
-  const externalOrientationFree = useRef(false);
+  const selectionOrigin = useRef<{ view: MapView; orientationFree: boolean } | null>(null);
+  const presentation = useRef({ view, orientationFree });
+  presentation.current = { view, orientationFree };
   const [quality, setQuality] = useState<MapQuality>("auto");
   useEffect(() => setQuality(readQualityPreference()), []);
-  const [gesture, setGesture] = useState<MapGesture>("move");
   const [menu, setMenu] = useState<"search" | "settings" | "help" | "legend" | "more" | null>(null);
   const menuOrigin = useRef<HTMLButtonElement | null>(null);
   const [menuRight, setMenuRight] = useState(12);
@@ -172,27 +164,35 @@ export function CommercialMapWorkspace({
     [],
   );
   const handle = () => (representation === "ready" ? map.current : lightMap.current);
-  useEffect(() => {
-    if (window.matchMedia("(pointer: fine)").matches) setGesture("rotate");
-  }, []);
   const select = useCallback((id: string, keyboard = false) => {
     if (!ENTITIES.some((e) => e.id === id)) return;
-    const focused = document.activeElement;
-    origin.current =
-      focused instanceof HTMLElement &&
-      focused !== document.body &&
-      !focused.closest(".im-map-popover")
-        ? focused
-        : (workspace.current?.querySelector<HTMLButtonElement>(
-            'button[aria-label="Buscar lote, pavilhão, via ou estrutura"]',
-          ) ?? null);
+    if (!selectionOrigin.current) {
+      selectionOrigin.current = { ...presentation.current };
+      const focused = document.activeElement;
+      origin.current =
+        focused instanceof HTMLElement &&
+        focused !== document.body &&
+        !focused.closest(".im-map-popover")
+          ? focused
+          : (workspace.current?.querySelector<HTMLButtonElement>(
+              'button[aria-label="Buscar lote, pavilhão, via ou estrutura"]',
+            ) ?? null);
+    }
     performance.mark("indumoveis:selection-input");
+    setInspectedId((previous) => (previous && previous !== id ? null : previous));
     lightNavigated.current = false;
     dispatch({ type: "select", id });
     setMenu(null);
     if (keyboard) requestAnimationFrame(() => closeButton.current?.focus());
   }, []);
   const close = useCallback(() => {
+    const saved = selectionOrigin.current;
+    if (saved) {
+      setView(saved.view);
+      setOrientationFree(saved.orientationFree);
+      selectionOrigin.current = null;
+    }
+    setInspectedId(null);
     dispatch({ type: "close" });
     onCloseExternal?.();
     const returnTo = origin.current?.isConnected
@@ -244,10 +244,8 @@ export function CommercialMapWorkspace({
   useEffect(() => {
     if (selection.id) {
       performance.mark("indumoveis:selection-dom");
-      handle()?.focus(selection.id);
     }
-    // Focus only on a new explicit selection, never on refetch or panel close.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Each renderer owns selection framing and its original return pose.
   }, [selection.id]);
   useEffect(() => {
     const el = workspace.current,
@@ -406,9 +404,10 @@ export function CommercialMapWorkspace({
     view,
     viewRevision,
     quality,
-    gesture,
+    gesture: "move",
     insets,
     onSelect: select,
+    onDeselect: close,
     onReady: () => {},
     onFailure: fail,
     statuses,
@@ -491,34 +490,6 @@ export function CommercialMapWorkspace({
       )}
     </div>
   );
-  const gestureControls =
-    representation === "ready" &&
-    (compactHeader ? (
-      <select
-        className="im-map-gesture-select"
-        aria-label="Gesto de navegação"
-        value={gesture}
-        onChange={(event) => setGesture(event.target.value as MapGesture)}
-      >
-        <option value="move">Mover</option>
-        <option value="rotate">Girar</option>
-      </select>
-    ) : (
-      <div
-        className="im-map-control-group im-map-gestures"
-        role="group"
-        aria-label="Gesto de navegação"
-      >
-        {tool("Mover mapa", <Move />, () => setGesture("move"), gesture === "move", "Mover")}
-        {tool(
-          "Girar mapa",
-          <RotateCw />,
-          () => setGesture("rotate"),
-          gesture === "rotate",
-          "Girar",
-        )}
-      </div>
-    ));
   const headerActions = (
     <div className="im-map-header-actions">
       {tool(
@@ -573,20 +544,16 @@ export function CommercialMapWorkspace({
     >
       <header className="im-map-header">
         <h1>Mapa Comercial</h1>
-        {inspectedId && (
+        {selection.id && (
           <button
             className="im-map-button im-map-return"
-            aria-label="Voltar ao parque"
-            title="Voltar ao parque"
-            onClick={() => {
-              setInspectedId(null);
-              setView(externalView.current);
-              setOrientationFree(externalOrientationFree.current);
-            }}
+            aria-label="Voltar à vista anterior"
+            title="Voltar à vista anterior"
+            onClick={close}
           >
             <ArrowLeft size={18} />
             <span className="im-map-tooltip" aria-hidden="true">
-              Voltar ao parque
+              Voltar à vista anterior
             </span>
           </button>
         )}
@@ -594,7 +561,6 @@ export function CommercialMapWorkspace({
         <div className="im-map-header-tools">
           {viewControls}
           {navigationControls}
-          {gestureControls}
         </div>
         {(!compactHeader || landscapeLayout) && headerActions}
       </header>
@@ -624,7 +590,6 @@ export function CommercialMapWorkspace({
               onReady={() => {
                 performance.mark("indumoveis:3d-interactive");
                 setRepresentation("ready");
-                if (selection.id && !lightNavigated.current) map.current?.focus(selection.id);
               }}
             />
           </div>
@@ -766,15 +731,14 @@ export function CommercialMapWorkspace({
                           aria-pressed={
                             result.type === "entity" ? selection.id === result.entity.id : undefined
                           }
-                          disabled={result.type === "landmark" && representation !== "ready"}
                           onClick={(e) => {
                             if (result.type === "entity") select(result.entity.id, e.detail === 0);
-                            else if (map.current?.focusLandmark(result.landmark.id)) {
+                            else if (handle()?.focusLandmark(result.landmark.id)) {
                               setLandmarkNotice("");
                               dismissMenu();
                             } else
                               setLandmarkNotice(
-                                "Estrutura indisponível no momento. Tente reabrir a visualização 3D.",
+                                "Não foi possível enquadrar esta estrutura no momento.",
                               );
                           }}
                           onKeyDown={(e) => {
@@ -871,14 +835,14 @@ export function CommercialMapWorkspace({
               ) : displayedMenu === "help" ? (
                 <>
                   <p>
-                    3D, Superior e Oblíqua orientam a mesma cena. Em todas elas, Mover desloca e
-                    Girar orbita com um dedo ou arrasto esquerdo. O botão secundário desloca. Uma
-                    órbita manual ativa a orientação livre; escolher um preset conserva o alvo.
+                    3D, Superior e Oblíqua orientam a mesma cena. Arraste com o botão esquerdo para
+                    mover; com o direito ou Shift + esquerdo para orbitar e inclinar. Uma órbita
+                    manual ativa a orientação livre; escolher um preset conserva o alvo.
                   </p>
                   <p>
-                    Use + / −, roda ou pinça para aproximar. Dois dedos combinam pinça e
-                    deslocamento. Na planta de compatibilidade 2D, arraste para mover; a órbita fica
-                    disponível no 3D.
+                    Use + / −, roda ou pinça para aproximar. Um dedo move; dois dedos combinam
+                    pinça, giro e inclinação. Na planta de compatibilidade 2D, arraste para mover; a
+                    órbita fica disponível no 3D.
                   </p>
                   <p>
                     Toque em uma área para consultar. A busca também permite selecionar pelo
@@ -1009,10 +973,6 @@ export function CommercialMapWorkspace({
                       <button
                         className="im-map-action im-map-action-primary"
                         onClick={() => {
-                          if (!inspectedId) {
-                            externalView.current = view;
-                            externalOrientationFree.current = orientationFree;
-                          }
                           setInspectedId(entity.id);
                         }}
                       >

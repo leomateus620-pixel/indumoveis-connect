@@ -13,7 +13,7 @@ export const VISUAL_THEME = {
   red: "#a83b40",
   wall: "#f1f0e7",
   concrete: "#c4cbc8",
-  roof: "#aebdc6",
+  roof: "#b8bcb8",
   roofLight: "#d2dce0",
   support: "#d9ddd5",
   metal: "#778991",

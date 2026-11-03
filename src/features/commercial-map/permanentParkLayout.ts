@@ -1,257 +1,385 @@
-import type { Point } from "./data/territory";
-import { REFERENCE_ROADS } from "./urbanReference";
+import { ENTITIES, type MapEntity, type Point } from "./data/territory";
+import { pointInPolygon, polygonBounds, signedPolygonArea } from "./geometry";
+import { PHOTO_P1_COURTYARD } from "./photoPavilionSetting";
 import { deriveRoadRibbon } from "./roadGeometry";
+import { subtractPolygons } from "./parkGeometry";
+import {
+  PARK_REFERENCE_ACCESS_PATHS,
+  PARK_REFERENCE_BLOCKS,
+  PARK_REFERENCE_BUILDINGS,
+  PARK_REFERENCE_GATES,
+} from "./parkReference";
+import {
+  PARK_REGISTRATION,
+  PARK_A2_REGISTRATION,
+  registerParkPoint,
+  registerParkPolygon,
+  registerA2Point,
+  registerA2Polygon,
+} from "./parkRegistration";
+import {
+  PARK_A2_BLOCK_PIECES,
+  PARK_A2_BUILDING_FOOTPRINTS,
+  PARK_A2_ROAD_SURFACES,
+  PARK_A2_GATES,
+} from "./parkA2Reference";
+import {
+  PARK_SUPPLEMENTAL_WALKS,
+  PARK_SUPPLEMENTAL_ACCESS_PATHS,
+  PARK_IMIGRANTES_SOURCE_FRONTAGE,
+} from "./parkSupplementalReference";
+import { PARK_A2_GATE_PAVEMENT_REPAIRS } from "./parkA2CirculationRepairs";
+import { simplifyRoadContour } from "./roadContour";
 
-/** A deliberately schematic sector placement, NOT a geographic transform.
- * Physical identities are from the FENASOJA checkout a09a4c68052a7c5fb2a1966d6e1e67980264e8fd;
- * coordinates are presentation-only in the Indumóveis drawing. No feature is
- * a commercial entity and no identity is assigned to an existing Indumóveis lot. */
+/** One physical drawing frame. Cadastre stays in territory.ts. Context never
+ * carries a status, edition, company, parcel number or commercial raycast. */
 export type PermanentParkLandmark = {
-  id:
-    | "arena"
-    | "mirante"
-    | "alameda"
-    | "sede"
-    | "etnia-polonesa"
-    | "etnia-italiana"
-    | "etnia-alema"
-    | "etnia-afro"
-    | "pavilhao-9"
-    | "pavilhao-7"
-    | "pavilhoes-6-10-11"
-    | "pavilhao-5";
+  id: string;
   name: string;
   source: string;
+  sourceId: string;
+  polygon: Point[];
   bounds: readonly [number, number, number, number];
-  placement: "arena-sector" | "east-sector" | "rural-sector";
+  front: Point;
+  existingOwner?: string;
 };
-export const PERMANENT_PARK_LANDMARKS: readonly PermanentParkLandmark[] = [
-  {
-    id: "pavilhao-9",
-    name: "Pavilhão 9",
-    source: "PAVILHAO-09 / gateFourDistrict.ts",
-    bounds: [-9.3, -56.24, -0.66, -35.76],
-    placement: "rural-sector",
-  },
-  {
-    id: "pavilhao-7",
-    name: "Pavilhão 7",
-    source: "B10 / officialReference2026.ts",
-    bounds: [1.74, -40.64, 15.18, -35.56],
-    placement: "rural-sector",
-  },
-  {
-    id: "pavilhoes-6-10-11",
-    name: "Pavilhões 6, 10 e 11",
-    source: "B9 / officialReference2026.ts",
-    bounds: [15.58, -40.48, 49.98, -35.16],
-    placement: "rural-sector",
-  },
-  {
-    id: "pavilhao-5",
-    name: "Pavilhão 5",
-    source: "B8 / officialReference2026.ts",
-    bounds: [50.74, -42.6, 59.26, -35.12],
-    placement: "rural-sector",
-  },
-  {
-    id: "alameda",
-    name: "Alameda Gastronômica",
-    source: "D1 / officialReference2026.ts",
-    bounds: [145, -5.9, 152, 3.9],
-    placement: "arena-sector",
-  },
-  {
-    id: "mirante",
-    name: "Mirante",
-    source: "D3 / miranteComplexReconstruction.ts",
-    bounds: [155, -18, 161, -5],
-    placement: "arena-sector",
-  },
-  {
-    id: "arena",
-    name: "Arena",
-    source: "F / arenaCanonicalLayout.ts; SicrediArena.tsx, without brand",
-    bounds: [191, -12, 210, 2],
-    placement: "arena-sector",
-  },
-  {
-    id: "sede",
-    name: "Casa / Sede",
-    source: "B12 / fenasojaComplexReconstruction.ts",
-    bounds: [190, 50, 197, 58],
-    placement: "east-sector",
-  },
-  {
-    id: "etnia-polonesa",
-    name: "Casa da Etnia Polonesa",
-    source: "C5 / officialReference2026.ts",
-    bounds: [196, 68, 201, 75],
-    placement: "east-sector",
-  },
-  {
-    id: "etnia-italiana",
-    name: "Casa da Etnia Italiana",
-    source: "C6 / officialReference2026.ts",
-    bounds: [215, 68, 220, 75],
-    placement: "east-sector",
-  },
-  {
-    id: "etnia-alema",
-    name: "Casa da Etnia Alemã",
-    source: "C8 / officialReference2026.ts",
-    bounds: [196, 82, 201, 89],
-    placement: "east-sector",
-  },
-  {
-    id: "etnia-afro",
-    name: "Casa da Etnia Afro",
-    source: "C7 / officialReference2026.ts",
-    bounds: [215, 82, 220, 89],
-    placement: "east-sector",
-  },
-];
-export function permanentParkPolygon(landmark: PermanentParkLandmark): Point[] {
-  const [x0, z0, x1, z1] = landmark.bounds;
-  return [
-    [x0, z0],
-    [x1, z0],
-    [x1, z1],
-    [x0, z1],
-  ];
-}
-export const PERMANENT_PARK_EXPLORATION = PERMANENT_PARK_LANDMARKS.map(permanentParkPolygon);
-
-/** R/S Exporural context only: uniform PDF-source × 0.04 with a translated
- * sector origin, never the source's commercial parcels or numbering. */
-const ruralPoint = ([x, z]: readonly [number, number]): Point => [
-  x * 0.04 - 77.18,
-  z * 0.04 - 130.72,
-];
-const ruralRect = (bounds: readonly [number, number, number, number]): Point[] => {
-  const [x0, z0, x1, z1] = bounds;
-  return [
-    [x0, z0],
-    [x1, z0],
-    [x1, z1],
-    [x0, z1],
-  ].map((point) => ruralPoint(point as [number, number]));
+const ids: Record<string, string> = {
+  "PAVILHAO-09": "pavilhao-9",
+  B10: "pavilhao-7",
+  B9: "pavilhoes-6-10-11",
+  B8: "pavilhao-5",
+  D1: "alameda",
+  D3: "mirante",
+  F: "arena",
+  B12: "sede",
+  B13: "palco-lactalis",
+  C5: "etnia-polonesa",
+  C6: "etnia-italiana",
+  C8: "etnia-alema",
+  C7: "etnia-afro",
+  B7: "cozinha-soja",
+  C4: "churrascaria-rural",
+  B28: "cooperativismo",
+  B22: "terceira-idade",
+  B29: "casa-rotaria",
+  D2: "via-expressa",
 };
-export const EXPORURAL_GROUND = ruralRect([3960, 1250, 5980, 2380]);
-// Paraguay's western edge terminates at the actual OSM Buenos Aires ribbon.
-// Source geometry confirms the intersection; this cut assigns the crossing to
-// the existing road surface instead of drawing overlapping asphalt.
-const buenos = REFERENCE_ROADS.find((road) => road.id === "park-buenos-aires")!;
-const buenosRibbon = deriveRoadRibbon(buenos.path, buenos.width);
-function buenosEastEdge(z: number) {
-  const crossings: number[] = [];
-  for (let i = 0; i < buenosRibbon.length; i++) {
-    const a = buenosRibbon[i],
-      b = buenosRibbon[(i + 1) % buenosRibbon.length];
-    if ((a[1] <= z && b[1] > z) || (b[1] <= z && a[1] > z))
-      crossings.push(a[0] + ((z - a[1]) * (b[0] - a[0])) / (b[1] - a[1]));
+const boundsTuple = (polygon: readonly Point[]): [number, number, number, number] => {
+  const b = polygonBounds(polygon);
+  return [b.minX, b.minY, b.maxX, b.maxY];
+};
+const clockwise = (polygon: Point[]): Point[] =>
+  signedPolygonArea(polygon) > 0 ? polygon : [...polygon].reverse();
+const physicalBuildingPolygon = (id: string, source: readonly (readonly [number, number])[]) =>
+  clockwise(
+    PARK_A2_BUILDING_FOOTPRINTS[id]
+      ? registerA2Polygon(PARK_A2_BUILDING_FOOTPRINTS[id])
+      : registerParkPolygon(source),
+  );
+// A presentation-owner correspondence is independent of the printed code B7.
+// The auditorium occupies the already represented support beside P3; C1 and
+// commercial pavilions likewise keep their existing owners, without copies.
+export const PARK_EXISTING_BUILDING_OWNERS: Record<string, string> = {
+  B11: "indumoveis:support:b7",
+};
+export const PERMANENT_PARK_LANDMARKS: readonly PermanentParkLandmark[] =
+  PARK_REFERENCE_BUILDINGS.filter(
+    (item) =>
+      !item.existingOwner &&
+      item.id !== "PISTA-CAMPEIRA" &&
+      !PARK_EXISTING_BUILDING_OWNERS[item.id],
+  ).map((item) => {
+    const polygon = physicalBuildingPolygon(item.id, item.sourcePolygon),
+      [fx, fz] = item.front ?? [0, 1];
+    const origin = registerParkPoint([0, 0]),
+      tip = registerParkPoint([fx, fz]),
+      length = Math.hypot(tip[0] - origin[0], tip[1] - origin[1]);
+    return {
+      id: ids[item.id] ?? item.id.toLowerCase(),
+      sourceId: item.id,
+      name: item.name,
+      source: `${item.source}${PARK_A2_BUILDING_FOOTPRINTS[item.id] ? "; footprint A2 normalizado" : "; conversão gráfica comum"}`,
+      polygon,
+      bounds: boundsTuple(polygon),
+      front: [(tip[0] - origin[0]) / length, (tip[1] - origin[1]) / length] as Point,
+      existingOwner: item.id === "B12" ? "indumoveis:support:mao-na-massa" : undefined,
+    };
+  });
+export const permanentParkPolygon = (landmark: PermanentParkLandmark): Point[] => landmark.polygon;
+/** Structural overrides are presentation data; the original cadastro is never
+ * rewritten. The one Sede model replaces the schematic Mão na Massa box. */
+export const PARK_CORE_ENTITIES: MapEntity[] = ENTITIES.map((e) => {
+  // Lots retain the exact original object, polygon, metadata and subdivision.
+  if (e.kind === "lot") return e;
+  if (e.id === "indumoveis:support:gate-03") {
+    const evidence = PARK_A2_GATES.A3,
+      anchor = registerA2Point(evidence.passagePoint),
+      [dx, dz] = evidence.axis2D;
+    const width = evidence.width * PARK_A2_REGISTRATION.scale;
+    const polygon: Point[] = [
+      [-0.3, -width / 2],
+      [0.3, -width / 2],
+      [0.3, width / 2],
+      [-0.3, width / 2],
+    ].map(([along, across]) => [
+      anchor[0] + dx * along - dz * across,
+      anchor[1] + dz * along + dx * across,
+    ]);
+    return { ...e, anchor, polygon, height: 0.1 };
   }
-  if (!crossings.length) throw new Error("rural-buenos-aires-junction-not-found");
-  return Math.max(...crossings);
+  // C2/C3 is a combined reference envelope. Its three existing presentation
+  // owners retain their footprints until an individual correspondence exists.
+  const reference = PARK_REFERENCE_BUILDINGS.find(
+    (b) =>
+      b.id !== "C2-C3" &&
+      (b.existingOwner === e.id ||
+        PARK_EXISTING_BUILDING_OWNERS[b.id] === e.id ||
+        (b.id === "B12" && e.id === "indumoveis:support:mao-na-massa")),
+  );
+  if (!reference) return e;
+  const polygon = physicalBuildingPolygon(reference.id, reference.sourcePolygon),
+    b = polygonBounds(polygon),
+    old = polygonBounds(e.polygon);
+  const project = (p: Point): Point => {
+    const candidate: Point = [
+      b.minX + ((p[0] - old.minX) / (old.maxX - old.minX)) * (b.maxX - b.minX),
+      b.minY + ((p[1] - old.minY) / (old.maxY - old.minY)) * (b.maxY - b.minY),
+    ];
+    let closest: Point = candidate,
+      best = Infinity;
+    polygon.forEach((a, i) => {
+      const q = polygon[(i + 1) % polygon.length],
+        dx = q[0] - a[0],
+        dz = q[1] - a[1],
+        t = Math.max(
+          0,
+          Math.min(
+            1,
+            ((candidate[0] - a[0]) * dx + (candidate[1] - a[1]) * dz) / (dx * dx + dz * dz),
+          ),
+        ),
+        c: Point = [a[0] + t * dx, a[1] + t * dz],
+        d = Math.hypot(c[0] - candidate[0], c[1] - candidate[1]);
+      if (d < best) {
+        best = d;
+        closest = c;
+      }
+    });
+    return closest;
+  };
+  return {
+    ...e,
+    polygon,
+    anchor: [(b.minX + b.maxX) / 2, (b.minY + b.maxY) / 2],
+    accesses: e.accesses?.map(project),
+    ...(reference.id === "B12" ? { height: 4.4 } : {}),
+  };
+});
+const lots = ENTITIES.filter((e) => e.kind === "lot");
+export const PARK_PHYSICAL_BLOCKS = PARK_REFERENCE_BLOCKS.map((block) => {
+  const members = lots.filter((e) => e.numbers?.some((n) => block.indumoveisNumbers.includes(n))),
+    referencePieces = (PARK_A2_BLOCK_PIECES[block.id] ?? []).map(registerA2Polygon);
+  if (!referencePieces.length) referencePieces.push(registerParkPolygon(block.sourcePolygon));
+  return {
+    ...block,
+    referencePolygon: referencePieces[0],
+    referencePieces,
+    commercialIds: members.map((e) => e.id),
+    polygons:
+      block.coverage === "whole-commercial-envelope"
+        ? members.map((e) => e.polygon)
+        : referencePieces,
+  };
+});
+export const PARK_UNMATCHED_COMMERCIAL_NUMBERS = lots
+  .flatMap((e) => e.numbers ?? [])
+  .filter((n) => !PARK_REFERENCE_BLOCKS.some((b) => b.indumoveisNumbers.includes(n)));
+function roadEntity(id: string, name: string, polygon: Point[], pedestrian = false): MapEntity {
+  const b = polygonBounds(polygon);
+  return {
+    id: `indumoveis:context:${pedestrian ? "walk" : "road"}:${id}`,
+    kind: "road",
+    label: name,
+    location: "Parque · contexto físico",
+    polygon,
+    anchor: [(b.minX + b.maxX) / 2, (b.minY + b.maxY) / 2],
+    source: "Planta física / registro único pelas quadras",
+    confidence: "registro gráfico conferido; não levantamento",
+    notes: pedestrian
+      ? "Passeio físico sem estado comercial"
+      : "Rua interna sem pintura de tráfego",
+  };
 }
-const paraguay = ruralRect([1640, 2444, 3945, 2467]);
-paraguay[0][0] = buenosEastEdge(paraguay[0][1]);
-paraguay[3][0] = buenosEastEdge(paraguay[3][1]);
-export const EXPORURAL_ROADS = [
-  { name: "Rua Bruno Schwartz", polygon: ruralRect([3984, 1484, 5966, 1518]) },
-  { name: "Rua Johan Muller", polygon: ruralRect([3984, 1726, 5966, 1762]) },
-  { name: "Rua Gustavo Bessel", polygon: ruralRect([3985, 2041, 5966, 2078]) },
-  { name: "Rua Emanuel Brachmann", polygon: ruralRect([5227, 2333, 5966, 2372]) },
-  { name: "Rua 15 de Novembro", polygon: ruralRect([5188, 1265, 5227, 2372]) },
-  {
-    name: "Rua Pastor Albert Lehenbauer",
-    polygon: [
-      [3968, 1265],
-      [4004, 1265],
-      [4004, 1484],
-      [3985, 1518],
-      [3984, 1726],
-      [3984, 2445],
-      [3945, 2445],
-      [3945, 1758],
-      [3963, 1726],
-      [3963, 1518],
-      [3968, 1484],
-    ].map((point) => ruralPoint(point as [number, number])),
-  },
-  {
-    name: "Rua Ubiretama",
-    polygon: [
-      [5966, 1265],
-      [6008, 1265],
-      [6008, 2080],
-      [5960, 2320],
-      [5880, 2570],
-      [5832, 2640],
-      [5800, 2618],
-      [5842, 2550],
-      [5920, 2310],
-      [5966, 2070],
-    ].map((point) => ruralPoint(point as [number, number])),
-  },
-  { name: "Rua Paraguai", polygon: paraguay },
-  { name: "Rua Brasília — recorte norte", polygon: ruralRect([3940, 2440, 3988, 2600]) },
-] as const;
-
-/** Source Arena plaza/stairs [4092..4888] are uniformly adapted between the
- * existing schematic Mirante east edge and Arena west edge; the exact physical
- * landform, levels and registration to the commercial drawing remain unknown. */
-const arenaScale = (191 - 161) / (4888 - 4092);
-const arenaX = (source: number) => 161 + (source - 4092) * arenaScale;
-const arenaZ = (source: number) => -5 + (source - 2811) * arenaScale;
-export const ARENA_APPROACH = {
-  stairs: [arenaX(4092), arenaZ(2682), arenaX(4480), arenaZ(2940)] as const,
-  plaza: [arenaX(4480), arenaZ(2682), arenaX(4888), arenaZ(2940)] as const,
-  // 80×196 source points under the same uniform arena-sector scale.
-  canopy: [161 - 80 * arenaScale, -5, 161, -5 + 196 * arenaScale] as const,
-  // Presentation connection between D1 and the covered access: geometry is
-  // locally inferred, not a surveyed crossing of Rua Brasília.
-  landing: [152, -4.6, 161, -0.2] as const,
-};
-const contextRect = ([x0, z0, x1, z1]: readonly [number, number, number, number]): Point[] => [
-  [x0, z0],
-  [x1, z0],
-  [x1, z1],
-  [x0, z1],
+const blockers = PARK_CORE_ENTITIES.filter(
+  (e) =>
+    e.kind === "lot" ||
+    e.kind === "pavilion" ||
+    (e.kind === "support" &&
+      !["indumoveis:support:gate-03", "indumoveis:support:mao-na-massa"].includes(e.id)),
+).map((e) => e.polygon);
+const sourceRoads = [...PARK_SUPPLEMENTAL_WALKS]
+  .filter((road) => road.id.startsWith("NATIONS-"))
+  .flatMap((road) => {
+    if (["RUA-ARGENTINA", "RUA-URUGUAI", "CALCADA-ARVOREDO"].includes(road.id)) return [];
+    return subtractPolygons([registerParkPolygon(road.sourcePolygon)], blockers).map((part, i) =>
+      roadEntity(`${road.id}:${i}`, road.name, part, road.roadClass === "internal-pedestrian"),
+    );
+  });
+const accessRoads = [...PARK_REFERENCE_ACCESS_PATHS, ...PARK_SUPPLEMENTAL_ACCESS_PATHS]
+  .filter((path) => path.roadClass === "internal-pedestrian")
+  .flatMap((path) => {
+    const polygon = deriveRoadRibbon(
+      path.sourcePath.map(registerParkPoint),
+      path.widthSource * PARK_REGISTRATION.scale,
+    );
+    return subtractPolygons([polygon], blockers).map((part, i) =>
+      roadEntity(`${path.id}:${i}`, path.name, part, path.roadClass === "internal-pedestrian"),
+    );
+  });
+export const PARK_CONTEXT_ROADS: MapEntity[] = [
+  ...PARK_A2_ROAD_SURFACES.map((surface, i) => ({
+    ...roadEntity(
+      `a2-network:${i}`,
+      "Circulação interna do parque",
+      registerA2Polygon(simplifyRoadContour(surface.polygon)),
+    ),
+    holes: [
+      ...surface.holes.map((ring) => registerA2Polygon(simplifyRoadContour(ring))),
+      // Photo 9 resolves a small raised tree island inside the broad A2 white
+      // corridor. Source rings remain unchanged; this is one presentation hole.
+      ...(pointInPolygon(PHOTO_P1_COURTYARD.center, registerA2Polygon(surface.polygon)) &&
+      !surface.holes.some((ring) =>
+        pointInPolygon(PHOTO_P1_COURTYARD.center, registerA2Polygon(ring)),
+      )
+        ? [PHOTO_P1_COURTYARD.polygon]
+        : []),
+    ],
+    source: surface.sourceCondition,
+  })),
+  ...PARK_A2_GATE_PAVEMENT_REPAIRS.map((repair) => ({
+    ...roadEntity(repair.id, "Passagem do acesso", registerA2Polygon(repair.polygon)),
+    source: repair.source,
+    notes: repair.condition,
+  })),
 ];
-PERMANENT_PARK_EXPLORATION.push(
-  EXPORURAL_GROUND,
-  ...EXPORURAL_ROADS.map((r) => r.polygon),
-  contextRect(ARENA_APPROACH.stairs),
-  contextRect(ARENA_APPROACH.plaza),
-  contextRect(ARENA_APPROACH.landing),
-  contextRect(ARENA_APPROACH.canopy),
+export const PARK_CONTEXT_WALKS: MapEntity[] = [...sourceRoads, ...accessRoads].filter((e) =>
+  e.id.includes(":walk:"),
 );
-
-/** Approximate peripheral canopy masses; never road or commercial inventory. */
-export const EXPORURAL_EDGE_TREES: Point[] = (
-  [
-    ...Array.from({ length: 12 }, (_, i): Point => [84 + i * 6.6, -84.5 - (i % 3) * 0.4]),
-    ...Array.from({ length: 12 }, (_, i): Point => [84 + i * 6.6, -28.5 + (i % 3) * 0.4]),
-    [78, -66],
-    [78, -55],
-    [78, -44],
-    [165, -66],
-    [165, -55],
-    [165, -44],
-  ] as Point[]
-).filter(([x, z]) =>
-  EXPORURAL_ROADS.every(({ polygon }) => {
-    const xs = polygon.map((p) => p[0]),
-      zs = polygon.map((p) => p[1]);
-    const dx = Math.max(Math.min(...xs) - x, 0, x - Math.max(...xs));
-    const dz = Math.max(Math.min(...zs) - z, 0, z - Math.max(...zs));
-    return Math.hypot(dx, dz) > 1.6;
-  }),
-);
-PERMANENT_PARK_EXPLORATION.push([
-  [76, -87],
-  [167, -87],
-  [167, -25],
-  [76, -25],
+// The public Imigrantes frontage has the same physical owner as the existing
+// avenue: extend that surface east to the documented Nations mouth. It is not
+// another independently drawn avenue or an excluded parking lot.
+const frontage = registerParkPolygon(PARK_IMIGRANTES_SOURCE_FRONTAGE.sourcePolygon);
+const fb = polygonBounds(frontage);
+const avenue = ENTITIES.find((e) => e.id === "indumoveis:road:imigrantes")!,
+  ab = polygonBounds(avenue.polygon);
+const avenueExtension = roadEntity("imigrantes-frontage", avenue.label, [
+  [ab.maxX, ab.minY],
+  [fb.maxX, fb.minY],
+  [fb.maxX, fb.maxY],
+  [ab.maxX, ab.maxY],
 ]);
+export const PARK_RENDER_ENTITIES: MapEntity[] = [
+  ...PARK_CORE_ENTITIES.filter((e) => e.kind !== "road"),
+  ...PARK_CONTEXT_ROADS,
+  ...PARK_CONTEXT_WALKS,
+  avenueExtension,
+];
+/** Gate symbols locate OPENINGS, never building footprints. These clearances
+ * are drawing estimates, not invented portal architecture or metre surveys. */
+export const PARK_GATES = PARK_REFERENCE_GATES.map((gate) => {
+  const evidence = PARK_A2_GATES[gate.id];
+  const point = registerA2Point(evidence.passagePoint),
+    origin = registerA2Point([0, 0]),
+    tip = registerA2Point(evidence.axis2D),
+    length = Math.hypot(tip[0] - origin[0], tip[1] - origin[1]);
+  const axis: Point = [(tip[0] - origin[0]) / length, (tip[1] - origin[1]) / length];
+  return {
+    ...gate,
+    point,
+    axis,
+    width: evidence.width * PARK_A2_REGISTRATION.scale,
+    source: evidence.source,
+    condition: evidence.condition,
+    existingOwner: gate.id === "A3" ? "indumoveis:support:gate-03" : undefined,
+  };
+});
+/** Architectural approach adaptation anchored to the actual A2 buildings.
+ * Mirante source bounds 4004,2440–4072,2748 supply the local z proportions;
+ * the source stair/plaza split 388:408 is retained across the measured drawing
+ * gap to Arena. It is a local equipment recipe, not a sector translation.
+ * Alameda's apron follows the existing documented cross-street return to the
+ * lateral covered structure. Heights remain illustrative, never field levels. */
+const miranteBounds = PERMANENT_PARK_LANDMARKS.find((item) => item.id === "mirante")!.bounds;
+const arenaBounds = PERMANENT_PARK_LANDMARKS.find((item) => item.id === "arena")!.bounds;
+const alamedaBounds = PERMANENT_PARK_LANDMARKS.find((item) => item.id === "alameda")!.bounds;
+const approachZScale = (miranteBounds[3] - miranteBounds[1]) / 308;
+const approachNorth = miranteBounds[3] - (2748 - 2682) * approachZScale;
+const approachSouth = miranteBounds[3] + (2940 - 2748) * approachZScale;
+const stairEnd = miranteBounds[2] + (arenaBounds[0] - miranteBounds[2]) * (388 / 796);
+const arenaOutline = PERMANENT_PARK_LANDMARKS.find((item) => item.id === "arena")!.polygon;
+const arenaFront = arenaOutline
+  .map((a, i) => ({ a, b: arenaOutline[(i + 1) % arenaOutline.length] }))
+  .filter(({ a, b }) => Math.abs(b[1] - a[1]) > Math.abs(b[0] - a[0]) * 4)
+  .sort((a, b) => a.a[0] + a.b[0] - (b.a[0] + b.b[0]))[0];
+const arenaFrontX = (z: number) =>
+  arenaFront.a[0] +
+  ((arenaFront.b[0] - arenaFront.a[0]) * (z - arenaFront.a[1])) /
+    (arenaFront.b[1] - arenaFront.a[1]);
+export const ARENA_APPROACH = {
+  stairs: [miranteBounds[2], approachNorth, stairEnd, approachSouth],
+  plaza: [stairEnd, approachNorth, arenaBounds[0], approachSouth],
+  canopy: [miranteBounds[0], miranteBounds[3], miranteBounds[2], approachSouth],
+  landing: [
+    alamedaBounds[2],
+    Math.max(alamedaBounds[1], miranteBounds[3]),
+    miranteBounds[0],
+    Math.min(alamedaBounds[3], approachSouth),
+  ],
+} satisfies Record<string, readonly [number, number, number, number]>;
+/** Plaza ends on the actual slanted facade, not a bounding-box corner. */
+export const ARENA_APPROACH_POLYGONS: Record<keyof typeof ARENA_APPROACH, Point[]> = {
+  stairs: [
+    [miranteBounds[2], approachNorth],
+    [stairEnd, approachNorth],
+    [stairEnd, approachSouth],
+    [miranteBounds[2], approachSouth],
+  ],
+  plaza: [
+    [stairEnd, approachNorth],
+    [arenaFrontX(approachNorth), approachNorth],
+    [arenaFrontX(approachSouth), approachSouth],
+    [stairEnd, approachSouth],
+  ],
+  canopy: [
+    [miranteBounds[0], miranteBounds[3]],
+    [miranteBounds[2], miranteBounds[3]],
+    [miranteBounds[2], approachSouth],
+    [miranteBounds[0], approachSouth],
+  ],
+  landing: (() => {
+    const [x0, z0, x1, z1] = ARENA_APPROACH.landing;
+    return [
+      [x0, z0],
+      [x1, z0],
+      [x1, z1],
+      [x0, z1],
+    ] as Point[];
+  })(),
+};
+export const ARENA_APPROACH_CONDITION = {
+  source:
+    "arenaCanonicalLayout.ts / stairs, frontPlaza; miranteComplexReconstruction.ts / lateralStructure, southApron; A2 actual D1/D3/F footprints",
+  levels:
+    "Illustrative platform .32 and plaza .03; no surveyed levels or accessibility certification",
+  stairPlazaRatio: [388, 408],
+  sourceMiranteDepth: 308,
+};
+export const PARK_CONTEXT_BLOCKS = PARK_PHYSICAL_BLOCKS.filter(
+  (b) => b.coverage !== "whole-commercial-envelope",
+);
+export const PERMANENT_PARK_EXPLORATION: Point[][] = [
+  ...PARK_PHYSICAL_BLOCKS.flatMap((b) => b.polygons),
+  ...PERMANENT_PARK_LANDMARKS.map((l) => l.polygon),
+  ...PARK_CONTEXT_ROADS.map((e) => e.polygon),
+  ...PARK_CONTEXT_WALKS.map((e) => e.polygon),
+];
