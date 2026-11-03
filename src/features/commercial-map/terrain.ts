@@ -13,11 +13,14 @@ export const TERRAIN = {
   baseElevation: -0.18,
   albedoSize: 512,
   detailSize: 256,
-  albedoTile: 192,
+  // The original 192-unit tile covered almost the entire park with one
+  // low-contrast lobe. A smaller world-anchored tile makes the organic field
+  // perceptible in the commercial overview without adding geometry or draws.
+  albedoTile: 112,
   detailTile: 3.1,
   roughness: 0.94,
   bump: 0.009,
-  palette: ["#aab78b", "#95a578", "#b3ad8b", "#a08b70", "#8d785f"],
+  palette: ["#a4b787", "#789b68", "#b5b48b", "#a58f71", "#806f59"],
 } as const;
 
 export type TerrainTopology = {
@@ -178,10 +181,10 @@ function terrainPixels(kind: "albedo" | "detail") {
           middle = noise(u, v, 11, 43),
           organic = noise(u, v, 5, 83),
           small = noise(u, v, 47, 29);
-        const dry = THREE.MathUtils.smoothstep(broad * 0.58 + organic * 0.42, 0.44, 0.86);
-        sample.copy(palette[0]).lerp(palette[1], broad * 0.35 + middle * 0.17);
+        const dry = THREE.MathUtils.smoothstep(broad * 0.58 + organic * 0.42, 0.48, 0.82);
+        sample.copy(palette[0]).lerp(palette[1], broad * 0.58 + middle * 0.22);
         soil.copy(palette[2]).lerp(palette[3], organic * 0.38);
-        sample.lerp(soil, dry * 0.48).lerp(palette[4], small * dry * 0.045);
+        sample.lerp(soil, dry * 0.5).lerp(palette[4], small * dry * 0.055);
         // Colour data is stored in sRGB; all mixing above happens in linear light.
         sample.convertLinearToSRGB();
         pixels.set(

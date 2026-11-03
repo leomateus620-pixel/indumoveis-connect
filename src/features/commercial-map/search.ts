@@ -1,4 +1,5 @@
 import type { MapEntity } from "./data/territory";
+import type { PermanentParkLandmark } from "./permanentParkLayout";
 
 export function normalizeSearch(value: string) {
   return value
@@ -7,6 +8,22 @@ export function normalizeSearch(value: string) {
     .trim()
     .replace(/\s+/g, " ")
     .toLowerCase();
+}
+
+/** Contextual destinations are not selectable commercial entities. */
+export function searchLandmarks(
+  landmarks: readonly PermanentParkLandmark[],
+  query: string,
+  location = "",
+) {
+  const text = normalizeSearch(query);
+  if (location) return [];
+  const numeric = /^\d+$/.test(text) ? Number(text) : null;
+  return landmarks.filter((landmark) =>
+    numeric === null
+      ? normalizeSearch(landmark.name).includes(text)
+      : (landmark.name.match(/\d+/g) ?? []).some((number) => Number(number) === numeric),
+  );
 }
 
 export function searchEntities(entities: MapEntity[], query: string, location = "") {

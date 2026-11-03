@@ -35,8 +35,10 @@ import type {
   MapView,
 } from "./types";
 import { Map2D } from "./Map2D";
-import { searchEntities } from "./search";
+import { searchEntities, searchLandmarks } from "./search";
+import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
 import { MOTION } from "./motion";
+import { readQualityPreference, writeQualityPreference } from "./qualityPreference";
 import { area, SPACE_STATUS } from "@/lib/format";
 import "./map.css";
 
@@ -103,6 +105,7 @@ export function CommercialMapWorkspace({
   const externalView = useRef<MapView>("perspective");
   const externalOrientationFree = useRef(false);
   const [quality, setQuality] = useState<MapQuality>("auto");
+  useEffect(() => setQuality(readQualityPreference()), []);
   const [gesture, setGesture] = useState<MapGesture>("move");
   const [menu, setMenu] = useState<"search" | "settings" | "help" | "legend" | "more" | null>(null);
   const menuOrigin = useRef<HTMLButtonElement | null>(null);
@@ -122,6 +125,7 @@ export function CommercialMapWorkspace({
   }, [menu]);
   const [query, setQuery] = useState(""),
     [location, setLocation] = useState("");
+  const [landmarkNotice, setLandmarkNotice] = useState("");
   const [inspectedId, setInspectedId] = useState<string | null>(null);
   const [Renderer, setRenderer] = useState<Renderer | null>(null);
   const [engineWanted, setEngineWanted] = useState(true);
@@ -146,7 +150,19 @@ export function CommercialMapWorkspace({
   const [landscapeLayout, setLandscapeLayout] = useState(false);
   const [compactHeader, setCompactHeader] = useState(false);
   const entity = ENTITIES.find((e) => e.id === selection.panelId);
-  const results = useMemo(() => searchEntities(ENTITIES, query, location), [query, location]);
+  const results = useMemo(
+    () => [
+      ...searchEntities(ENTITIES, query, location).map((entity) => ({
+        type: "entity" as const,
+        entity,
+      })),
+      ...searchLandmarks(PERMANENT_PARK_LANDMARKS, query, location).map((landmark) => ({
+        type: "landmark" as const,
+        landmark,
+      })),
+    ],
+    [query, location],
+  );
   const locations = useMemo(
     () => [
       ...new Set(
@@ -168,7 +184,7 @@ export function CommercialMapWorkspace({
       !focused.closest(".im-map-popover")
         ? focused
         : (workspace.current?.querySelector<HTMLButtonElement>(
-            'button[aria-label="Buscar lote, pavilhão ou via"]',
+            'button[aria-label="Buscar lote, pavilhão, via ou estrutura"]',
           ) ?? null);
     performance.mark("indumoveis:selection-input");
     lightNavigated.current = false;
@@ -182,7 +198,7 @@ export function CommercialMapWorkspace({
     const returnTo = origin.current?.isConnected
       ? origin.current
       : workspace.current?.querySelector<HTMLButtonElement>(
-          'button[aria-label="Buscar lote, pavilhão ou via"]',
+          'button[aria-label="Buscar lote, pavilhão, via ou estrutura"]',
         );
     returnTo?.focus({ preventScroll: true });
   }, [onCloseExternal]);
@@ -247,7 +263,7 @@ export function CommercialMapWorkspace({
       }
       const p = panel.current?.getBoundingClientRect(),
         s = canvas.getBoundingClientRect();
-      setLandscapeLayout(s.width >= 620 && s.height < 400);
+      setLandscapeLayout(s.width > s.height * 1.4 && s.height < 400);
       setCompactHeader(el.clientWidth < (inspectedId ? 1280 : 1220));
       // Classify the actual side sheet by its horizontal placement. A compact
       // desktop sheet still occupies the right edge, even when content is short.
@@ -470,8 +486,8 @@ export function CommercialMapWorkspace({
     >
       {tool("Aproximar", <Plus />, () => handle()?.zoom(1.2))}
       {tool("Afastar", <Minus />, () => handle()?.zoom(1 / 1.2))}
-      {tool(inspectedId ? "Reenquadrar pavilhão" : "Reenquadrar parque", <Scan />, () =>
-        inspectedId ? handle()?.focus(inspectedId) : handle()?.restoreOverview(),
+      {tool(inspectedId ? "Reenquadrar pavilhão" : "Reenquadrar área Indumóveis", <Scan />, () =>
+        inspectedId ? handle()?.focus(inspectedId) : handle()?.restoreCommercial(),
       )}
     </div>
   );
@@ -506,7 +522,7 @@ export function CommercialMapWorkspace({
   const headerActions = (
     <div className="im-map-header-actions">
       {tool(
-        "Buscar lote, pavilhão ou via",
+        "Buscar lote, pavilhão, via ou estrutura",
         <Search />,
         () => toggleMenu("search"),
         menu === "search",
@@ -709,14 +725,17 @@ export function CommercialMapWorkspace({
                     <input
                       autoFocus
                       value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      aria-label="Lote, pavilhão ou via"
-                      placeholder="Lote, pavilhão ou via"
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        setLandmarkNotice("");
+                      }}
+                      aria-label="Lote, pavilhão, via ou estrutura"
+                      placeholder="Lote, pavilhão, via ou estrutura"
                       onKeyDown={(e) => {
                         if (e.key === "ArrowDown") {
                           e.preventDefault();
                           workspace.current
-                            ?.querySelector<HTMLButtonElement>(".im-map-result")
+                            ?.querySelector<HTMLButtonElement>(".im-map-result:not(:disabled)")
                             ?.focus();
                         }
                       }}
@@ -733,26 +752,45 @@ export function CommercialMapWorkspace({
                       <option key={value}>{value}</option>
                     ))}
                   </select>
+                  {landmarkNotice && <p role="status">{landmarkNotice}</p>}
                   <div className="im-map-results" aria-label="Resultados da busca">
                     {results.length ? (
-                      results.map((result, index) => (
+                      results.map((result) => (
                         <button
                           className="im-map-result"
-                          key={result.id}
-                          aria-pressed={selection.id === result.id}
-                          onClick={(e) => select(result.id, e.detail === 0)}
+                          key={
+                            result.type === "entity"
+                              ? result.entity.id
+                              : `landmark:${result.landmark.id}`
+                          }
+                          aria-pressed={
+                            result.type === "entity" ? selection.id === result.entity.id : undefined
+                          }
+                          disabled={result.type === "landmark" && representation !== "ready"}
+                          onClick={(e) => {
+                            if (result.type === "entity") select(result.entity.id, e.detail === 0);
+                            else if (map.current?.focusLandmark(result.landmark.id)) {
+                              setLandmarkNotice("");
+                              dismissMenu();
+                            } else
+                              setLandmarkNotice(
+                                "Estrutura indisponível no momento. Tente reabrir a visualização 3D.",
+                              );
+                          }}
                           onKeyDown={(e) => {
                             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
                               e.preventDefault();
-                              const rows =
+                              const rows = Array.from(
                                 workspace.current?.querySelectorAll<HTMLButtonElement>(
-                                  ".im-map-result",
-                                );
-                              rows?.[
+                                  ".im-map-result:not(:disabled)",
+                                ) ?? [],
+                              );
+                              const index = rows.indexOf(e.currentTarget);
+                              rows[
                                 Math.max(
                                   0,
                                   Math.min(
-                                    results.length - 1,
+                                    rows.length - 1,
                                     index + (e.key === "ArrowDown" ? 1 : -1),
                                   ),
                                 )
@@ -761,23 +799,33 @@ export function CommercialMapWorkspace({
                           }}
                         >
                           <span className="im-map-result-icon" aria-hidden="true">
-                            {result.kind === "pavilion" ? (
+                            {result.type === "entity" && result.entity.kind === "pavilion" ? (
                               <Box />
-                            ) : result.kind === "lot" ? (
+                            ) : result.type === "entity" && result.entity.kind === "lot" ? (
                               <Scan />
                             ) : (
                               <MapIcon />
                             )}
                           </span>
                           <span className="im-map-result-copy">
-                            <strong>{result.label}</strong>
-                            <small>{result.location}</small>
+                            <strong>
+                              {result.type === "entity"
+                                ? result.entity.label
+                                : result.landmark.name}
+                            </strong>
+                            <small>
+                              {result.type === "entity"
+                                ? result.entity.location
+                                : representation === "ready"
+                                  ? "Estrutura do parque"
+                                  : "Disponível no mapa 3D"}
+                            </small>
                           </span>
-                          {selection.id === result.id ? (
+                          {result.type === "entity" && selection.id === result.entity.id ? (
                             <Check className="im-map-result-check" aria-hidden="true" />
-                          ) : statuses[result.id] ? (
+                          ) : result.type === "entity" && statuses[result.entity.id] ? (
                             <span className="im-map-result-status">
-                              {SPACE_STATUS[statuses[result.id]]?.label ?? "Não confirmada"}
+                              {SPACE_STATUS[statuses[result.entity.id]]?.label ?? "Não confirmada"}
                             </span>
                           ) : null}
                         </button>
@@ -794,7 +842,11 @@ export function CommercialMapWorkspace({
                     <select
                       aria-label="Qualidade gráfica"
                       value={quality}
-                      onChange={(e) => setQuality(e.target.value as MapQuality)}
+                      onChange={(e) => {
+                        const next = e.target.value as MapQuality;
+                        setQuality(next);
+                        writeQualityPreference(next);
+                      }}
                     >
                       <option value="auto">Automática</option>
                       <option value="light">Leve</option>
@@ -802,6 +854,14 @@ export function CommercialMapWorkspace({
                       <option value="detailed">Detalhado</option>
                     </select>
                   </label>
+                  <button className="im-map-action" onClick={() => handle()?.restoreCommercial()}>
+                    <Scan /> Enquadrar área Indumóveis
+                  </button>
+                  {representation === "ready" && (
+                    <button className="im-map-action" onClick={() => handle()?.restoreOverview()}>
+                      <Scan /> Enquadrar parque completo
+                    </button>
+                  )}
                   <button className="im-map-action" onClick={changeRepresentation}>
                     {representation === "2d" ? <Box /> : <MapIcon />}
                     {representation === "2d" ? "Tentar visualização 3D" : "Usar planta leve 2D"}
@@ -908,6 +968,12 @@ export function CommercialMapWorkspace({
                   </>
                 ) : (
                   <span>Área não confirmada</span>
+                )}
+                {entity.kind === "lot" && (
+                  <span>
+                    Situação:{" "}
+                    {status ? (SPACE_STATUS[status]?.label ?? "Não confirmada") : "Não confirmada"}
+                  </span>
                 )}
               </div>
               <button

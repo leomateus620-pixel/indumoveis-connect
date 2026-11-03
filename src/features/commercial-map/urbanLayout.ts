@@ -4,9 +4,11 @@ import {
   URBAN_REFERENCE,
   REFERENCE_ROADS,
   EXPLORATION_POLYGONS,
+  RESIDENTIAL_ROAD_WIDTH,
   type ReferenceRoad,
 } from "./urbanReference";
 import { deriveRoadRibbon } from "./roadGeometry";
+import { DISTRICT_REFERENCE } from "./urbanDistrictReference";
 
 // Lightweight authored layout only: no renderer, materials or scene factories.
 const AVENUE_SOUTH = URBAN_REFERENCE.avenueSouth;
@@ -19,7 +21,6 @@ export const URBAN_CONTEXT = {
   houseMinimumZ: AVENUE_SOUTH + 1.05,
   avenueSouth: AVENUE_SOUTH,
   groundY: -0.145,
-  houses: 32,
   clusters: 5,
   palette: {
     walls: ["#d4cfc0", "#e1dccf", "#c5c4b9", "#d9c9ad", "#c9c4b4"],
@@ -32,6 +33,8 @@ export type UrbanHouse = {
   center: Point;
   heading: number;
   frontageDistance: number;
+  /** A direct unobstructed link to a road was found; otherwise no driveway is drawn. */
+  roadAccess: boolean;
   form: "courtyard" | "split" | "villa" | "compact" | "two-storey" | "gable";
   footprint: Point[];
   parcel: Point[];
@@ -80,103 +83,92 @@ export function urbanPolygonAllowed(polygon: readonly Point[]) {
   return true;
 }
 
-/** Fixed modular rhythm inspired by the rotated residential reference, without
- * tracing addresses, private parcels or the satellite's printed annotations. */
+/** Sector-local presentation adapter. A uniform scale is used within each
+ * sector; each sector is independently placed between the existing OSM road
+ * interfaces because the commercial schematic is not a single metric survey.
+ * Source rectangles are interpretive landscaping envelopes, not real parcels. */
 export function deriveUrbanHouses(): UrbanHouse[] {
-  const houses: UrbanHouse[] = [];
   const boundaries = ["campeira", "musicanto", "10-de-agosto", "fenasoja"].map(
     (id) => REFERENCE_ROADS.find((r) => r.id === id)!.path[0][0],
   );
-  const forms = ["courtyard", "split", "villa", "compact", "two-storey", "gable"] as const;
-  const addHouse = (
-    center: Point,
-    parcel: Point[],
-    heading: number,
-    frontageDistance: number,
-    cluster: number,
-    dimensions?: [number, number],
-  ) => {
-    const number = houses.length;
-    const width = dimensions?.[0] ?? 6.2 + (number % 4) * 0.3;
-    const depth = dimensions?.[1] ?? 10.2 + ((number * 3) % 5) * 0.38;
-    const footprint = rectangle(...center, heading ? depth : width, heading ? width : depth);
-    if (!urbanPolygonAllowed(parcel) || !footprint.every((p) => pointInPolygon(p, parcel))) return;
-    houses.push({
-      center,
-      parcel,
-      heading,
-      frontageDistance,
-      cluster,
-      width,
-      depth,
-      footprint,
-      form: forms[number % forms.length],
-      height: 2.1 + (number % 3) * 0.18,
-      roof: number % 6 === 0 ? "flat" : number % 3 === 0 ? "gable" : "hip",
-      facing: -1,
-      pool: number % 3 === 2,
-    });
+  const spans = [
+    { source: [98, 155], target: [boundaries[0], boundaries[1]], block: "Q2", cluster: 0 },
+    { source: [166, 239], target: [boundaries[1], boundaries[2]], block: "Q3", cluster: 1 },
+    { source: [250, 318], target: [boundaries[2], boundaries[3]], block: "Q4", cluster: 2 },
+    { source: [329, 409], target: [boundaries[3], boundaries[3] + 43], block: "Q5", cluster: 3 },
+  ] as const;
+  const forms: Record<string, UrbanHouse["form"]> = {
+    "hip-villa": "villa",
+    courtyard: "courtyard",
+    gable: "gable",
+    "flat-modern": "compact",
+    "split-level": "two-storey",
+    "long-shed": "split",
   };
-  for (let block = 0; block < 3; block++) {
-    const [left, right] = [boundaries[block], boundaries[block + 1]];
-    const sidewalkEdge = (5.8 + 1.05) / 2 + 1.4;
-    const residentialWidth = right - left - 2 * sidewalkEdge;
-    // Four smaller front homes and four rear homes opening onto the existing
-    // cross streets reproduce the denser residential grain of reference52.
-    // No public/private road is added through the middle of a block.
-    for (let column = 0; column < 4; column++) {
-      const x = left + sidewalkEdge + (residentialWidth * (column + 0.5)) / 4;
-      const parcelWidth = residentialWidth / 4 - 0.16;
-      const houseZ = 111.9 + ((column * 2 + block) % 4) * 0.68;
-      addHouse(
-        [x, houseZ],
-        rectangle(x, 115.7, parcelWidth, 22.3),
-        0,
-        houseZ - AVENUE_SOUTH,
-        block,
-        [
-          Math.min(parcelWidth - 1.45, 6.05 + ((column + block) % 3) * 0.42),
-          10.5 + (column % 3) * 0.5,
-        ],
+  const houses: UrbanHouse[] = [];
+  for (const span of spans) {
+    // Road + sidewalk clearance is kept at both ends. The t extent is bounded
+    // by the original dead ends; no street is invented behind the residences.
+    const roadClearance = (RESIDENTIAL_ROAD_WIDTH + 1.05) / 2 + 1.0;
+    const usable = span.target[1] - span.target[0] - 2 * roadClearance;
+    const scale = Math.min(usable / (span.source[1] - span.source[0]), 45 / 90);
+    const offsetX =
+      (span.target[0] + span.target[1] - scale * (span.source[0] + span.source[1])) / 2;
+    const world = ([s, t]: readonly [number, number]): Point => [
+      offsetX + s * scale,
+      AVENUE_SOUTH + 1.5 + (t - 11) * scale,
+    ];
+    for (const item of DISTRICT_REFERENCE.filter((record) => record.block === span.block)) {
+      const [a, b, c, d] = item.bounds;
+      const min = world([a, b]),
+        max = world([c, d]);
+      const center = world(item.center);
+      const parcel = rectangle(
+        (min[0] + max[0]) / 2,
+        (min[1] + max[1]) / 2,
+        max[0] - min[0],
+        max[1] - min[1],
       );
+      const sideFrontage = item.frontage !== "avenue";
+      const heading =
+        item.frontage === "north" ? Math.PI / 2 : item.frontage === "south" ? -Math.PI / 2 : 0;
+      // Rotate the facade while keeping the original world-space footprint.
+      const width = item.size[sideFrontage ? 1 : 0] * scale,
+        depth = item.size[sideFrontage ? 0 : 1] * scale;
+      const footprint = rectangle(...center, item.size[0] * scale, item.size[1] * scale);
+      if (!urbanPolygonAllowed(parcel) || !footprint.every((p) => pointInPolygon(p, parcel)))
+        continue;
+      houses.push({
+        center,
+        parcel,
+        footprint,
+        heading,
+        cluster: span.cluster,
+        frontageDistance: depth / 2,
+        roadAccess: false,
+        width,
+        depth,
+        height: item.storeys === 2 ? 2.6 : 2.1,
+        form: forms[item.typology],
+        roof:
+          item.typology === "flat-modern"
+            ? "flat"
+            : item.typology === "gable" || item.typology === "long-shed"
+              ? "gable"
+              : "hip",
+        facing: -1,
+        pool: item.pool,
+      });
     }
-    for (let row = 0; row < 2; row++)
-      for (let side = 0; side < 2; side++) {
-        const x = left + sidewalkEdge + residentialWidth * (side ? 0.75 : 0.25);
-        const z = 133.35 + row * 11.55;
-        const parcel = rectangle(x, z, residentialWidth / 2 - 0.2, 11.35);
-        const heading = side ? Math.PI / 2 : -Math.PI / 2;
-        addHouse([x, z], parcel, heading, side ? right - 2.9 - x : x - left - 2.9, block, [
-          7.3 + ((row + side + block) % 2) * 0.4,
-          10.2 + ((block + row) % 3) * 0.35,
-        ]);
-      }
   }
-  // Partial upper area visible beyond Fenasoja, with separate setbacks rather
-  // than repeating the three full blocks into an unlimited suburb.
-  for (let column = 0; column < 4; column++) {
-    const x = 133.7 + column * 11.15;
-    const houseZ = 112.3 + (column % 3) * 0.68;
-    addHouse([x, houseZ], rectangle(x, 115.8, 10.9, 22.4), 0, houseZ - AVENUE_SOUTH, 3, [
-      7.3 + (column % 2) * 0.6,
-      11.3 + (column % 3) * 0.4,
-    ]);
-  }
-  for (let row = 0; row < 2; row++)
-    addHouse(
-      [136.8, 133.5 + row * 11.5],
-      rectangle(136.8, 133.5 + row * 11.5, 17, 11.3),
-      -Math.PI / 2,
-      136.8 - 125.7,
-      3,
-      [7.5, 10.7],
-    );
+  // The tapered wedge is clipped against the actual diagonal OSM corridor.
+  // Keep the two separately interpreted built volumes, without duplicate wings.
   const diagonal = REFERENCE_ROADS.find((r) => r.id === "tuparendi")!.path;
   const diagonalCeiling = (x: number) => {
     for (let i = 1; i < diagonal.length; i++) {
       const [a, b] = [diagonal[i - 1], diagonal[i]];
       if (x >= Math.min(a[0], b[0]) && x <= Math.max(a[0], b[0]))
-        return a[1] + ((x - a[0]) / (b[0] - a[0])) * (b[1] - a[1]) - 5.8;
+        return a[1] + ((x - a[0]) / (b[0] - a[0])) * (b[1] - a[1]) - 6.8;
     }
     return -Infinity;
   };
@@ -195,24 +187,84 @@ export function deriveUrbanHouses(): UrbanHouse[] {
     }
     return out;
   };
-  // Two individually fitted dwellings occupy the tapered triangle. Their
-  // gardens/fences follow the clipped parcel, not its enclosing rectangle.
-  addHouse(
-    [-23, 112],
-    clipDiagonal(rectangle(-24.5, 111.7, 15, 14)),
-    0,
-    112 - AVENUE_SOUTH,
-    4,
-    [8, 9.5],
+  for (const [center, parcel, heading, form] of [
+    [[-23, 112], clipDiagonal(rectangle(-24.5, 111.7, 15, 14)), 0, "villa"],
+    [[-13, 123.6], clipDiagonal(rectangle(-14, 125.3, 12, 12.2)), Math.PI / 2, "split"],
+  ] as [Point, Point[], number, UrbanHouse["form"]][]) {
+    const width = 8,
+      depth = 9.5;
+    const footprint = rectangle(...center, heading ? depth : width, heading ? width : depth);
+    if (urbanPolygonAllowed(parcel) && footprint.every((p) => pointInPolygon(p, parcel)))
+      houses.push({
+        center,
+        parcel,
+        heading,
+        frontageDistance: 6.2,
+        roadAccess: true,
+        cluster: 4,
+        width,
+        depth,
+        footprint,
+        form,
+        height: 2.1,
+        roof: "hip",
+        facing: -1,
+        pool: false,
+      });
+  }
+  // The source marks facade orientation, but an internal parcel is not proof of
+  // a public driveway through its neighbours. Draw a direct access only where
+  // a straight segment reaches the existing sidewalk without crossing another
+  // parcel. The source's shared drives remain pending rather than invented.
+  const sideRoads = REFERENCE_ROADS.filter((road) =>
+    ["campeira", "musicanto", "10-de-agosto", "fenasoja"].includes(road.id),
   );
-  addHouse(
-    [-13, 123.6],
-    clipDiagonal(rectangle(-14, 125.3, 12, 12.2)),
-    Math.PI / 2,
-    6.2,
-    4,
-    [8, 9.5],
-  );
+  for (const house of houses.filter((item) => item.cluster !== 4)) {
+    const direction = Math.sign(Math.sin(house.heading));
+    const parcel = polygonBounds(house.parcel);
+    let distance = 0;
+    if (!direction) {
+      const edge = AVENUE_SOUTH + 1.05;
+      if (parcel.minY >= edge && parcel.minY - edge < 10) distance = house.center[1] - edge;
+    } else {
+      const targetX: number[] = [];
+      for (const road of sideRoads)
+        for (let i = 1; i < road.path.length; i++) {
+          const a = road.path[i - 1],
+            b = road.path[i],
+            z = house.center[1];
+          if (z < Math.min(a[1], b[1]) || z > Math.max(a[1], b[1]) || Math.abs(b[1] - a[1]) < 1e-9)
+            continue;
+          const centerX = a[0] + ((z - a[1]) / (b[1] - a[1])) * (b[0] - a[0]);
+          const sidewalkEdge = centerX - direction * (road.width / 2 + 0.525 + 0.15);
+          const gap = direction * (sidewalkEdge - (direction > 0 ? parcel.maxX : parcel.minX));
+          if (gap >= 0 && gap < 10) targetX.push(sidewalkEdge);
+        }
+      if (targetX.length)
+        distance = Math.min(...targetX.map((x) => direction * (x - house.center[0])));
+    }
+    if (distance <= house.depth / 2) continue;
+    // Account for both offset driveway and walkway, not only their centrelines.
+    const reach = distance - house.depth / 2;
+    const roadLink = direction
+      ? rectangle(
+          house.center[0] + direction * (house.depth / 2 + reach / 2),
+          house.center[1],
+          reach,
+          house.width * 0.6 + 1.6,
+        )
+      : rectangle(
+          house.center[0],
+          house.center[1] - (house.depth / 2 + reach / 2),
+          house.width * 0.6 + 1.6,
+          reach,
+        );
+    const linkBounds = polygonBounds(roadLink);
+    if (houses.some((other) => other !== house && overlap(linkBounds, polygonBounds(other.parcel))))
+      continue;
+    house.frontageDistance = distance;
+    house.roadAccess = true;
+  }
   return houses;
 }
 

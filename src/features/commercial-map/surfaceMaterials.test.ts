@@ -77,6 +77,9 @@ describe("renderer-owned semantic surface materials", () => {
       expect(material.normalScale.x).toBeGreaterThan(0);
     }
     const material = surfaces.materials.paintedSheet;
+    surfaces.updateDetail(20);
+    expect(material.normalScale.x).toBeGreaterThan(0);
+    expect(material.normalScale.x).toBeLessThanOrEqual(0.12);
     const version = material.version;
     surfaces.updateDetail(200);
     expect(material.normalScale.length()).toBe(0);

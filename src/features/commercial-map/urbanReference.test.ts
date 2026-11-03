@@ -142,10 +142,8 @@ describe("selected OpenStreetMap context aligned to the approved schematic", () 
     expect(brasil.path[0][0]).toBeCloseTo(5.8, 8);
     expect(buenos.path[0]).toEqual(projectReferenceNode("5489900218"));
     expect(brasil.path).toContainEqual(buenos.path[0]);
-    expect(buenos.path.at(-1)![1]).toBeCloseTo(
-      URBAN_REFERENCE.secondaryJunction.center[1] - 100,
-      8,
-    );
+    // The previously clipped approach now retains its actual mapped end.
+    expect(buenos.path.at(-1)).toEqual(projectReferenceNode("8787950880"));
     const argentina = REFERENCE_EXCLUSIONS.find((road) => road.id === "park-argentina")!;
     expect(argentina.sourceWayIds).toEqual(["571138892"]);
     expect(argentina.sourcePath.every(([x]) => x > 5.8)).toBe(true);

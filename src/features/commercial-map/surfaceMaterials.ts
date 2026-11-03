@@ -12,6 +12,8 @@ export type SurfaceFamily =
   | "exposedMetal"
   | "glass"
   | "warmAccent"
+  | "masonryBrick"
+  | "architecturalFrame"
   | "grass";
 
 /** Resolved sRGB colours; this lazy renderer module never consumes CSS/OKLCH. */
@@ -26,7 +28,11 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   exposedMetal: VISUAL_THEME.metal,
   glass: VISUAL_THEME.glass,
   warmAccent: VISUAL_THEME.warm,
-  grass: VISUAL_THEME.landscape,
+  masonryBrick: "#a9604c",
+  architecturalFrame: "#40504a",
+  // The commercial floor stays lighter than surrounding landscape so thin
+  // parcel borders and status bands keep their contrast in overview.
+  grass: "#a6ba94",
 };
 
 export interface SurfaceMaterials {
@@ -140,11 +146,19 @@ export function createSurfaceMaterials(
     exposedMetal: make("exposedMetal", 0.42, 0.72),
     glass: make("glass", 0.25, 0.08),
     warmAccent: make("warmAccent", 0.84),
+    masonryBrick: make("masonryBrick", 0.94),
+    architecturalFrame: make("architecturalFrame", 0.7, 0.1),
     grass: make("grass", 0.98),
   };
   if (textures.length === 4) {
     const [mineralAlbedo, mineralData, sheetAlbedo, sheetData] = textures;
-    for (const family of ["paintedWall", "concrete", "asphalt", "warmAccent"] as const) {
+    for (const family of [
+      "paintedWall",
+      "concrete",
+      "asphalt",
+      "warmAccent",
+      "masonryBrick",
+    ] as const) {
       materials[family].map = mineralAlbedo;
       materials[family].bumpMap = mineralData;
       materials[family].roughnessMap = mineralData;
@@ -196,8 +210,9 @@ export function createSurfaceMaterials(
     paintedWall: 0.009,
     concrete: 0.018,
     asphalt: 0.013,
-    paintedSheet: 0.022,
+    paintedSheet: 0.008,
     warmAccent: 0.006,
+    masonryBrick: 0.012,
     grass: 0.008,
   };
   let quality: SurfaceQuality = "balanced";
@@ -207,9 +222,13 @@ export function createSurfaceMaterials(
     concrete: 0.34,
     asphalt: 0.23,
     whitePaint: 0.08,
-    paintedSheet: 0.44,
+    // The atlas normal already encodes corrugations. A large multiplier turns
+    // them into dark blue stripes on curved and oblique roofs; retain a subtle
+    // filtered relief without a new texture, shader or extra draw.
+    paintedSheet: 0.11,
     exposedMetal: 0.22,
     warmAccent: 0.16,
+    masonryBrick: 0.18,
     grass: 0.28,
   };
   function updateDetail(distance: number) {
@@ -235,6 +254,8 @@ export function createSurfaceMaterials(
       exposedMetal: 0.48,
       glass: 0.72,
       warmAccent: 0.14,
+      masonryBrick: 0.08,
+      architecturalFrame: 0.2,
       grass: 0,
     };
     for (const [family, material] of Object.entries(materials))
@@ -318,6 +339,8 @@ export function createSurfaceMaterials(
             paintedSheet: "paintedMetal",
             exposedMetal: "paintedMetal",
             warmAccent: "mineral",
+            masonryBrick: "mineral",
+            architecturalFrame: "paintedMetal",
             grass: "grass",
           };
           for (const [family, cell] of Object.entries(families)) {

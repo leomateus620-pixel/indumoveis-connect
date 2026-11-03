@@ -10,6 +10,9 @@ import { DAYLIGHT, createDaylightSky, createDaylightBackground } from "./dayligh
 import { createSunShadows } from "./sunShadows";
 import { createLotGrass } from "./lotGrass";
 import type { createUrbanContext } from "./urbanContext";
+import type { createPermanentPark } from "./permanentPark";
+import { PERMANENT_PARK_EXPLORATION, PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
+import type { PermanentParkLandmark } from "./permanentParkLayout";
 import { deriveUrbanHouses } from "./urbanLayout";
 import { EXPLORATION_POLYGONS } from "./urbanReference";
 import { createParkDetails, lotStatusBands } from "./parkDetails";
@@ -197,6 +200,7 @@ const SMALLEST_LOT_SPAN = smallestSelectableSpan(
 const COMMERCIAL_POLYGONS = ENTITIES.map((entity) => entity.polygon);
 const CONTEXT_EXPLORATION = [
   ...EXPLORATION_POLYGONS,
+  ...PERMANENT_PARK_EXPLORATION,
   ...deriveUrbanHouses().map((house) => house.parcel),
   ...CONTEXT_WOODLAND.map((tree) =>
     Array.from({ length: 12 }, (_, i): Point => [
@@ -271,11 +275,13 @@ const MapRenderer = forwardRef<MapHandle, MapRendererProps>(function MapRenderer
     ref,
     () => ({
       focus: (id) => runtimeRef.current?.focus(id),
+      focusLandmark: (id) => runtimeRef.current?.focusLandmark(id) ?? false,
       zoom: (factor) => runtimeRef.current?.zoom(factor),
       pan: (dx, dy) => runtimeRef.current?.pan(dx, dy),
       rotate: (direction) => runtimeRef.current?.rotate(direction),
       getTarget: () => runtimeRef.current?.getTarget() ?? CENTER,
       restoreOverview: () => runtimeRef.current?.restoreOverview(),
+      restoreCommercial: () => runtimeRef.current?.restoreCommercial(),
     }),
     [],
   );
@@ -433,8 +439,11 @@ function initializeMapRuntime(
   let contextVegetation: ReturnType<typeof createVegetation> | null = null;
   let lotGrass: ReturnType<typeof createLotGrass> | null = null;
   let urban: ReturnType<typeof createUrbanContext> | null = null;
+  let permanentPark: ReturnType<typeof createPermanentPark> | null = null;
+  let permanentParkPrepared = false;
   let parkDetails: ReturnType<typeof createParkDetails> | null = null;
   let parkDetailsPrepared = false;
+  let parkDetailsFailed = false;
   let contextTask = 0;
   let contextAttempted = false;
   let contextPrepared = false;
@@ -736,7 +745,14 @@ function initializeMapRuntime(
       const color = new THREE.Color(
         kind === "lot" ? "#ffffff" : kind === "landscape" ? PALETTE.landscape : PALETTE.support,
       );
-      for (let i = 0; i < data.length / 3; i++) colors.push(color.r, color.g, color.b);
+      for (let i = 0; i < data.length; i += 3) {
+        // Broad deterministic shading gives the planted ground a little depth
+        // in overview, without a repeating microtexture, extra mesh or moving
+        // the commercial polygons. Lots retain their exact status tint path.
+        const variation =
+          kind === "landscape" ? 0.94 + 0.06 * Math.sin(data[i] * 0.079 + data[i + 2] * 0.047) : 1;
+        colors.push(color.r * variation, color.g * variation, color.b * variation);
+      }
       if (kind === "lot") lotRanges.set(entity.id, [start, data.length / 3]);
       if (kind === "lot") {
         const bandStart = statusPositions.length / 3;
@@ -1040,7 +1056,7 @@ function initializeMapRuntime(
           ? Math.hypot(m[0], m[4])
           : Math.hypot(m[2], m[6]);
       const minText =
-        entity.kind === "lot" ? (selected ? 12 : 0) : entity.kind === "pavilion" ? 12 : 10;
+        entity.kind === "lot" ? (selected ? 12 : 9) : entity.kind === "pavilion" ? 12 : 10;
       let labelHeight = isGroundReference(entity)
         ? label.size
         : readableLabelSize(
@@ -1050,9 +1066,26 @@ function initializeMapRuntime(
             (entity.kind === "lot" ? 22 : 19) / cellHeight,
             minText,
           );
+      // The commercial overview is intentionally wider than a single lot.
+      // Allow a slightly larger screen-readable number there; collision checks
+      // below still suppress overlaps and the polygon remains the picking target.
+      if (entity.kind === "lot" && !selected) {
+        const target =
+          (minText * worldUnitsPerPixel) / Math.max(0.08, projectedAxis * (22 / cellHeight));
+        labelHeight = Math.max(labelHeight, Math.min(label.size * 4, target));
+        const lotBounds = boundsOf(entity).box;
+        const labelLimit = Math.min(
+          (lotBounds.width * 0.8) / Math.max(0.01, (cellWidth / cellHeight) * label.textWidth),
+          (lotBounds.depth * 0.8) / Math.max(0.01, label.textHeight),
+        );
+        labelHeight = Math.min(labelHeight, labelLimit);
+      }
       let labelWidth = (labelHeight * cellWidth) / cellHeight;
       const projectedHeight = (labelHeight / worldUnitsPerPixel) * projectedAxis;
-      if (entity.kind === "lot" && !selected && (projectedHeight * 22) / cellHeight < 9) continue;
+      if (entity.kind === "lot" && !selected) {
+        label.visible = (projectedHeight * 22) / cellHeight >= (label.visible ? 7 : 8.5);
+        if (!label.visible) continue;
+      }
       const [anchorX, anchorY] = entity.anchor;
       // Buildings share the same atlas but face the camera above the ridge.
       // Ground labels keep the plant axis; flip 180 degrees when viewed backwards.
@@ -1234,25 +1267,69 @@ function initializeMapRuntime(
     try {
       // Cosmetic road/pavement details stay off the first-draw path, but do
       // not depend on the separately downloaded residential factory.
-      if (!parkDetails) {
-        parkDetails = createParkDetails(ENTITIES, surfaces);
-        parkDetails.group.visible = false;
-        commercialGroup.add(parkDetails.group);
-        rollback.push(() => parkDetails?.dispose());
+      try {
+        if (!parkDetails && !parkDetailsFailed) {
+          parkDetails = createParkDetails(ENTITIES, surfaces);
+          parkDetails.group.visible = false;
+          commercialGroup.add(parkDetails.group);
+          rollback.push(() => parkDetails?.dispose());
+        }
+        if (parkDetails && !parkDetailsPrepared) {
+          softwareMaterials.sync(parkDetails.group);
+          await renderer.compileAsync(parkDetails.group, camera, scene);
+          if (disposed || failed) return;
+          parkDetailsPrepared = true;
+        }
+        if (activePointers.size || transition || document.hidden) {
+          contextAttempted = false;
+          contextTask = window.setTimeout(prepareContext, 250);
+          return;
+        }
+        if (parkDetails) parkDetails.group.visible = true;
+        invalidate();
+      } catch {
+        if (parkDetails) {
+          softwareMaterials.release(parkDetails.group);
+          commercialGroup.remove(parkDetails.group);
+          parkDetails.dispose();
+        }
+        parkDetails = null;
+        parkDetailsFailed = true;
+        diag.optionalFailures.push("park-details-preparation");
       }
-      if (!parkDetailsPrepared) {
-        softwareMaterials.sync(parkDetails.group);
-        await renderer.compileAsync(parkDetails.group, camera, scene);
-        if (disposed || failed) return;
-        parkDetailsPrepared = true;
+      // The permanent park is independent from the urban chunk: a failure in
+      // either optional layer must leave the commercial core usable.
+      try {
+        if (!permanentPark) {
+          const { createPermanentPark } = await import("./permanentPark");
+          if (disposed || failed) return;
+          permanentPark = createPermanentPark(surfaces);
+          permanentPark.group.visible = false;
+          scene.add(permanentPark.group);
+          diag.textureBytes += permanentPark.metadata.textureBytes;
+          rollback.push(() => permanentPark?.dispose());
+        }
+        if (!permanentParkPrepared) {
+          softwareMaterials.sync(permanentPark.group);
+          await renderer.compileAsync(permanentPark.group, camera, scene);
+          if (disposed || failed) return;
+          permanentParkPrepared = true;
+        }
+        if (activePointers.size || transition || document.hidden) {
+          contextAttempted = false;
+          contextTask = window.setTimeout(prepareContext, 250);
+          return;
+        }
+        permanentPark.group.visible = true;
+        invalidate();
+      } catch {
+        if (permanentPark) diag.textureBytes -= permanentPark.metadata.textureBytes;
+        if (permanentPark) softwareMaterials.release(permanentPark.group);
+        permanentPark?.dispose();
+        if (permanentPark) scene.remove(permanentPark.group);
+        permanentPark = null;
+        diag.optionalFailures.push("permanent-park-preparation");
       }
-      if (activePointers.size || transition || document.hidden) {
-        contextAttempted = false;
-        contextTask = window.setTimeout(prepareContext, 250);
-        return;
-      }
-      parkDetails.group.visible = true;
-      invalidate();
       // Layout required for navigation is lightweight and already available.
       // Parse the optional architecture/landscape/contact factory only after
       // the core 3D and the shared material/environment preparation are ready.
@@ -1634,6 +1711,40 @@ function initializeMapRuntime(
       entity ? MOVEMENT.focusNearMs : MOVEMENT.focusFarMs,
     );
   }
+  function focusCommercial() {
+    animate(
+      freeRegionPose(
+        CENTER,
+        DIAGONAL / 2,
+        props().view,
+        { width: WIDTH, depth: DEPTH, height: COMMERCIAL_HEIGHT },
+        ready
+          ? new THREE.Vector3().subVectors(camera.position, controls.target).normalize()
+          : undefined,
+      ),
+      MOVEMENT.focusFarMs,
+    );
+  }
+  function focusLandmark(id: PermanentParkLandmark["id"]) {
+    const landmark = PERMANENT_PARK_LANDMARKS.find((item) => item.id === id);
+    if (!landmark || !permanentPark?.group.visible) return false;
+    const [x0, z0, x1, z1] = landmark.bounds;
+    const center: Point = [(x0 + x1) / 2, (z0 + z1) / 2];
+    const box = { width: x1 - x0, depth: z1 - z0, height: 8 };
+    animate(
+      freeRegionPose(
+        center,
+        Math.hypot(box.width, box.depth, box.height) / 2,
+        props().view,
+        box,
+        ready
+          ? new THREE.Vector3().subVectors(camera.position, controls.target).normalize()
+          : undefined,
+      ),
+      MOVEMENT.focusNearMs,
+    );
+    return true;
+  }
   function clampTarget() {
     constrainCamera();
   }
@@ -1872,6 +1983,7 @@ function initializeMapRuntime(
     contextVegetation?.setQuality(tier);
     lotGrass?.setQuality(tier);
     urban?.setQuality(tier);
+    permanentPark?.setQuality(tier);
     if (softwareMode !== null) softwareMaterials.setEnabled(softwareMode);
     softwareMaterials.sync(scene);
     softwareMaterials.update();
@@ -2286,27 +2398,20 @@ function initializeMapRuntime(
 
   resizeBuffer();
   const overview = freeRegionPose(
-    envelope.viewCenter,
-    Math.hypot(
-      envelope.viewBounds.maxX - envelope.viewBounds.minX,
-      envelope.viewBounds.maxY - envelope.viewBounds.minY,
-    ) / 2,
+    CENTER,
+    DIAGONAL / 2,
     props().view,
     {
-      width: envelope.viewBounds.maxX - envelope.viewBounds.minX,
-      depth: envelope.viewBounds.maxY - envelope.viewBounds.minY,
-      height: Math.max(...ENTITIES.map(architectureVisualHeight)),
+      width: WIDTH,
+      depth: DEPTH,
+      height: COMMERCIAL_HEIGHT,
     },
     undefined,
-    true,
+    false,
   );
   if (props().initialFocus) {
     const focusTarget = props().initialFocus!;
-    const shift = new THREE.Vector3(
-      focusTarget[0] - envelope.viewCenter[0],
-      0,
-      focusTarget[1] - envelope.viewCenter[1],
-    );
+    const shift = new THREE.Vector3(focusTarget[0] - CENTER[0], 0, focusTarget[1] - CENTER[1]);
     overview.position.add(shift);
     overview.target.add(shift);
   }
@@ -2379,7 +2484,9 @@ function initializeMapRuntime(
       animate(next, MOVEMENT.zoomMs, "rotate");
     },
     getTarget: () => [controls.target.x, controls.target.z],
+    focusLandmark,
     restoreOverview: () => focus(),
+    restoreCommercial: focusCommercial,
     update,
     dispose() {
       disposed = true;
@@ -2398,6 +2505,7 @@ function initializeMapRuntime(
       contextVegetation?.dispose();
       lotGrass?.dispose();
       urban?.dispose();
+      permanentPark?.dispose();
       parkDetails?.dispose();
       solarShadows.dispose();
       terrain.dispose();

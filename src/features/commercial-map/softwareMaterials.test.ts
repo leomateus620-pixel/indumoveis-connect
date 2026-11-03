@@ -13,6 +13,27 @@ const atlas = (): PbrAtlas => ({
 });
 
 describe("presentation-only diffuse materials for Automatic software", () => {
+  it("releases a failed optional subtree without retaining or changing its meshes on later quality switches", () => {
+    const controller = createSoftwareMaterials({ enabled: true });
+    const geometry = new THREE.BufferGeometry();
+    const source = new THREE.MeshStandardMaterial();
+    const mesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material> = new THREE.Mesh(geometry, source);
+    const root = new THREE.Group();
+    root.add(mesh);
+    controller.sync(root);
+    expect(mesh.material).not.toBe(source);
+    controller.release(root);
+    expect(mesh.material).toBe(source);
+    const replacement = new THREE.MeshBasicMaterial();
+    mesh.material = replacement;
+    controller.setEnabled(false);
+    controller.setEnabled(true);
+    controller.dispose();
+    expect(mesh.material).toBe(replacement);
+    geometry.dispose();
+    source.dispose();
+    replacement.dispose();
+  });
   it("leaves disabled hardware meshes and material arrays untouched without creating mirrors", () => {
     const controller = createSoftwareMaterials({ enabled: false });
     const standard = new THREE.MeshStandardMaterial(),

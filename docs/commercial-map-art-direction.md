@@ -4,7 +4,7 @@ Esta evolução conserva a revisão territorial `2026-10-15`, os seis perfis de 
 
 ## Direção e materiais
 
-A vista geral separa parque, circulação e áreas consultáveis. Na aproximação, pintura mineral clara, concreto, chapa prateada, vidro azul acinzentado e arremates de metal têm respostas próprias. Taupe aparece somente nas soleiras já existentes. O terreno de apresentação é um neutro esverdeado claro, sem relevo inventado. Asfalto grafite azulado, passeios claros e contornos limpos substituem a contaminação bege, preservando a topologia de cruzamentos e aberturas laterais.
+A vista geral separa parque, circulação e áreas consultáveis. Na aproximação, pintura mineral clara, concreto, chapa prateada, vidro azul acinzentado e arremates de metal têm respostas próprias. Taupe aparece somente nas soleiras já existentes. O terreno usa verdes naturais e variação orgânica suave, sem relevo inventado. Asfalto grafite azulado, passeios claros e contornos limpos preservam a topologia de cruzamentos e aberturas laterais.
 
 `visualTheme.ts` contém cores sRGB compatíveis com Three/SVG e não importa engine, backend ou componentes. Situação comercial usa uma tabela própria e só aparece para associação persistida confirmada. Seleção é um contorno ameixa e preenchimento translúcido separado; nunca substitui o albedo comercial.
 
@@ -24,6 +24,8 @@ Os valores são bases; roughness maps modulam a resposta. A biblioteca compartil
 ## Luz, reflexão e vegetação
 
 Luz principal quente com direção fixa e preenchimento celeste frio revelam os perfis em qualquer orientação. Não há pós-processamento, transmissão, SSR, reflexo planar ou cubemap por prédio. O ambiente é uma única PMREM local derivada de céu/solo procedurais suaves em 256×128, compatível com Three 0.186, preparada depois da primeira navegação e apenas quando Equilibrado/Detalhado precisa dela. Não aparece como fundo. Falha mantém os materiais válidos sob luz local. Leve remove a contribuição do ambiente e mantém as mesmas famílias, geometrias e árvores.
+
+Na revisão de novembro, o preenchimento hemisférico e a luz de apoio foram reduzidos para diferenciar melhor faces sob o sol. O albedo do solo continua gerado uma vez, com as mesmas texturas e sem novos passes, mas usa uma escala territorial de 112 unidades e variação mais perceptível. Os polígonos de paisagem recebem variação de vértice suave e determinística; os pisos comerciais permanecem mais claros e com contornos neutros mais contrastantes. A tabela de cores de situação comercial continua independente. Esses ajustes são escolhas de apresentação, não medição de vegetação ou material de campo.
 
 O contato arquitetônico continua contido nos footprints; árvores recebem contato estático suave em um mapa RGBA8 compartilhado de 64². Não foi ativado shadow map direcional: o contato estático evita passes adicionais e sombras sobre identificação/acessos. A comparação e os custos do frame completo constam no relatório de validação.
 

@@ -56,6 +56,8 @@ describe("engine-independent territorial fallback", () => {
     const lot = ENTITIES.find((e) => e.kind === "lot")!;
     ref.current!.focus(lot.id);
     const target = ref.current!.getTarget();
+    expect(ref.current!.focusLandmark("arena")).toBe(false);
+    expect(ref.current!.getTarget()).toEqual(target);
     rerender(<Map2D ref={ref} {...props} selectedId={lot.id} />);
     rerender(<Map2D ref={ref} {...props} />);
     expect(container.querySelector("svg")).toBe(svg);

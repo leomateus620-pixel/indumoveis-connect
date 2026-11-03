@@ -467,7 +467,12 @@ const fromNodes = (
 /** Keep only the supplied western approach and a finite neighbourhood of the
  * second junction. Intersections are linearly interpolated in world units;
  * commercial protected polygons remain the stronger clipping boundary. */
-const APPROACH_CLIP = { maxX: 5.8, minZ: fittedSecondary.center[1] - 100 };
+// Include the full supplied Buenos Aires way to the OSM node alongside P9.
+// No additional road segment or invented connection is introduced.
+const APPROACH_CLIP = {
+  maxX: 5.8,
+  minZ: Math.min(fittedSecondary.center[1] - 100, projectReferenceNode("8787950880")[1]),
+};
 function clipApproach(path: readonly Point[]): Point[] {
   const result: Point[] = [];
   for (let i = 1; i < path.length; i++) {
@@ -527,6 +532,9 @@ export const REFERENCE_EXCLUSIONS = [
     sourcePath: REFERENCE_WAYS["571138892"].nodes.map(projectReferenceNode),
   },
 ];
+// Reference estimate: 7.4 m from the FENASOJA presentation model, converted
+// with this context adapter; not an OSM width or a surveyed measurement.
+export const RESIDENTIAL_ROAD_WIDTH = 7.4 * URBAN_REFERENCE.unitsPerMetre;
 export const REFERENCE_ROADS: ReferenceRoad[] = [
   ...westernApproaches,
 
@@ -540,7 +548,7 @@ export const REFERENCE_ROADS: ReferenceRoad[] = [
       REFERENCE_WAYS[way].tags.name,
       [way],
       [...REFERENCE_WAYS[way].nodes].reverse(),
-      5.8,
+      RESIDENTIAL_ROAD_WIDTH,
       ["benvenuto"],
       true,
     ),
@@ -550,7 +558,7 @@ export const REFERENCE_ROADS: ReferenceRoad[] = [
     "Rua Campeira",
     ["203230163"],
     [...REFERENCE_WAYS["203230163"].nodes].reverse(),
-    5.8,
+    RESIDENTIAL_ROAD_WIDTH,
     ["benvenuto", "tuparendi"],
   ),
   {
@@ -637,7 +645,8 @@ const residentialMinX = Math.min(
   projectReferenceNode(CAMPEIRA_BENVENUTO_ID)[0],
   ...deadEndPaths.map((p) => p[0]),
 );
-const residentialMaxX = Math.max(...deadEndPaths.map((p) => p[0]));
+// Include the finite institutional transition beyond Rua Fenasoja.
+const residentialMaxX = Math.max(...deadEndPaths.map((p) => p[0])) + 43;
 const residentialMaxZ = Math.max(...deadEndPaths.map((p) => p[1]));
 export const RESIDENTIAL_REFERENCE_BOUNDS = {
   minX: residentialMinX,

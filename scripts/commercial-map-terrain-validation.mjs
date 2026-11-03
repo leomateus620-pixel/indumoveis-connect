@@ -370,8 +370,12 @@ async function drag(page, dx, dy, { button = "left", steps = 18 } = {}) {
   return idle(page);
 }
 async function select(page, query, name) {
-  await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-  await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill(query);
+  await page
+    .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+    .fill(query);
   await page
     .locator(".im-map-result")
     .filter({ has: page.getByText(name, { exact: true }) })
@@ -680,8 +684,12 @@ async function preparationInteraction() {
     .locator(".im-map-stage")
     .getAttribute("data-representation");
   const inputStarted = performance.now();
-  await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-  await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill("70");
+  await page
+    .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+    .fill("70");
   await page
     .locator(".im-map-result")
     .filter({ has: page.getByText("Lote 70", { exact: true }) })
@@ -791,7 +799,7 @@ async function hardwareSmoke() {
   await select(page, "70", "Lote 70");
   await closeDetail(page);
   for (const preset of ["Superior", "Oblíqua", "3D"]) await view(page, preset);
-  await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+  await page.getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true }).click();
   await idle(page);
   await page.getByRole("button", { name: "Tela cheia", exact: true }).click();
   await page.getByRole("button", { name: "Sair da tela cheia", exact: true }).waitFor();
@@ -1020,7 +1028,7 @@ try {
     });
     await check("orbit pan zoom preserve commercial transforms", async () => {
       await view(page, "3D");
-      await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+      await page.getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true }).click();
       const before = await idle(page),
         samples = [];
       await gesture(page, "Girar");
@@ -1076,7 +1084,7 @@ try {
         }
         await closeDetail(page);
       }
-      await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+      await page.getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true }).click();
       await idle(page);
       const point = await page.evaluate(() =>
         window.__indumoveisMap.project("indumoveis:external:lot:70", 0),

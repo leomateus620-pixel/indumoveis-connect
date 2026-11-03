@@ -185,6 +185,17 @@ export function createSoftwareMaterials(options: { enabled: boolean }) {
         if (enabled) present(record);
       });
     },
+    /** Forget a failed optional subtree before its owner disposes it. */
+    release(root: THREE.Object3D) {
+      if (disposed) return;
+      root.traverse((object) => {
+        const record = registrations.get(object as THREE.Mesh);
+        if (!record) return;
+        captureExternal(record);
+        record.mesh.material = record.canonical;
+        registrations.delete(record.mesh);
+      });
+    },
     /** Uniform/reference sync only. No material, texture, array or mesh is
      * allocated here; call sync() when the scene adds/replaces materials. */
     update() {

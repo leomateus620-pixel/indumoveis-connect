@@ -57,9 +57,9 @@ describe("static presentation architecture", () => {
         meshes++;
         triangles += object.geometry.getAttribute("position").count / 3;
       });
-      // Semantic PBR batches retain one shared material per family. The
-      // individual roof groups must remain independently inspectable.
-      expect(meshes).toBeLessThanOrEqual(32);
+      // Two batches distinguish brick and structural frames in addition to
+      // the event-center roof; roofs remain independently inspectable.
+      expect(meshes).toBeLessThanOrEqual(36);
       expect(triangles).toBeLessThan(20000);
       for (const entity of pavilions) {
         const roof = model.roofs.get(entity.id)!;
@@ -77,15 +77,155 @@ describe("static presentation architecture", () => {
     }
   });
 
-  it("keeps ambiguous open areas and Portão 03 unroofed; B7 and annexes retain their identity", () => {
+  it("uses the photographed gables for P8 and P13 and retains P8's recessed high front glazing", () => {
+    const p8 = ENTITIES.find((entry) => entry.id === "indumoveis:pavilion:8")!;
+    const p13 = ENTITIES.find((entry) => entry.id === "indumoveis:pavilion:13")!;
+    expect(getArchitectureDefinition(p8)?.profile).toBe("p8-gable");
+    expect(getArchitectureDefinition(p13)?.profile).toBe("p13-gable");
+    const model = buildArchitecture([p8, p13]);
+    try {
+      model.group.updateMatrixWorld(true);
+      // Roof glazing here would recreate the unsubstantiated raised monitor.
+      for (const entity of [p8, p13]) expect(model.roofs.get(entity.id)!.children).toHaveLength(2);
+      const glazing = model.group.children.find((child) => child.name === "entry-glazing")!;
+      const ray = new THREE.Raycaster(new THREE.Vector3(100, 2.8, 87), new THREE.Vector3(0, 0, -1));
+      expect(ray.intersectObject(glazing).length).toBeGreaterThan(0);
+      // The source shells meet directly; no bridge or new circulation is needed.
+      expect(p8.polygon[1][0]).toBeCloseTo(p13.polygon[0][0], 6);
+    } finally {
+      model.dispose();
+    }
+  });
+
+  it("adds distinct P12 brick and P3 glazing at their front without changing the territory", () => {
+    const p12 = ENTITIES.find((entry) => entry.id === "indumoveis:pavilion:12")!;
+    const p3 = ENTITIES.find((entry) => entry.id === "indumoveis:pavilion:3")!;
+    const before = JSON.stringify([p12, p3]);
+    const model = buildArchitecture([p12, p3]);
+    try {
+      model.group.updateMatrixWorld(true);
+      const brick = model.group.getObjectByName("brick-front")!;
+      const glass = model.group.getObjectByName("entry-glazing")!;
+      const p12Ray = new THREE.Raycaster(
+        new THREE.Vector3(70, 1.4, 89),
+        new THREE.Vector3(0, 0, -1),
+      );
+      const p3Ray = new THREE.Raycaster(
+        new THREE.Vector3(125, 1.5, 89),
+        new THREE.Vector3(0, 0, -1),
+      );
+      expect(p12Ray.intersectObject(brick)).not.toHaveLength(0);
+      expect(p3Ray.intersectObject(glass)).not.toHaveLength(0);
+      expect(JSON.stringify([p12, p3])).toBe(before);
+    } finally {
+      model.dispose();
+    }
+  });
+
+  it("retains a closed construction seam at P8/P13/P3 with both roofs hidden", () => {
+    const entities = ["8", "13", "3"].map((id) =>
+      ENTITIES.find((entry) => entry.id === `indumoveis:pavilion:${id}`)!,
+    );
+    const model = buildArchitecture(entities);
+    try {
+      for (const roof of model.roofs.values()) roof.visible = false;
+      model.group.updateMatrixWorld(true);
+      for (let i = 0; i < entities.length - 1; i++) {
+        const left = entities[i],
+          right = entities[i + 1];
+        const seam = left.polygon[1][0];
+        expect(seam).toBeCloseTo(right.polygon[0][0], 6);
+        const minZ = Math.max(left.polygon[0][1], right.polygon[0][1]);
+        const maxZ = Math.min(left.polygon[2][1], right.polygon[2][1]);
+        // Include ordinary bays and existing recesses, in both viewing directions.
+        for (let z = minZ + 0.2; z < maxZ - 0.2; z += 0.2) {
+          for (const direction of [-1, 1]) {
+            const ray = new THREE.Raycaster(
+              new THREE.Vector3(seam - direction * 0.4, 1.5, z),
+              new THREE.Vector3(direction, 0, 0),
+              0,
+              0.8,
+            );
+            expect(ray.intersectObjects(model.group.children, true).length).toBeGreaterThan(0);
+          }
+        }
+      }
+    } finally {
+      model.dispose();
+    }
+  });
+
+  it("keeps Mão na Massa and Portão 03 unroofed; B7 and annexes retain their identity", () => {
     const bySuffix = (suffix: string) =>
       ENTITIES.find((entity) => entity.id === `indumoveis:support:${suffix}`)!;
-    for (const suffix of ["events", "mao-na-massa", "gate-03"])
+    for (const suffix of ["mao-na-massa", "gate-03"])
       expect(getArchitectureDefinition(bySuffix(suffix))).toBeNull();
     for (const suffix of ["cafe", "bar", "restaurant", "b7", "b7-annex-a", "b7-annex-b"]) {
       const entity = bySuffix(suffix);
       expect(architectureVisualHeight(entity)).toBeGreaterThan(entity.height!);
       expect(getArchitectureDefinition(entity)?.estimated).toBe(true);
+    }
+  });
+
+  it("keeps the authorised event-center model and its picking volume inside its existing footprint", () => {
+    const entity = ENTITIES.find((entry) => entry.id === "indumoveis:support:events")!;
+    const before = JSON.stringify(entity);
+    expect(getArchitectureDefinition(entity)?.profile).toBe("event-center-gable");
+    const model = buildArchitecture([entity]);
+    try {
+      const [minX, minZ] = entity.polygon[0];
+      const [maxX, maxZ] = entity.polygon[2];
+      model.group.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        const positions = object.geometry.getAttribute("position");
+        for (let i = 0; i < positions.count; i++) {
+          expect(positions.getX(i)).toBeGreaterThanOrEqual(minX - 0.00002);
+          expect(positions.getX(i)).toBeLessThanOrEqual(maxX + 0.00002);
+          expect(positions.getZ(i)).toBeGreaterThanOrEqual(minZ - 0.00002);
+          expect(positions.getZ(i)).toBeLessThanOrEqual(maxZ + 0.00002);
+        }
+      });
+      const ray = new THREE.Raycaster(
+        new THREE.Vector3(minX - 1, 1, (minZ + maxZ) / 2),
+        new THREE.Vector3(1, 0, 0),
+      );
+      expect(ray.intersectObjects(model.pickables)[0]?.object.userData.entityId).toBe(entity.id);
+      expect(JSON.stringify(entity)).toBe(before);
+    } finally {
+      model.dispose();
+    }
+  });
+
+  it("gives the three food supports an aligned longitudinal roof while preserving separate picks", () => {
+    const entities = ["cafe", "bar", "restaurant"].map((id) =>
+      ENTITIES.find((entry) => entry.id === `indumoveis:support:${id}`)!,
+    );
+    const before = JSON.stringify(entities);
+    const model = buildArchitecture(entities);
+    try {
+      const ridges = entities.map((entity) => {
+        const roof = model.roofs.get(entity.id)!.children[0] as THREE.Mesh;
+        const position = roof.geometry.getAttribute("position");
+        const maxY = roof.geometry.boundingBox!.max.y;
+        const ridgeXs = Array.from({ length: position.count }, (_, i) => i)
+          .filter((i) => Math.abs(position.getY(i) - maxY) < 0.00001)
+          .map((i) => position.getX(i));
+        expect(ridgeXs.length).toBeGreaterThan(0);
+        expect(Math.max(...ridgeXs) - Math.min(...ridgeXs)).toBeLessThan(0.0001);
+        const ray = new THREE.Raycaster(
+          new THREE.Vector3(entity.anchor[0], 20, entity.anchor[1]),
+          new THREE.Vector3(0, -1, 0),
+        );
+        expect(ray.intersectObjects(model.pickables)[0]?.object.userData.entityId).toBe(entity.id);
+        return { x: ridgeXs[0], y: maxY };
+      });
+      for (const ridge of ridges.slice(1)) {
+        expect(ridge.x).toBeCloseTo(ridges[0].x, 5);
+        expect(ridge.y).toBeCloseTo(ridges[0].y, 5);
+      }
+      expect(JSON.stringify(entities)).toBe(before);
+    } finally {
+      model.dispose();
     }
   });
 
@@ -145,13 +285,15 @@ describe("static presentation architecture", () => {
         for (let i = 0; i < color.count; i++)
           expect(color.getX(i) - color.getZ(i)).toBeLessThan(0.015);
       });
-      expect(families.size).toBe(6);
+      expect(families.size).toBe(8);
       const family = (name: string) =>
         (model.group.children.find((child) => child.name === name) as THREE.Mesh).material;
       const roof = model.roofs.get("indumoveis:pavilion:1")!.children[0] as THREE.Mesh;
       expect(roof.material).not.toBe(family("walls"));
       expect(family("walls")).not.toBe(family("floors-contact"));
       expect(family("entry-glazing")).not.toBe(family("entry-lintels"));
+      expect(family("brick-front")).not.toBe(family("walls"));
+      expect(family("architectural-frames")).not.toBe(family("walls"));
       expect(model.textureBytes).toBeLessThan(0.5 * 1024 * 1024);
     } finally {
       model.dispose();
@@ -166,7 +308,7 @@ describe("static presentation architecture", () => {
       model.group.updateMatrixWorld(true);
       const walls = model.group.children.find((child) => child.name === "walls") as THREE.Mesh;
       const structure = model.group.children.find(
-        (child) => child.name === "structure-recesses",
+        (child) => child.name === "architectural-frames",
       ) as THREE.Mesh;
       const roof = model.roofs.get(entity.id)!.children[0] as THREE.Mesh;
       expect(walls.geometry.boundingBox!.max.y).toBeCloseTo(

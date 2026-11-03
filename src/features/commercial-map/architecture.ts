@@ -11,9 +11,10 @@ export type RoofProfile =
   | "broad-gable"
   | "twin-offset-gables"
   | "northlight-sawtooth"
-  | "raised-monitor"
-  | "asymmetric-shed"
+  | "p8-gable"
+  | "p13-gable"
   | "triple-gable"
+  | "event-center-gable"
   | "support-gable"
   | "support-shed";
 
@@ -21,18 +22,24 @@ const PAVILION_PROFILES: Record<string, RoofProfile> = {
   "indumoveis:pavilion:1": "broad-gable",
   "indumoveis:pavilion:14": "twin-offset-gables",
   "indumoveis:pavilion:12": "northlight-sawtooth",
-  "indumoveis:pavilion:8": "raised-monitor",
-  "indumoveis:pavilion:13": "asymmetric-shed",
+  "indumoveis:pavilion:8": "p8-gable",
+  "indumoveis:pavilion:13": "p13-gable",
   "indumoveis:pavilion:3": "triple-gable",
 };
 const SUPPORT_PROFILES: Record<string, RoofProfile> = {
   "indumoveis:support:b7": "support-gable",
   "indumoveis:support:b7-annex-a": "support-shed",
   "indumoveis:support:b7-annex-b": "support-shed",
-  "indumoveis:support:cafe": "support-shed",
+  "indumoveis:support:cafe": "support-gable",
   "indumoveis:support:bar": "support-gable",
   "indumoveis:support:restaurant": "support-gable",
+  "indumoveis:support:events": "event-center-gable",
 };
+const FOOD_HALL_IDS = new Set([
+  "indumoveis:support:cafe",
+  "indumoveis:support:bar",
+  "indumoveis:support:restaurant",
+]);
 
 type Vertex = [number, number, number];
 type RoofSegment = { start: number; end: number; from: number; to: number };
@@ -100,8 +107,11 @@ export function getArchitectureDefinition(entity: MapEntity): ArchitectureDefini
   const frame = localFrame(entity);
   const span = Math.min(frame.width, frame.depth);
   const eaveHeight = entity.height ?? 2.2;
+  // P1's roof sits low behind the photographed facade; P8 and P13 have
+  // moderate gables. All pitches remain estimates in drawing units.
   const roofRise =
-    span * (profile === "raised-monitor" ? 0.16 : entity.kind === "pavilion" ? 0.11 : 0.085);
+    (FOOD_HALL_IDS.has(entity.id) ? frame.width : span) *
+    (entity.id === "indumoveis:pavilion:1" ? 0.055 : entity.kind === "pavilion" ? 0.11 : 0.085);
   const roofThickness = span * 0.013;
   return {
     profile,
@@ -156,17 +166,13 @@ function roofSegments(profile: RoofProfile): RoofSegment[] {
       break;
     case "northlight-sawtooth":
       return [0, 1, 2].map((i) => ({ start: i / 3, end: (i + 1) / 3, from: 0, to: 1 }));
-    case "raised-monitor":
-      return [
-        { start: 0, end: 0.36, from: 0, to: 0.12 },
-        { start: 0.36, end: 0.5, from: 0.74, to: 1 },
-        { start: 0.5, end: 0.64, from: 1, to: 0.74 },
-        { start: 0.64, end: 1, from: 0.12, to: 0 },
-      ];
-    case "asymmetric-shed":
+    case "p8-gable":
+    case "p13-gable":
+      // The 2026 photographic reference supports a gable for each, while
+      // the rear pitches and their exact dimensions remain unmeasured.
       points = [
-        [0, 0.2],
-        [0.27, 1],
+        [0, 0],
+        [0.5, 1],
         [1, 0],
       ];
       break;
@@ -401,6 +407,8 @@ export function buildArchitecture(
   const pickMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
   const floors = bucket(),
     walls = bucket(),
+    brick = bucket(),
+    frames = bucket(),
     structure = bucket(),
     glazing = bucket(),
     metal = bucket(),
@@ -419,6 +427,8 @@ export function buildArchitecture(
     const frame = localFrame(entity);
     const localFloor = bucket(),
       localWalls = bucket(),
+      localBrick = bucket(),
+      localFrames = bucket(),
       localStructure = bucket(),
       localGlass = bucket(),
       localMetal = bucket(),
@@ -438,7 +448,10 @@ export function buildArchitecture(
     // The roof fascia occupies this last thickness band. Walls end exactly at
     // its underside instead of competing with it on the same facade plane.
     const wallTop = definition.eaveHeight - definition.roofThickness;
-    const axis: 0 | 1 = frame.width <= frame.depth ? 0 : 1;
+    // These adjacent support footprints represent one elongated hall in the
+    // reference. Give their separate selectable roofs the same longitudinal
+    // ridge, without building over the small gaps in the approved drawing.
+    const axis: 0 | 1 = FOOD_HALL_IDS.has(entity.id) || frame.width <= frame.depth ? 0 : 1;
     const roof = bucket(axis);
     const min = Math.min(...polygon.map((p) => p[axis]));
     const extent = axis === 0 ? frame.width : frame.depth;
@@ -513,20 +526,50 @@ export function buildArchitecture(
             q = interpolate(a, b, to);
           const ip = interpolate(ia, ib, from),
             iq = interpolate(ia, ib, to);
-          wallPrism(
-            localWalls,
-            interpolate(panelA, panelB, from),
-            interpolate(panelA, panelB, to),
-            ip,
-            iq,
-            foundationTop,
-            wallTop,
-            bay % 2 ? "#f0f3f2" : "#ffffff",
-          );
+          const panelP = interpolate(panelA, panelB, from);
+          const panelQ = interpolate(panelA, panelB, to);
+          // On P8's documented front, a high window ribbon is recessed into
+          // the existing bays. It does not invent an access or enlarge the
+          // protected footprint. Other faces remain conservative estimates.
+          const frontRibbon =
+            entity.id === "indumoveis:pavilion:8" &&
+            Math.abs(a[1] - frame.depth) < 1e-6 &&
+            Math.abs(b[1] - frame.depth) < 1e-6;
+          const eventFront = entity.id === "indumoveis:support:events" && i === 3;
+          const foodFront = FOOD_HALL_IDS.has(entity.id) && i === 1;
+          const p12Front = entity.id === "indumoveis:pavilion:12" && i === 2;
+          const p3Front = entity.id === "indumoveis:pavilion:3" && i === 2;
+          const p1Side = entity.id === "indumoveis:pavilion:1" && (i === 0 || i === 2);
+          const panel = p12Front ? localBrick : localWalls;
+          const shade = bay % 2 ? "#f0f3f2" : "#ffffff";
+          if (frontRibbon || eventFront || foodFront || p12Front || p3Front || p1Side) {
+            const sill =
+              foundationTop +
+              (wallTop - foundationTop) * (eventFront || foodFront || p3Front ? 0.24 : 0.64);
+            const head =
+              foundationTop +
+              (wallTop - foundationTop) * (eventFront || foodFront || p3Front ? 0.78 : 0.82);
+            wallPrism(panel, panelP, panelQ, ip, iq, foundationTop, sill, shade);
+            wallPrism(panel, panelP, panelQ, ip, iq, head, wallTop, shade);
+            const gp = interpolate(panelP, ip, 0.35),
+              gq = interpolate(panelQ, iq, 0.35);
+            quad(
+              localGlass,
+              [gp[0], sill, gp[1]],
+              [gq[0], sill, gq[1]],
+              [gq[0], head, gq[1]],
+              [gp[0], head, gp[1]],
+              "#ffffff",
+              [b[1] - a[1], 0, a[0] - b[0]],
+            );
+          } else {
+            wallPrism(panel, panelP, panelQ, ip, iq, foundationTop, wallTop, shade);
+          }
           wallPrism(localStructure, p, q, ip, iq, 0.09, foundationTop, "#a5abad");
           const trimWidth = Math.min(definition.wallThickness / length, (to - from) * 0.18);
+          const framed = entity.kind === "pavilion";
           wallPrism(
-            localStructure,
+            framed ? localFrames : localStructure,
             p,
             interpolate(a, b, from + trimWidth),
             interpolate(structuralInner[i], structuralInner[(i + 1) % polygon.length], from),
@@ -539,6 +582,20 @@ export function buildArchitecture(
             wallTop,
             "#ffffff",
           );
+          if (framed) {
+            // Fascia sits at the structural face, ahead of recessed panels;
+            // it adds depth without an external canopy or a new footprint.
+            wallPrism(
+              localFrames,
+              p,
+              q,
+              ip,
+              iq,
+              wallTop - Math.min(definition.eaveHeight * 0.055, 0.2),
+              wallTop,
+              "#ffffff",
+            );
+          }
         }
       }
       for (const [start, end] of doors) {
@@ -705,6 +762,30 @@ export function buildArchitecture(
         }
       }
     }
+    if (entity.id === "indumoveis:support:events") {
+      // Interpreted transverse entrance gable, clipped to the authorised
+      // existing support area. Its axis crosses the main hall; no origin
+      // coordinates, brands, new accesses or commercial records are imported.
+      const x0 = frame.width * 0.012,
+        x1 = frame.width * 0.34;
+      const z0 = frame.depth * 0.385,
+        z1 = frame.depth * 0.615,
+        zm = frame.depth * 0.5;
+      const eave = definition.eaveHeight + definition.roofRise * 0.08;
+      const ridge = definition.eaveHeight + definition.roofRise * 0.92;
+      const a: Vertex = [x0, eave, z0],
+        b: Vertex = [x1, eave, z0];
+      const c: Vertex = [x1, ridge, zm],
+        d: Vertex = [x0, ridge, zm];
+      const e: Vertex = [x1, eave, z1],
+        f: Vertex = [x0, eave, z1];
+      for (const target of [roof, picking]) {
+        quad(target, a, b, c, d, "#ffffff", [0, 1, 0]);
+        quad(target, d, c, e, f, "#ffffff", [0, 1, 0]);
+      }
+      triangle(roofGlass, a, d, f, "#ffffff", [-1, 0, 0]);
+      triangle(picking, a, d, f, "#ffffff", [-1, 0, 0]);
+    }
     const pickGeometry = geometryFrom(picking, frame);
     geometries.add(pickGeometry);
     const pick = new THREE.Mesh(pickGeometry, pickMaterial);
@@ -713,6 +794,8 @@ export function buildArchitecture(
     pickables.push(pick);
     appendGeometry(floors, geometryFrom(localFloor, frame));
     appendGeometry(walls, geometryFrom(localWalls, frame));
+    appendGeometry(brick, geometryFrom(localBrick, frame));
+    appendGeometry(frames, geometryFrom(localFrames, frame));
     appendGeometry(structure, geometryFrom(localStructure, frame));
     appendGeometry(glazing, geometryFrom(localGlass, frame));
     appendGeometry(metal, geometryFrom(localMetal, frame));
@@ -736,6 +819,8 @@ export function buildArchitecture(
   for (const [name, data, family] of [
     ["floors-contact", floors, "concrete"],
     ["walls", walls, "paintedWall"],
+    ["brick-front", brick, "masonryBrick"],
+    ["architectural-frames", frames, "architecturalFrame"],
     ["structure-recesses", structure, "concrete"],
     ["entry-glazing", glazing, "glass"],
     ["entry-lintels", metal, "exposedMetal"],

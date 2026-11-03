@@ -288,7 +288,9 @@ async function runStage2Checks() {
           "Button and wheel maximum differ",
         );
         assert(wheelMax.distance > wheelMin.distance * 2);
-        await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+        await page
+          .getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true })
+          .click();
         const beforeTouch = await settledPose(page);
         const cdp = await context.newCDPSession(page);
         const touches = (half) => [
@@ -413,7 +415,7 @@ async function runStage2Checks() {
     mapScenario(async (page) => {
       const before = await settledPose(page);
       const search = await page
-        .getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true })
+        .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
         .boundingBox();
       await page.mouse.move(search.x + 22, search.y + 22);
       await page.mouse.wheel(0, -400);
@@ -594,7 +596,10 @@ async function runStage2Checks() {
               },
             );
           }
-        } else await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+        } else
+          await page
+            .getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true })
+            .click();
         await settledPose(page);
         await fitReferenceCanvas();
         const reference = previous.find((row) => row.name === capture.name);
@@ -943,7 +948,7 @@ async function runStage3Checks() {
           async (page) => {
             const name = viewport.width < 600 ? "mobile" : "desktop";
             const search = page.getByRole("button", {
-              name: "Buscar lote, pavilhão ou via",
+              name: "Buscar lote, pavilhão, via ou estrutura",
               exact: true,
             });
             await page.mouse.move(viewport.width - 4, viewport.height - 4);
@@ -957,7 +962,7 @@ async function runStage3Checks() {
             await page.keyboard.press("Tab");
             assert.equal(
               await page.evaluate(() => document.activeElement?.getAttribute("aria-label")),
-              "Buscar lote, pavilhão ou via",
+              "Buscar lote, pavilhão, via ou estrutura",
             );
             await snapshot(page, `S37-${name}-keyboard-focus`);
             await chooseView(page, "Superior");
@@ -973,7 +978,7 @@ async function runStage3Checks() {
             await page.mouse.up();
             await search.click();
             await page
-              .getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true })
+              .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
               .fill("09");
             await page.locator(".im-map-result").first().waitFor();
             await snapshot(page, `S37-${name}-search`);
@@ -1487,8 +1492,12 @@ async function openAuxiliary(page, name) {
 }
 
 async function selectResult(page, query, expected) {
-  await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-  await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill(query);
+  await page
+    .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+    .fill(query);
   const result = page
     .locator(".im-map-result")
     .filter({ has: page.getByText(expected, { exact: true }) })
@@ -1590,7 +1599,8 @@ async function navigate30Seconds(page, quality, { nearLot70 = false, target } = 
     await selectResult(page, target?.query ?? "70", target?.label ?? "Lote 70");
     await closeDetail(page);
     if (target?.name === "asphalt-crossing") await panToArgentinaCrossing(page);
-  } else await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+  } else
+    await page.getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true }).click();
   await setProfile(page, quality);
   await cameraIdle(page);
   await page.waitForFunction((tier) => window.__indumoveisMap?.tier === tier, quality, {
@@ -1938,7 +1948,9 @@ try {
       "real canvas picking, drag rejection, cancellation and manual interruption",
       async () => {
         await chooseView(page, "Superior");
-        await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+        await page
+          .getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true })
+          .click();
         let point = await projectedPoint(page, "indumoveis:pavilion:1");
         await page.mouse.click(point.x, point.y);
         await page
@@ -1961,7 +1973,9 @@ try {
           .dispatchEvent("pointercancel", { pointerId: 1, bubbles: true });
         await page.evaluate(() => window.dispatchEvent(new Event("blur")));
         await page.mouse.up();
-        await page.getByRole("button", { name: "Reenquadrar parque", exact: true }).click();
+        await page
+          .getByRole("button", { name: "Reenquadrar área Indumóveis", exact: true })
+          .click();
         point = await projectedPoint(page, "indumoveis:pavilion:1");
         await page.mouse.click(point.x, point.y);
         await page
@@ -1983,8 +1997,13 @@ try {
       },
     );
     await runCheck("keyboard search and Esc restores useful focus", async () => {
-      await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-      const input = page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true });
+      await page
+        .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+        .click();
+      const input = page.getByRole("textbox", {
+        name: "Lote, pavilhão, via ou estrutura",
+        exact: true,
+      });
       await input.fill("09");
       await input.press("ArrowDown");
       await page.keyboard.press("Enter");
@@ -1995,7 +2014,7 @@ try {
         tag: document.activeElement.tagName,
         label: document.activeElement.getAttribute("aria-label"),
       }));
-      assert.equal(active.label, "Buscar lote, pavilhão ou via");
+      assert.equal(active.label, "Buscar lote, pavilhão, via ou estrutura");
       return active;
     });
     await runCheck("sidebar resize preserves selected identity and renderer", async () => {
@@ -2029,8 +2048,12 @@ try {
         await page.locator(".im-map-detail.closing").count(),
         "Test did not enter closing phase",
       );
-      await page.getByRole("button", { name: "Buscar lote, pavilhão ou via", exact: true }).click();
-      await page.getByRole("textbox", { name: "Lote, pavilhão ou via", exact: true }).fill("69");
+      await page
+        .getByRole("button", { name: "Buscar lote, pavilhão, via ou estrutura", exact: true })
+        .click();
+      await page
+        .getByRole("textbox", { name: "Lote, pavilhão, via ou estrutura", exact: true })
+        .fill("69");
       await page
         .locator(".im-map-result")
         .filter({ hasText: "Lote 69" })
