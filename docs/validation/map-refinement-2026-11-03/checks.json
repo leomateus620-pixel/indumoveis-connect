@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-11-03T06:56:03.145Z",
+  "baseCommit": "980d1dc69c392c9a7737a00f53d0765a8e3080a4",
+  "tests": {
+    "command": "npm test -- --maxWorkers=1",
+    "files": 74,
+    "passed": 454,
+    "status": "passed"
+  },
+  "types": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "status": "passed"
+  },
+  "lint": {
+    "scope": "27 changed code files; final renderer and three scripts rechecked",
+    "status": "passed",
+    "broaderScope": "Existing CRLF-only formatting differences in untouched feature files, not cleaned in this PR"
+  },
+  "build": {
+    "command": "npm run build",
+    "status": "passed"
+  },
+  "backend": "No migrations, production writes or publication",
+  "physicalDevices": "No physical touch/trackpad/iPhone/Safari/Android validation"
+}

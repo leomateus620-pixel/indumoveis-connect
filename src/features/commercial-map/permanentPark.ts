@@ -9,7 +9,6 @@ import {
   PERMANENT_PARK_LANDMARKS,
   type PermanentParkLandmark,
 } from "./permanentParkLayout";
-import { createPermanentParkLabels } from "./permanentParkLabels";
 import { pavementUnionCells, derivePavement, type PavementTopology } from "./pavement";
 import { subtractPolygons } from "./parkGeometry";
 import { PARK_REFERENCE_REVISION, PARK_REFERENCE_BUILDINGS } from "./parkReference";
@@ -935,8 +934,6 @@ export function createPermanentPark(
     for (const geometry of owned) geometry.dispose();
     throw error;
   }
-  const labels = createPermanentParkLabels();
-  if (labels) group.add(labels.mesh);
   return {
     group,
     metadata: {
@@ -944,15 +941,16 @@ export function createPermanentPark(
       schematic: true,
       landmarks: PERMANENT_PARK_LANDMARKS.map(({ id }) => id),
       drawBatches: group.children.length,
-      labelCount: labels?.labels ?? 0,
-      textureBytes: labels?.textureBytes ?? 0,
+      // Context names stay in search and the selected destination notice.
+      // No above-building plates, atlas texture or label draw is allocated.
+      labelCount: 0,
+      textureBytes: 0,
     },
     // All landmarks and architectural silhouettes are essential at every tier.
     setQuality(_quality: SurfaceQuality) {},
     dispose() {
       if (disposed) return;
       disposed = true;
-      labels?.dispose();
       for (const geometry of owned) geometry.dispose();
       group.clear();
     },

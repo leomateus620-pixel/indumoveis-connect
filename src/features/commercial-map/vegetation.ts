@@ -209,8 +209,8 @@ export function createVegetation(
     const up = new THREE.Vector3(0, 1, 0),
       matrix = new THREE.Matrix4(),
       rotation = new THREE.Quaternion();
-    const greens = ["#507443", "#6e874c", "#476e43"];
-    const leafGreens = ["#6d8c50", "#7f9458", "#5d8050"];
+    const greens = ["#4a7946", "#6c8e4e", "#427647"];
+    const leafGreens = ["#679750", "#829e5b", "#568b50"];
     const variants = Array.from({ length: 3 }, (_, variant) => {
       const width = [1.25, 0.92, 1.48][variant],
         height = [1, 1.17, 0.92][variant];

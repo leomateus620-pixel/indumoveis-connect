@@ -21,6 +21,7 @@ import {
   streetLabelPresentation,
 } from "./labelPolicy";
 import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
+import { commercialBoundaries, interiorLotAnchor, LOT_GRAPHICS } from "./commercialPresentation";
 
 const fullWidth = MAP_BOUNDS.maxX - MAP_BOUNDS.minX;
 const fullHeight = MAP_BOUNDS.maxY - MAP_BOUNDS.minY;
@@ -38,12 +39,19 @@ const base: Box = {
   height: fullHeight * 1.07,
 };
 const roads = ENTITIES.filter((entity) => entity.kind === "road");
+const lotBoundaries = commercialBoundaries(ENTITIES);
+const lotAnchors = new Map(
+  ENTITIES.filter((entity) => entity.kind === "lot").map((entity) => [
+    entity.id,
+    interiorLotAnchor(entity.polygon, entity.anchor),
+  ]),
+);
 const roadCorridors = new Map(
   roads.map((entity) => [entity.id, streetLabelCorridor(entity, roads)]),
 );
 function entityColor(entity: MapEntity) {
   if (entity.kind === "road") return isWalkway(entity) ? VISUAL_THEME.walk : VISUAL_THEME.road;
-  if (entity.kind === "lot") return VISUAL_THEME.lot;
+  if (entity.kind === "lot") return "#91ad7d";
   if (entity.kind === "pavilion") return VISUAL_THEME.wall;
   if (entity.kind === "landscape") return VISUAL_THEME.landscape;
   return VISUAL_THEME.support;
@@ -146,7 +154,6 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     const accepted: DOMRect[] = [];
     for (const { node, entity, bounds } of measured) {
       const selected = entity.id === current.current.selectedId;
-      const near = b.width < fullWidth * 0.7;
       const unit = b.width / rect.width;
       const left = b.x + (bounds.left - rect.left - 2) * unit;
       const right = b.x + (bounds.right - rect.left + 2) * unit;
@@ -160,8 +167,8 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           pointInPolygon([right, bottom], entity.polygon));
       const visible =
         !!node.textContent &&
+        (entity.kind === "lot" || entity.kind === "road" || selected) &&
         (entity.kind !== "road" || streetState.current.get(entity.id)?.visible) &&
-        (entity.kind !== "lot" || near || selected) &&
         fits &&
         bounds.right > rect.left &&
         bounds.left < rect.right &&
@@ -591,7 +598,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
             <polygon
               points={entity.polygon.map((p) => p.join(",")).join(" ")}
               pointerEvents="none"
-              style={{ fill: VISUAL_THEME.plum, fillOpacity: 0.09, stroke: "none" }}
+              style={{ fill: LOT_GRAPHICS.selected, fillOpacity: 0.09, stroke: "none" }}
             />
           )}
           {entity.accesses?.map((p, i) => (
@@ -599,6 +606,23 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           ))}
         </g>
       ))}
+      <g className="im-map-cadastral-ink" pointerEvents="none" aria-hidden="true">
+        {lotBoundaries.map((edge, index) => (
+          <line
+            key={index}
+            x1={edge.a[0]}
+            y1={edge.a[1]}
+            x2={edge.b[0]}
+            y2={edge.b[1]}
+            stroke={edge.owners.length === 1 ? LOT_GRAPHICS.perimeter : LOT_GRAPHICS.division}
+            strokeWidth={
+              edge.owners.length === 1 ? LOT_GRAPHICS.perimeterPixels : LOT_GRAPHICS.divisionPixels
+            }
+            vectorEffect="non-scaling-stroke"
+            strokeLinecap="round"
+          />
+        ))}
+      </g>
       {TREES.map((p, i) => (
         <circle
           key={i}
@@ -617,8 +641,8 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
             className={`im-map-entity im-map-${entity.kind} ${props.selectedId === entity.id ? "is-selected" : ""}`}
           >
             <text
-              x={entity.anchor[0]}
-              y={entity.anchor[1]}
+              x={(lotAnchors.get(entity.id) ?? entity.anchor)[0]}
+              y={(lotAnchors.get(entity.id) ?? entity.anchor)[1]}
               textAnchor="middle"
               dominantBaseline="central"
               className={entity.kind === "lot" ? "im-lot-number" : ""}
@@ -633,7 +657,9 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
                       strokeWidth: 0.06,
                       visibility: "hidden",
                     }
-                  : undefined
+                  : entity.kind !== "lot"
+                    ? { visibility: entity.id === props.selectedId ? undefined : "hidden" }
+                    : undefined
               }
             >
               {sceneLabel(entity)}

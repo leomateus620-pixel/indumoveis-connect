@@ -24,7 +24,7 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   paintedWall: VISUAL_THEME.wall,
   // Pavement/aprons read as grey concrete under the fixed daylight, while
   // white paint and pale pavilion facades retain their separate identities.
-  concrete: "#989f9b",
+  concrete: "#a2a6a0",
   asphalt: VISUAL_THEME.road,
   whitePaint: "#f3f1e6",
   paintedSheet: VISUAL_THEME.roof,
@@ -36,7 +36,7 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   architecturalFrame: "#40504a",
   // The commercial floor stays lighter than surrounding landscape so thin
   // parcel borders and status bands keep their contrast in overview.
-  grass: "#91ad7d",
+  grass: "#83ad70",
 };
 
 export interface SurfaceMaterials {

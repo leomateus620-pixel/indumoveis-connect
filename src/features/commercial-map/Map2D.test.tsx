@@ -7,6 +7,7 @@ import { ENTITIES } from "./data/territory";
 import type { MapHandle, MapRendererProps } from "./types";
 import { STREET_LABEL } from "./labelPolicy";
 import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
+import { LOT_GRAPHICS } from "./commercialPresentation";
 
 const props: MapRendererProps = {
   selectedId: null,
@@ -55,8 +56,19 @@ describe("engine-independent territorial fallback", () => {
       `[data-entity="${lot.id}"] polygon`,
     );
     expect(lotPolygons[0].style.fill).toBe(COMMERCIAL_STATUS_COLORS.disponivel);
-    expect(lotPolygons[1].style.fill).toBe(VISUAL_THEME.plum);
+    expect(lotPolygons[1].style.fill).toBe(LOT_GRAPHICS.selected);
     expect(lotPolygons[1].style.fillOpacity).toBe("0.09");
+  });
+  it("keeps numbers as transparent text and reveals building names only with selection", () => {
+    const pavilion = ENTITIES.find((entity) => entity.kind === "pavilion")!;
+    const { container, rerender } = render(<Map2D {...props} />);
+    expect(container.querySelector(".im-map-labels rect")).toBeNull();
+    const text = container.querySelector<SVGTextElement>(
+      `[data-label-entity="${pavilion.id}"] text`,
+    )!;
+    expect(text.style.visibility).toBe("hidden");
+    rerender(<Map2D {...props} selectedId={pavilion.id} />);
+    expect(text.style.visibility).not.toBe("hidden");
   });
   it("keeps the same SVG and target when selection closes and preserves external pose after inspection", () => {
     const matchMedia = window.matchMedia;

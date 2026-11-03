@@ -15,8 +15,8 @@ export const GROUND_VARIATION_GLSL = `
     float broad=parkGroundNoise(p/27.0+vec2(13.2,-7.4));
     float middle=parkGroundNoise(p/6.7+vec2(broad*2.1,5.3));
     float dry=smoothstep(.43,.84,broad*.72+middle*.28);
-    vec3 living=mix(vec3(.85,1.015,.80),vec3(1.055,1.005,.93),dry);
-    return living*(.965+(middle-.5)*.105);
+    vec3 living=mix(vec3(.91,1.018,.87),vec3(1.025,1.005,.96),dry);
+    return living*(.985+(middle-.5)*.065);
   }
 `;
 

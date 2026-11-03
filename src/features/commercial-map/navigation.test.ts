@@ -20,6 +20,9 @@ import {
   viewDirection,
   createSelectionNavigationSession,
   normalizedWheelDelta,
+  wheelZoomDistance,
+  wheelZoomProgress,
+  validWheelAnchor,
   touchTwistDelta,
   type NavigationPose,
 } from "./navigation";
@@ -28,9 +31,39 @@ describe("map navigation decisions", () => {
   it("normalizes wheel units without mouse/trackpad inference and bounds a two-touch twist", () => {
     expect(normalizedWheelDelta(2, 1, 600)).toBe(32);
     expect(normalizedWheelDelta(0.05, 2, 600)).toBe(30);
-    expect(normalizedWheelDelta(2000, 0, 600)).toBe(120);
-    expect(normalizedWheelDelta(-2000, 0, 600)).toBe(-120);
+    expect(normalizedWheelDelta(2000, 0, 600)).toBe(800);
+    expect(normalizedWheelDelta(-2000, 0, 600)).toBe(-800);
     expect(touchTwistDelta([-1, 0.01], [-1, -0.01], [0, 0])).toBeCloseTo(0.02, 3);
+  });
+  it("preserves equivalent wheel units, fractional precision and balanced near/far zoom", () => {
+    for (const distance of [12, 60, 240]) {
+      const delta = normalizedWheelDelta(100, 0, 600);
+      const farther = wheelZoomDistance(distance, delta, 2, 1000);
+      expect(farther / distance).toBeCloseTo(Math.exp(0.32), 8);
+      expect(wheelZoomDistance(farther, -delta, 2, 1000)).toBeCloseTo(distance, 8);
+      expect(wheelZoomDistance(distance, normalizedWheelDelta(6.25, 1, 600), 2, 1000)).toBeCloseTo(
+        farther,
+        8,
+      );
+      expect(wheelZoomDistance(distance, normalizedWheelDelta(1 / 6, 2, 600), 2, 1000)).toBeCloseTo(
+        farther,
+        8,
+      );
+      expect(wheelZoomDistance(distance, 0.25, 2, 1000)).toBeGreaterThan(distance);
+    }
+    expect(normalizedWheelDelta(Number.NaN, 0, 600)).toBe(0);
+    expect(wheelZoomDistance(5, -800, 5, 250)).toBe(5);
+    expect(wheelZoomDistance(250, 800, 5, 250)).toBe(250);
+    expect(wheelZoomDistance(100, 800, 5, 1000) / 100).toBeCloseTo(Math.exp(0.75));
+  });
+  it("starts a wheel response without a zero-slope delay and rejects distant horizon anchors", () => {
+    expect(wheelZoomProgress(0)).toBe(0);
+    expect(wheelZoomProgress(1)).toBe(1);
+    expect(wheelZoomProgress(0.1)).toBeGreaterThan(0.25);
+    expect(validWheelAnchor(60, 100)).toBe(true);
+    expect(validWheelAnchor(301, 100)).toBe(false);
+    expect(validWheelAnchor(Number.POSITIVE_INFINITY, 100)).toBe(false);
+    expect(validWheelAnchor(-1, 100)).toBe(false);
   });
   it("restores the exact original pose after A to B, despite repeat selection and manual navigation", () => {
     const session = createSelectionNavigationSession<NavigationPose>((pose) => ({

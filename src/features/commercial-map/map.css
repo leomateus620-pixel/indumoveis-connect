@@ -743,9 +743,10 @@
   stroke: #b5c0a6;
 }
 .im-map-lot polygon {
-  fill: #e4e8e2;
-  stroke: #7b877f;
-  stroke-width: 0.25;
+  fill: #91ad7d;
+  stroke: transparent;
+  stroke-width: 1.85;
+  vector-effect: non-scaling-stroke;
 }
 .im-map-pavilion polygon {
   fill: #f1f0e7;
@@ -785,29 +786,29 @@
 }
 .im-map-lot text {
   font-size: calc(var(--im-label-unit, 0.1px) * 12);
-  font-weight: 600;
-  stroke: #e4e8e2;
-  stroke-width: calc(var(--im-label-unit, 0.1px) * 2);
+  font-weight: 700;
+  fill: #483a43;
+  stroke: rgba(236, 231, 205, 0.75);
+  stroke-width: calc(var(--im-label-unit, 0.1px) * 1);
 }
 .im-map-entity.is-selected polygon {
-  stroke: #65354f;
-  stroke-width: 0.6;
+  stroke: #f1cc70;
+  stroke-width: 3.2;
+  vector-effect: non-scaling-stroke;
 }
 .im-map-entity.is-highlighted polygon {
   stroke: #823d60;
   stroke-width: 0.55;
 }
 .im-map-entity:hover polygon {
-  stroke: #65354f;
-  stroke-width: 0.4;
+  stroke: #ede0ad;
+  stroke-width: 2.25;
+  vector-effect: non-scaling-stroke;
   cursor: pointer;
 }
-.im-map-entity .im-lot-number {
-  visibility: hidden;
-}
-.im-map-near .im-map-entity .im-lot-number,
-.im-map-entity.is-selected .im-lot-number {
-  visibility: visible;
+.im-map-entity.is-selected:hover polygon {
+  stroke: #f1cc70;
+  stroke-width: 3.2;
 }
 @container (max-width: 899px) {
   .im-map-detail {
@@ -945,6 +946,11 @@
 @media (max-height: 500px) and (orientation: portrait) {
   .im-map-detail {
     max-height: 45%;
+  }
+}
+@media (max-width: 360px) {
+  .im-map-workspace.has-compact-header .im-map-header-tools {
+    flex-wrap: wrap;
   }
 }
 @media (max-height: 500px) and (orientation: landscape) {

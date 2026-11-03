@@ -255,7 +255,7 @@ describe("continuous source-protected commercial map terrain", () => {
       expect(disposed).toHaveBeenCalledTimes(2);
       expect(terrain.textures).toHaveLength(0);
       expect(terrain.material.map).toBeNull();
-      expect(terrain.material.color.getHexString()).toBe("a4b787");
+      expect(terrain.material.color.getHexString()).toBe(TERRAIN.palette[0].slice(1));
       expect(terrain.group.children).toHaveLength(2);
       terrain.dispose();
     } finally {
@@ -345,7 +345,7 @@ describe("continuous source-protected commercial map terrain", () => {
       expect(terrain.textures).toHaveLength(0);
       expect(terrain.textureBytes).toBe(4);
       expect(placeholder.colorSpace).toBe(THREE.SRGBColorSpace);
-      expect(Array.from(placeholder.image.data!)).toEqual([164, 183, 135, 255]);
+      expect(Array.from(placeholder.image.data!)).toEqual([147, 181, 128, 255]);
       expect(material.color.getHexString()).toBe("ffffff");
       expect(terrain.prepareMaps()).toBe(true);
       expect(allocations).toEqual([1, 512, 256]);
@@ -425,8 +425,11 @@ describe("continuous source-protected commercial map terrain", () => {
     try {
       second.prepareMaps();
       first.textures.forEach((texture, index) => {
-        expect(second.textures[index]).not.toBe(texture);
-        expect(second.textures[index].image.data).toBe(texture.image.data);
+        // Texture objects contain megabyte pixel arrays and circular source
+        // references. Assert identity directly: Vitest's failed-equality hint
+        // otherwise performs a pointless deep comparison for .not.toBe().
+        expect(Object.is(second.textures[index], texture)).toBe(false);
+        expect(Object.is(second.textures[index].image.data, texture.image.data)).toBe(true);
         texture.addEventListener("dispose", firstDisposed);
         second.textures[index].addEventListener("dispose", secondDisposed);
       });
@@ -436,7 +439,7 @@ describe("continuous source-protected commercial map terrain", () => {
       first.dispose();
       expect(firstDisposed).toHaveBeenCalledTimes(2);
       expect(secondDisposed).not.toHaveBeenCalled();
-      expect(second.material.map).toBe(second.textures[0]);
+      expect(Object.is(second.material.map, second.textures[0])).toBe(true);
       second.dispose();
       expect(secondDisposed).toHaveBeenCalledTimes(2);
     } finally {

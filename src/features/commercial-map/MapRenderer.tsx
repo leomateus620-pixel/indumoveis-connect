@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { configureMapInput, prepareSecondaryOrbit } from "./mapInput";
+import { configureMapInput, prepareSecondaryPan } from "./mapInput";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 import { createSoftwareMaterials } from "./softwareMaterials";
@@ -9,6 +9,7 @@ import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
 import { createPhotoPavilionSetting } from "./photoPavilionSettingGeometry";
 import { getRegisteredParkWoodland, PARK_WOODLAND_MASSES } from "./parkPlanting";
 import { createTerrain, TERRAIN } from "./terrain";
+import { derivePavilionGround } from "./pavilionGround";
 import { DAYLIGHT, createDaylightSky, createDaylightBackground } from "./daylight";
 import { createSunShadows } from "./sunShadows";
 import { createLotGrass } from "./lotGrass";
@@ -25,6 +26,13 @@ import type { PermanentParkLandmark } from "./permanentParkLayout";
 import { deriveUrbanHouses } from "./urbanLayout";
 import { EXPLORATION_POLYGONS } from "./urbanReference";
 import { createParkDetails, lotStatusBands } from "./parkDetails";
+import { createCommercialBoundaries } from "./commercialBoundaries";
+import {
+  boundaryDistance,
+  interiorLotAnchor,
+  lotNumberHeight,
+  LOT_GRAPHICS,
+} from "./commercialPresentation";
 import { createSolarShadows } from "./solarShadows";
 import { isSoftwareRasterizer, ResolutionBudget } from "./performanceBudget";
 import { VISUAL_THEME as PALETTE, COMMERCIAL_STATUS_COLORS } from "./visualTheme";
@@ -57,6 +65,10 @@ import {
   minimumNavigationDistance,
   createSelectionNavigationSession,
   normalizedWheelDelta,
+  wheelZoomDistance,
+  wheelZoomProgress,
+  validWheelAnchor,
+  WHEEL_ZOOM,
   touchTwistDelta,
   type QualityTier,
 } from "./navigation";
@@ -110,6 +122,13 @@ type Diagnostic = {
   ambientFrames: number;
   optionalFailures: string[];
   labels: { id: string; scale: number; visible: boolean; textHeightPx: number }[];
+  lotLabels: {
+    id: string;
+    visible: boolean;
+    textHeightPx: number;
+    rect: { x: number; y: number; w: number; h: number };
+    anchor: Point;
+  }[];
   dpr: number;
   buffer: [number, number];
   tier: QualityTier;
@@ -419,7 +438,7 @@ function initializeMapRuntime(
   controls.zoomToCursor = true;
   controls.rotateSpeed = 0.6;
   controls.panSpeed = 0.85;
-  controls.zoomSpeed = 0.8;
+  controls.zoomSpeed = 1.15;
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
   let softwareRasterizer = false;
   try {
@@ -477,6 +496,8 @@ function initializeMapRuntime(
     duration: number;
     kind: CameraAction;
   } | null = null;
+  let wheelDirection = 0;
+  let buttonZoomDirection = 0;
   const selectionSession = createSelectionNavigationSession<Pose>((value) => ({
     position: value.position.clone(),
     target: value.target.clone(),
@@ -520,6 +541,10 @@ function initializeMapRuntime(
   const pickables: THREE.Mesh[] = [];
   const labels: {
     entity: MapEntity;
+    anchor: Point;
+    radius: number;
+    multiline: boolean;
+    glyphHeight: number;
     text: string;
     size: number;
     width: number;
@@ -558,7 +583,7 @@ function initializeMapRuntime(
     geometries: 0,
     textures: 0,
     programs: 0,
-    textureBytes: 4 * 1024 * 1024,
+    textureBytes: 5_592_404, // 1024² RGBA label atlas including its complete mip chain.
     environmentBytes: 0,
     environmentPeakBytes: 0,
     environmentPrepareMs: 0,
@@ -575,6 +600,7 @@ function initializeMapRuntime(
     ambientFrames: 0,
     optionalFailures: [],
     labels: [],
+    lotLabels: [],
     dpr: 1,
     buffer: [0, 0],
     tier,
@@ -709,7 +735,9 @@ function initializeMapRuntime(
     explorationPolygons: CONTEXT_EXPLORATION,
     fov: camera.fov,
   });
+  const pavilionGround = derivePavilionGround(PARK_RENDER_ENTITIES);
   const terrain = createTerrain(ENTITIES, {
+    foundationExclusions: pavilionGround.foundationExclusions,
     extent: envelope.terrainBounds,
     quality: tier,
     deferMaps: true,
@@ -740,7 +768,8 @@ function initializeMapRuntime(
   const lotRanges = new Map<string, [number, number]>();
   const statusRanges = new Map<string, [number, number]>();
   const statusPositions: number[] = [],
-    statusColors: number[] = [];
+    statusColors: number[] = [],
+    statusOpacity: number[] = [];
   let lotGeometry: THREE.BufferGeometry | null = null;
   let lotBaseMesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material> | null = null;
   const pavement = createPavement(PARK_RENDER_ENTITIES, surfaces, {
@@ -792,17 +821,19 @@ function initializeMapRuntime(
         const bandColor = new THREE.Color(
           props().statuses[entity.id] ? statusColor(props().statuses[entity.id]) : PALETTE.lotEdge,
         );
-        for (const band of lotStatusBands(entity.polygon)) {
+        for (const band of lotStatusBands(entity.polygon, 0.18)) {
           const shape = polygonGeometry(band, 0.062);
           const vertices = shape.getAttribute("position").array;
           statusPositions.push(...vertices);
-          for (let i = 0; i < vertices.length / 3; i++)
+          for (let i = 0; i < vertices.length / 3; i++) {
             statusColors.push(bandColor.r, bandColor.g, bandColor.b);
+            statusOpacity.push(props().statuses[entity.id] ? 0.9 : 0);
+          }
           shape.dispose();
         }
         statusRanges.set(entity.id, [bandStart, statusPositions.length / 3 - bandStart]);
       }
-      if (kind !== "landscape") borderPositions.push(...edges(entity.polygon, elevation + 0.035));
+      if (kind === "support") borderPositions.push(...edges(entity.polygon, elevation + 0.035));
       if (kind === "lot" || kind === "support") {
         const pick = new THREE.Mesh(track(geometry), basic("#ffffff"));
         pick.userData.entityId = entity.id;
@@ -858,12 +889,37 @@ function initializeMapRuntime(
   const statusGeometry = track(new THREE.BufferGeometry());
   statusGeometry.setAttribute("position", new THREE.Float32BufferAttribute(statusPositions, 3));
   statusGeometry.setAttribute("color", new THREE.Float32BufferAttribute(statusColors, 3));
-  const statusMesh = new THREE.Mesh(
-    statusGeometry,
-    track(new THREE.MeshBasicMaterial({ vertexColors: true })),
+  statusGeometry.setAttribute(
+    "commercialOpacity",
+    new THREE.Float32BufferAttribute(statusOpacity, 1),
   );
+  const statusMaterial = track(
+    new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false }),
+  );
+  statusMaterial.onBeforeCompile = (shader) => {
+    shader.vertexShader =
+      `attribute float commercialOpacity; varying float vCommercialOpacity;\n${shader.vertexShader}`.replace(
+        "#include <begin_vertex>",
+        "#include <begin_vertex>\nvCommercialOpacity = commercialOpacity;",
+      );
+    shader.fragmentShader = `varying float vCommercialOpacity;\n${shader.fragmentShader}`.replace(
+      "#include <color_fragment>",
+      "#include <color_fragment>\ndiffuseColor.a *= vCommercialOpacity;",
+    );
+  };
+  statusMaterial.customProgramCacheKey = () => "commercial-status-band-opacity-v1";
+  const statusMesh = new THREE.Mesh(statusGeometry, statusMaterial);
   statusMesh.raycast = () => {};
   commercialGroup.add(statusMesh);
+  const commercialInk = createCommercialBoundaries(ENTITIES);
+  commercialGroup.add(commercialInk.group);
+  commercialInk.resources.forEach(track);
+  function setHoveredEntity(id: string | null) {
+    const entity = id ? ENTITY_BY_ID.get(id) : undefined;
+    const elevation =
+      entity && getArchitectureDefinition(entity) ? architectureVisualHeight(entity) + 0.35 : 0.155;
+    if (commercialInk.hover(entity, elevation)) invalidate();
+  }
 
   // The registered Casa/Sede replaces the schematic support box. One model,
   // one commercial selection owner, with its current visual proxy and bounds.
@@ -897,18 +953,6 @@ function initializeMapRuntime(
   rollback.push(() => sunShadows.dispose());
   diag.textureBytes += sky.textureBytes;
 
-  const selectedGeometry = track(new THREE.BufferGeometry());
-  const selectionPositions = new Float32Array(
-    Math.max(...ENTITIES.map((entity) => entity.polygon.length)) * 6,
-  );
-  selectedGeometry.setAttribute("position", new THREE.BufferAttribute(selectionPositions, 3));
-  selectedGeometry.setDrawRange(0, 0);
-  const selectedLine = new THREE.LineSegments(
-    selectedGeometry,
-    track(new THREE.LineBasicMaterial({ color: "#4d1e3e", linewidth: 2 })),
-  );
-  selectedLine.renderOrder = 5;
-  commercialGroup.add(selectedLine);
   const selectionFillGeometry = track(new THREE.BufferGeometry());
   const selectionFillPositions = new Float32Array(
     Math.max(...ENTITIES.map((entity) => entity.polygon.length - 2)) * 9,
@@ -922,9 +966,9 @@ function initializeMapRuntime(
     selectionFillGeometry,
     track(
       new THREE.MeshBasicMaterial({
-        color: PALETTE.plum,
+        color: LOT_GRAPHICS.selected,
         transparent: true,
-        opacity: 0.12,
+        opacity: 0.09,
         depthWrite: false,
       }),
     ),
@@ -946,8 +990,8 @@ function initializeMapRuntime(
   );
   labelEntities.sort(
     (a, b) =>
-      (a.kind === "pavilion" ? 0 : a.kind === "road" ? 1 : a.kind === "support" ? 2 : 3) -
-      (b.kind === "pavilion" ? 0 : b.kind === "road" ? 1 : b.kind === "support" ? 2 : 3),
+      (a.kind === "lot" ? 0 : a.kind === "pavilion" ? 1 : a.kind === "support" ? 2 : 3) -
+      (b.kind === "lot" ? 0 : b.kind === "pavilion" ? 1 : b.kind === "support" ? 2 : 3),
   );
   const cellWidth = 256,
     cellHeight = 40;
@@ -959,37 +1003,46 @@ function initializeMapRuntime(
     const row = Math.floor(index / 4),
       col = index % 4;
     if (row * cellHeight >= 1024) return;
-    atlas.font = `${entity.kind === "lot" ? 600 : 700} ${entity.kind === "lot" ? 22 : 19}px sans-serif`;
-    const metrics = atlas.measureText(text);
+    const lot = entity.kind === "lot";
+    const multiline = lot && (entity.numbers?.length ?? 0) > 2;
+    const textLines = multiline
+      ? [entity.numbers!.slice(0, 2), entity.numbers!.slice(2)].map((line) =>
+          line.map((n) => String(n).padStart(2, "0")).join(" / "),
+        )
+      : [text];
+    atlas.font = `700 ${multiline ? 17 : lot ? 22 : 19}px system-ui, sans-serif`;
+    const metrics = atlas.measureText(textLines[0]);
     const street = entity.kind === "road";
     const groundReference = isGroundReference(entity);
     const glyphHeight = Math.ceil(
       metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
     );
-    const measured = Math.min(240, metrics.width + (groundReference ? 4 : 14));
-    const glyphBand = groundReference ? glyphHeight + 2 : 30;
-    if (!groundReference) {
-      atlas.fillStyle = entity.kind === "lot" ? "rgba(251,250,245,0.78)" : "rgba(251,250,245,0.96)";
-      atlas.beginPath();
-      atlas.roundRect(
-        col * cellWidth + (cellWidth - measured) / 2,
-        row * cellHeight + 6,
-        measured,
-        30,
-        5,
-      );
-      atlas.fill();
-    }
-    atlas.fillStyle = street && !isWalkway(entity) ? PALETTE.roadText : PALETTE.text;
+    const measured = Math.min(
+      240,
+      Math.max(...textLines.map((line) => atlas.measureText(line).width)) + 4,
+    );
+    const glyphBand = multiline ? 34 : glyphHeight + 4;
+    // Ground numbers are ink over the living grass. The atlas contains only
+    // glyphs and a narrow tonal halo, with no plate/background for any entity.
+    atlas.fillStyle = lot
+      ? "#483a43"
+      : street && !isWalkway(entity)
+        ? PALETTE.roadText
+        : PALETTE.text;
     atlas.textAlign = "center";
     atlas.textBaseline = "middle";
-    if (groundReference) {
-      atlas.strokeStyle = !street || isWalkway(entity) ? "#f5f3ec" : PALETTE.roadHalo;
-      atlas.lineWidth = 1.3;
-      atlas.lineJoin = "round";
-      atlas.strokeText(text, col * cellWidth + cellWidth / 2, row * cellHeight + 21, 230);
-    }
-    atlas.fillText(text, col * cellWidth + cellWidth / 2, row * cellHeight + 21, 230);
+    atlas.strokeStyle = lot
+      ? "rgba(236,231,205,0.75)"
+      : street && !isWalkway(entity)
+        ? PALETTE.roadHalo
+        : "rgba(245,243,236,0.88)";
+    atlas.lineWidth = lot ? 1.5 : 1.3;
+    atlas.lineJoin = "round";
+    textLines.forEach((line, lineIndex) => {
+      const lineY = row * cellHeight + (multiline ? 11 + lineIndex * 17 : 21);
+      atlas.strokeText(line, col * cellWidth + cellWidth / 2, lineY, 230);
+      atlas.fillText(line, col * cellWidth + cellWidth / 2, lineY, 230);
+    });
     const size = groundReference
       ? (STREET_LABEL.baseTextHeight * cellHeight) / glyphBand
       : entity.kind === "lot"
@@ -1001,7 +1054,9 @@ function initializeMapRuntime(
     const vertical = entity.kind === "road" && entityBounds.depth > entityBounds.width * 2.5;
     const labelWidth = (size * cellWidth) / cellHeight;
     const y = getArchitectureDefinition(entity) ? architectureVisualHeight(entity) + 0.6 : 0.23;
-    const [x, z] = entity.anchor;
+    const anchor = lot ? interiorLotAnchor(entity.polygon, entity.anchor) : entity.anchor;
+    const radius = lot ? boundaryDistance(anchor, entity.polygon) : 0;
+    const [x, z] = anchor;
     const vertex = labelPositions.length / 3;
     labelPositions.push(
       x - labelWidth / 2,
@@ -1024,6 +1079,10 @@ function initializeMapRuntime(
     labelUVs.push(u0, v1, u1, v1, u1, v0, u0, v0);
     labels.push({
       entity,
+      anchor,
+      radius,
+      multiline,
+      glyphHeight,
       text,
       size,
       width: labelWidth,
@@ -1038,9 +1097,9 @@ function initializeMapRuntime(
       drawn: false,
       rect: { x: 0, y: 0, w: 0, h: 0 },
       priority:
-        entity.kind === "pavilion"
+        entity.kind === "lot"
           ? 1
-          : entity.kind === "road"
+          : entity.kind === "pavilion"
             ? 2
             : entity.kind === "support"
               ? 3
@@ -1049,8 +1108,12 @@ function initializeMapRuntime(
   });
   const labelTexture = track(new THREE.CanvasTexture(atlasCanvas));
   labelTexture.colorSpace = THREE.SRGBColorSpace;
-  labelTexture.minFilter = THREE.LinearFilter;
-  labelTexture.generateMipmaps = false;
+  // Atlas padding separates cells by several glyph pixels. Trilinear mipmaps
+  // suppress distant sparkle; billboards avoid ground-label foreshortening.
+  labelTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  labelTexture.magFilter = THREE.LinearFilter;
+  labelTexture.generateMipmaps = true;
+  labelTexture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
   const labelsGeometry = track(new THREE.BufferGeometry());
   labelsGeometry.setAttribute("position", new THREE.Float32BufferAttribute(labelPositions, 3));
   labelsGeometry.setAttribute("uv", new THREE.Float32BufferAttribute(labelUVs, 2));
@@ -1089,9 +1152,12 @@ function initializeMapRuntime(
       label.drawn = false;
       const { entity, vertex } = label;
       const building = !!getArchitectureDefinition(entity);
-      const y = building ? architectureVisualHeight(entity) + 0.6 : 0.23;
+      const lot = entity.kind === "lot";
+      if (!lot && entity.kind !== "road" && entity.id !== state.selectedId) continue;
+      const billboard = building;
+      let y = building ? architectureVisualHeight(entity) + 0.6 : 0.23;
       const positions = labelsGeometry.getAttribute("position") as THREE.BufferAttribute;
-      projection.set(entity.anchor[0], y, entity.anchor[1]).project(camera);
+      projection.set(label.anchor[0], y, label.anchor[1]).project(camera);
       if (
         projection.z > 1 ||
         projection.z < -1 ||
@@ -1101,18 +1167,25 @@ function initializeMapRuntime(
         continue;
       const px = ((projection.x + 1) * width) / 2,
         py = ((1 - projection.y) * height) / 2;
-      const distance = camera.position.distanceTo(
-        scratch.set(entity.anchor[0], y, entity.anchor[1]),
-      );
+      const distance = camera.position.distanceTo(scratch.set(label.anchor[0], y, label.anchor[1]));
       const selected = entity.id === state.selectedId;
       const worldUnitsPerPixel =
         (2 * Math.max(distance, 1) * Math.tan((camera.fov * Math.PI) / 360)) / height;
       const m = camera.matrixWorld.elements;
-      const projectedAxis = building
-        ? 1
-        : label.vertical
-          ? Math.hypot(m[0], m[4])
-          : Math.hypot(m[2], m[6]);
+      // A ground number follows camera azimuth continuously, retaining a
+      // horizontal plane. There is no compass threshold or 180-degree flip.
+      const groundRightLength = Math.hypot(m[0], m[2]) || 1;
+      const lotRx = m[0] / groundRightLength,
+        lotRz = m[2] / groundRightLength,
+        lotUx = lotRz,
+        lotUz = -lotRx;
+      const projectedAxis = lot
+        ? Math.max(0.08, Math.abs(lotUx * m[4] + lotUz * m[6]))
+        : billboard
+          ? 1
+          : label.vertical
+            ? Math.hypot(m[0], m[4])
+            : Math.hypot(m[2], m[6]);
       const minText =
         entity.kind === "lot" ? (selected ? 12 : 9) : entity.kind === "pavilion" ? 12 : 10;
       let labelHeight = isGroundReference(entity)
@@ -1124,36 +1197,34 @@ function initializeMapRuntime(
             (entity.kind === "lot" ? 22 : 19) / cellHeight,
             minText,
           );
-      // The commercial overview is intentionally wider than a single lot.
-      // Allow a slightly larger screen-readable number there; collision checks
-      // below still suppress overlaps and the polygon remains the picking target.
-      if (entity.kind === "lot" && !selected) {
-        const target =
-          (minText * worldUnitsPerPixel) / Math.max(0.08, projectedAxis * (22 / cellHeight));
-        labelHeight = Math.max(labelHeight, Math.min(label.size * 4, target));
-        const lotBounds = boundsOf(entity).box;
-        const labelLimit = Math.min(
-          (lotBounds.width * 0.8) / Math.max(0.01, (cellWidth / cellHeight) * label.textWidth),
-          (lotBounds.depth * 0.8) / Math.max(0.01, label.textHeight),
-        );
-        labelHeight = Math.min(labelHeight, labelLimit);
+      if (lot) {
+        const badgeAspect = ((cellWidth / cellHeight) * label.textWidth) / label.textHeight;
+        labelHeight =
+          lotNumberHeight(
+            label.radius,
+            (worldUnitsPerPixel * (label.multiline ? 1.9 : 1)) / projectedAxis,
+            badgeAspect,
+            selected,
+          ) / label.textHeight;
       }
       let labelWidth = (labelHeight * cellWidth) / cellHeight;
       const projectedHeight = (labelHeight / worldUnitsPerPixel) * projectedAxis;
-      if (entity.kind === "lot" && !selected) {
-        label.visible = (projectedHeight * 22) / cellHeight >= (label.visible ? 7 : 8.5);
+      if (lot) {
+        label.textHeightPx = (projectedHeight * label.glyphHeight) / cellHeight;
+        label.visible = label.textHeightPx >= (label.visible ? 6.8 : 7.5);
         if (!label.visible) continue;
+        y = 0.16;
       }
-      const [anchorX, anchorY] = entity.anchor;
-      // Buildings share the same atlas but face the camera above the ridge.
-      // Ground labels keep the plant axis; flip 180 degrees when viewed backwards.
-      const rx = building ? m[0] : label.vertical ? 0 : 1;
-      const ry = building ? m[1] : 0;
-      const rz = building ? m[2] : label.vertical ? 1 : 0;
-      const ux = building ? m[4] : label.vertical ? 1 : 0;
-      const uy = building ? m[5] : 0;
-      const uz = building ? m[6] : label.vertical ? 0 : -1;
-      const sign = building || rx * m[0] + rz * m[2] >= 0 ? 1 : -1;
+      const [anchorX, anchorY] = label.anchor;
+      // Numbers remain grounded; only selected architectural names use the
+      // shared camera-facing text above the ridge, with no rectangular plate.
+      const rx = lot ? lotRx : billboard ? m[0] : label.vertical ? 0 : 1;
+      const ry = billboard ? m[1] : 0;
+      const rz = lot ? lotRz : billboard ? m[2] : label.vertical ? 1 : 0;
+      const ux = lot ? lotUx : billboard ? m[4] : label.vertical ? 1 : 0;
+      const uy = billboard ? m[5] : 0;
+      const uz = lot ? lotUz : billboard ? m[6] : label.vertical ? 0 : -1;
+      const sign = lot || billboard || rx * m[0] + rz * m[2] >= 0 ? 1 : -1;
       const projectText = (w: number, h: number) => {
         const corners: { x: number; y: number }[] = [];
         for (let corner = 0; corner < 4; corner++) {
@@ -1224,7 +1295,7 @@ function initializeMapRuntime(
         maxX = -Infinity,
         minY = Infinity,
         maxY = -Infinity;
-      // Project the actual atlas background, not the mostly transparent cell.
+      // Project the actual glyph/halo band, not the mostly transparent cell.
       for (let corner = 0; corner < 4; corner++) {
         const ox = ((corner === 0 || corner === 3 ? -1 : 1) * labelWidth * label.textWidth) / 2;
         const oz = ((corner < 2 ? 1 : -1) * labelHeight * label.textHeight) / 2;
@@ -1246,6 +1317,7 @@ function initializeMapRuntime(
       rect.y = (minY + maxY) / 2;
       rect.w = maxX - minX;
       rect.h = maxY - minY;
+      if (lot) label.textHeightPx = (rect.h * label.glyphHeight) / (label.textHeight * cellHeight);
       let collides = false;
       if (!selected)
         for (const other of collisionRects) {
@@ -1278,6 +1350,16 @@ function initializeMapRuntime(
           scale: label.scale,
           visible: label.drawn,
           textHeightPx: label.textHeightPx,
+        }));
+    if (diag.enabled)
+      diag.lotLabels = labels
+        .filter((label) => label.entity.kind === "lot")
+        .map((label) => ({
+          id: label.entity.id,
+          visible: label.drawn,
+          textHeightPx: label.textHeightPx,
+          rect: { ...label.rect },
+          anchor: label.anchor,
         }));
   }
 
@@ -1338,7 +1420,7 @@ function initializeMapRuntime(
       // not depend on the separately downloaded residential factory.
       try {
         if (!parkDetails && !parkDetailsFailed) {
-          parkDetails = createParkDetails(PARK_RENDER_ENTITIES, surfaces);
+          parkDetails = createParkDetails(PARK_RENDER_ENTITIES, surfaces, pavilionGround);
           parkDetails.group.visible = false;
           commercialGroup.add(parkDetails.group);
           rollback.push(() => parkDetails?.dispose());
@@ -1790,7 +1872,11 @@ function initializeMapRuntime(
         bounds.center,
         Math.max(bounds.radius, 3),
         props().view,
-        entity ? bounds.box : { ...bounds.box, height: COMMERCIAL_HEIGHT },
+        entity?.kind === "pavilion"
+          ? { ...bounds.box, width: bounds.box.width * 1.3, depth: bounds.box.depth * 1.3 }
+          : entity
+            ? bounds.box
+            : { ...bounds.box, height: COMMERCIAL_HEIGHT },
         ready
           ? new THREE.Vector3().subVectors(camera.position, controls.target).normalize()
           : undefined,
@@ -1870,7 +1956,7 @@ function initializeMapRuntime(
       const progress = transition.duration
         ? Math.min(1, (now - transition.start) / transition.duration)
         : 1;
-      const t = smoothStep(progress);
+      const t = transition.kind === "wheel" ? wheelZoomProgress(progress) : smoothStep(progress);
       controls.target.lerpVectors(transition.from.target, transition.to.target, t);
       // Interpolate orbit coordinates, not a chord through the building/ground
       // when presets cross opposite sides of the target.
@@ -2108,14 +2194,17 @@ function initializeMapRuntime(
   }
   function cancelTransition() {
     transition = null;
+    wheelDirection = 0;
+    buttonZoomDirection = 0;
     pendingVisibilityCheck = false;
     navigationLimits();
     lastActivity = performance.now();
     diag.cameraState = "manual";
   }
   function pointerDown(event: PointerEvent) {
+    setHoveredEntity(null);
     cancelTransition();
-    prepareSecondaryOrbit(controls, event);
+    prepareSecondaryPan(controls, event);
     if (
       event.button !== 0 ||
       event.shiftKey ||
@@ -2170,8 +2259,14 @@ function initializeMapRuntime(
       lastActivity = performance.now();
       invalidate();
     } else if (event.pointerType === "mouse") {
-      canvas.style.cursor = pick(event.clientX, event.clientY) ? "pointer" : "grab";
+      const hovered = pick(event.clientX, event.clientY);
+      canvas.style.cursor = hovered ? "pointer" : "grab";
+      setHoveredEntity(hovered);
     }
+  }
+  function pointerLeave() {
+    setHoveredEntity(null);
+    canvas.style.cursor = "grab";
   }
   function pointerUp(event: PointerEvent) {
     const initial = activePointers.get(event.pointerId);
@@ -2188,7 +2283,7 @@ function initializeMapRuntime(
     }
     if (!activePointers.size) {
       clickCancelled = false;
-      controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+      controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
       lastActivity = performance.now();
       invalidate();
     }
@@ -2220,35 +2315,53 @@ function initializeMapRuntime(
     if (activePointers.has(event.pointerId)) cancelPointers();
   }
   function wheel(event: WheelEvent) {
-    // OrbitControls owns pointer gestures; this small wheel transition smooths
-    // normalized trackpad/line deltas without a queue or a long inertial tail.
+    // One wheel consumer. OrbitControls owns pointer/pinch gestures only.
     event.preventDefault();
     event.stopImmediatePropagation();
-    // Only a previous wheel destination may accumulate wheel input. A preset
-    // or focus animation is interrupted at its visible pose.
+    // Accumulate only a wheel destination continuing in the same direction.
+    // A reversal, preset or focus is interrupted at the visible pose, so a
+    // small reverse input never keeps moving toward an older destination.
     if (activePointers.size) return;
     selectionManuallyNavigated = true;
     pendingVisibilityCheck = false;
-    const base = transition?.kind === "wheel" ? transition.to : pose();
+    const delta = normalizedWheelDelta(event.deltaY, event.deltaMode, height);
+    if (!delta) return;
+    const direction = Math.sign(delta);
+    const base =
+      transition?.kind === "wheel" && direction === wheelDirection ? transition.to : pose();
+    wheelDirection = direction;
     const rect = canvas.getBoundingClientRect();
     pointer.set(
       ((event.clientX - rect.left) / rect.width) * 2 - 1,
       1 - ((event.clientY - rect.top) / rect.height) * 2,
     );
     raycaster.setFromCamera(pointer, camera);
-    const anchored = raycaster.ray.intersectPlane(groundPlane, wheelAnchor);
-    const delta = normalizedWheelDelta(event.deltaY, event.deltaMode, height);
+    const groundHit = raycaster.ray.intersectPlane(groundPlane, wheelAnchor);
     const distance = base.position.distanceTo(base.target);
-    const nextDistance = Math.max(
-      distanceLimits().min,
-      Math.min(distanceLimits().max, distance * Math.exp(delta * 0.0015)),
-    );
+    const limits = distanceLimits();
+    const nextDistance = wheelZoomDistance(distance, delta, limits.min, limits.max);
     const ratio = nextDistance / distance;
-    const anchor = anchored ?? base.target;
+    const anchor =
+      groundHit &&
+      validWheelAnchor(
+        camera.position.distanceTo(groundHit),
+        camera.position.distanceTo(controls.target),
+      )
+        ? wheelAnchor
+        : base.target;
     const next = {
       position: base.position.clone().sub(anchor).multiplyScalar(ratio).add(anchor),
       target: base.target.clone().sub(anchor).multiplyScalar(ratio).add(anchor),
     };
+    boundedPose(next);
+    // Make the first input visible synchronously. A short ease-out completes
+    // the remaining displacement; replacing its sole destination never queues
+    // a flight or restarts a zero-slope acceleration phase on a trackpad.
+    const visible = pose();
+    applyPose({
+      position: visible.position.lerp(next.position, WHEEL_ZOOM.immediateFraction),
+      target: visible.target.lerp(next.target, WHEEL_ZOOM.immediateFraction),
+    });
     lastActivity = performance.now();
     animate(next, MOVEMENT.wheelMs, "wheel");
   }
@@ -2309,6 +2422,7 @@ function initializeMapRuntime(
 
   canvas.addEventListener("pointerdown", pointerDown, true);
   canvas.addEventListener("pointermove", pointerMove, true);
+  canvas.addEventListener("pointerleave", pointerLeave);
   window.addEventListener("pointerup", pointerUp, true);
   canvas.addEventListener("pointercancel", pointerCancelled, true);
   canvas.addEventListener("lostpointercapture", lostCapture, true);
@@ -2322,6 +2436,7 @@ function initializeMapRuntime(
     controls.removeEventListener("change", controlsChanged);
     canvas.removeEventListener("pointerdown", pointerDown, true);
     canvas.removeEventListener("pointermove", pointerMove, true);
+    canvas.removeEventListener("pointerleave", pointerLeave);
     window.removeEventListener("pointerup", pointerUp, true);
     canvas.removeEventListener("pointercancel", pointerCancelled, true);
     canvas.removeEventListener("lostpointercapture", lostCapture, true);
@@ -2427,6 +2542,10 @@ function initializeMapRuntime(
     diag.navigation = envelope;
     if (diag.terrain) diag.terrain.bounds = envelope.terrainBounds;
   }
+  let selectionAppearanceId: string | null | undefined;
+  let selectionAppearanceInspection: string | null | undefined;
+  const selectionSurfaces = new Map<string, Float32Array>();
+  const previousStatusColors = new Map<string, string>();
   function update() {
     const state = props();
     configureMapInput(controls);
@@ -2470,40 +2589,52 @@ function initializeMapRuntime(
       diag.slowFrameWindows = 0;
     }
     const selected = state.selectedId ? ENTITY_BY_ID.get(state.selectedId) : undefined;
-    const selection = selected
-      ? edges(
-          selected.polygon,
-          getArchitectureDefinition(selected) && state.inspectedId !== selected.id
-            ? architectureVisualHeight(selected) + 0.3
-            : 0.2,
-        )
-      : [];
-    selectionPositions.fill(0);
-    selectionPositions.set(selection);
-    selectedGeometry.getAttribute("position").needsUpdate = true;
-    selectedGeometry.setDrawRange(0, selection.length / 3);
-    selectedGeometry.computeBoundingSphere();
-    if (selected && !getArchitectureDefinition(selected)) {
-      const surface = polygonGeometry(selected.polygon, 0.13);
-      const positions = surface.getAttribute("position").array;
-      selectionFillPositions.set(positions);
-      selectionFillGeometry.getAttribute("position").needsUpdate = true;
-      selectionFillGeometry.setDrawRange(0, positions.length / 3);
-      surface.dispose();
-    } else selectionFillGeometry.setDrawRange(0, 0);
+    if (
+      selectionAppearanceId !== state.selectedId ||
+      selectionAppearanceInspection !== state.inspectedId
+    ) {
+      selectionAppearanceId = state.selectedId;
+      selectionAppearanceInspection = state.inspectedId;
+      commercialInk.select(
+        selected,
+        selected && getArchitectureDefinition(selected) && state.inspectedId !== selected.id
+          ? architectureVisualHeight(selected) + 0.3
+          : 0.2,
+      );
+      if (selected && !getArchitectureDefinition(selected)) {
+        let positions = selectionSurfaces.get(selected.id);
+        if (!positions) {
+          const surface = polygonGeometry(selected.polygon, 0.13);
+          positions = new Float32Array(surface.getAttribute("position").array);
+          selectionSurfaces.set(selected.id, positions);
+          surface.dispose();
+        }
+        selectionFillPositions.set(positions);
+        selectionFillGeometry.getAttribute("position").needsUpdate = true;
+        selectionFillGeometry.setDrawRange(0, positions.length / 3);
+      } else selectionFillGeometry.setDrawRange(0, 0);
+    }
     if (lotGeometry) {
       const colors = statusGeometry.getAttribute("color") as THREE.BufferAttribute;
+      const opacities = statusGeometry.getAttribute("commercialOpacity") as THREE.BufferAttribute;
+      let changed = false;
       for (const [id, [start, count]] of statusRanges) {
-        const color = new THREE.Color(
-          state.highlightedIds.includes(id) && !state.statuses[id]
-            ? "#d5c69c"
-            : state.statuses[id]
-              ? statusColor(state.statuses[id])
-              : PALETTE.lotEdge,
-        );
-        for (let i = start; i < start + count; i++) colors.setXYZ(i, color.r, color.g, color.b);
+        const persisted = state.statuses[id];
+        const key = persisted
+          ? statusColor(persisted)
+          : state.highlightedIds.includes(id)
+            ? "highlight"
+            : "none";
+        if (previousStatusColors.get(id) === key) continue;
+        previousStatusColors.set(id, key);
+        const color = new THREE.Color(persisted ? statusColor(persisted) : "#c3b58b");
+        for (let i = start; i < start + count; i++) {
+          colors.setXYZ(i, color.r, color.g, color.b);
+          opacities.setX(i, persisted ? 0.9 : key === "highlight" ? 0.65 : 0);
+        }
+        changed = true;
       }
-      colors.needsUpdate = true;
+      if (changed) colors.needsUpdate = opacities.needsUpdate = true;
     }
     if (previousSelection !== state.selectedId) pendingVisibilityCheck = false;
     if (state.insets.right !== previousInsetRight || state.insets.bottom !== previousInsetBottom) {
@@ -2569,7 +2700,12 @@ function initializeMapRuntime(
     zoom(factor) {
       selectionManuallyNavigated = true;
       pendingVisibilityCheck = false;
-      const base = transition?.kind === "zoom" ? transition.to : undefined;
+      const direction = Math.sign(factor - 1);
+      const base =
+        transition?.kind === "zoom" && direction === buttonZoomDirection
+          ? transition.to
+          : undefined;
+      buttonZoomDirection = direction;
       const next = base ? { position: base.position.clone(), target: base.target.clone() } : pose();
       scratch.subVectors(next.position, next.target);
       scratch.setLength(

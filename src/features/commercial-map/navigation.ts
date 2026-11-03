@@ -55,8 +55,43 @@ export function createSelectionNavigationSession<T>(clone: (value: T) => T) {
 /** Normalize scroll units, not guessed mouse/trackpad identities. Browsers
  * expose precision touchpad and pinch-generated wheels through the same API. */
 export function normalizedWheelDelta(delta: number, mode: number, viewportHeight: number) {
-  const unit = mode === 1 ? 16 : mode === 2 ? viewportHeight : 1;
-  return Math.max(-120, Math.min(120, delta * unit));
+  if (!Number.isFinite(delta)) return 0;
+  const unit = mode === 1 ? 16 : mode === 2 ? Math.max(1, viewportHeight) : 1;
+  return Math.max(-800, Math.min(800, delta * unit));
+}
+
+export const WHEEL_ZOOM = {
+  /** Log-distance / CSS pixel. 100 px is about 38%, at park and lot scales. */
+  sensitivity: 0.0032,
+  maxLogStep: 0.75,
+  immediateFraction: 0.32,
+  durationMs: 72,
+  /** A ray near the horizon can hit far beyond the authored park. */
+  maxAnchorDistanceFactor: 3,
+} as const;
+
+/** Reversible, distance-proportional dolly. Preserve subpixel trackpad input;
+ * only limit unusually large single events, after converting their units. */
+export function wheelZoomDistance(distance: number, delta: number, min: number, max: number) {
+  const logStep = Math.max(
+    -WHEEL_ZOOM.maxLogStep,
+    Math.min(WHEEL_ZOOM.maxLogStep, delta * WHEEL_ZOOM.sensitivity),
+  );
+  return Math.max(min, Math.min(max, distance * Math.exp(logStep)));
+}
+
+/** Ease-out has an immediate slope. Restarting smoothStep for every high-rate
+ * trackpad event repeatedly restarted its zero-velocity acceleration phase. */
+export function wheelZoomProgress(progress: number) {
+  return 1 - (1 - Math.max(0, Math.min(1, progress))) ** 3;
+}
+
+export function validWheelAnchor(rayDistance: number, cameraDistance: number) {
+  return (
+    Number.isFinite(rayDistance) &&
+    rayDistance > 0 &&
+    rayDistance <= cameraDistance * WHEEL_ZOOM.maxAnchorDistanceFactor
+  );
 }
 
 /** Incremental two-finger twist, with the shortest angular difference across
@@ -340,7 +375,7 @@ export const MOVEMENT = {
   focusFarMs: MOTION.focusFar,
   viewMs: MOTION.view,
   zoomMs: 180,
-  wheelMs: 120,
+  wheelMs: WHEEL_ZOOM.durationMs,
   mouseClickTolerance: MOTION.mouseDrag,
   touchClickTolerance: MOTION.touchDrag,
   qualityDwellMs: 12_000,
