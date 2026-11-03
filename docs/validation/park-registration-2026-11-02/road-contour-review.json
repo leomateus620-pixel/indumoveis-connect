@@ -1,0 +1,53 @@
+{
+  "condition": "GEOS/Shapely is_valid/is_simple/exact Hausdorff; no repair/make_valid/buffer applied",
+  "review": {
+    "tolerancePdfPoints": 0.75,
+    "sourcePixelPdfPoints": 1
+  },
+  "components": [
+    {
+      "index": 0,
+      "valid": true,
+      "reason": "Valid Geometry",
+      "rawValid": true,
+      "allRingsSimple": true,
+      "rawVertices": 2818,
+      "displayVertices": 2138,
+      "holes": 39,
+      "maxRingHausdorffWorld": 0.19312995043784154
+    },
+    {
+      "index": 1,
+      "valid": true,
+      "reason": "Valid Geometry",
+      "rawValid": true,
+      "allRingsSimple": true,
+      "rawVertices": 208,
+      "displayVertices": 136,
+      "holes": 0,
+      "maxRingHausdorffWorld": 0.19139304636030582
+    },
+    {
+      "index": 2,
+      "valid": true,
+      "reason": "Valid Geometry",
+      "rawValid": true,
+      "allRingsSimple": true,
+      "rawVertices": 14,
+      "displayVertices": 13,
+      "holes": 0,
+      "maxRingHausdorffWorld": 0.18220075189002274
+    }
+  ],
+  "crossComponentPositiveArea": [],
+  "rawVertices": 3040,
+  "displayVertices": 2287,
+  "allValid": true,
+  "maxHausdorffWorld": 0.19312995043784154,
+  "generatedAt": "2026-11-03T03:36:02.345290+00:00",
+  "tool": {
+    "Shapely": "2.2.0",
+    "GEOS": "3.14.1"
+  },
+  "technicalDataSha256": "7e7d536e21d6c812b3159aeb9fdaf0f83e25202fb638b58a93131014ac0ba1a8"
+}

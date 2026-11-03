@@ -595,6 +595,7 @@ export function createUrbanContext(
     for (const r of allRoads) {
       const oneWay = r.sourceWayIds.some((id) => REFERENCE_WAYS[id]?.tags.oneway === "yes");
       const marks = markRoadLanes(r.path, r.width, {
+        roadClass: "public-external",
         dashLength: 1.35,
         dashGap: 1.9,
         lineWidth: 0.075,

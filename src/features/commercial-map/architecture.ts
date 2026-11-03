@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import type { MapEntity, Point } from "./data/territory";
+import { getPavilionPresentation, isPavilionFrontEdge } from "./architectureOrientation";
+import { signedPolygonArea } from "./geometry";
 import {
   createSurfaceMaterials,
   type SurfaceMaterials,
@@ -81,16 +83,34 @@ export interface MapArchitecture {
 }
 
 function localFrame(entity: MapEntity): Frame {
-  const origin = entity.polygon[0];
-  const next = entity.polygon[1];
-  const length = Math.hypot(next[0] - origin[0], next[1] - origin[1]);
-  const ux: Point = [(next[0] - origin[0]) / length, (next[1] - origin[1]) / length];
-  const uz: Point = [-ux[1], ux[0]];
-  const polygon = entity.polygon.map((p): Point => {
-    const dx = p[0] - origin[0],
-      dz = p[1] - origin[1];
-    return [dx * ux[0] + dz * ux[1], dx * uz[0] + dz * uz[1]];
+  // A notch, reversed winding or a different first vertex cannot rotate the
+  // construction frame. Use the longest predominantly horizontal source edge,
+  // oriented towards drawing +X, then normalize the projected minima.
+  const sheet =
+    signedPolygonArea(entity.polygon) > 0 ? entity.polygon : [...entity.polygon].reverse();
+  const edges = sheet.map((p, i) => {
+    const q = sheet[(i + 1) % sheet.length],
+      dx = q[0] - p[0],
+      dz = q[1] - p[1],
+      length = Math.hypot(dx, dz);
+    return {
+      dx,
+      dz,
+      length,
+      score: (Math.abs(dx) / Math.max(length, 1e-9)) * 1000 + length * 0.001,
+    };
   });
+  const edge = edges.reduce((a, b) => (a.score > b.score ? a : b)),
+    sign = edge.dx < 0 ? -1 : 1;
+  const ux: Point = [(edge.dx / edge.length) * sign, (edge.dz / edge.length) * sign];
+  const uz: Point = [-ux[1], ux[0]];
+  const minX = Math.min(...sheet.map((p) => p[0] * ux[0] + p[1] * ux[1])),
+    minZ = Math.min(...sheet.map((p) => p[0] * uz[0] + p[1] * uz[1]));
+  const origin: Point = [minX * ux[0] + minZ * uz[0], minX * ux[1] + minZ * uz[1]];
+  const polygon = sheet.map((p): Point => [
+    (p[0] - origin[0]) * ux[0] + (p[1] - origin[1]) * ux[1],
+    (p[0] - origin[0]) * uz[0] + (p[1] - origin[1]) * uz[1],
+  ]);
   return {
     origin,
     ux,
@@ -120,7 +140,7 @@ export function getArchitectureDefinition(entity: MapEntity): ArchitectureDefini
     roofRise,
     roofThickness,
     wallThickness: span * 0.014,
-    height: eaveHeight + roofRise,
+    height: eaveHeight + roofRise + (entity.kind === "pavilion" ? roofThickness * 0.12 : 0),
   };
 }
 
@@ -274,13 +294,17 @@ function interpolate(a: Point, b: Point, t: number): Point {
 
 /** Convex offset intersections retain the small skew of P12 and stay inside it. */
 function insetPolygon(polygon: Point[], distance: number): Point[] {
+  const orientation = Math.sign(signedPolygonArea(polygon));
   const lines = polygon.map((a, i) => {
     const b = polygon[(i + 1) % polygon.length];
     const dx = b[0] - a[0],
       dz = b[1] - a[1],
       length = Math.hypot(dx, dz);
     return {
-      p: [a[0] - (dz / length) * distance, a[1] + (dx / length) * distance] as Point,
+      p: [
+        a[0] - (dz / length) * distance * orientation,
+        a[1] + (dx / length) * distance * orientation,
+      ] as Point,
       d: [dx, dz] as Point,
     };
   });
@@ -425,6 +449,7 @@ export function buildArchitecture(
     const definition = getArchitectureDefinition(entity);
     if (!definition) continue;
     const frame = localFrame(entity);
+    const presentation = getPavilionPresentation(entity);
     const localFloor = bucket(),
       localWalls = bucket(),
       localBrick = bucket(),
@@ -451,7 +476,20 @@ export function buildArchitecture(
     // These adjacent support footprints represent one elongated hall in the
     // reference. Give their separate selectable roofs the same longitudinal
     // ridge, without building over the small gaps in the approved drawing.
-    const axis: 0 | 1 = FOOD_HALL_IDS.has(entity.id) || frame.width <= frame.depth ? 0 : 1;
+    const axis: 0 | 1 = presentation
+      ? Math.abs(
+          presentation.ridgeDirection[0] * frame.ux[0] +
+            presentation.ridgeDirection[1] * frame.ux[1],
+        ) >=
+        Math.abs(
+          presentation.ridgeDirection[0] * frame.uz[0] +
+            presentation.ridgeDirection[1] * frame.uz[1],
+        )
+        ? 1
+        : 0
+      : FOOD_HALL_IDS.has(entity.id) || frame.width <= frame.depth
+        ? 0
+        : 1;
     const roof = bucket(axis);
     const min = Math.min(...polygon.map((p) => p[axis]));
     const extent = axis === 0 ? frame.width : frame.depth;
@@ -464,9 +502,15 @@ export function buildArchitecture(
             (segment.end - segment.start));
 
     // Contact, raised slab and perimeter plinth all remain inside the footprint.
-    polygonSurface(localFloor, polygon, () => 0.085, "#8d9495");
+    polygonSurface(localFloor, polygon, () => 0.005, "#8d9495");
     polygonSurface(localFloor, inner, () => foundationTop, "#ffffff");
-    const localAccesses = (entity.accesses ?? []).map((access) => {
+    const displayAccesses = presentation
+      ? [
+          ...presentation.mainEntries.map((point) => ({ point, main: true })),
+          ...presentation.serviceEntries.map((point) => ({ point, main: false })),
+        ]
+      : (entity.accesses ?? []).map((point) => ({ point, main: false }));
+    const localAccesses = displayAccesses.map(({ point: access, main }) => {
       const delta: Point = [access[0] - frame.origin[0], access[1] - frame.origin[1]];
       const point: Point = [
         delta[0] * frame.ux[0] + delta[1] * frame.ux[1],
@@ -486,7 +530,7 @@ export function buildArchitecture(
         const distance = Math.hypot(projected[0] - point[0], projected[1] - point[1]);
         if (distance < nearest.distance) nearest = { edge: i, t, distance };
       }
-      return nearest;
+      return { ...nearest, main };
     });
     for (let i = 0; i < polygon.length; i++) {
       const a = polygon[i],
@@ -496,6 +540,15 @@ export function buildArchitecture(
       const panelA = panelOuter[i],
         panelB = panelOuter[(i + 1) % polygon.length];
       const length = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const world = (p: Point): Point => [
+        frame.origin[0] + p[0] * frame.ux[0] + p[1] * frame.uz[0],
+        frame.origin[1] + p[0] * frame.ux[1] + p[1] * frame.uz[1],
+      ];
+      const front = isPavilionFrontEdge(
+        { ...entity, polygon: polygon.map(world) },
+        world(a),
+        world(b),
+      );
       const doorHalf = Math.min((span * 0.075) / length, 0.14);
       const entries = localAccesses
         .filter((access) => access.edge === i)
@@ -532,17 +585,20 @@ export function buildArchitecture(
           // the existing bays. It does not invent an access or enlarge the
           // protected footprint. Other faces remain conservative estimates.
           const frontRibbon =
-            entity.id === "indumoveis:pavilion:8" &&
-            Math.abs(a[1] - frame.depth) < 1e-6 &&
-            Math.abs(b[1] - frame.depth) < 1e-6;
+            ["indumoveis:pavilion:8", "indumoveis:pavilion:13"].includes(entity.id) && front;
           const eventFront = entity.id === "indumoveis:support:events" && i === 3;
           const foodFront = FOOD_HALL_IDS.has(entity.id) && i === 1;
-          const p12Front = entity.id === "indumoveis:pavilion:12" && i === 2;
-          const p3Front = entity.id === "indumoveis:pavilion:3" && i === 2;
-          const p1Side = entity.id === "indumoveis:pavilion:1" && (i === 0 || i === 2);
+          const p12Front = entity.id === "indumoveis:pavilion:12" && front;
+          const p3Front = entity.id === "indumoveis:pavilion:3" && front;
+          const p14Front = entity.id === "indumoveis:pavilion:14" && front;
+          const worldA = world(a),
+            worldB = world(b);
+          const p1Side =
+            entity.id === "indumoveis:pavilion:1" &&
+            Math.abs(worldB[1] - worldA[1]) < Math.abs(worldB[0] - worldA[0]) * 0.1;
           const panel = p12Front ? localBrick : localWalls;
           const shade = bay % 2 ? "#f0f3f2" : "#ffffff";
-          if (frontRibbon || eventFront || foodFront || p12Front || p3Front || p1Side) {
+          if (frontRibbon || eventFront || foodFront || p12Front || p3Front || p14Front || p1Side) {
             const sill =
               foundationTop +
               (wallTop - foundationTop) * (eventFront || foodFront || p3Front ? 0.24 : 0.64);
@@ -562,6 +618,33 @@ export function buildArchitecture(
               "#ffffff",
               [b[1] - a[1], 0, a[0] - b[0]],
             );
+            // Narrow recessed mullions and sills give the ribbon real depth.
+            // Their outer face stays behind the structural frontage, so the
+            // glass/paint never compete for the same plane at oblique angles.
+            if (entity.kind === "pavilion") {
+              const mid = (from + to) / 2,
+                half = Math.min((definition.wallThickness * 0.14) / length, (to - from) * 0.03);
+              wallPrism(
+                localFrames,
+                interpolate(panelA, panelB, mid - half),
+                interpolate(panelA, panelB, mid + half),
+                interpolate(ia, ib, mid - half),
+                interpolate(ia, ib, mid + half),
+                sill,
+                head,
+                "#d7ded9",
+              );
+              wallPrism(
+                localFrames,
+                panelP,
+                panelQ,
+                ip,
+                iq,
+                sill,
+                sill + definition.wallThickness * 0.18,
+                "#b6c1ba",
+              );
+            }
           } else {
             wallPrism(panel, panelP, panelQ, ip, iq, foundationTop, wallTop, shade);
           }
@@ -603,6 +686,9 @@ export function buildArchitecture(
           q = interpolate(a, b, end);
         const ip = interpolate(ia, ib, start),
           iq = interpolate(ia, ib, end);
+        const mainEntry = localAccesses.some(
+          (access) => access.main && access.edge === i && access.t >= start && access.t <= end,
+        );
         wallPrism(
           localWalls,
           interpolate(panelA, panelB, start),
@@ -631,10 +717,10 @@ export function buildArchitecture(
         );
         quad(
           localAccent,
-          [p[0], foundationTop, p[1]],
-          [q[0], foundationTop, q[1]],
-          [rq[0], foundationTop, rq[1]],
-          [rp[0], foundationTop, rp[1]],
+          [p[0], 0.008, p[1]],
+          [q[0], 0.008, q[1]],
+          [iq[0], foundationTop, iq[1]],
+          [ip[0], foundationTop, ip[1]],
           "#ffffff",
           [0, 1, 0],
         );
@@ -669,6 +755,19 @@ export function buildArchitecture(
           "#ffffff",
           [b[1] - a[1], 0, a[0] - b[0]],
         );
+        if (mainEntry) {
+          // Recessed entrance soffit: it identifies the public side without
+          // crossing a shared hall seam or expanding the picking footprint.
+          quad(
+            localMetal,
+            [p[0], openingTop, p[1]],
+            [q[0], openingTop, q[1]],
+            [rq[0], openingTop, rq[1]],
+            [rp[0], openingTop, rp[1]],
+            "#ffffff",
+            [0, -1, 0],
+          );
+        }
       }
     }
     for (let index = 0; index < segments.length; index++) {
@@ -683,6 +782,37 @@ export function buildArchitecture(
       const height = (p: Point) => roofHeight(segment, p);
       polygonSurface(roof, clipped, height, index % 2 ? "#edf2f5" : "#ffffff");
       polygonSurface(roof, clipped, (p) => height(p) - definition.roofThickness, "#aab2b9", false);
+      if (entity.kind === "pavilion") {
+        const halfWidth = Math.min(span * 0.012, definition.roofThickness * 0.8),
+          lift = definition.roofThickness * 0.12;
+        // Folded caps on real peaks only; sawtooth clerestories keep their
+        // independent vertical closure. They share the existing roof batch.
+        for (const peak of [
+          ...(index > 0 &&
+          segment.from >= segments[index - 1].to &&
+          segment.from > segment.to &&
+          segments[index - 1].from < segments[index - 1].to
+            ? [segment.start]
+            : []),
+          ...(index < segments.length - 1 &&
+          segment.to >= segments[index + 1].from &&
+          segment.to > segment.from &&
+          segments[index + 1].to < segments[index + 1].from
+            ? [segment.end]
+            : []),
+        ]) {
+          const cap = clipArchitecturePolygon(
+            clipArchitecturePolygon(clipped, axis, min + peak * extent - halfWidth, true),
+            axis,
+            min + peak * extent + halfWidth,
+            false,
+          );
+          if (cap.length >= 3) {
+            polygonSurface(roof, cap, (p) => height(p) + lift, "#d4dbdc");
+            polygonSurface(picking, cap, (p) => height(p) + lift, "#ffffff");
+          }
+        }
+      }
       // A simple closed silhouette, without facade detail, follows the actual
       // pitches. A box capped at ridge height could select air above an eave.
       polygonSurface(picking, clipped, height, "#ffffff");

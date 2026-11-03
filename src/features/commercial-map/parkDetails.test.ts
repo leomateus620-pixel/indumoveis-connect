@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { describe, it, expect, vi } from "vitest";
-import { ENTITIES } from "./data/territory";
-import { pointInPolygon, signedPolygonArea } from "./geometry";
+import { ENTITIES, type Point } from "./data/territory";
+import { pointInPolygon, polygonBounds, signedPolygonArea } from "./geometry";
+import { getPavilionPresentation } from "./architectureOrientation";
 import {
   deriveParkDetails,
   subtractGround,
@@ -70,6 +71,86 @@ describe("satellite-inspired surface details preserve cadastral surfaces", () =>
       );
     }
   });
+  it("retains an apron inside a traced road void and resolves named streets without duplicate runtime road entities", () => {
+    const source = ENTITIES.filter((entity) => entity.kind !== "road");
+    const trace = {
+      ...ENTITIES.find((entity) => entity.id === "indumoveis:road:brasil")!,
+      id: "indumoveis:context:road:a2-test",
+      polygon: [
+        [0, 0],
+        [200, 0],
+        [200, 100],
+        [0, 100],
+      ] as Point[],
+      holes: [
+        [
+          [60.1, 55],
+          [66.12, 55],
+          [66.12, 66.19],
+          [60.1, 66.19],
+        ] as Point[],
+      ],
+    };
+    const details = deriveParkDetails([...source, trace]);
+    expect(details.concrete.some((cell) => pointInPolygon([63, 60], cell))).toBe(true);
+    expect(details.concrete.some((cell) => pointInPolygon([63, 68], cell))).toBe(false);
+    expect(details.lanePaint).toEqual([]);
+  });
+  it("connects the explicit interior fronts to their street without walking through P12 or any lot", () => {
+    const concrete = deriveParkDetails(ENTITIES).concrete;
+    const roads = ENTITIES.filter((entity) => entity.kind === "road");
+    const protectedVolumes = ENTITIES.filter((entity) => ["lot", "pavilion"].includes(entity.kind));
+    const p1 = polygonBounds(
+      ENTITIES.find((entity) => entity.id === "indumoveis:pavilion:1")!.polygon,
+    );
+    const p14 = polygonBounds(
+      ENTITIES.find((entity) => entity.id === "indumoveis:pavilion:14")!.polygon,
+    );
+    for (const building of ENTITIES.filter((entity) => entity.kind === "pavilion")) {
+      const front = getPavilionPresentation(building)!;
+      const street = roads.find((road) => road.id === front.frontStreetId)!;
+      const n = front.frontNormal;
+      const projection = (p: Point) => p[0] * n[0] + p[1] * n[1];
+      const nearStreet = Math.min(...street.polygon.map(projection));
+      for (const entry of front.mainEntries) {
+        const start: Point = [entry[0] + n[0] * 0.04, entry[1] + n[1] * 0.04];
+        const route: Point[] =
+          building.id === "indumoveis:pavilion:14"
+            ? [
+                start,
+                [start[0] + 0.8, start[1]],
+                [start[0] + 0.8, (p1.maxY + p14.minY) / 2],
+                [polygonBounds(street.polygon).minX + 0.2, (p1.maxY + p14.minY) / 2],
+              ]
+            : [
+                start,
+                [
+                  entry[0] + n[0] * (nearStreet - projection(entry) + 0.2),
+                  entry[1] + n[1] * (nearStreet - projection(entry) + 0.2),
+                ],
+              ];
+        for (let i = 1; i < route.length; i++) {
+          const a = route[i - 1],
+            b = route[i];
+          const steps = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 0.12);
+          for (let step = 0; step <= steps; step++) {
+            const p: Point = [
+              a[0] + ((b[0] - a[0]) * step) / steps,
+              a[1] + ((b[1] - a[1]) * step) / steps,
+            ];
+            expect(
+              concrete.some((cell) => pointInPolygon(p, cell)) ||
+                roads.some((road) => pointInPolygon(p, road.polygon)),
+              `${building.id}: unsupported access ${p.join(",")}`,
+            ).toBe(true);
+            expect(protectedVolumes.some((volume) => pointInPolygon(p, volume.polygon))).toBe(
+              false,
+            );
+          }
+        }
+      }
+    }
+  });
   it("does not capture picking or dispose borrowed materials", () => {
     const surfaces = createSurfaceMaterials({ maps: false }),
       dispose = vi.spyOn(surfaces.materials.concrete, "dispose");
@@ -83,36 +164,29 @@ describe("satellite-inspired surface details preserve cadastral surfaces", () =>
     expect(model.group.children).toHaveLength(0);
     surfaces.dispose();
   });
-  it("fits every commercial marking triangle inside its authored road and outside junctions", () => {
+  it("removes generated centre dashes and arrows from internal commercial circulation at every consumer", () => {
     const before = JSON.stringify(ENTITIES),
       sources = deriveCommercialLanePaint(ENTITIES);
-    expect(sources.length).toBeGreaterThan(3);
-    expect(sources.flatMap((s) => s.directionArrows).length).toBeGreaterThan(10);
-    expect(sources.some((s) => /benvenuto|imigrantes|arvoredo|east-walk/.test(s.sourceId))).toBe(
-      false,
-    );
-    for (const source of sources) {
-      const road = ENTITIES.find((e) => e.id === source.sourceId)!;
-      expect(source.laneWidth * 2).toBeCloseTo(source.width);
-      for (const polygon of [...source.centerDashes, ...source.directionArrows]) {
-        const triangles = THREE.ShapeUtils.triangulateShape(
-          polygon.map((p) => new THREE.Vector2(...p)),
-          [],
-        );
-        for (const triangle of triangles) {
-          const vertices = triangle.map((i) => polygon[i]);
-          const centroid: [number, number] = [
-            vertices.reduce((s, p) => s + p[0], 0) / 3,
-            vertices.reduce((s, p) => s + p[1], 0) / 3,
-          ];
-          expect([...vertices, centroid].every((p) => pointInPolygon(p, road.polygon))).toBe(true);
-          expect(
-            ENTITIES.filter((e) => e.kind === "road" && e !== road).some((e) =>
-              pointInPolygon(centroid, e.polygon),
-            ),
-          ).toBe(false);
-        }
+    // The public avenues retain their dedicated owner in urbanContext; no
+    // second source paint layer is emitted here, including for context roads.
+    expect(sources).toEqual([]);
+    const details = deriveParkDetails(ENTITIES);
+    expect(details.lanePaint).toEqual([]);
+    expect(details.laneArrows).toEqual([]);
+    expect(details.paint.length).toBeGreaterThan(0); // external parking remains
+    const surfaces = createSurfaceMaterials({ maps: false });
+    const model = createParkDetails(ENTITIES, surfaces);
+    try {
+      for (const name of [
+        "indumoveis-commercial-lane-paint",
+        "indumoveis-commercial-direction-arrows",
+      ]) {
+        const mesh = model.group.getObjectByName(name) as THREE.Mesh;
+        expect(mesh.geometry.getAttribute("position").count).toBe(0);
       }
+    } finally {
+      model.dispose();
+      surfaces.dispose();
     }
     expect(JSON.stringify(ENTITIES)).toBe(before);
   });

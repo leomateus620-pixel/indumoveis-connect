@@ -29,9 +29,12 @@ export interface MapRendererProps {
   viewRevision?: number;
   onManualOrientation?(): void;
   quality: MapQuality;
+  /** Retained for callers; mouse/touch bindings are stable and ignore modes. */
   gesture: MapGesture;
   insets: MapInsets;
   onSelect(id: string): void;
+  /** A click on unselectable ground closes the current inspection session. */
+  onDeselect?(): void;
   onReady(): void;
   onFailure(reason: string): void;
   statuses: Record<string, string>;

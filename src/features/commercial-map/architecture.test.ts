@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
 import { ENTITIES } from "./data/territory";
+import { getPavilionPresentation, isPavilionFrontEdge } from "./architectureOrientation";
 import {
   architectureVisualHeight,
   buildArchitecture,
@@ -88,7 +89,7 @@ describe("static presentation architecture", () => {
       // Roof glazing here would recreate the unsubstantiated raised monitor.
       for (const entity of [p8, p13]) expect(model.roofs.get(entity.id)!.children).toHaveLength(2);
       const glazing = model.group.children.find((child) => child.name === "entry-glazing")!;
-      const ray = new THREE.Raycaster(new THREE.Vector3(100, 2.8, 87), new THREE.Vector3(0, 0, -1));
+      const ray = new THREE.Raycaster(new THREE.Vector3(100, 2.8, 66), new THREE.Vector3(0, 0, 1));
       expect(ray.intersectObject(glazing).length).toBeGreaterThan(0);
       // The source shells meet directly; no bridge or new circulation is needed.
       expect(p8.polygon[1][0]).toBeCloseTo(p13.polygon[0][0], 6);
@@ -107,18 +108,90 @@ describe("static presentation architecture", () => {
       const brick = model.group.getObjectByName("brick-front")!;
       const glass = model.group.getObjectByName("entry-glazing")!;
       const p12Ray = new THREE.Raycaster(
-        new THREE.Vector3(70, 1.4, 89),
-        new THREE.Vector3(0, 0, -1),
+        new THREE.Vector3(70, 1.4, 66),
+        new THREE.Vector3(0, 0, 1),
       );
       const p3Ray = new THREE.Raycaster(
-        new THREE.Vector3(125, 1.5, 89),
-        new THREE.Vector3(0, 0, -1),
+        new THREE.Vector3(125, 1.5, 66),
+        new THREE.Vector3(0, 0, 1),
       );
       expect(p12Ray.intersectObject(brick)).not.toHaveLength(0);
       expect(p3Ray.intersectObject(glass)).not.toHaveLength(0);
+      const reverse = new THREE.Raycaster(
+        new THREE.Vector3(70, 1.4, 89),
+        new THREE.Vector3(0, 0, -1),
+        0,
+        3,
+      );
+      expect(reverse.intersectObject(brick)).toHaveLength(0);
+      expect(reverse.intersectObject(model.group.getObjectByName("walls")!)).not.toHaveLength(0);
       expect(JSON.stringify([p12, p3])).toBe(before);
     } finally {
       model.dispose();
+    }
+  });
+
+  it("keeps public fronts in world coordinates and separate from roof axes and source order", () => {
+    const before = JSON.stringify(ENTITIES);
+    for (const id of [1, 14, 12, 8, 13, 3]) {
+      const entity = ENTITIES.find((entry) => entry.id === `indumoveis:pavilion:${id}`)!;
+      const presentation = getPavilionPresentation(entity)!;
+      const direction = [1, 14].includes(id) ? [1, 0] : [0, -1];
+      expect(presentation.frontNormal).toEqual(direction);
+      expect(presentation.frontStreetId).toBe(
+        [1, 14].includes(id) ? "indumoveis:road:mercosul" : "indumoveis:road:argentina",
+      );
+      for (let start = 0; start < entity.polygon.length; start++) {
+        const rotated = {
+          ...entity,
+          polygon: [...entity.polygon.slice(start), ...entity.polygon.slice(0, start)],
+        };
+        expect(getPavilionPresentation(rotated)).toEqual(presentation);
+      }
+      expect(
+        getPavilionPresentation({ ...entity, polygon: [...entity.polygon].reverse() }),
+      ).toEqual(presentation);
+      expect(isPavilionFrontEdge(entity, ...presentation.frontEdge)).toBe(true);
+      expect(isPavilionFrontEdge(entity, ...presentation.rearEdge)).toBe(false);
+      const [a, b] = presentation.frontEdge;
+      for (const point of presentation.mainEntries) {
+        const cross = (b[0] - a[0]) * (point[1] - a[1]) - (b[1] - a[1]) * (point[0] - a[0]);
+        expect(Math.abs(cross)).toBeLessThan(0.00001);
+      }
+    }
+    expect(
+      getPavilionPresentation(ENTITIES.find((entry) => entry.id === "indumoveis:pavilion:12")!)!
+        .ridgeDirection,
+    ).not.toEqual([0, -1]);
+    expect(JSON.stringify(ENTITIES)).toBe(before);
+  });
+
+  it("opens all public entries toward the internal circulation and preserves their pick volume", () => {
+    for (const entity of ENTITIES.filter((entry) => entry.kind === "pavilion")) {
+      const presentation = getPavilionPresentation(entity)!;
+      const model = buildArchitecture([entity]);
+      try {
+        model.group.updateMatrixWorld(true);
+        const glazing = model.group.getObjectByName("entry-glazing")!;
+        for (const [x, z] of presentation.mainEntries) {
+          const ray = new THREE.Raycaster(
+            new THREE.Vector3(
+              x + presentation.frontNormal[0],
+              1.4,
+              z + presentation.frontNormal[1],
+            ),
+            new THREE.Vector3(-presentation.frontNormal[0], 0, -presentation.frontNormal[1]),
+            0,
+            2,
+          );
+          expect(ray.intersectObject(glazing).length, entity.id).toBeGreaterThan(0);
+          expect(ray.intersectObjects(model.pickables)[0]?.object.userData.entityId).toBe(
+            entity.id,
+          );
+        }
+      } finally {
+        model.dispose();
+      }
     }
   });
 

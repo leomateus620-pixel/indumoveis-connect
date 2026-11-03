@@ -27,17 +27,52 @@ const protectedTerritory = {
     }),
   ),
 };
+// Commercial protection is independent of editable park structure. Trees,
+// roads, gates and presentation accesses are no longer accidental invariants.
+const protectedCommercial = ENTITIES.filter((entity) => entity.kind === "lot").map(
+  ({
+    id,
+    kind,
+    polygon,
+    anchor,
+    numbers,
+    declaredAreaM2,
+    label,
+    location,
+    source,
+    confidence,
+    notes,
+  }) => ({
+    id,
+    kind,
+    polygon,
+    anchor,
+    numbers,
+    declaredAreaM2,
+    label,
+    location,
+    source,
+    confidence,
+    notes,
+  }),
+);
 const signature = {
   algorithm: "sha256",
   sourceSha256: createHash("sha256").update(input.replaceAll("\r\n", "\n")).digest("hex"),
   protectedSha256: createHash("sha256").update(JSON.stringify(protectedTerritory)).digest("hex"),
+  commercialSha256: createHash("sha256").update(JSON.stringify(protectedCommercial)).digest("hex"),
+  commercialScope:
+    "all lot identity, geometry, anchors, numbering, groups, declared areas and source attributes; persisted associations use unchanged application/API paths",
   envelopes: ENTITIES.filter((e) => e.kind === "lot").length,
   numbers: ENTITIES.filter((e) => e.kind === "lot").flatMap((e) => e.numbers ?? []).length,
 };
 if (process.argv[3]) {
   const baseline = JSON.parse(await fs.readFile(process.argv[3], "utf8"));
-  if (baseline.protectedSha256 !== signature.protectedSha256)
-    throw new Error("Protected territory changed");
+  if (
+    (baseline.commercialSha256 && baseline.commercialSha256 !== signature.commercialSha256) ||
+    (!baseline.commercialSha256 && baseline.protectedSha256 !== signature.protectedSha256)
+  )
+    throw new Error("Protected commercial territory changed");
   signature.matchesBaseline = true;
 }
 const escape = (s) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll('"', "&quot;");

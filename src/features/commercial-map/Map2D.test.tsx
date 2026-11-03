@@ -38,6 +38,19 @@ describe("engine-independent territorial fallback", () => {
     expect(streetText.style.fontSize).toBe(`${STREET_LABEL.baseTextHeight}px`);
     expect(streetText.style.fill).toBe(VISUAL_THEME.roadText);
     expect(streetText.parentElement?.querySelector("rect")).toBeNull();
+    expect(
+      container.querySelector<SVGPolygonElement>(
+        '[data-entity="indumoveis:road:argentina"] polygon',
+      )?.style.fill,
+    ).toBe("transparent");
+    for (const avenue of ["benvenuto", "imigrantes"])
+      expect(
+        container.querySelector<SVGPolygonElement>(
+          `[data-entity="indumoveis:road:${avenue}"] polygon`,
+        )?.style.fill,
+      ).toBe(VISUAL_THEME.road);
+    for (const surface of container.querySelectorAll(".im-map-physical-context path"))
+      expect(surface.getAttribute("fill-rule")).toBe("evenodd");
     const lotPolygons = container.querySelectorAll<SVGPolygonElement>(
       `[data-entity="${lot.id}"] polygon`,
     );
@@ -56,8 +69,6 @@ describe("engine-independent territorial fallback", () => {
     const lot = ENTITIES.find((e) => e.kind === "lot")!;
     ref.current!.focus(lot.id);
     const target = ref.current!.getTarget();
-    expect(ref.current!.focusLandmark("arena")).toBe(false);
-    expect(ref.current!.getTarget()).toEqual(target);
     rerender(<Map2D ref={ref} {...props} selectedId={lot.id} />);
     rerender(<Map2D ref={ref} {...props} />);
     expect(container.querySelector("svg")).toBe(svg);
@@ -66,6 +77,30 @@ describe("engine-independent territorial fallback", () => {
     rerender(<Map2D ref={ref} {...props} inspectedId={pavilion.id} />);
     rerender(<Map2D ref={ref} {...props} />);
     expect(ref.current!.getTarget()).toEqual(target);
+    reduced.mockRestore();
+  });
+  it("focuses each selection once and restores the whole original SVG pose after A to B to close", () => {
+    const matchMedia = window.matchMedia;
+    const reduced = vi
+      .spyOn(window, "matchMedia")
+      .mockImplementation((query) => ({ ...matchMedia(query), matches: true }));
+    const ref = createRef<MapHandle>();
+    const { container, rerender } = render(<Map2D ref={ref} {...props} />);
+    const svg = container.querySelector("svg")!;
+    const original = svg.getAttribute("viewBox");
+    const [a, b] = ENTITIES.filter((e) => e.kind === "lot");
+    rerender(<Map2D ref={ref} {...props} selectedId={a.id} />);
+    expect(svg.getAttribute("viewBox")).not.toBe(original);
+    const focusA = svg.getAttribute("viewBox");
+    rerender(<Map2D ref={ref} {...props} selectedId={a.id} statuses={{ [a.id]: "vendido" }} />);
+    expect(svg.getAttribute("viewBox")).toBe(focusA);
+    ref.current!.pan(1, 0);
+    rerender(<Map2D ref={ref} {...props} selectedId={b.id} />);
+    rerender(<Map2D ref={ref} {...props} />);
+    expect(svg.getAttribute("viewBox")).toBe(original);
+    expect(container.querySelector("svg")).toBe(svg);
+    expect(ref.current!.focusLandmark("arena")).toBe(true);
+    expect(svg.getAttribute("viewBox")).not.toBe(original);
     reduced.mockRestore();
   });
   it("does not select at the end of a drag or a canceled gesture", () => {
@@ -97,5 +132,41 @@ describe("engine-independent territorial fallback", () => {
     fireEvent.pointerDown(lot, { button: 0, clientX: 200, clientY: 200, pointerId: 1 });
     fireEvent.pointerUp(svg, { clientX: 200, clientY: 200, pointerId: 1 });
     expect(select).toHaveBeenCalledOnce();
+  });
+  it("does not run a canceled focus callback after a manual pan, even if that RAF was already queued", () => {
+    const callbacks: FrameRequestCallback[] = [];
+    const raf = vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+      callbacks.push(callback);
+      return callbacks.length;
+    });
+    const cancel = vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    const ref = createRef<MapHandle>();
+    const { container, rerender } = render(<Map2D ref={ref} {...props} />);
+    const a = ENTITIES.find((entry) => entry.kind === "lot")!;
+    rerender(<Map2D ref={ref} {...props} selectedId={a.id} />);
+    expect(callbacks).toHaveLength(1);
+    const old = callbacks[0];
+    ref.current!.pan(1, 0);
+    const visible = container.querySelector("svg")!.getAttribute("viewBox");
+    old(performance.now() + 1000);
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe(visible);
+    rerender(<Map2D ref={ref} {...props} selectedId={a.id} statuses={{ [a.id]: "vendido" }} />);
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe(visible);
+    raf.mockRestore();
+    cancel.mockRestore();
+  });
+  it("dismisses a selection only after an empty-ground click, never a release beyond the click threshold", () => {
+    Object.defineProperty(window, "PointerEvent", { configurable: true, value: MouseEvent });
+    const close = vi.fn();
+    const a = ENTITIES.find((entry) => entry.kind === "lot")!;
+    const { container } = render(<Map2D {...props} selectedId={a.id} onDeselect={close} />);
+    const svg = container.querySelector("svg")!;
+    svg.setPointerCapture = () => {};
+    fireEvent.pointerDown(svg, { button: 0, clientX: 20, clientY: 20 });
+    fireEvent.pointerUp(svg, { button: 0, clientX: 40, clientY: 20 });
+    expect(close).not.toHaveBeenCalled();
+    fireEvent.pointerDown(svg, { button: 0, clientX: 20, clientY: 20 });
+    fireEvent.pointerUp(svg, { button: 0, clientX: 20, clientY: 20 });
+    expect(close).toHaveBeenCalledOnce();
   });
 });

@@ -1,0 +1,22 @@
+{
+  "tests": {
+    "command": "npm test -- --maxWorkers=1 --testTimeout=30000",
+    "passed": 408,
+    "files": 67,
+    "failed": 0
+  },
+  "types": {
+    "command": "npx tsc --noEmit",
+    "passed": true
+  },
+  "lint": {
+    "scope": "src/features/commercial-map and changed commercial-map scripts",
+    "lineEndings": "auto (preexisting Windows CRLF)",
+    "passed": true
+  },
+  "build": {
+    "command": "npm run build",
+    "passed": true
+  },
+  "production": "Not deployed; local production output and intercepted fixtures only"
+}

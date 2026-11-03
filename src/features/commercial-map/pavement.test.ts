@@ -2,11 +2,14 @@ import { describe, expect, it } from "vitest";
 import { ENTITIES, type MapEntity, type Point } from "./data/territory";
 import { pointInPolygon, polygonBounds, signedPolygonArea } from "./geometry";
 import { createSurfaceMaterials } from "./surfaceMaterials";
+import { polygonsOverlap } from "./parkGeometry";
 import {
   createPavement,
+  classifyRoad,
   derivePavement,
   isPedestrianRoad,
   pavementUnionCells,
+  pavementSurfaceUnionCells,
   PAVEMENT,
 } from "./pavement";
 
@@ -32,6 +35,63 @@ const horizontal = road("horizontal", rectangle(0, 4, 10, 6));
 const vertical = road("vertical", rectangle(4, 0, 6, 10));
 
 describe("derived park pavement", () => {
+  it("retains actual block voids in a traced road surface with multiple rings", () => {
+    const polygon = rectangle(0, 0, 30, 20);
+    const holes = [rectangle(2, 2, 12, 18), rectangle(18, 2, 28, 18).reverse()];
+    const before = JSON.stringify({ polygon, holes });
+    const cells = pavementSurfaceUnionCells([{ polygon, holes }]);
+    expect(area(cells)).toBeCloseTo(280, 8);
+    for (let x = 0.17; x < 30; x += 0.41)
+      for (let z = 0.13; z < 20; z += 0.39) {
+        const p: Point = [x, z];
+        const expected =
+          pointInPolygon(p, polygon) && !holes.some((hole) => pointInPolygon(p, hole));
+        expect(cells.filter((cell) => pointInPolygon(p, cell))).toHaveLength(expected ? 1 : 0);
+      }
+    const donut = { ...road("indumoveis:context:road:a2-network:test", polygon), holes };
+    expect(area(derivePavement([donut]).asphaltCells)).toBeCloseTo(280, 8);
+    expect(JSON.stringify({ polygon, holes })).toBe(before);
+  });
+
+  it("preserves a concave road void and joins its outside mouth without filling the block", () => {
+    const hole: Point[] = [
+      [2, 2],
+      [18, 2],
+      [18, 6],
+      [6, 6],
+      [6, 18],
+      [2, 18],
+    ];
+    const cells = pavementSurfaceUnionCells([
+      { polygon: rectangle(0, 0, 20, 20), holes: [hole] },
+      { polygon: rectangle(5, -5, 15, 0) },
+    ]);
+    expect(area(cells)).toBeCloseTo(338, 8);
+    expect(cells.some((cell) => pointInPolygon([4, 14], cell))).toBe(false);
+    expect(cells.some((cell) => pointInPolygon([14, 14], cell))).toBe(true);
+    expect(cells.some((cell) => pointInPolygon([10, -0.01], cell))).toBe(true);
+    expect(cells.some((cell) => pointInPolygon([10, 0.01], cell))).toBe(true);
+  });
+
+  it("classifies park service streets separately from pedestrian paths and public avenues", () => {
+    const classes = Object.fromEntries(
+      ENTITIES.filter((entity) => entity.kind === "road").map((entity) => [
+        entity.id,
+        classifyRoad(entity),
+      ]),
+    );
+    for (const id of ["argentina", "uruguai", "brasil", "mercosul", "brasilia", "la-paz"])
+      expect(classes[`indumoveis:road:${id}`]).toBe("park-internal");
+    for (const id of ["arvoredo", "east-walk-upper", "east-walk-lower"])
+      expect(classes[`indumoveis:road:${id}`]).toBe("park-pedestrian");
+    for (const id of ["benvenuto", "imigrantes"])
+      expect(classes[`indumoveis:road:${id}`]).toBe("public-external");
+    expect(classifyRoad({ id: "park-context:road:bruno-schwartz" })).toBe("park-internal");
+    expect(classifyRoad({ id: "indumoveis:context:walk:gate-2-woodland-connector:0" })).toBe(
+      "park-pedestrian",
+    );
+  });
+
   it("unions overlapping source roads into nonoverlapping cells with the exact network area", () => {
     const cells = pavementUnionCells([horizontal.polygon, vertical.polygon]);
     expect(area(cells)).toBeCloseTo(36, 8);
@@ -45,6 +105,61 @@ describe("derived park pavement", () => {
           sourceInside ? 1 : 0,
         );
       }
+  });
+
+  it("assigns a pedestrian crossing one concrete owner without asphalt or edge paint beneath it", () => {
+    const crossing = road("indumoveis:context:walk:test-crossing", rectangle(4, 0, 6, 10));
+    const topology = derivePavement([horizontal, crossing]);
+    expect(area(topology.asphaltCells)).toBeCloseTo(16, 8);
+    expect(area(topology.walkCells)).toBeCloseTo(20, 8);
+    for (let x = 0.17; x < 10; x += 0.31)
+      for (let y = 0.19; y < 10; y += 0.29) {
+        const p: Point = [x, y];
+        const asphaltOwners = topology.asphaltCells.filter((cell) =>
+          pointInPolygon(p, cell),
+        ).length;
+        const walkOwners = topology.walkCells.filter((cell) => pointInPolygon(p, cell)).length;
+        expect(asphaltOwners + walkOwners).toBeLessThanOrEqual(1);
+        if (pointInPolygon(p, crossing.polygon)) expect(asphaltOwners).toBe(0);
+      }
+    expect(
+      topology.lateralEdges.some(
+        ({ a, b }) => Math.min(a[0], b[0]) < 5 && Math.max(a[0], b[0]) > 5,
+      ),
+    ).toBe(false);
+  });
+
+  it("clips graphical road and walk residuals against real lot and concave building polygons, keeping gate markers open", () => {
+    const street = road("street", rectangle(0, 0, 10, 4));
+    const walk = road("indumoveis:context:walk:frontage", rectangle(4, 0, 6, 10));
+    const lot: MapEntity = { ...road("lot", rectangle(4, 0, 6, 2)), kind: "lot", numbers: [1] };
+    const pavilion: MapEntity = {
+      ...road("pavilion", [
+        [7, 0],
+        [9, 0],
+        [9, 1],
+        [8, 1],
+        [8, 3],
+        [7, 3],
+      ]),
+      kind: "pavilion",
+    };
+    const support: MapEntity = { ...road("support", rectangle(0, 3, 2, 4)), kind: "support" };
+    const gate: MapEntity = {
+      ...road("indumoveis:support:gate-03", rectangle(3, 2, 4, 4)),
+      kind: "support",
+    };
+    const source = [street, walk, lot, pavilion, support, gate],
+      before = JSON.stringify(source);
+    const topology = derivePavement(source);
+    expect(area(topology.asphaltCells)).toBeCloseTo(26, 8);
+    expect(area(topology.walkCells)).toBeCloseTo(16, 8);
+    for (const cell of [...topology.asphaltCells, ...topology.walkCells])
+      for (const blocker of [lot, pavilion, support])
+        expect(polygonsOverlap(cell, blocker.polygon)).toBe(false);
+    expect(topology.asphaltCells.some((cell) => pointInPolygon([8.5, 2], cell))).toBe(true);
+    expect(topology.asphaltCells.some((cell) => pointInPolygon([3.5, 3], cell))).toBe(true);
+    expect(JSON.stringify(source)).toBe(before);
   });
 
   it("leaves cross and T junctions open and paints only lateral edges, never a centre line or an end cap", () => {
@@ -117,7 +232,22 @@ describe("derived park pavement", () => {
       "indumoveis:road:east-walk-lower",
     ]);
     const topology = derivePavement(ENTITIES);
-    expect(area(topology.walkCells)).toBeCloseTo(area(walks.map((entity) => entity.polygon)), 6);
+    // Source drawings contain tiny walk/building overlaps. The rendered
+    // footprint now removes those residuals while preserving the source.
+    expect(area(topology.walkCells)).toBeLessThanOrEqual(
+      area(walks.map((entity) => entity.polygon)),
+    );
+    expect(area(topology.walkCells)).toBeGreaterThan(
+      area(walks.map((entity) => entity.polygon)) * 0.99,
+    );
+    for (const cell of topology.walkCells)
+      for (const blocker of ENTITIES.filter(
+        (entity) =>
+          entity.kind === "lot" ||
+          entity.kind === "pavilion" ||
+          (entity.kind === "support" && entity.id !== "indumoveis:support:gate-03"),
+      ))
+        expect(polygonsOverlap(cell, blocker.polygon)).toBe(false);
     expect(
       topology.lateralEdges.every(({ sourceId }) => !walks.some(({ id }) => id === sourceId)),
     ).toBe(true);

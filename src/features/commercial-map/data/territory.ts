@@ -11,6 +11,9 @@ export type MapEntity = {
   label: string;
   location: string;
   polygon: Point[];
+  /** Optional presentation surface voids. Commercial source entities do not
+   * gain or rewrite rings; registered physical context may use these holes. */
+  holes?: Point[][];
   anchor: Point;
   numbers?: number[];
   declaredAreaM2?: number;

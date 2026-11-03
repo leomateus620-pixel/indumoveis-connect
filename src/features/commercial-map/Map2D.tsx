@@ -1,9 +1,19 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { ENTITIES, MAP_BOUNDS, TREES } from "./data/territory";
+import { MAP_BOUNDS, TREES } from "./data/territory";
+import {
+  PARK_CORE_ENTITIES as ENTITIES,
+  PARK_CONTEXT_BLOCKS,
+  PARK_CONTEXT_ROADS,
+  PARK_CONTEXT_WALKS,
+  PERMANENT_PARK_LANDMARKS,
+  PERMANENT_PARK_EXPLORATION,
+  PARK_GATES,
+} from "./permanentParkLayout";
 import type { MapEntity, Point } from "./data/territory";
 import type { MapHandle, MapRendererProps } from "./types";
 import { MOTION } from "./motion";
-import { pointInPolygon } from "./geometry";
+import { createSelectionNavigationSession, isClick, normalizedWheelDelta } from "./navigation";
+import { pointInPolygon, polygonBounds } from "./geometry";
 import {
   isWalkway,
   STREET_LABEL,
@@ -14,6 +24,8 @@ import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
 
 const fullWidth = MAP_BOUNDS.maxX - MAP_BOUNDS.minX;
 const fullHeight = MAP_BOUNDS.maxY - MAP_BOUNDS.minY;
+const parkBounds = polygonBounds(PERMANENT_PARK_EXPLORATION.flat());
+const parkWidth = parkBounds.maxX - parkBounds.minX;
 type Box = { x: number; y: number; width: number; height: number };
 type Map2DProps = MapRendererProps & {
   onNavigate?(): void;
@@ -44,6 +56,7 @@ function sceneLabel(entity: MapEntity) {
     return `P${number}${number === "1" ? " · Mostra" : ""}`;
   }
   if (entity.kind === "landscape" && entity.id !== "indumoveis:landscape:grove") return "";
+  if (entity.id === "indumoveis:support:mao-na-massa") return "Casa / Sede";
   return entity.label;
 }
 function labelRotation(entity: MapEntity) {
@@ -53,12 +66,20 @@ function labelRotation(entity: MapEntity) {
     : undefined;
 }
 
+function physicalSurfacePath(surface: MapEntity & { holes?: Point[][] }) {
+  return [surface.polygon, ...(surface.holes ?? [])]
+    .map((ring) => `M${ring.map((point) => point.join(",")).join("L")}Z`)
+    .join("");
+}
+
 /** Same territorial polygons, independent of the engine, usable while the 3D chunk loads. */
 export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref) {
   const svg = useRef<SVGSVGElement>(null);
   const box = useRef<Box>({ ...base });
-  const exterior = useRef<Box | null>(null);
+  const selectionSession = useRef(createSelectionNavigationSession<Box>((value) => ({ ...value })));
+  const manuallyNavigated = useRef(false);
   const animation = useRef<number | null>(null);
+  const animationGeneration = useRef(0);
   const labels = useRef<{ node: SVGTextElement; entity: MapEntity }[]>([]);
   const streetState = useRef(new Map<string, { scale: number; visible: boolean }>());
   const current = useRef(props);
@@ -77,10 +98,10 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     const aspect = rect?.width && rect.height ? rect.height / rect.width : base.height / base.width;
     const cx = b.x + b.width / 2,
       cy = b.y + b.height / 2;
-    b.width = Math.min(base.width * 1.5, Math.max(fullWidth * 0.035, b.width));
+    b.width = Math.min(parkWidth * 2.2, Math.max(fullWidth * 0.035, b.width));
     b.height = b.width * aspect;
-    b.x = Math.max(MAP_BOUNDS.minX, Math.min(MAP_BOUNDS.maxX, cx)) - b.width / 2;
-    b.y = Math.max(MAP_BOUNDS.minY, Math.min(MAP_BOUNDS.maxY, cy)) - b.height / 2;
+    b.x = Math.max(parkBounds.minX, Math.min(parkBounds.maxX, cx)) - b.width / 2;
+    b.y = Math.max(parkBounds.minY, Math.min(parkBounds.maxY, cy)) - b.height / 2;
     svg.current?.setAttribute("viewBox", `${b.x} ${b.y} ${b.width} ${b.height}`);
     svg.current?.classList.toggle("im-map-near", b.width < fullWidth * 0.7);
     if (!rect?.width) return;
@@ -159,6 +180,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     }
   };
   const cancelAnimation = () => {
+    animationGeneration.current++;
     if (animation.current !== null) cancelAnimationFrame(animation.current);
     animation.current = null;
   };
@@ -171,7 +193,9 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     }
     const start = { ...box.current },
       began = performance.now();
+    const generation = animationGeneration.current;
     const frame = (now: number) => {
+      if (generation !== animationGeneration.current) return;
       const p = Math.min(1, (now - began) / duration),
         t = p * p * (3 - 2 * p);
       box.current = {
@@ -187,6 +211,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     animation.current = requestAnimationFrame(frame);
   };
   const zoom = (factor: number, center?: Point) => {
+    manuallyNavigated.current = true;
     current.current.onNavigate?.();
     cancelAnimation();
     const b = box.current;
@@ -219,11 +244,18 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       );
       return;
     }
-    const xs = entity.polygon.map((p) => p[0]),
-      ys = entity.polygon.map((p) => p[1]);
+    focusPolygon(entity.polygon, entity.anchor);
+  };
+  const focusPolygon = (polygon: Point[], anchor?: Point) => {
+    const xs = polygon.map((p) => p[0]),
+      ys = polygon.map((p) => p[1]);
+    const center: Point = anchor ?? [
+      (Math.min(...xs) + Math.max(...xs)) / 2,
+      (Math.min(...ys) + Math.max(...ys)) / 2,
+    ];
     const rect = svg.current?.getBoundingClientRect();
-    const right = current.current.insets.right / Math.max(1, rect?.width ?? 1);
-    const bottom = current.current.insets.bottom / Math.max(1, rect?.height ?? 1);
+    const right = Math.min(0.75, current.current.insets.right / Math.max(1, rect?.width ?? 1));
+    const bottom = Math.min(0.75, current.current.insets.bottom / Math.max(1, rect?.height ?? 1));
     const aspect = rect?.width && rect.height ? rect.height / rect.width : base.height / base.width;
     const width = Math.max(
       ((Math.max(...xs) - Math.min(...xs)) * 2.1) / (1 - right),
@@ -233,16 +265,22 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     const height = width * aspect;
     animateBox(
       {
-        x: entity.anchor[0] - width * (0.5 - right * 0.5),
-        y: entity.anchor[1] - height * (0.5 - bottom * 0.5),
+        x: center[0] - width * (0.5 - right * 0.5),
+        y: center[1] - height * (0.5 - bottom * 0.5),
         width,
         height,
       },
-      MOTION.focusNear,
+      Math.min(240, MOTION.focusNear),
     );
   };
   function ensureSelectedVisible() {
-    if (animation.current !== null || pointers.current.size || !current.current.selectedId) return;
+    if (
+      animation.current !== null ||
+      pointers.current.size ||
+      manuallyNavigated.current ||
+      !current.current.selectedId
+    )
+      return;
     const entity = ENTITIES.find((e) => e.id === current.current.selectedId),
       element = svg.current;
     const matrix = element?.getScreenCTM?.();
@@ -263,9 +301,15 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
   }
   useImperativeHandle(ref, () => ({
     focus,
-    focusLandmark: () => false,
+    focusLandmark: (id) => {
+      const landmark = PERMANENT_PARK_LANDMARKS.find((entry) => entry.id === id);
+      if (!landmark) return false;
+      focusPolygon(landmark.polygon);
+      return true;
+    },
     zoom,
     pan: (dx, dy) => {
+      manuallyNavigated.current = true;
       current.current.onNavigate?.();
       cancelAnimation();
       box.current.x += dx * box.current.width * 0.08;
@@ -277,7 +321,21 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       box.current.x + box.current.width / 2,
       box.current.y + box.current.height / 2,
     ],
-    restoreOverview: () => focus(),
+    restoreOverview: () => {
+      const rect = svg.current?.getBoundingClientRect(),
+        aspect = (rect?.width ?? 1) / Math.max(1, rect?.height ?? 1);
+      const width = Math.max(parkWidth, (parkBounds.maxY - parkBounds.minY) * aspect) * 1.08,
+        height = width / aspect;
+      animateBox(
+        {
+          x: (parkBounds.minX + parkBounds.maxX - width) / 2,
+          y: (parkBounds.minY + parkBounds.maxY - height) / 2,
+          width,
+          height,
+        },
+        MOTION.focusFar,
+      );
+    },
     restoreCommercial: () => focus(),
   }));
   useEffect(() => {
@@ -314,10 +372,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(matrix.inverse());
       zoom(
         Math.exp(
-          -Math.max(
-            -150,
-            Math.min(150, e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 300 : 1)),
-          ) * 0.002,
+          -normalizedWheelDelta(e.deltaY, e.deltaMode, element?.clientHeight ?? 300) * 0.002,
         ),
         [p.x, p.y],
       );
@@ -331,6 +386,11 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     };
     window.addEventListener("blur", cancel);
     document.addEventListener("visibilitychange", cancel);
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const changedMotion = () => {
+      if (motion.matches) cancelAnimation();
+    };
+    motion.addEventListener("change", changedMotion);
     const observer =
       typeof ResizeObserver !== "undefined"
         ? new ResizeObserver(() => {
@@ -343,6 +403,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       element?.removeEventListener("wheel", wheel);
       window.removeEventListener("blur", cancel);
       document.removeEventListener("visibilitychange", cancel);
+      motion.removeEventListener("change", changedMotion);
       observer?.disconnect();
       cancel();
     };
@@ -350,16 +411,16 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-    if (props.inspectedId) {
-      if (!exterior.current) exterior.current = { ...box.current };
-      focus(props.inspectedId);
-    } else if (exterior.current) {
-      const destination = exterior.current;
-      exterior.current = null;
-      animateBox(destination, MOTION.view);
-    }
+    const change = selectionSession.current.change(
+      props.selectedId ?? props.inspectedId,
+      () => box.current,
+    );
+    if (change.kind === "none") return;
+    manuallyNavigated.current = false;
+    if (change.kind === "focus") focus(change.id);
+    else animateBox(change.destination, Math.min(260, MOTION.view));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.inspectedId]);
+  }, [props.selectedId, props.inspectedId]);
   // Reframe only when a newly occupied screen region actually hides the item.
   useEffect(() => {
     ensureSelectedVisible();
@@ -404,6 +465,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
         )
           c.moved = true;
         if (c?.moved) props.onNavigate?.();
+        if (c?.moved) manuallyNavigated.current = true;
         const rect = e.currentTarget.getBoundingClientRect();
         const scale = Math.max(box.current.width / rect.width, box.current.height / rect.height);
         if (pointers.current.size === 2) {
@@ -429,7 +491,15 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       }}
       onPointerUp={(e) => {
         const c = candidate.current;
-        if (c && c.id === e.pointerId && !c.moved && c.entity) props.onSelect(c.entity);
+        if (
+          c &&
+          c.id === e.pointerId &&
+          !c.moved &&
+          isClick({ x: c.start[0], y: c.start[1], touch: c.touch }, e.clientX, e.clientY)
+        ) {
+          if (c.entity) props.onSelect(c.entity);
+          else if (props.selectedId) props.onDeselect?.();
+        }
         pointers.current.delete(e.pointerId);
         if (!pointers.current.size) {
           candidate.current = null;
@@ -450,13 +520,46 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       }}
     >
       <rect
-        x={base.x - fullWidth}
-        y={base.y - fullHeight}
-        width={fullWidth * 4}
-        height={fullHeight * 4}
+        x={parkBounds.minX - parkWidth}
+        y={parkBounds.minY - parkWidth}
+        width={parkWidth * 4}
+        height={parkWidth * 4}
         fill={VISUAL_THEME.background}
       />
-      {ENTITIES.map((entity) => (
+      <g className="im-map-physical-context" pointerEvents="none" aria-hidden="true">
+        {PARK_CONTEXT_BLOCKS.flatMap((block) =>
+          (block.referencePieces ?? [block.referencePolygon]).map((polygon, index) => (
+            <polygon
+              key={`${block.id}:${index}`}
+              points={polygon.map((p) => p.join(",")).join(" ")}
+              fill="#afbd9b"
+              stroke="#839678"
+              strokeWidth=".08"
+            />
+          )),
+        )}
+        {[...PARK_CONTEXT_ROADS, ...PARK_CONTEXT_WALKS].map((road) => (
+          <path
+            key={road.id}
+            d={physicalSurfacePath(road)}
+            fillRule="evenodd"
+            fill={road.id.includes(":walk:") ? VISUAL_THEME.walk : VISUAL_THEME.road}
+          />
+        ))}
+        {PERMANENT_PARK_LANDMARKS.filter((l) => !l.existingOwner).map((l) => (
+          <polygon
+            key={l.id}
+            points={l.polygon.map((p) => p.join(",")).join(" ")}
+            fill={VISUAL_THEME.roof}
+            stroke="#68736b"
+            strokeWidth=".1"
+          />
+        ))}
+        {PARK_GATES.map((g) => (
+          <circle key={g.id} cx={g.point[0]} cy={g.point[1]} r=".5" fill={VISUAL_THEME.plum} />
+        ))}
+      </g>
+      {ENTITIES.filter((entity) => entity.kind !== "landscape").map((entity) => (
         <g
           key={entity.id}
           data-entity={entity.id}
@@ -466,8 +569,12 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
             points={entity.polygon.map((p) => p.join(",")).join(" ")}
             style={{
               fill:
-                (entity.kind === "lot" && COMMERCIAL_STATUS_COLORS[props.statuses[entity.id]]) ||
-                entityColor(entity),
+                entity.kind === "road" &&
+                !["indumoveis:road:benvenuto", "indumoveis:road:imigrantes"].includes(entity.id)
+                  ? "transparent"
+                  : (entity.kind === "lot" &&
+                      COMMERCIAL_STATUS_COLORS[props.statuses[entity.id]]) ||
+                    entityColor(entity),
             }}
           />
           {entity.kind === "pavilion" && (

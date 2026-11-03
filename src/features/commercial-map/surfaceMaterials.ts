@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { VISUAL_THEME } from "./visualTheme";
 import { bindPbrAtlas, loadPbrAtlas, type AtlasFamily, type PbrTexture } from "./pbrAtlas";
+import { patchGroundVariation } from "./groundVariation";
+import { applyMasonryFinish } from "./masonryFinish";
 
 export type SurfaceQuality = "light" | "balanced" | "detailed";
 export type SurfaceFamily =
@@ -32,7 +34,7 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   architecturalFrame: "#40504a",
   // The commercial floor stays lighter than surrounding landscape so thin
   // parcel borders and status bands keep their contrast in overview.
-  grass: "#a6ba94",
+  grass: "#91ad7d",
 };
 
 export interface SurfaceMaterials {
@@ -150,6 +152,11 @@ export function createSurfaceMaterials(
     architecturalFrame: make("architecturalFrame", 0.7, 0.1),
     grass: make("grass", 0.98),
   };
+  applyMasonryFinish(materials.masonryBrick);
+  for (const family of ["grass", "asphalt", "concrete"] as const) {
+    materials[family].onBeforeCompile = (shader) => patchGroundVariation(shader, family);
+    materials[family].customProgramCacheKey = () => `indumoveis-procedural-ground-v2-${family}`;
+  }
   if (textures.length === 4) {
     const [mineralAlbedo, mineralData, sheetAlbedo, sheetData] = textures;
     for (const family of [
@@ -346,6 +353,7 @@ export function createSurfaceMaterials(
           for (const [family, cell] of Object.entries(families)) {
             const material = materials[family as SurfaceFamily];
             bindPbrAtlas(material, cell, atlas);
+            if (family === "masonryBrick") applyMasonryFinish(material);
             const full = fullMaps.get(material)!;
             for (const key of detailMapKeys) full[key] = material[key];
             // Environment may have arrived while software maps were omitted;

@@ -2,6 +2,8 @@ import * as THREE from "three";
 import type { MapEntity, Point } from "./data/territory";
 import { pointInPolygon, polygonBounds, signedPolygonArea } from "./geometry";
 import { createSurfaceMaterials, type SurfaceMaterials } from "./surfaceMaterials";
+import type { RoadPhysicalClass } from "./roadGeometry";
+import { subtractConvexPolygon } from "./parkGeometry";
 
 /** Drawing proportions only. The source coordinate system is not measured in metres. */
 export const PAVEMENT = {
@@ -15,13 +17,82 @@ export const PAVEMENT = {
 
 const EPSILON = 1e-7;
 type Edge = { a: Point; b: Point };
+export type PavementSurface = { polygon: Point[]; holes?: Point[][] };
+const surfaceRings = (surface: PavementSurface) => [surface.polygon, ...(surface.holes ?? [])];
+const pointInSurface = (point: Point, surface: PavementSurface) =>
+  surfaceRings(surface).filter((ring) => pointInPolygon(point, ring)).length % 2 === 1;
+
+function triangulateSurface(surface: PavementSurface): Point[][] {
+  const rings = surfaceRings(surface).map((ring) =>
+    ring.filter(
+      (p, i) => i !== ring.length - 1 || Math.hypot(p[0] - ring[0][0], p[1] - ring[0][1]) > EPSILON,
+    ),
+  );
+  const points = rings.flat();
+  return THREE.ShapeUtils.triangulateShape(
+    rings[0].map((p) => new THREE.Vector2(...p)),
+    rings.slice(1).map((ring) => ring.map((p) => new THREE.Vector2(...p))),
+  ).map((indices) => indices.map((i) => points[i]));
+}
+
+/** Static broad phase only. Every candidate still undergoes polygon clipping;
+ * a shared grid bucket never establishes occupancy or physical connection. */
+function pavementClipper(blockers: readonly Point[][]) {
+  if (!blockers.length) return (input: Point[][]) => input;
+  const bounds = blockers.map(polygonBounds);
+  const envelope = bounds.reduce((a, b) => ({
+    minX: Math.min(a.minX, b.minX),
+    minY: Math.min(a.minY, b.minY),
+    maxX: Math.max(a.maxX, b.maxX),
+    maxY: Math.max(a.maxY, b.maxY),
+  }));
+  const grid = new Map<string, number[]>();
+  bounds.forEach((b, index) => {
+    for (let x = Math.floor(b.minX / 8); x <= Math.floor(b.maxX / 8); x++)
+      for (let z = Math.floor(b.minY / 8); z <= Math.floor(b.maxY / 8); z++) {
+        const key = `${x}:${z}`,
+          bucket = grid.get(key) ?? [];
+        bucket.push(index);
+        grid.set(key, bucket);
+      }
+  });
+  return (input: Point[][]) =>
+    input.flatMap((cell) => {
+      const b = polygonBounds(cell),
+        candidates = new Set<number>();
+      if (
+        b.maxX <= envelope.minX ||
+        b.minX >= envelope.maxX ||
+        b.maxY <= envelope.minY ||
+        b.minY >= envelope.maxY
+      )
+        return [cell];
+      for (let x = Math.floor(b.minX / 8); x <= Math.floor(b.maxX / 8); x++)
+        for (let z = Math.floor(b.minY / 8); z <= Math.floor(b.maxY / 8); z++)
+          for (const i of grid.get(`${x}:${z}`) ?? []) candidates.add(i);
+      let pieces = [cell];
+      for (const index of [...candidates].sort((a, b) => a - b)) {
+        const blocker = bounds[index];
+        pieces = pieces.flatMap((piece) => {
+          const p = polygonBounds(piece);
+          return p.maxX <= blocker.minX ||
+            p.minX >= blocker.maxX ||
+            p.maxY <= blocker.minY ||
+            p.minY >= blocker.maxY
+            ? [piece]
+            : subtractConvexPolygon(piece, blockers[index]);
+        });
+      }
+      return pieces;
+    });
+}
 export type PavementEdge = Edge & {
   sourceId: string;
   inward: Point;
   width: number;
 };
 export type PavementTopology = {
-  /** Nonoverlapping trapezoids of the rendered union, not replacement source polygons. */
+  /** Nonoverlapping convex cells of the rendered union, not cadastral polygons. */
   asphaltCells: Point[][];
   walkCells: Point[][];
   lateralEdges: PavementEdge[];
@@ -38,12 +109,27 @@ const interpolate = (a: Point, b: Point, t: number): Point => [
 const polygonEdges = (polygon: readonly Point[]): Edge[] =>
   polygon.map((a, i) => ({ a, b: polygon[(i + 1) % polygon.length] }));
 
+/** Source IDs resolve physical function, not commercial state or a road name.
+ * The two street-facing avenue surfaces share their public paint owner with
+ * urbanContext. All other authored roads lie inside the park circulation.
+ * New context roads are internal until their public function is established. */
+export function classifyRoad(entity: Pick<MapEntity, "id">): RoadPhysicalClass {
+  if (entity.id.startsWith("indumoveis:context:walk:")) return "park-pedestrian";
+  switch (entity.id) {
+    case "indumoveis:road:arvoredo":
+    case "indumoveis:road:east-walk-upper":
+    case "indumoveis:road:east-walk-lower":
+      return "park-pedestrian";
+    case "indumoveis:road:benvenuto":
+    case "indumoveis:road:imigrantes":
+      return "public-external";
+    default:
+      return "park-internal";
+  }
+}
+
 export function isPedestrianRoad(entity: MapEntity): boolean {
-  return (
-    entity.id === "indumoveis:road:arvoredo" ||
-    entity.id === "indumoveis:road:east-walk-upper" ||
-    entity.id === "indumoveis:road:east-walk-lower"
-  );
+  return classifyRoad(entity) === "park-pedestrian";
 }
 
 /** Intersections include the ends of collinear overlaps; no geographic rounding. */
@@ -123,8 +209,8 @@ function junctionConnectors(polygons: readonly Point[][]): Point[][] {
 /** Vertical decomposition of a polygon union. Slabs split at every crossing, so
  * each band has linear sides and can be triangulated once without coplanar
  * overlapping meshes, holes at junctions, or an additional clipping dependency. */
-export function pavementUnionCells(polygons: readonly Point[][]): Point[][] {
-  const edges = polygons.flatMap(polygonEdges);
+export function pavementSurfaceUnionCells(surfaces: readonly PavementSurface[]): Point[][] {
+  const edges = surfaces.flatMap((surface) => surfaceRings(surface).flatMap(polygonEdges));
   const xs = edges.flatMap(({ a }) => [a[0]]);
   for (let i = 0; i < edges.length; i++)
     for (let j = i + 1; j < edges.length; j++)
@@ -139,8 +225,11 @@ export function pavementUnionCells(polygons: readonly Point[][]): Point[][] {
       x1 = ordered[i],
       middle = (x0 + x1) / 2;
     const intervals: { low: Edge; high: Edge; lowY: number; highY: number }[] = [];
-    for (const polygon of polygons) {
-      const crossings = polygonEdges(polygon)
+    for (const surface of surfaces) {
+      // Parity is evaluated per physical surface across ALL its rings. The
+      // outer ring is never filled as a standalone polygon over its blocks.
+      const crossings = surfaceRings(surface)
+        .flatMap(polygonEdges)
         .filter(({ a, b }) => middle > Math.min(a[0], b[0]) && middle < Math.max(a[0], b[0]))
         .sort((a, b) => ordinate(a, middle) - ordinate(b, middle));
       for (let j = 0; j + 1 < crossings.length; j += 2)
@@ -174,6 +263,11 @@ export function pavementUnionCells(polygons: readonly Point[][]): Point[][] {
   return cells;
 }
 
+/** Compatibility wrapper for simple source polygons without interior rings. */
+export function pavementUnionCells(polygons: readonly Point[][]): Point[][] {
+  return pavementSurfaceUnionCells(polygons.map((polygon) => ({ polygon })));
+}
+
 function roadDimensions(road: MapEntity) {
   const bounds = polygonBounds(road.polygon);
   const width = bounds.maxX - bounds.minX,
@@ -193,18 +287,44 @@ function roadDimensions(road: MapEntity) {
  * source accesses and the existing gate make openings in the remaining sides. */
 export function derivePavement(entities: readonly MapEntity[]): PavementTopology {
   const roads = entities.filter((entity) => entity.kind === "road");
+  const protectedVolumes = entities.filter(
+    (entity) =>
+      entity.kind === "lot" ||
+      entity.kind === "pavilion" ||
+      (entity.kind === "support" && entity.id !== "indumoveis:support:gate-03"),
+  );
+  // Commercial/source footprints keep priority over a graphical registration
+  // residual. Do not append overlapping parcel holes to an even-odd A2 ring:
+  // their XOR could fill the parcel. Triangulate each actual blocker once and
+  // subtract its triangles from the already decomposed pavement cells.
+  const protectedTriangles = protectedVolumes.flatMap(triangulateSurface);
+  const clipProtected = pavementClipper(protectedTriangles);
   const asphalt = roads.filter((entity) => !isPedestrianRoad(entity));
-  const polygons = asphalt.map((entity) => entity.polygon);
+  // A2 components are already disjoint, including their original holes. Earcut
+  // preserves every source vertex exactly and avoids thousands of raster-x
+  // slabs. Only remaining simple surfaces need the generic polygon union.
+  const referenceSurfaces = asphalt.filter((entity) =>
+    entity.id.startsWith("indumoveis:context:road:a2-network:"),
+  );
+  const simpleAsphalt = asphalt.filter((entity) => !referenceSurfaces.includes(entity));
+  const polygons = simpleAsphalt.map((entity) => entity.polygon);
   const connectors = junctionConnectors(polygons);
-  const network = [...polygons, ...connectors];
-  const networkEdges = network.flatMap(polygonEdges);
-  const inside = (point: Point) => network.some((polygon) => pointInPolygon(point, polygon));
+  const network: PavementSurface[] = [...asphalt, ...connectors.map((polygon) => ({ polygon }))];
+  const walks = roads.filter(isPedestrianRoad);
+  const walkCells = clipProtected(pavementSurfaceUnionCells(walks));
+  const networkEdges = [...network, ...walks, ...protectedVolumes].flatMap((surface) =>
+    surfaceRings(surface).flatMap(polygonEdges),
+  );
+  const inside = (point: Point) =>
+    network.some((surface) => pointInSurface(point, surface)) &&
+    !walks.some((surface) => pointInSurface(point, surface)) &&
+    !protectedVolumes.some((surface) => pointInSurface(point, surface));
   const portals = entities.flatMap((entity) => [
     ...(entity.accesses ?? []),
     ...(entity.id === "indumoveis:support:gate-03" ? [entity.anchor] : []),
   ]);
   const lateralEdges: PavementEdge[] = [];
-  for (const road of asphalt) {
+  for (const road of simpleAsphalt) {
     const sign = Math.sign(signedPolygonArea(road.polygon));
     const { axis, breadth } = roadDimensions(road);
     for (const edge of polygonEdges(road.polygon)) {
@@ -252,9 +372,20 @@ export function derivePavement(entities: readonly MapEntity[]): PavementTopology
       }
     }
   }
+  // Walks own their crossings. Difference is applied to convex union cells,
+  // outside gestures; no second union of the resulting fragments is needed.
+  // Each visual point consequently has one asphalt/concrete surface owner.
+  const simpleNetwork: PavementSurface[] = [
+    ...simpleAsphalt,
+    ...connectors.map((polygon) => ({ polygon })),
+  ];
+  const simpleCells = pavementSurfaceUnionCells(simpleNetwork);
+  const referenceCells = referenceSurfaces.flatMap(triangulateSurface);
+  let asphaltCells = [...pavementClipper(simpleCells)(referenceCells), ...simpleCells];
+  asphaltCells = pavementClipper(walkCells)(asphaltCells);
   return {
-    asphaltCells: pavementUnionCells(network),
-    walkCells: pavementUnionCells(roads.filter(isPedestrianRoad).map((entity) => entity.polygon)),
+    asphaltCells: clipProtected(asphaltCells),
+    walkCells,
     lateralEdges,
     connectorCount: connectors.length,
   };

@@ -56,7 +56,13 @@ export function deriveRoadRibbon(
   return [...offsetPath(path, width / 2, limit), ...offsetPath(path, -width / 2, limit).reverse()];
 }
 
+/** Traffic paint belongs to public streets. Internal park circulation is a
+ * shared fairground surface, even when vehicles can use it for servicing. */
+export type RoadPhysicalClass = "public-external" | "park-internal" | "park-pedestrian";
+
 export interface RoadLaneOptions {
+  /** Unclassified paths deliberately receive no highway-style lane paint. */
+  roadClass?: RoadPhysicalClass;
   dashLength?: number;
   dashGap?: number;
   lineWidth?: number;
@@ -76,7 +82,7 @@ export type RoadLaneMarkings = {
   laneWidth: number;
 };
 
-/** Equal two-way lanes, continuous arclength dash phase, and right-hand arrows.
+/** Public streets only: equal two-way lanes, continuous dash phase, right-hand arrows.
  * These are schematic presentation markings, not a regulatory traffic plan. */
 export function markRoadLanes(
   input: readonly Point[],
@@ -88,8 +94,12 @@ export function markRoadLanes(
       centerDashes: [],
       edgeWhite: [],
       directionArrows: [],
-      laneWidth: Number.isFinite(width) ? Math.max(0, width / 2) : 0,
+      laneWidth:
+        options.roadClass === "public-external" && Number.isFinite(width)
+          ? Math.max(0, width / 2)
+          : 0,
     };
+  if (options.roadClass !== "public-external") return empty;
   if (path.length < 2 || !Number.isFinite(width) || width <= EPSILON) return empty;
   const lengths = [0];
   for (let i = 1; i < path.length; i++)

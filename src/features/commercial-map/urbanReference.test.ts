@@ -4,6 +4,7 @@ import { ENTITIES, type Point } from "./data/territory";
 import { pointInPolygon, polygonBounds } from "./geometry";
 import {
   EXPLORATION_POLYGONS,
+  ACTIVE_REFERENCE_ROADS,
   projectReferenceNode,
   REFERENCE_ROADS,
   REFERENCE_EXCLUSIONS,
@@ -107,11 +108,20 @@ describe("selected OpenStreetMap context aligned to the approved schematic", () 
       expect(
         Math.abs(distance(projectReferenceNode(id), ring.center) - ring.centerlineRadius),
       ).toBeLessThan(0.01);
-    for (const road of REFERENCE_ROADS)
+    for (const road of ACTIVE_REFERENCE_ROADS)
       for (const point of road.path)
         expect(EXPLORATION_POLYGONS.some((polygon) => pointInPolygon(point, polygon))).toBe(true);
     expect(URBAN_REFERENCE_PROVENANCE.attribution).toContain("OpenStreetMap");
     expect(URBAN_REFERENCE_PROVENANCE.license).toBe("ODbL 1.0");
+  });
+
+  it("keeps internal OSM evidence while rendering and exploring only the external network", () => {
+    const internalIds = ["park-brasil", "park-buenos-aires"];
+    expect(REFERENCE_ROADS.filter((road) => internalIds.includes(road.id))).toHaveLength(2);
+    expect(ACTIVE_REFERENCE_ROADS.some((road) => internalIds.includes(road.id))).toBe(false);
+    expect(ACTIVE_REFERENCE_ROADS.map((road) => road.id)).toEqual(
+      REFERENCE_ROADS.filter((road) => !internalIds.includes(road.id)).map((road) => road.id),
+    );
   });
 
   it("clips verified western approaches by interpolation and does not extend Argentina beyond its mapped end", () => {

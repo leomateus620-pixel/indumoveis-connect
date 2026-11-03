@@ -160,8 +160,31 @@ export function createVegetation(
       new THREE.MeshLambertMaterial({ color: "#ffffff", vertexColors: true }),
     );
     const woodMaterial = own(
-      new THREE.MeshLambertMaterial({ color: "#73634e", vertexColors: true }),
+      new THREE.MeshStandardMaterial({
+        color: "#887961",
+        vertexColors: true,
+        roughness: 0.96,
+        metalness: 0,
+      }),
     );
+    // One shared program, no bark texture per tree. Object-space longitudinal
+    // furrows remain fixed on branches; screen derivatives suppress subpixels.
+    woodMaterial.onBeforeCompile = (shader) => {
+      shader.vertexShader = `varying vec3 barkPosition;\n${shader.vertexShader}`.replace(
+        "#include <begin_vertex>",
+        "#include <begin_vertex>\nbarkPosition = position;",
+      );
+      shader.fragmentShader = `varying vec3 barkPosition;\n${shader.fragmentShader}`.replace(
+        "#include <color_fragment>",
+        `#include <color_fragment>
+        float barkPhase = barkPosition.x * 39.0 + barkPosition.z * 47.0 + sin(barkPosition.y * 2.7) * 1.7;
+        float barkFilter = 1.0 - smoothstep(0.5, 2.2, fwidth(barkPhase));
+        float barkFurrow = sin(barkPhase) * .085 + sin(barkPhase * 2.13) * .035;
+        diffuseColor.rgb *= 1.0 + barkFurrow * barkFilter;
+      `,
+      );
+    };
+    woodMaterial.customProgramCacheKey = () => "indumoveis-diffuse-bark-v1";
     const up = new THREE.Vector3(0, 1, 0),
       matrix = new THREE.Matrix4(),
       rotation = new THREE.Quaternion();
@@ -206,7 +229,7 @@ export function createVegetation(
         elbow.y -= 0.1;
         segment(root, elbow, 0.068, 0.043);
         segment(elbow, end, 0.044, 0.012);
-        const lobe = own(new THREE.IcosahedronGeometry(0.82, 0)),
+        const lobe = own(new THREE.IcosahedronGeometry(0.82, 1)),
           p = lobe.getAttribute("position");
         for (let j = 0; j < p.count; j++) {
           const x = p.getX(j),
@@ -217,7 +240,21 @@ export function createVegetation(
         }
         lobe.scale(width * 0.85, 0.8, width * 0.82);
         lobe.translate(...end.toArray());
-        lobe.computeVertexNormals();
+        // IcosahedronGeometry is non-indexed: recomputing its normals would
+        // shade each triangle as a separate facet. Ellipsoidal radial normals
+        // keep volume and branch-lobe variation with a softer distant crown.
+        const normals = lobe.getAttribute("normal"),
+          normal = new THREE.Vector3();
+        for (let j = 0; j < p.count; j++) {
+          normal
+            .set(
+              (p.getX(j) - end.x) / (width * 0.85) ** 2,
+              (p.getY(j) - end.y) / (0.8 * 0.8),
+              (p.getZ(j) - end.z) / (width * 0.82) ** 2,
+            )
+            .normalize();
+          normals.setXYZ(j, normal.x, normal.y, normal.z);
+        }
         append(
           far,
           lobe,
@@ -369,24 +406,26 @@ export function createVegetation(
     let quality = options.quality ?? "balanced",
       lastDistance = 80,
       lastTarget: Point | undefined;
+    // Reuse the ordering buffer during gestures. Hysteresis retains a stable
+    // silhouette when distance oscillates around an LOD boundary.
+    const ordered = [...lodPairs];
     const updateLod = (distance: number, target?: Point) => {
       lastDistance = distance;
       lastTarget = target;
       let trianglesLeft = VEGETATION.nearTriangleBudget;
-      const ordered = target
-        ? [...lodPairs].sort(
-            (a, b) =>
-              Math.hypot(a.centre[0] - target[0], a.centre[1] - target[1]) -
-              Math.hypot(b.centre[0] - target[0], b.centre[1] - target[1]),
-          )
-        : lodPairs;
+      if (target)
+        ordered.sort(
+          (a, b) =>
+            Math.hypot(a.centre[0] - target[0], a.centre[1] - target[1]) -
+            Math.hypot(b.centre[0] - target[0], b.centre[1] - target[1]),
+        );
       for (const pair of ordered) {
         const local =
           !target ||
           Math.hypot(pair.centre[0] - target[0], pair.centre[1] - target[1]) < distance * 0.9 + 50;
         const triangles = pair.near.count * VEGETATION.leavesPerTree * 2;
-        pair.near.visible =
-          distance < VEGETATION.nearDistances[quality] && local && triangles <= trianglesLeft;
+        const threshold = VEGETATION.nearDistances[quality] + (pair.near.visible ? 4 : -4);
+        pair.near.visible = distance < threshold && local && triangles <= trianglesLeft;
         if (pair.near.visible) trianglesLeft -= triangles;
         pair.far.visible = !pair.near.visible;
       }

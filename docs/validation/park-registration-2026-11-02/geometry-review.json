@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-11-03T03:36:02.345290+00:00",
+  "tool": {
+    "Shapely": "2.2.0",
+    "GEOS": "3.14.1"
+  },
+  "scope": "Exact planar footprints, not GPU triangles, photographic fidelity, roof details or survey certification. Boundary-only contact is permitted.",
+  "positiveAreaThresholdDrawingUnits2": 1e-07,
+  "structures": 32,
+  "physicalBlocks": 22,
+  "physicalPieces": 37,
+  "commercialEnvelopes": 59,
+  "commercialNumbers": 70,
+  "mappedEnvelopes": 59,
+  "allStructurePolygonsValid": true,
+  "buildingIntersections": [],
+  "lotBuildingIntersections": [],
+  "noPrivateRasterInPublicSVG": true,
+  "technicalDataSha256": "7e7d536e21d6c812b3159aeb9fdaf0f83e25202fb638b58a93131014ac0ba1a8"
+}

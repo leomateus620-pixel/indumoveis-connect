@@ -66,6 +66,7 @@ describe("joined two-way road geometry", () => {
       [7, 10],
     ];
     const markings = markRoadLanes(path, 2, {
+      roadClass: "public-external",
       dashLength: 4,
       dashGap: 2,
       lineWidth: 0.1,
@@ -76,7 +77,13 @@ describe("joined two-way road geometry", () => {
     expect(Math.abs(signedPolygonArea(markings.centerDashes[1]))).toBeCloseTo(0.4);
     expect(Math.min(...markings.centerDashes[2].map((p) => p[1]))).toBeCloseTo(5);
     expect(
-      markRoadLanes(path, 2, { dashLength: 4, dashGap: 2, lineWidth: 0.1, arrowSpacing: 100 }),
+      markRoadLanes(path, 2, {
+        roadClass: "public-external",
+        dashLength: 4,
+        dashGap: 2,
+        lineWidth: 0.1,
+        arrowSpacing: 100,
+      }),
     ).toEqual(markings);
   });
   it("places opposite arrows at the centres of equal-width carriageway halves", () => {
@@ -86,7 +93,7 @@ describe("joined two-way road geometry", () => {
         [100, 0],
       ],
       8,
-      { arrowSpacing: 20 },
+      { roadClass: "public-external", arrowSpacing: 20 },
     );
     expect(marks.laneWidth).toBe(4);
     expect(marks.edgeWhite).toHaveLength(2);
@@ -102,5 +109,24 @@ describe("joined two-way road geometry", () => {
       expect(forward.every((p) => p[1] > 0 && p[1] < 4)).toBe(true);
       expect(backward.every((p) => p[1] < 0 && p[1] > -4)).toBe(true);
     }
+  });
+  it("does not regenerate traffic arrows or dashes on internal, pedestrian or unclassified paths", () => {
+    const path: Point[] = [
+      [0, 0],
+      [100, 0],
+    ];
+    for (const roadClass of ["park-internal", "park-pedestrian", undefined] as const) {
+      const marks = markRoadLanes(path, 8, { roadClass, arrowSpacing: 20 });
+      expect(marks).toEqual({
+        centerDashes: [],
+        edgeWhite: [],
+        directionArrows: [],
+        laneWidth: 0,
+      });
+    }
+    const external = markRoadLanes(path, 8, { roadClass: "public-external", arrowSpacing: 20 });
+    expect(external.centerDashes.length).toBeGreaterThan(0);
+    expect(external.directionArrows.length).toBeGreaterThan(0);
+    expect(external.edgeWhite).toHaveLength(2);
   });
 });

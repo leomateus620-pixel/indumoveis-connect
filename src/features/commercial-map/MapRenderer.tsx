@@ -1,17 +1,25 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { configureMapInput, prepareSecondaryOrbit } from "./mapInput";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 import { createSoftwareMaterials } from "./softwareMaterials";
 import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
+import { getRegisteredParkWoodland, PARK_WOODLAND_MASSES } from "./parkPlanting";
 import { createTerrain, TERRAIN } from "./terrain";
 import { DAYLIGHT, createDaylightSky, createDaylightBackground } from "./daylight";
 import { createSunShadows } from "./sunShadows";
 import { createLotGrass } from "./lotGrass";
 import type { createUrbanContext } from "./urbanContext";
 import type { createPermanentPark } from "./permanentPark";
-import { PERMANENT_PARK_EXPLORATION, PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
+import type { createParkContextShadows } from "./parkContextShadows";
+import {
+  PERMANENT_PARK_EXPLORATION,
+  PERMANENT_PARK_LANDMARKS,
+  PARK_CORE_ENTITIES,
+  PARK_RENDER_ENTITIES,
+} from "./permanentParkLayout";
 import type { PermanentParkLandmark } from "./permanentParkLayout";
 import { deriveUrbanHouses } from "./urbanLayout";
 import { EXPLORATION_POLYGONS } from "./urbanReference";
@@ -27,7 +35,7 @@ import {
   streetLabelPresentation,
   streetLabelVisible,
 } from "./labelPolicy";
-import { ENTITIES, MAP_BOUNDS, type MapEntity, type Point } from "./data/territory";
+import { MAP_BOUNDS, type MapEntity, type Point } from "./data/territory";
 import {
   framingDistance,
   framingBoxDistance,
@@ -46,6 +54,9 @@ import {
   createNavigationEnvelope,
   constrainNavigationPose,
   minimumNavigationDistance,
+  createSelectionNavigationSession,
+  normalizedWheelDelta,
+  touchTwistDelta,
   type QualityTier,
 } from "./navigation";
 import type { MapHandle, MapRendererProps, MapView } from "./types";
@@ -58,6 +69,7 @@ import {
 
 type Pose = { position: THREE.Vector3; target: THREE.Vector3 };
 type Runtime = MapHandle & { update(): void; dispose(): void };
+const ENTITIES = PARK_CORE_ENTITIES;
 function rebasePoseTarget(pose: Pose, target: Point) {
   pose.position.x += target[0] - pose.target.x;
   pose.position.z += target[1] - pose.target.z;
@@ -145,6 +157,7 @@ type Diagnostic = {
     woodland: ReturnType<typeof createVegetation>["metadata"] | null;
     urban: ReturnType<typeof createUrbanContext>["metadata"] | null;
     shadows: { enabled: boolean; updates: number; textureBytes: number };
+    contextShadows?: ReturnType<typeof createParkContextShadows>["metadata"];
     adaptiveResolution: number;
     softwareRasterizer: boolean;
   };
@@ -202,6 +215,7 @@ const CONTEXT_EXPLORATION = [
   ...EXPLORATION_POLYGONS,
   ...PERMANENT_PARK_EXPLORATION,
   ...deriveUrbanHouses().map((house) => house.parcel),
+  ...PARK_WOODLAND_MASSES.map((mass) => mass.polygon),
   ...CONTEXT_WOODLAND.map((tree) =>
     Array.from({ length: 12 }, (_, i): Point => [
       tree.world[0] + Math.cos((i * Math.PI) / 6) * 5,
@@ -441,6 +455,7 @@ function initializeMapRuntime(
   let urban: ReturnType<typeof createUrbanContext> | null = null;
   let permanentPark: ReturnType<typeof createPermanentPark> | null = null;
   let permanentParkPrepared = false;
+  let contextShadows: ReturnType<typeof createParkContextShadows> | null = null;
   let parkDetails: ReturnType<typeof createParkDetails> | null = null;
   let parkDetailsPrepared = false;
   let parkDetailsFailed = false;
@@ -460,12 +475,16 @@ function initializeMapRuntime(
     duration: number;
     kind: CameraAction;
   } | null = null;
-  let exteriorPose: Pose | null = null;
+  const selectionSession = createSelectionNavigationSession<Pose>((value) => ({
+    position: value.position.clone(),
+    target: value.target.clone(),
+  }));
   let previousInspected = props().inspectedId;
   let previousView = props().view;
   let previousViewRevision = props().viewRevision;
   let previousQuality = props().quality;
-  let previousSelection = props().selectedId;
+  let previousSelection: string | null = null;
+  let selectionManuallyNavigated = false;
   let previousInsetRight = props().insets.right,
     previousInsetBottom = props().insets.bottom;
   let pendingVisibilityCheck = false;
@@ -477,7 +496,15 @@ function initializeMapRuntime(
   const adaptiveSamples: number[] = [];
   const activePointers = new Map<
     number,
-    { x: number; y: number; touch: boolean; candidate: string | null }
+    {
+      x: number;
+      y: number;
+      currentX: number;
+      currentY: number;
+      touch: boolean;
+      candidate: string | null;
+      primary: boolean;
+    }
   >();
   let clickCancelled = false;
   let manualPolar = 0,
@@ -714,7 +741,7 @@ function initializeMapRuntime(
     statusColors: number[] = [];
   let lotGeometry: THREE.BufferGeometry | null = null;
   let lotBaseMesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material> | null = null;
-  const pavement = createPavement(ENTITIES, surfaces, {
+  const pavement = createPavement(PARK_RENDER_ENTITIES, surfaces, {
     openSouthEdgesOf: new Set(["indumoveis:road:benvenuto", "indumoveis:road:imigrantes"]),
   });
   commercialGroup.add(pavement.group);
@@ -735,7 +762,11 @@ function initializeMapRuntime(
       colors: number[] = [],
       borderPositions: number[] = [];
     for (const entity of ENTITIES.filter(
-      (entry) => entry.kind === kind && !(kind === "support" && getArchitectureDefinition(entry)),
+      (entry) =>
+        entry.kind === kind &&
+        kind !== "landscape" &&
+        !["indumoveis:support:gate-03", "indumoveis:support:mao-na-massa"].includes(entry.id) &&
+        !(kind === "support" && getArchitectureDefinition(entry)),
     )) {
       const elevation = kind === "landscape" ? -0.08 : 0.05;
       const geometry = polygonGeometry(entity.polygon, elevation);
@@ -777,6 +808,7 @@ function initializeMapRuntime(
         pickables.push(pick);
       } else geometry.dispose();
     }
+    if (!positions.length) continue;
     const geometry = track(new THREE.BufferGeometry());
     geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
@@ -831,9 +863,30 @@ function initializeMapRuntime(
   statusMesh.raycast = () => {};
   commercialGroup.add(statusMesh);
 
-  const architecture = buildArchitecture(ENTITIES, surfaces);
+  // The registered Casa/Sede replaces the schematic support box. One model,
+  // one commercial selection owner, with its current visual proxy and bounds.
+  const architecture = buildArchitecture(
+    ENTITIES.filter((e) => e.id !== "indumoveis:support:mao-na-massa"),
+    surfaces,
+  );
   commercialGroup.add(architecture.group);
   pickables.push(...architecture.pickables);
+  const sedeEntity = ENTITY_BY_ID.get("indumoveis:support:mao-na-massa")!;
+  const sedePick = new THREE.Mesh(
+    track(polygonGeometry(sedeEntity.polygon, 3.2)),
+    basic("#ffffff"),
+  );
+  sedePick.userData.entityId = sedeEntity.id;
+  sedePick.updateMatrixWorld();
+  pickables.push(sedePick);
+  const gateEntity = ENTITY_BY_ID.get("indumoveis:support:gate-03")!;
+  const gatePick = new THREE.Mesh(
+    track(polygonGeometry(gateEntity.polygon, 0.04)),
+    basic("#ffffff"),
+  );
+  gatePick.userData.entityId = gateEntity.id;
+  gatePick.updateMatrixWorld();
+  pickables.push(gatePick);
   rollback.push(() => architecture.dispose());
   const sunShadows = createSunShadows(ENTITIES);
   commercialGroup.add(sunShadows.mesh);
@@ -885,7 +938,9 @@ function initializeMapRuntime(
   if (!atlas) throw new Error("label-atlas-unavailable");
   const labelPositions: number[] = [],
     labelUVs: number[] = [];
-  const labelEntities = [...ENTITIES].filter((entity) => entity.kind !== "landscape");
+  const labelEntities = [...ENTITIES].filter(
+    (entity) => entity.kind !== "landscape" && entity.id !== "indumoveis:support:mao-na-massa",
+  );
   labelEntities.sort(
     (a, b) =>
       (a.kind === "pavilion" ? 0 : a.kind === "road" ? 1 : a.kind === "support" ? 2 : 3) -
@@ -1269,7 +1324,7 @@ function initializeMapRuntime(
       // not depend on the separately downloaded residential factory.
       try {
         if (!parkDetails && !parkDetailsFailed) {
-          parkDetails = createParkDetails(ENTITIES, surfaces);
+          parkDetails = createParkDetails(PARK_RENDER_ENTITIES, surfaces);
           parkDetails.group.visible = false;
           commercialGroup.add(parkDetails.group);
           rollback.push(() => parkDetails?.dispose());
@@ -1303,7 +1358,7 @@ function initializeMapRuntime(
         if (!permanentPark) {
           const { createPermanentPark } = await import("./permanentPark");
           if (disposed || failed) return;
-          permanentPark = createPermanentPark(surfaces);
+          permanentPark = createPermanentPark(surfaces, pavement.topology);
           permanentPark.group.visible = false;
           scene.add(permanentPark.group);
           diag.textureBytes += permanentPark.metadata.textureBytes;
@@ -1321,6 +1376,22 @@ function initializeMapRuntime(
           return;
         }
         permanentPark.group.visible = true;
+        try {
+          if (!contextShadows) {
+            const { createParkContextShadows } = await import("./parkContextShadows");
+            if (disposed || failed) return;
+            contextShadows = createParkContextShadows();
+            diag.realism.contextShadows = contextShadows.metadata;
+            contextShadows.group.visible = false;
+            scene.add(contextShadows.group);
+            rollback.push(() => contextShadows?.dispose());
+            await renderer.compileAsync(contextShadows.group, camera, scene);
+            if (disposed || failed) return;
+            contextShadows.group.visible = true;
+          }
+        } catch {
+          diag.optionalFailures.push("park-shadow-preparation");
+        }
         invalidate();
       } catch {
         if (permanentPark) diag.textureBytes -= permanentPark.metadata.textureBytes;
@@ -1348,7 +1419,10 @@ function initializeMapRuntime(
       diag.realism.grass = lotGrass.metadata;
       rollback.push(() => lotGrass?.dispose());
       urban = createUrbanContext({ quality: tier, sharedSurfaces: surfaces });
-      contextVegetation = createVegetation({ quality: tier, contextPlanting: CONTEXT_WOODLAND });
+      contextVegetation = createVegetation({
+        quality: tier,
+        contextPlanting: [...CONTEXT_WOODLAND, ...getRegisteredParkWoodland()],
+      });
       contextVegetation.group.visible = false;
       scene.add(contextVegetation.group);
       diag.realism.woodland = contextVegetation.metadata;
@@ -1702,13 +1776,13 @@ function initializeMapRuntime(
         bounds.center,
         Math.max(bounds.radius, 3),
         props().view,
-        entity ? undefined : { ...bounds.box, height: COMMERCIAL_HEIGHT },
+        entity ? bounds.box : { ...bounds.box, height: COMMERCIAL_HEIGHT },
         ready
           ? new THREE.Vector3().subVectors(camera.position, controls.target).normalize()
           : undefined,
         !entity,
       ),
-      entity ? MOVEMENT.focusNearMs : MOVEMENT.focusFarMs,
+      entity ? Math.min(240, MOVEMENT.focusNearMs) : MOVEMENT.focusFarMs,
     );
   }
   function focusCommercial() {
@@ -2019,12 +2093,22 @@ function initializeMapRuntime(
   }
   function cancelTransition() {
     transition = null;
+    pendingVisibilityCheck = false;
     navigationLimits();
     lastActivity = performance.now();
     diag.cameraState = "manual";
   }
   function pointerDown(event: PointerEvent) {
     cancelTransition();
+    prepareSecondaryOrbit(controls, event);
+    if (
+      event.button !== 0 ||
+      event.shiftKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      activePointers.size
+    )
+      selectionManuallyNavigated = true;
     if (!activePointers.size) {
       manualPolar = controls.getPolarAngle();
       manualAzimuth = controls.getAzimuthalAngle();
@@ -2033,8 +2117,14 @@ function initializeMapRuntime(
     activePointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
+      currentX: event.clientX,
+      currentY: event.clientY,
       touch: event.pointerType === "touch",
-      candidate: event.button === 0 ? pick(event.clientX, event.clientY) : null,
+      candidate:
+        event.button === 0 && !event.shiftKey && !event.ctrlKey && !event.metaKey
+          ? pick(event.clientX, event.clientY)
+          : null,
+      primary: event.button === 0 && !event.shiftKey && !event.ctrlKey && !event.metaKey,
     });
     clickCancelled = activePointers.size > 1;
   }
@@ -2042,8 +2132,26 @@ function initializeMapRuntime(
     const initial = activePointers.get(event.pointerId);
     if (initial && !isClick(initial, event.clientX, event.clientY)) {
       clickCancelled = true;
+      selectionManuallyNavigated = true;
     }
     if (initial) {
+      if (initial.touch && activePointers.size === 2) {
+        const other = [...activePointers.values()].find((entry) => entry !== initial);
+        if (other) {
+          const twist = touchTwistDelta(
+            [initial.currentX, initial.currentY],
+            [event.clientX, event.clientY],
+            [other.currentX, other.currentY],
+          );
+          scratch.subVectors(camera.position, controls.target).applyAxisAngle(up, twist);
+          camera.position.copy(controls.target).add(scratch);
+          camera.lookAt(controls.target);
+          controls.update();
+          selectionManuallyNavigated = true;
+        }
+      }
+      initial.currentX = event.clientX;
+      initial.currentY = event.clientY;
       lastActivity = performance.now();
       invalidate();
     } else if (event.pointerType === "mouse") {
@@ -2057,12 +2165,15 @@ function initializeMapRuntime(
       initial &&
       !clickCancelled &&
       isClick(initial, event.clientX, event.clientY) &&
-      initial.candidate &&
+      initial.primary &&
       initial.candidate === pick(event.clientX, event.clientY)
-    )
-      props().onSelect(initial.candidate);
+    ) {
+      if (initial.candidate) props().onSelect(initial.candidate);
+      else if (props().selectedId) props().onDeselect?.();
+    }
     if (!activePointers.size) {
       clickCancelled = false;
+      controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
       lastActivity = performance.now();
       invalidate();
     }
@@ -2101,6 +2212,8 @@ function initializeMapRuntime(
     // Only a previous wheel destination may accumulate wheel input. A preset
     // or focus animation is interrupted at its visible pose.
     if (activePointers.size) return;
+    selectionManuallyNavigated = true;
+    pendingVisibilityCheck = false;
     const base = transition?.kind === "wheel" ? transition.to : pose();
     const rect = canvas.getBoundingClientRect();
     pointer.set(
@@ -2109,8 +2222,7 @@ function initializeMapRuntime(
     );
     raycaster.setFromCamera(pointer, camera);
     const anchored = raycaster.ray.intersectPlane(groundPlane, wheelAnchor);
-    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? height : 1;
-    const delta = Math.max(-120, Math.min(120, event.deltaY * unit));
+    const delta = normalizedWheelDelta(event.deltaY, event.deltaMode, height);
     const distance = base.position.distanceTo(base.target);
     const nextDistance = Math.max(
       distanceLimits().min,
@@ -2175,6 +2287,10 @@ function initializeMapRuntime(
     diag.contextLosses++;
     fail("webgl-context-lost");
   }
+  function reducedMotionChanged() {
+    if (reduceMotion.matches && transition) transition.duration = 0;
+    invalidate();
+  }
 
   canvas.addEventListener("pointerdown", pointerDown, true);
   canvas.addEventListener("pointermove", pointerMove, true);
@@ -2185,7 +2301,7 @@ function initializeMapRuntime(
   canvas.addEventListener("webglcontextlost", contextLost);
   window.addEventListener("blur", cancelPointers);
   document.addEventListener("visibilitychange", onVisibility);
-  reduceMotion.addEventListener("change", invalidate);
+  reduceMotion.addEventListener("change", reducedMotionChanged);
   controls.addEventListener("change", controlsChanged);
   function removeListeners() {
     controls.removeEventListener("change", controlsChanged);
@@ -2198,7 +2314,7 @@ function initializeMapRuntime(
     canvas.removeEventListener("webglcontextlost", contextLost);
     window.removeEventListener("blur", cancelPointers);
     document.removeEventListener("visibilitychange", onVisibility);
-    reduceMotion.removeEventListener("change", invalidate);
+    reduceMotion.removeEventListener("change", reducedMotionChanged);
     if (scheduled) cancelAnimationFrame(scheduled);
     window.clearTimeout(optionalTask);
     window.clearTimeout(environmentTask);
@@ -2234,7 +2350,7 @@ function initializeMapRuntime(
 
   function keepSelectionVisible() {
     const selected = props().selectedId ? ENTITY_BY_ID.get(props().selectedId!) : undefined;
-    if (!selected || (!ready && props().readInitialTarget)) {
+    if (!selected || selectionManuallyNavigated || (!ready && props().readInitialTarget)) {
       pendingVisibilityCheck = false;
       return;
     }
@@ -2244,12 +2360,10 @@ function initializeMapRuntime(
       return;
     }
     pendingVisibilityCheck = false;
-    const points = getArchitectureDefinition(selected)
-      ? selected.polygon.flatMap(([x, z]) => [
-          new THREE.Vector3(x, 0, z),
-          new THREE.Vector3(x, architectureVisualHeight(selected) + 0.6, z),
-        ])
-      : [new THREE.Vector3(selected.anchor[0], 0, selected.anchor[1])];
+    const points = selected.polygon.flatMap(([x, z]) => [
+      new THREE.Vector3(x, 0, z),
+      new THREE.Vector3(x, architectureVisualHeight(selected) + 0.6, z),
+    ]);
     const hidden = points.some((point) => {
       point.project(camera);
       const px = ((point.x + 1) * width) / 2,
@@ -2300,27 +2414,23 @@ function initializeMapRuntime(
   }
   function update() {
     const state = props();
-    controls.mouseButtons.LEFT = state.gesture === "move" ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
-    controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
-    controls.touches.ONE = state.gesture === "move" ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE;
-    controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
-    controls.enableRotate = true;
+    configureMapInput(controls);
     if (!transition) navigationLimits();
     for (const [id, roof] of architecture.roofs) roof.visible = state.inspectedId !== id;
     const inspectionChanged = state.inspectedId !== previousInspected;
     if (inspectionChanged) {
       solarShadows.invalidate();
-      if (state.inspectedId) {
-        if (!previousInspected) exteriorPose = pose();
-        focus(state.inspectedId);
-      } else if (exteriorPose) {
-        animate(exteriorPose, MOVEMENT.viewMs, "view");
-        exteriorPose = null;
-      }
       previousInspected = state.inspectedId;
     }
+    const selectionChange = selectionSession.change(state.selectedId, pose);
+    if (selectionChange.kind !== "none") {
+      cancelTransition();
+      selectionManuallyNavigated = false;
+      if (selectionChange.kind === "focus") focus(selectionChange.id);
+      else animate(selectionChange.destination, Math.min(260, MOVEMENT.viewMs), "view");
+    }
     if (
-      !inspectionChanged &&
+      selectionChange.kind === "none" &&
       (state.view !== previousView || state.viewRevision !== previousViewRevision)
     ) {
       const distance = camera.position.distanceTo(controls.target);
@@ -2442,6 +2552,8 @@ function initializeMapRuntime(
   return {
     focus,
     zoom(factor) {
+      selectionManuallyNavigated = true;
+      pendingVisibilityCheck = false;
       const base = transition?.kind === "zoom" ? transition.to : undefined;
       const next = base ? { position: base.position.clone(), target: base.target.clone() } : pose();
       scratch.subVectors(next.position, next.target);
@@ -2455,6 +2567,7 @@ function initializeMapRuntime(
       animate(next, MOVEMENT.zoomMs, "zoom");
     },
     pan(dx, dy) {
+      selectionManuallyNavigated = true;
       cancelTransition();
       const range = camera.position.distanceTo(controls.target) * 0.08;
       // Ground projections of screen right/down stay intuitive after any orbit.
@@ -2475,6 +2588,8 @@ function initializeMapRuntime(
       invalidate();
     },
     rotate(direction) {
+      selectionManuallyNavigated = true;
+      pendingVisibilityCheck = false;
       if (!controls.enableRotate) return;
       props().onManualOrientation?.();
       const base = transition?.kind === "rotate" ? transition.to : undefined;
@@ -2506,6 +2621,7 @@ function initializeMapRuntime(
       lotGrass?.dispose();
       urban?.dispose();
       permanentPark?.dispose();
+      contextShadows?.dispose();
       parkDetails?.dispose();
       solarShadows.dispose();
       terrain.dispose();

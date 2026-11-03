@@ -2,7 +2,7 @@ import { ENTITIES, type Point } from "./data/territory";
 import { pointInPolygon, polygonBounds, type Bounds } from "./geometry";
 import {
   URBAN_REFERENCE,
-  REFERENCE_ROADS,
+  ACTIVE_REFERENCE_ROADS,
   EXPLORATION_POLYGONS,
   RESIDENTIAL_ROAD_WIDTH,
   type ReferenceRoad,
@@ -89,7 +89,7 @@ export function urbanPolygonAllowed(polygon: readonly Point[]) {
  * Source rectangles are interpretive landscaping envelopes, not real parcels. */
 export function deriveUrbanHouses(): UrbanHouse[] {
   const boundaries = ["campeira", "musicanto", "10-de-agosto", "fenasoja"].map(
-    (id) => REFERENCE_ROADS.find((r) => r.id === id)!.path[0][0],
+    (id) => ACTIVE_REFERENCE_ROADS.find((r) => r.id === id)!.path[0][0],
   );
   const spans = [
     { source: [98, 155], target: [boundaries[0], boundaries[1]], block: "Q2", cluster: 0 },
@@ -163,7 +163,7 @@ export function deriveUrbanHouses(): UrbanHouse[] {
   }
   // The tapered wedge is clipped against the actual diagonal OSM corridor.
   // Keep the two separately interpreted built volumes, without duplicate wings.
-  const diagonal = REFERENCE_ROADS.find((r) => r.id === "tuparendi")!.path;
+  const diagonal = ACTIVE_REFERENCE_ROADS.find((r) => r.id === "tuparendi")!.path;
   const diagonalCeiling = (x: number) => {
     for (let i = 1; i < diagonal.length; i++) {
       const [a, b] = [diagonal[i - 1], diagonal[i]];
@@ -216,7 +216,7 @@ export function deriveUrbanHouses(): UrbanHouse[] {
   // a public driveway through its neighbours. Draw a direct access only where
   // a straight segment reaches the existing sidewalk without crossing another
   // parcel. The source's shared drives remain pending rather than invented.
-  const sideRoads = REFERENCE_ROADS.filter((road) =>
+  const sideRoads = ACTIVE_REFERENCE_ROADS.filter((road) =>
     ["campeira", "musicanto", "10-de-agosto", "fenasoja"].includes(road.id),
   );
   for (const house of houses.filter((item) => item.cluster !== 4)) {
@@ -269,7 +269,10 @@ export function deriveUrbanHouses(): UrbanHouse[] {
 }
 
 export function deriveUrbanRoads(): ReferenceRoad[] {
-  return REFERENCE_ROADS.map((road) => ({ ...road, path: road.path.map((p) => [...p] as Point) }));
+  return ACTIVE_REFERENCE_ROADS.map((road) => ({
+    ...road,
+    path: road.path.map((p) => [...p] as Point),
+  }));
 }
 
 /** Explicit approximate canopy masses along the photographed residential/field
@@ -296,7 +299,7 @@ export function deriveResidentialBuffer() {
     [171, 158.5],
   ];
   const parcels = deriveUrbanHouses().map((house) => house.parcel);
-  const corridors = REFERENCE_ROADS.map((r) => deriveRoadRibbon(r.path, r.width + 1.05));
+  const corridors = ACTIVE_REFERENCE_ROADS.map((r) => deriveRoadRibbon(r.path, r.width + 1.05));
   const radius = 1.55 * 1.45 + 0.25;
   return candidates.filter((point) => {
     const disc = Array.from({ length: 16 }, (_, i): Point => [
