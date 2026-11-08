@@ -1,0 +1,83 @@
+{
+  "project": {
+    "id": "188cb605-7a42-42a0-9e75-28f5097e9433",
+    "name": "Indumóveis Connect",
+    "workspace": "cabebf41df8c5aca2b08",
+    "repository": "https://github.com/leomateus620-pixel/indumoveis-connect",
+    "databaseEnabled": true,
+    "stack": "supabase"
+  },
+  "appliedMigrations": [
+    {
+      "version": "20261108180000",
+      "name": "pavilion_interior_domain"
+    },
+    {
+      "version": "20261108181000",
+      "name": "pavilion_1_mostra_seed"
+    }
+  ],
+  "method": "Lovable query_database DDL/DML; migration statements registered in supabase_migrations.schema_migrations in each application transaction",
+  "before": {
+    "spaces": 0,
+    "floorPlans": 0,
+    "deals": 0,
+    "contractSpaces": 0
+  },
+  "after": {
+    "spaces": 14,
+    "numbered": 15,
+    "commercial": 14,
+    "environments": 19,
+    "parts": 24,
+    "externalParts": 5,
+    "architecturalElements": 8,
+    "revisions": 1,
+    "noncommercialStock": 0,
+    "historicalSpaces": 0,
+    "hallArea": null,
+    "allPolygonsValid": true
+  },
+  "authenticatedRpcRoundtrip": {
+    "same": true,
+    "editionId": "49af7d79-9bef-4981-9ecd-ddf64928036e",
+    "databasePlanId": "f23306f0-c7d5-4966-b073-bbe8543e43f3",
+    "revisionId": "4c932cf5-ea41-4624-9185-b223001ee724"
+  },
+  "rollbackPermissions": {
+    "authenticated_revision_write_denied": true,
+    "commercial_rpc_denies_map_only_user": true,
+    "commercial_user_reads_14_view_derived_statuses": true,
+    "cross_edition_links_rejected": true,
+    "hall_area_null": true,
+    "inactive_edition_plan_not_exposed": true,
+    "map_only_geometry_read_without_commercial_data": true,
+    "published_geometry_immutable": true,
+    "self_intersecting_polygon_rejected": true,
+    "user_without_map_permission_denied": true
+  },
+  "rollbackReexecution": {
+    "architectural_elements": 8,
+    "parts": 24,
+    "revisions": 1,
+    "safe_reexecution": true,
+    "spaces": 14
+  },
+  "sourceSha256": "088ab9d98e61ed98c98b45834c5813416d9fd09a10af195aeeae29bfc9a4c02a",
+  "omissions": [
+    "No source PDF was uploaded to Storage; floor_plans.storage_path is null and source_uri explicitly points to the repository source.",
+    "No real exhibitor/deal records existed to validate an exhibitor name against a live deal."
+  ],
+  "migrationHashes": [
+    {
+      "name": "pavilion_interior_domain",
+      "sha256": "f8a6d735203b7ec8f37402012842e77ce5588db936698215bd5397c55ba4c38e",
+      "version": "20261108180000"
+    },
+    {
+      "name": "pavilion_1_mostra_seed",
+      "sha256": "d697719ee738264d2e62b8f99c0940a3a99e5ae04dd389ee7024907d0ff9ccb8",
+      "version": "20261108181000"
+    }
+  ]
+}

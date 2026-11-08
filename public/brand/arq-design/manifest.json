@@ -1,0 +1,63 @@
+{
+  "name": "ARQ & Design Indumóveis",
+  "visibleCopy": [
+    "ARQ &",
+    "Design",
+    "Indumóveis"
+  ],
+  "format": "SVG with original font outlines; transparent background; no embedded raster",
+  "palette": {
+    "graphite": "#302C2F",
+    "plum": "#643B54",
+    "projection": "#A69C8E",
+    "suggestedBackground": "#F8F6F1"
+  },
+  "fonts": [
+    {
+      "family": "Cormorant Garamond",
+      "weight": 500,
+      "license": "SIL OFL 1.1",
+      "source": "https://github.com/google/fonts/tree/main/ofl/cormorantgaramond"
+    },
+    {
+      "family": "Figtree",
+      "weight": 500,
+      "license": "SIL OFL 1.1",
+      "source": "https://github.com/google/fonts/tree/main/ofl/figtree"
+    }
+  ],
+  "files": [
+    {
+      "name": "arq-design-primary.svg",
+      "sha256": "c7d375814d9ab3f268f32f93f05bdcfcc2f9abe44fdb64f37e54a8a6a7e2aa40",
+      "viewBox": [
+        0,
+        0,
+        360,
+        282
+      ]
+    },
+    {
+      "name": "arq-design-compact.svg",
+      "sha256": "b4ff1a5d5bb5c76d2398d33062bbb48bba709327bd877099adc658fc01a8dd9d",
+      "viewBox": [
+        0,
+        0,
+        244,
+        186
+      ]
+    },
+    {
+      "name": "arq-design-monochrome.svg",
+      "sha256": "f4c7d198164a76b63a2f8b1bd12ccc6dc48890464b3c90b05e79c655f268de63",
+      "viewBox": [
+        0,
+        0,
+        360,
+        282
+      ]
+    }
+  ],
+  "provenance": "Deterministic typographic composition using licensed font curves, not a raster-to-vector conversion. Creative Production exact-content and deterministic-exports workflow.",
+  "capabilityNote": "creative_production_board is not exposed in this session; no board was generated."
+}

@@ -30,6 +30,7 @@ import { Route as AuthenticatedAppEmpresasIndexRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppEmpresasIdRouteImport } from './routes/_authenticated/_app/empresas.$id'
 import { Route as AuthenticatedAppVistoriasIndexRouteImport } from './routes/_authenticated/_app/vistorias.index'
 import { Route as AuthenticatedAppVistoriasIdRouteImport } from './routes/_authenticated/_app/vistorias.$id'
+import { Route as AuthenticatedMapaPavilhoes1InteriorRouteImport } from './routes/_authenticated/mapa.pavilhoes.1.interior'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -147,6 +148,12 @@ const AuthenticatedAppVistoriasIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedAppVistoriasRoute,
   } as any)
+const AuthenticatedMapaPavilhoes1InteriorRoute =
+  AuthenticatedMapaPavilhoes1InteriorRouteImport.update({
+    id: '/mapa/pavilhoes/1/interior',
+    path: '/mapa/pavilhoes/1/interior',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/contratos/': typeof AuthenticatedAppContratosIndexRoute
   '/empresas/': typeof AuthenticatedAppEmpresasIndexRoute
   '/vistorias/': typeof AuthenticatedAppVistoriasIndexRoute
+  '/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/contratos': typeof AuthenticatedAppContratosIndexRoute
   '/empresas': typeof AuthenticatedAppEmpresasIndexRoute
   '/vistorias': typeof AuthenticatedAppVistoriasIndexRoute
+  '/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -210,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/contratos/': typeof AuthenticatedAppContratosIndexRoute
   '/_authenticated/_app/empresas/': typeof AuthenticatedAppEmpresasIndexRoute
   '/_authenticated/_app/vistorias/': typeof AuthenticatedAppVistoriasIndexRoute
+  '/_authenticated/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/contratos/'
     | '/empresas/'
     | '/vistorias/'
+    | '/mapa/pavilhoes/1/interior'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/contratos'
     | '/empresas'
     | '/vistorias'
+    | '/mapa/pavilhoes/1/interior'
   id:
     | '__root__'
     | '/'
@@ -274,6 +286,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/contratos/'
     | '/_authenticated/_app/empresas/'
     | '/_authenticated/_app/vistorias/'
+    | '/_authenticated/mapa/pavilhoes/1/interior'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppVistoriasIdRouteImport
       parentRoute: typeof AuthenticatedAppVistoriasRoute
     }
+    '/_authenticated/mapa/pavilhoes/1/interior': {
+      id: '/_authenticated/mapa/pavilhoes/1/interior'
+      path: '/mapa/pavilhoes/1/interior'
+      fullPath: '/mapa/pavilhoes/1/interior'
+      preLoaderRoute: typeof AuthenticatedMapaPavilhoes1InteriorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -516,11 +536,14 @@ const AuthenticatedAppRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRouteRoute: typeof AuthenticatedAppRouteRouteWithChildren
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
+  AuthenticatedMapaPavilhoes1InteriorRoute: typeof AuthenticatedMapaPavilhoes1InteriorRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppRouteRoute: AuthenticatedAppRouteRouteWithChildren,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
+  AuthenticatedMapaPavilhoes1InteriorRoute:
+    AuthenticatedMapaPavilhoes1InteriorRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

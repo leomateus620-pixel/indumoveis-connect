@@ -32,6 +32,7 @@ import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
 import { MOTION } from "./motion";
 import { readQualityPreference, writeQualityPreference } from "./qualityPreference";
 import { area, SPACE_STATUS } from "@/lib/format";
+import { readParkReturn, saveParkReturn } from "@/features/pavilion-interior/parkReturn";
 import "./map.css";
 
 type Renderer = ComponentType<MapRendererProps & RefAttributes<MapHandle>>;
@@ -60,6 +61,11 @@ function selectionReducer(state: Selection, action: Action): Selection {
     : { ...state, phase: "open" };
 }
 interface WorkspaceProps {
+  editionId?: string;
+  restorePark?: boolean;
+  initialPavilion?: boolean;
+  parkSearch?: { status?: string; space?: string; deal?: string };
+  onOpenInterior?: () => void;
   statuses?: Record<string, string>;
   highlightedIds?: string[];
   externalSelection?: string;
@@ -71,6 +77,11 @@ const emptyStatuses: Record<string, string> = {};
 const emptyIds: string[] = [];
 
 export function CommercialMapWorkspace({
+  editionId,
+  restorePark = true,
+  initialPavilion,
+  parkSearch,
+  onOpenInterior,
   statuses = emptyStatuses,
   highlightedIds = emptyIds,
   externalSelection,
@@ -78,6 +89,8 @@ export function CommercialMapWorkspace({
   commercialState = "unavailable",
   onCloseExternal,
 }: WorkspaceProps) {
+  const savedPark = useRef(restorePark ? readParkReturn(editionId) : null);
+  const firstExternalSelection = useRef(true);
   const workspace = useRef<HTMLDivElement>(null),
     stage = useRef<HTMLDivElement>(null),
     panel = useRef<HTMLElement>(null);
@@ -86,14 +99,16 @@ export function CommercialMapWorkspace({
     origin = useRef<HTMLElement | null>(null),
     closeButton = useRef<HTMLButtonElement>(null);
   const [selection, dispatch] = useReducer(selectionReducer, {
-    id: null,
-    panelId: null,
-    phase: "closed",
+    id: savedPark.current?.selectionId ?? (initialPavilion ? "indumoveis:pavilion:1" : null),
+    panelId: savedPark.current?.selectionId ?? (initialPavilion ? "indumoveis:pavilion:1" : null),
+    phase: savedPark.current || initialPavilion ? "open" : "closed",
     expanded: false,
   });
-  const [view, setView] = useState<MapView>("perspective");
+  const [view, setView] = useState<MapView>(savedPark.current?.view ?? "perspective");
   const [viewRevision, setViewRevision] = useState(0);
-  const [orientationFree, setOrientationFree] = useState(false);
+  const [orientationFree, setOrientationFree] = useState(
+    savedPark.current?.orientationFree ?? false,
+  );
   const selectionOrigin = useRef<{ view: MapView; orientationFree: boolean } | null>(null);
   const presentation = useRef({ view, orientationFree });
   presentation.current = { view, orientationFree };
@@ -120,9 +135,9 @@ export function CommercialMapWorkspace({
   const [landmarkNotice, setLandmarkNotice] = useState("");
   const [inspectedId, setInspectedId] = useState<string | null>(null);
   const [Renderer, setRenderer] = useState<Renderer | null>(null);
-  const [engineWanted, setEngineWanted] = useState(true);
+  const [engineWanted, setEngineWanted] = useState(savedPark.current?.camera?.kind !== "2d");
   const [representation, setRepresentation] = useState<"preparing" | "ready" | "recovering" | "2d">(
-    "preparing",
+    savedPark.current?.camera?.kind === "2d" ? "2d" : "preparing",
   );
   const [attempt, setAttempt] = useState(0),
     [expanded, setExpanded] = useState(false);
@@ -227,6 +242,10 @@ export function CommercialMapWorkspace({
     setOrientationFree(false);
   };
   useEffect(() => {
+    if (firstExternalSelection.current) {
+      firstExternalSelection.current = false;
+      if (savedPark.current) return;
+    }
     if (externalSelection) select(externalSelection);
   }, [externalSelection, select]);
   useEffect(() => {
@@ -413,6 +432,7 @@ export function CommercialMapWorkspace({
     statuses,
     highlightedIds,
     initialFocus: lastTarget.current,
+    initialCamera: savedPark.current?.camera,
     onManualOrientation: () => setOrientationFree(true),
   };
   const tool = (
@@ -942,6 +962,26 @@ export function CommercialMapWorkspace({
                   </span>
                 )}
               </div>
+              {entity.id === "indumoveis:pavilion:1" && onOpenInterior && (
+                <button
+                  className="im-map-action im-map-action-primary"
+                  style={{ margin: "0 20px 12px", width: "calc(100% - 40px)" }}
+                  onClick={() => {
+                    if (editionId)
+                      saveParkReturn({
+                        editionId,
+                        selectionId: entity.id,
+                        camera: handle()?.captureCamera?.(),
+                        view,
+                        orientationFree,
+                        search: parkSearch,
+                      });
+                    onOpenInterior();
+                  }}
+                >
+                  <ArrowRight size={18} /> Acesso Interno
+                </button>
+              )}
               <button
                 className="im-map-expand"
                 aria-expanded={selection.expanded}
@@ -973,7 +1013,7 @@ export function CommercialMapWorkspace({
                   {entity.kind === "pavilion" && (
                     <>
                       <button
-                        className="im-map-action im-map-action-primary"
+                        className={`im-map-action ${entity.id === "indumoveis:pavilion:1" ? "" : "im-map-action-primary"}`}
                         onClick={() => {
                           setInspectedId(entity.id);
                         }}
@@ -981,10 +1021,12 @@ export function CommercialMapWorkspace({
                         <Box size={18} />
                         Inspecionar sem cobertura
                       </button>
-                      <p>
-                        Casca arquitetônica com piso e acessos. Espaços internos ainda não
-                        cadastrados nesta base.
-                      </p>
+                      {entity.id !== "indumoveis:pavilion:1" && (
+                        <p>
+                          Casca arquitetônica com piso e acessos. Espaços internos ainda não
+                          cadastrados nesta base.
+                        </p>
+                      )}
                     </>
                   )}
                 </div>

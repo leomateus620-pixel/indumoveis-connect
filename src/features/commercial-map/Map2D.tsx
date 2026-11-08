@@ -86,6 +86,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
   const box = useRef<Box>({ ...base });
   const selectionSession = useRef(createSelectionNavigationSession<Box>((value) => ({ ...value })));
   const manuallyNavigated = useRef(false);
+  const cameraRestored = useRef(false);
   const animation = useRef<number | null>(null);
   const animationGeneration = useRef(0);
   const labels = useRef<{ node: SVGTextElement; entity: MapEntity }[]>([]);
@@ -328,6 +329,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       box.current.x + box.current.width / 2,
       box.current.y + box.current.height / 2,
     ],
+    captureCamera: () => ({ kind: "2d", ...box.current }),
     restoreOverview: () => {
       const rect = svg.current?.getBoundingClientRect(),
         aspect = (rect?.width ?? 1) / Math.max(1, rect?.height ?? 1);
@@ -423,6 +425,13 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       () => box.current,
     );
     if (change.kind === "none") return;
+    if (props.initialCamera?.kind === "2d" && change.kind === "focus" && !cameraRestored.current) {
+      cameraRestored.current = true;
+      manuallyNavigated.current = true;
+      box.current = { ...props.initialCamera };
+      write();
+      return;
+    }
     manuallyNavigated.current = false;
     if (change.kind === "focus") focus(change.id);
     else animateBox(change.destination, Math.min(260, MOTION.view));

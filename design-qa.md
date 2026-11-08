@@ -1,3 +1,75 @@
+# Pavilhão 1 — Mostra ARQ & Design — Design QA, 08/11/2026
+
+final result: passed
+
+## Evidência e escopo
+
+A referência geométrica é o PDF fornecido, preservado em `docs/references/pavilion-1/mostra-arq-design.pdf` (SHA-256 registrado em `docs/pavilion-interior/geometry.md`). A imagem original mede 2276 × 1178 pixels; a página vetorial, 1092,0616 × 565,0964 pontos. A referência de interface é a captura externa fornecida e os tokens existentes da Indumóveis. A identidade dedicada está em `public/brand/arq-design/`.
+
+A implementação foi aberta no navegador in-app em `/mapa/pavilhoes/1/interior`, usando o servidor de QA local `scripts/pavilion-interior/preview.mjs`. Ele utiliza a mesma geometria persistida e uma sessão sintética, sem negociação ou expositor inventados e sem escrever no banco real. A aplicação real do SQL e os testes de autorização são evidências independentes: `docs/validation/pavilion-interior/database-application.json`.
+
+As capturas finais JPEG foram normalizadas pelo navegador a 1 pixel por CSS pixel. A tela do host reportava DPR 1,65; as dimensões abaixo foram confirmadas por `innerWidth/innerHeight` e pela leitura dos arquivos, sem inferir tamanho CSS do tamanho físico solicitado à janela.
+
+| Captura | Viewport CSS e pixels do arquivo | Estado |
+|---|---|---|
+| `docs/validation/pavilion-interior/desktop-full.jpg` | 1440 × 900 | Planta inteira, nenhuma seleção |
+| `docs/validation/pavilion-interior/desktop-space-12.jpg` | 1440 × 900 | 12, interior e extensão |
+| `docs/validation/pavilion-interior/desktop-space-02.jpg` | 1440 × 900 | Espaço menor, área 47,50 m² |
+| `docs/validation/pavilion-interior/desktop-bathrooms.jpg` | 1440 × 900 | 15, apoio sem operação comercial |
+| `docs/validation/pavilion-interior/desktop-salon.jpg` | 1440 × 900 | Salão, sem linha de metragem |
+| `docs/validation/pavilion-interior/notebook-full.jpg` | 1366 × 768 | Enquadramento amplo e controles livres |
+| `docs/validation/pavilion-interior/tablet-full.jpg` | 834 × 1112 | Coluna esquerda reservada |
+| `docs/validation/pavilion-interior/mobile-full.jpg` | 390 × 844 | Painel recolhido, planta livre |
+| `docs/validation/pavilion-interior/mobile-space-12.jpg` | 390 × 844 | Painel esquerdo e espaço 12 visível à direita |
+
+## Comparação conjunta
+
+Foram abertos e examinados, no mesmo input visual, `docs/validation/pavilion-interior/geometry-comparison.jpg` e `geometry-detail-comparison.jpg`. O primeiro normaliza os mesmos limites locais (28,66)–(1080,532) para 1088 × 482 pixels e coloca PDF e SVG um acima do outro. O segundo compara espaço 12/extensão, banheiros/acessos e recepção/curva. A fotografia externa não define o desenho interno nem o pavilhão 14.
+
+A organização espacial, os recortes, as passagens, as portas e a curva coincidem com a fonte. Cotas, hachuras e setas repetidas foram removidas intencionalmente da apresentação. O tratamento cromático distingue comércio, apoio, salão e extensões. A curva permanece uma guia, sem ganhar espessura de parede. Testes topológicos complementam a inspeção visual: 24 anéis válidos, sem interseção de área.
+
+## Superfícies de fidelidade
+
+| Superfície | Resultado |
+|---|---|
+| Tipografia | Figtree e Plus Jakarta Sans do produto; números tabulares e estáveis, com mínimo de 10,5 px em tela. Número, nome e metragem têm níveis distintos. Marca usa curvas reais de Cormorant Garamond/Figtree, com “Indumóveis” inspecionado. |
+| Composição e espaçamento | Faixa fixa de marca acima da planta; coluna reservada no desktop/tablet; painel sobreposto e recolhível à esquerda no celular. Enquadramento reserva espaço para controles. Não há navegação geral do portal na rota. |
+| Cores e contraste | Papel quente #F8F6F1, grafite #302C2F, ameixa #643B54, exteriores em tom oliva discreto. Informação comercial usa texto, sem depender apenas de cor. Foco visível e seleção coerente entre partes vinculadas. |
+| Qualidade dos assets | Geometria SVG determinística, sem raster de fundo. Três assinaturas realmente vetoriais com transparência e PNGs auxiliares. Nenhuma conversão de raster ampliado foi alegada. |
+| Conteúdo | 01–15 preservados, áreas declaradas exatas, 01 Recepção e 14 Café comerciais. 15 apoio; salão sem metragem e sem aviso documental. Sem IDs, fontes de arquivo ou ressalvas técnicas no painel. |
+
+## Interações verificadas
+
+No navegador: seleção no desenho e no índice; clique na extensão 09 abrindo um único painel; espaços 12, 02, banheiros e salão; fechar seleção; recolher/reabrir painel mobile; botões de zoom/ajuste; arraste distinguido de clique; roda com âncora no cursor; acesso direto com `?espaco=12`; atualização; entrada pela ficha do Pavilhão 1; retorno, voltar e avançar. Ao abrir o interior foram observados zero `canvas` e zero `.im-map-stage`, confirmando desmontagem da experiência externa. A leitura dos logs finais não mostrou erros ou avisos.
+
+O arraste medido mudou apenas translação de (10,676;237,559) para (40,676;207,559), mantendo escala 0,333 e nenhuma seleção. A roda mudou a escala para 0,583, mantendo a âncora do cursor. Pan e zoom não escrevem no histórico. Os testes automatizados verificam pinça com dois ponteiros, cancelamento, teclado, retorno de foco, limites, restauração 2D/3D, contexto por edição e recuperação de erros.
+
+## Histórico de revisão
+
+- P1: código do salão divergente entre UI e catálogo. Unificado como `salon`; captura final mostra seleção e ausência de metragem.
+- P2: números mobile pequenos. Corrigido mínimo em pixels de tela, mantendo os pontos de ancoragem; captura mobile final conferida.
+- P2: painel móvel ocultava o espaço à esquerda. Corrigidos limites pela área livre e revelação mínima; captura 12 mostra ambas as partes à direita e controles verticais acessíveis.
+- P2: foco permanecia em painel oculto e Escape disparava duas vezes. Foco retorna à planta; fechamento centralizado; testes de teclado e painel passaram.
+- P2: retomada externa poderia trocar 2D por 3D ou selecionar um lote antigo. Representação e câmera salvas prevalecem na retomada; links externos novos continuam válidos; testes de regressão passaram.
+- P2: falha da edição poderia manter carregamento indefinido. Estado de erro com tentativa novamente implementado e testado.
+
+As capturas finais acima foram examinadas após as correções. Não restam achados P0/P1/P2 abertos.
+
+## Limites de verificação
+
+A pinça foi validada por eventos de ponteiro em testes; o navegador in-app não oferece `Input.dispatchTouchEvent`, portanto não houve ensaio de pinça real por esse canal nem telefone físico. Não foi feita auditoria completa com leitor de tela. Não existia negociação/expositor real para conferir um nome em produção; SQL verificou a origem e as barreiras de permissão. O servidor visual usa fixtures locais; não substitui teste com sessão real de usuário. Esses limites não foram ocultados sob a validação do banco.
+
+## Checklist concluído
+
+- Geometria e cinco extensões conferidas contra o PDF.
+- Composição desktop/notebook/tablet/mobile e estados principais examinados.
+- Conteúdo, identidade, cores, foco, navegação e erros revisados.
+- Capturas e evidências persistidas no repositório.
+
+---
+
+# Histórico anterior de QA
+
 # Agenda Indumóveis — Design QA, 27/10/2026
 
 final result: passed
