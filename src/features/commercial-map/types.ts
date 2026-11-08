@@ -4,6 +4,9 @@ import type { PermanentParkLandmark } from "./permanentParkLayout";
 export type MapView = "perspective" | "top" | "front";
 export type MapQuality = "auto" | "light" | "balanced" | "detailed";
 export type MapGesture = "move" | "rotate";
+export type MapCameraSnapshot =
+  | { kind: "2d"; x: number; y: number; width: number; height: number }
+  | { kind: "3d"; position: [number, number, number]; target: [number, number, number] };
 export interface MapInsets {
   right: number;
   bottom: number;
@@ -17,6 +20,7 @@ export interface MapHandle {
   pan(dx: number, dy: number): void;
   rotate(direction: number): void;
   getTarget(): Point;
+  captureCamera?(): MapCameraSnapshot | undefined;
   restoreOverview(): void;
   restoreCommercial(): void;
 }
@@ -40,6 +44,7 @@ export interface MapRendererProps {
   statuses: Record<string, string>;
   highlightedIds: string[];
   initialFocus?: Point;
+  initialCamera?: MapCameraSnapshot;
   /** Read the still-visible fallback's current target during renderer preparation. */
   readInitialTarget?: () => Point | undefined;
   /** Keep the fallback visible until its active pointer gesture has ended. */

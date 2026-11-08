@@ -314,6 +314,7 @@ const MapRenderer = forwardRef<MapHandle, MapRendererProps>(function MapRenderer
       pan: (dx, dy) => runtimeRef.current?.pan(dx, dy),
       rotate: (direction) => runtimeRef.current?.rotate(direction),
       getTarget: () => runtimeRef.current?.getTarget() ?? CENTER,
+      captureCamera: () => runtimeRef.current?.captureCamera?.(),
       restoreOverview: () => runtimeRef.current?.restoreOverview(),
       restoreCommercial: () => runtimeRef.current?.restoreCommercial(),
     }),
@@ -2673,6 +2674,15 @@ function initializeMapRuntime(
   }
   applyPose(overview);
   update();
+  const savedCamera = props().initialCamera;
+  if (savedCamera?.kind === "3d") {
+    cancelTransition();
+    applyPose({
+      position: new THREE.Vector3(...savedCamera.position),
+      target: new THREE.Vector3(...savedCamera.target),
+    });
+    selectionManuallyNavigated = true;
+  }
   softwareMaterials.sync(scene);
   performance.mark("indumoveis-map:essential-prepared");
   // Keep the already usable SVG/input thread available while the driver links
@@ -2750,6 +2760,11 @@ function initializeMapRuntime(
       animate(next, MOVEMENT.zoomMs, "rotate");
     },
     getTarget: () => [controls.target.x, controls.target.z],
+    captureCamera: () => ({
+      kind: "3d",
+      position: camera.position.toArray() as [number, number, number],
+      target: controls.target.toArray() as [number, number, number],
+    }),
     focusLandmark,
     restoreOverview: () => focus(),
     restoreCommercial: focusCommercial,

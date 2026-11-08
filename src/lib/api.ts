@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { errMsg } from "./format";
 import { mimeFor, validateDocFile } from "./documents";
+import type { PavilionInteriorPlan as PavilionPlan } from "@/features/pavilion-interior/data";
 
 const db = supabase as any;
 
@@ -410,6 +411,102 @@ export function useMapDealSpaces(dealId?: string, enabled = true) {
           .abortSignal(signal)
           .maybeSingle(),
       ),
+  });
+}
+
+/** A persisted revision from the active edition. Geometry is never fabricated on read failure. */
+export type PavilionInteriorPlan = PavilionPlan & {
+  editionId: string;
+  databasePlanId: string;
+  revisionId: string;
+};
+export type PavilionInteriorCommercial = Record<string, { status: string; exhibitor?: string }>;
+
+export function usePavilionInteriorPlan(enabled = true) {
+  const editionId = useEditionId();
+  const map = useCan("mapa");
+  const current = useQuery<{ id: string; revision: number } | null>({
+    queryKey: qk.list("pavilion-interior-current", editionId, 1, map.read),
+    enabled: enabled && !!editionId && map.read,
+    retry: 1,
+    queryFn: ({ signal }) =>
+      run(
+        supabase
+          .from("pavilion_plan_revisions")
+          .select("id,revision")
+          .eq("edition_id", editionId!)
+          .eq("pavilion_number", 1)
+          .eq("is_current", true)
+          .abortSignal(signal)
+          .maybeSingle(),
+      ),
+  });
+  const plan = useQuery<PavilionInteriorPlan | null>({
+    queryKey: qk.list(
+      "pavilion-interior",
+      editionId,
+      1,
+      current.data?.revision,
+      current.data?.id,
+      map.read,
+    ),
+    enabled: enabled && !!editionId && !!current.data && map.read,
+    retry: 1,
+    queryFn: async ({ signal }) => {
+      const result = await run(
+        supabase
+          .rpc("get_pavilion_interior", {
+            p_edition_id: editionId!,
+            p_pavilion_number: 1,
+            p_revision: current.data!.revision,
+          })
+          .abortSignal(signal),
+      );
+      const data = result as unknown as PavilionInteriorPlan | null;
+      if (data && (data.editionId !== editionId || data.revisionId !== current.data?.id))
+        throw new Error("A planta não pertence à edição e à revisão selecionadas.");
+      return data;
+    },
+  });
+  return {
+    ...plan,
+    isPending: current.isPending || (!!current.data && plan.isPending),
+    isError: current.isError || plan.isError,
+    error: current.error ?? plan.error,
+    refetch: () => (current.isError || !current.data ? current.refetch() : plan.refetch()),
+  };
+}
+
+export function usePavilionInteriorCommercial(planId?: string, revision?: number, enabled = true) {
+  const editionId = useEditionId();
+  const map = useCan("mapa");
+  const commercial = useCan("comercial");
+  const companies = useCan("empresas");
+  const permitted = map.read && commercial.read;
+  return useQuery<PavilionInteriorCommercial>({
+    queryKey: qk.list(
+      "spaces",
+      "pavilion-interior",
+      editionId,
+      planId,
+      revision,
+      permitted,
+      companies.read,
+    ),
+    enabled: enabled && !!editionId && !!planId && !!revision && permitted,
+    retry: 1,
+    queryFn: async ({ signal }) => {
+      const result = await run(
+        supabase
+          .rpc("get_pavilion_interior_commercial", {
+            p_edition_id: editionId!,
+            p_floor_plan_id: planId!,
+            p_revision: revision!,
+          })
+          .abortSignal(signal),
+      );
+      return result as unknown as PavilionInteriorCommercial;
+    },
   });
 }
 

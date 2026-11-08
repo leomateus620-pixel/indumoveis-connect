@@ -1185,21 +1185,27 @@ export type Database = {
           edition_id: string
           id: string
           name: string
-          storage_path: string
+          pavilion_number: number | null
+          source_uri: string | null
+          storage_path: string | null
         }
         Insert: {
           created_at?: string
           edition_id: string
           id?: string
           name: string
-          storage_path: string
+          pavilion_number?: number | null
+          source_uri?: string | null
+          storage_path?: string | null
         }
         Update: {
           created_at?: string
           edition_id?: string
           id?: string
           name?: string
-          storage_path?: string
+          pavilion_number?: number | null
+          source_uri?: string | null
+          storage_path?: string | null
         }
         Relationships: [
           {
@@ -1383,6 +1389,183 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pavilion_plan_revisions: {
+        Row: {
+          id: string
+          edition_id: string
+          floor_plan_id: string
+          pavilion_number: number
+          stable_id: string
+          revision: number
+          source_document: Json
+          source_name: string
+          source_sha256: string
+          payload_sha256: string
+          coordinate_system: Json
+          bounds: Json
+          is_current: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          edition_id: string
+          floor_plan_id: string
+          pavilion_number: number
+          stable_id: string
+          revision: number
+          source_document?: Json
+          source_name: string
+          source_sha256: string
+          payload_sha256: string
+          coordinate_system: Json
+          bounds: Json
+          is_current?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          edition_id?: string
+          floor_plan_id?: string
+          pavilion_number?: number
+          stable_id?: string
+          revision?: number
+          source_document?: Json
+          source_name?: string
+          source_sha256?: string
+          payload_sha256?: string
+          coordinate_system?: Json
+          bounds?: Json
+          is_current?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      pavilion_environments: {
+        Row: {
+          edition_id: string
+          id: string
+          pavilion_number: number
+          code: string
+          kind: string
+          space_id: string | null
+        }
+        Insert: {
+          edition_id: string
+          id: string
+          pavilion_number: number
+          code: string
+          kind: string
+          space_id?: string | null
+        }
+        Update: {
+          edition_id?: string
+          id?: string
+          pavilion_number?: number
+          code?: string
+          kind?: string
+          space_id?: string | null
+        }
+        Relationships: []
+      }
+      pavilion_environment_revisions: {
+        Row: {
+          edition_id: string
+          revision_id: string
+          environment_id: string
+          name: string
+          declared_area_m2: number | null
+          function_label: string | null
+          label: Json
+          display_order: number
+        }
+        Insert: {
+          edition_id: string
+          revision_id: string
+          environment_id: string
+          name: string
+          declared_area_m2?: number | null
+          function_label?: string | null
+          label: Json
+          display_order: number
+        }
+        Update: {
+          edition_id?: string
+          revision_id?: string
+          environment_id?: string
+          name?: string
+          declared_area_m2?: number | null
+          function_label?: string | null
+          label?: Json
+          display_order?: number
+        }
+        Relationships: []
+      }
+      pavilion_environment_parts: {
+        Row: {
+          id: string
+          edition_id: string
+          revision_id: string
+          environment_id: string
+          kind: string
+          path: string
+          polygon: Json | null
+        }
+        Insert: {
+          id: string
+          edition_id: string
+          revision_id: string
+          environment_id: string
+          kind: string
+          path: string
+          polygon?: Json | null
+        }
+        Update: {
+          id?: string
+          edition_id?: string
+          revision_id?: string
+          environment_id?: string
+          kind?: string
+          path?: string
+          polygon?: Json | null
+        }
+        Relationships: []
+      }
+      pavilion_architecture_elements: {
+        Row: {
+          id: string
+          edition_id: string
+          revision_id: string
+          kind: string
+          display_order: number
+          stroke_width: number | null
+          path: string
+          label: string | null
+          label_at: Json | null
+        }
+        Insert: {
+          id: string
+          edition_id: string
+          revision_id: string
+          kind: string
+          display_order?: number
+          stroke_width?: number | null
+          path: string
+          label?: string | null
+          label_at?: Json | null
+        }
+        Update: {
+          id?: string
+          edition_id?: string
+          revision_id?: string
+          kind?: string
+          display_order?: number
+          stroke_width?: number | null
+          path?: string
+          label?: string | null
+          label_at?: Json | null
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -1663,6 +1846,18 @@ export type Database = {
       }
     }
     Functions: {
+      get_pavilion_interior: {
+        Args: { p_edition_id: string; p_pavilion_number?: number; p_revision?: number }
+        Returns: Json
+      }
+      get_pavilion_interior_commercial: {
+        Args: { p_edition_id: string; p_floor_plan_id: string; p_revision: number }
+        Returns: Json
+      }
+      pavilion_valid_point: { Args: { p: Json }; Returns: boolean }
+      pavilion_valid_path: { Args: { p: string }; Returns: boolean }
+      pavilion_valid_polygon: { Args: { p: Json }; Returns: boolean }
+
       apply_company_import: {
         Args: { p_batch_id: string; p_edition_year?: number };
         Returns: Json;
