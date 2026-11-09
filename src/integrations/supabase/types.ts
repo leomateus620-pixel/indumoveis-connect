@@ -1404,6 +1404,7 @@ export type Database = {
           payload_sha256: string
           coordinate_system: Json
           bounds: Json
+          total_area_m2: number | null
           is_current: boolean
           created_at: string
         }
@@ -1420,6 +1421,7 @@ export type Database = {
           payload_sha256: string
           coordinate_system: Json
           bounds: Json
+          total_area_m2?: number | null
           is_current?: boolean
           created_at?: string
         }
@@ -1436,6 +1438,7 @@ export type Database = {
           payload_sha256?: string
           coordinate_system?: Json
           bounds?: Json
+          total_area_m2?: number | null
           is_current?: boolean
           created_at?: string
         }

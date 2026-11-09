@@ -38,6 +38,8 @@ export interface PavilionInteriorPlan {
   id: string;
   revision: number;
   pavilionNumber: number;
+  /** Declared total of the pavilion, including circulation. */
+  totalAreaM2?: number | null;
   bounds: { minX: number; minY: number; maxX: number; maxY: number };
   source: {
     revisionName: string;

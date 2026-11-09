@@ -256,23 +256,25 @@ describe("return from Pavilhão 1 interior", () => {
   });
 });
 
-describe("Pavilhão 13 interior entry and return", () => {
-  it("opens P13 through its primary access action and saves its edition and filters separately", async () => {
+describe("pavilion interior entry and return", () => {
+  it.each([8, 13] as const)("opens P%s and saves its own edition and filters", async (pavilion) => {
     const open = vi.fn();
     render(
       <CommercialMapWorkspace
         editionId="current-edition"
-        initialPavilionNumber={13}
+        initialPavilionNumber={pavilion}
         parkSearch={{ status: "disponivel", deal: "previous-deal" }}
         onOpenInterior={open}
       />,
     );
     fireEvent.click(await screen.findByRole("button", { name: "Acesso Interno" }));
-    expect(open).toHaveBeenCalledExactlyOnceWith(13);
-    const saved = JSON.parse(sessionStorage.getItem("indumoveis:pavilion-13:park-return:v1")!);
+    expect(open).toHaveBeenCalledExactlyOnceWith(pavilion);
+    const saved = JSON.parse(
+      sessionStorage.getItem(`indumoveis:pavilion-${pavilion}:park-return:v1`)!,
+    );
     expect(saved).toMatchObject({
       editionId: "current-edition",
-      selectionId: "indumoveis:pavilion:13",
+      selectionId: `indumoveis:pavilion:${pavilion}`,
       search: { status: "disponivel", deal: "previous-deal" },
     });
     expect(sessionStorage.getItem("indumoveis:pavilion-1:park-return:v1")).toBeNull();
@@ -309,7 +311,7 @@ describe("Pavilhão 13 interior entry and return", () => {
   });
 });
 
-it("keeps other pavilion sheets out of the two supported interior access flows", async () => {
+it("keeps pavilion sheets without interiors out of the access flow", async () => {
   const open = vi.fn();
   render(
     <CommercialMapWorkspace
