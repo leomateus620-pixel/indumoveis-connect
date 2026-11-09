@@ -17,14 +17,23 @@ const user = {
   created_at: "2026-01-01T00:00:00Z",
 };
 const editionId = "22222222-2222-4222-8222-222222222222";
-const plan = JSON.parse(
-  await readFile("src/features/pavilion-interior/plan.generated.json", "utf8"),
-);
-Object.assign(plan, {
-  editionId,
-  databasePlanId: "33333333-3333-4333-8333-333333333333",
-  revisionId: "44444444-4444-4444-8444-444444444444",
-});
+const plans = {};
+for (const pavilion of [1, 13]) {
+  const source = pavilion === 1 ? "plan.generated.json" : "pavilion13.generated.json";
+  const plan = JSON.parse(await readFile(`src/features/pavilion-interior/${source}`, "utf8"));
+  Object.assign(plan, {
+    editionId,
+    databasePlanId:
+      pavilion === 1
+        ? "33333333-3333-4333-8333-333333333333"
+        : "55555555-5555-4555-8555-555555555555",
+    revisionId:
+      pavilion === 1
+        ? "44444444-4444-4444-8444-444444444444"
+        : "66666666-6666-4666-8666-666666666666",
+  });
+  plans[pavilion] = plan;
+}
 const exp = Math.floor(Date.now() / 1000) + 86400;
 const encode = (v) => Buffer.from(JSON.stringify(v)).toString("base64url");
 const session = {
@@ -36,7 +45,6 @@ const session = {
   user,
 };
 const payloads = {
-  pavilion_plan_revisions: { id: plan.revisionId, revision: plan.revision },
   user_roles: [{ user_id: user.id, role: "admin" }],
   role_permissions: [],
   profiles: { id: user.id, full_name: "Prévia local" },
@@ -67,17 +75,36 @@ http
     }
     if (url.pathname === "/__qa/start") {
       res.setHeader("content-type", "text/html");
+      const requested = url.searchParams.get("pavilhao") === "13" ? 13 : 1;
       res.end(
-        `<script>localStorage.setItem('sb-127-auth-token',${JSON.stringify(JSON.stringify(session))});localStorage.setItem('indumoveis:map-quality','light');location.replace('/mapa/pavilhoes/1/interior')</script>`,
+        `<script>localStorage.setItem('sb-127-auth-token',${JSON.stringify(JSON.stringify(session))});localStorage.setItem('indumoveis:map-quality','light');location.replace('/mapa/pavilhoes/${requested}/interior')</script>`,
       );
       return;
     }
     if (url.pathname.startsWith("/auth/v1/") || url.pathname.startsWith("/rest/v1/")) {
       const name = url.pathname.split("/").at(-1);
+      let args = {};
+      if (req.method === "POST") {
+        const chunks = [];
+        for await (const chunk of req) chunks.push(chunk);
+        try {
+          args = JSON.parse(Buffer.concat(chunks).toString() || "{}");
+        } catch {
+          res.writeHead(400);
+          res.end();
+          return;
+        }
+      }
+      const pavilion = Number(
+        args.p_pavilion_number ?? url.searchParams.get("pavilion_number")?.replace("eq.", "") ?? 1,
+      );
+      const plan = plans[pavilion];
       let value;
       if (name === "user") value = user;
       else if (name === "ensure_profile") value = null;
-      else if (name === "get_pavilion_interior") value = plan;
+      else if (name === "pavilion_plan_revisions")
+        value = plan ? { id: plan.revisionId, revision: plan.revision } : null;
+      else if (name === "get_pavilion_interior") value = plan ?? null;
       else if (name === "get_pavilion_interior_commercial") value = {};
       else if (req.method === "GET" && name in payloads) value = payloads[name];
       else {

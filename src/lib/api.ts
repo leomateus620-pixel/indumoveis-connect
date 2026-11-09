@@ -422,11 +422,11 @@ export type PavilionInteriorPlan = PavilionPlan & {
 };
 export type PavilionInteriorCommercial = Record<string, { status: string; exhibitor?: string }>;
 
-export function usePavilionInteriorPlan(enabled = true) {
+export function usePavilionInteriorPlan(enabled = true, pavilionNumber = 1) {
   const editionId = useEditionId();
   const map = useCan("mapa");
   const current = useQuery<{ id: string; revision: number } | null>({
-    queryKey: qk.list("pavilion-interior-current", editionId, 1, map.read),
+    queryKey: qk.list("pavilion-interior-current", editionId, pavilionNumber, map.read),
     enabled: enabled && !!editionId && map.read,
     retry: 1,
     queryFn: ({ signal }) =>
@@ -435,7 +435,7 @@ export function usePavilionInteriorPlan(enabled = true) {
           .from("pavilion_plan_revisions")
           .select("id,revision")
           .eq("edition_id", editionId!)
-          .eq("pavilion_number", 1)
+          .eq("pavilion_number", pavilionNumber)
           .eq("is_current", true)
           .abortSignal(signal)
           .maybeSingle(),
@@ -445,7 +445,7 @@ export function usePavilionInteriorPlan(enabled = true) {
     queryKey: qk.list(
       "pavilion-interior",
       editionId,
-      1,
+      pavilionNumber,
       current.data?.revision,
       current.data?.id,
       map.read,
@@ -457,14 +457,19 @@ export function usePavilionInteriorPlan(enabled = true) {
         supabase
           .rpc("get_pavilion_interior", {
             p_edition_id: editionId!,
-            p_pavilion_number: 1,
+            p_pavilion_number: pavilionNumber,
             p_revision: current.data!.revision,
           })
           .abortSignal(signal),
       );
       const data = result as unknown as PavilionInteriorPlan | null;
-      if (data && (data.editionId !== editionId || data.revisionId !== current.data?.id))
-        throw new Error("A planta não pertence à edição e à revisão selecionadas.");
+      if (
+        data &&
+        (data.editionId !== editionId ||
+          data.revisionId !== current.data?.id ||
+          data.pavilionNumber !== pavilionNumber)
+      )
+        throw new Error("A planta não pertence à edição, ao pavilhão e à revisão selecionados.");
       return data;
     },
   });
@@ -477,7 +482,12 @@ export function usePavilionInteriorPlan(enabled = true) {
   };
 }
 
-export function usePavilionInteriorCommercial(planId?: string, revision?: number, enabled = true) {
+export function usePavilionInteriorCommercial(
+  planId?: string,
+  revision?: number,
+  enabled = true,
+  pavilionNumber = 1,
+) {
   const editionId = useEditionId();
   const map = useCan("mapa");
   const commercial = useCan("comercial");
@@ -488,6 +498,7 @@ export function usePavilionInteriorCommercial(planId?: string, revision?: number
       "spaces",
       "pavilion-interior",
       editionId,
+      pavilionNumber,
       planId,
       revision,
       permitted,
@@ -502,6 +513,7 @@ export function usePavilionInteriorCommercial(planId?: string, revision?: number
             p_edition_id: editionId!,
             p_floor_plan_id: planId!,
             p_revision: revision!,
+            p_pavilion_number: pavilionNumber,
           })
           .abortSignal(signal),
       );

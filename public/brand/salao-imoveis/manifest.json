@@ -1,0 +1,86 @@
+{
+  "name": "Salão de IMÓVEIS",
+  "visibleCopy": [
+    "Salão de",
+    "IMÓVEIS"
+  ],
+  "format": "Original font outlines and geometric line composition in SVG; transparent background; no embedded raster",
+  "palette": {
+    "graphite": "#302C2F",
+    "plum": "#643B54",
+    "urbanLine": "#8B7B65",
+    "suggestedBackground": "#F8F6F1"
+  },
+  "fonts": [
+    {
+      "family": "Figtree",
+      "weight": 500,
+      "license": "SIL OFL 1.1",
+      "source": "https://github.com/google/fonts/tree/main/ofl/figtree"
+    },
+    {
+      "family": "Figtree",
+      "weight": 600,
+      "license": "SIL OFL 1.1",
+      "source": "https://github.com/google/fonts/tree/main/ofl/figtree"
+    }
+  ],
+  "files": [
+    {
+      "name": "salao-imoveis-primary.svg",
+      "sha256": "9bec55adc1444598bee0af5357b3efb2d83a960ce5c6465046c8d91e188f1114",
+      "viewBox": [
+        0,
+        0,
+        430,
+        148
+      ]
+    },
+    {
+      "name": "salao-imoveis-compact.svg",
+      "sha256": "c30bde86966c9210c12e9744945971650fb520e0757fa5134ddba99f660c1db3",
+      "viewBox": [
+        0,
+        0,
+        324,
+        112
+      ]
+    },
+    {
+      "name": "salao-imoveis-monochrome.svg",
+      "sha256": "98bf3737ca7c8f00dc91a1d2a98701e01ca709794fde9d7576fc58c5cbaca2f8",
+      "viewBox": [
+        0,
+        0,
+        430,
+        148
+      ]
+    },
+    {
+      "name": "acesso-pavilhao-3.svg",
+      "sha256": "205f9e15928aec796df8ab16ff6353fa24000301be3f10d49cf471bdcbe8f200",
+      "viewBox": [
+        0,
+        0,
+        92,
+        104
+      ],
+      "label": "Pavilhão 3",
+      "side": "esquerda"
+    },
+    {
+      "name": "acesso-pavilhao-8.svg",
+      "sha256": "0fa2abe48914ba9fc18d3043dd1ad68f5a53d12ec5f171cd89d61c3cdaa0fb7c",
+      "viewBox": [
+        0,
+        0,
+        92,
+        104
+      ],
+      "label": "Pavilhão 8",
+      "side": "direita"
+    }
+  ],
+  "provenance": "Deterministic typesetting using licensed font curves and abstract facade planes. Not raster tracing. Creative Production exact-content and deterministic-exports instructions applied.",
+  "capabilityNote": "creative_production_board is not exposed by this session; no interactive board was created."
+}

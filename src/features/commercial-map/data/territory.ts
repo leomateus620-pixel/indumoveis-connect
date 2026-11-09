@@ -376,8 +376,7 @@ const pavilions: MapEntity[] = [
         sourcePoint([1098, 688.7159]),
         sourcePoint([1132, 688.7159]),
       ],
-      notes:
-        "850,5 m² é área total do edifício. RESERVADO impresso não gera estado comercial. Interior futuro deve verificar lacunas numéricas; nenhum estande criado nesta fase.",
+      notes: "O acesso interno permite localizar e consultar os 80 lotes do Salão de Imóveis.",
     },
   ),
   entity(

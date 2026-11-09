@@ -1,45 +1,77 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Maximize2, Minus, PanelLeft, Plus, Scan, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Maximize2,
+  Minus,
+  PanelLeft,
+  Plus,
+  Scan,
+  Search,
+  X,
+} from "lucide-react";
 import { SPACE_STATUS } from "@/lib/format";
 import { boundCamera, fitPlan, zoomPlan, type PlanCamera, type Viewport } from "./navigation";
 import type { PavilionPlan } from "./data";
+import {
+  PAVILION_PRESENTATIONS,
+  normalizedLotCode,
+  type InteriorPresentation,
+} from "./presentation";
 import "./interior.css";
+import {
+  parkPavilionNumber,
+  pavilionDestinationHref,
+  type ParkPavilionNumber,
+} from "./connections";
 
 type Props = {
   plan: PavilionPlan;
+  presentation?: InteriorPresentation;
   selectedCode?: string;
   commercial?: Record<string, { status: string; exhibitor?: string }>;
   commercialError?: boolean;
   onRetryCommercial?: () => void;
   onSelect: (code?: string) => void;
   onBack: () => void;
+  onConnect?: (pavilion: ParkPavilionNumber) => void;
 };
 const formatArea = (value: number) =>
   `${value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²`;
+const connectionBadge = { width: 92, height: 104, radius: 12, guideOffset: 24 };
 
 export function PavilionInterior({
   plan,
+  presentation = PAVILION_PRESENTATIONS[1],
   selectedCode,
   commercial = {},
   commercialError,
   onRetryCommercial,
   onSelect,
   onBack,
+  onConnect,
 }: Props) {
   const selected = plan.environments.find((e) => e.code === selectedCode);
+  const lotsMode = presentation.mode === "lots";
+  const [lotQuery, setLotQuery] = useState("");
+  const [searchError, setSearchError] = useState("");
   const [panelOpen, setPanelOpen] = useState(!!selected);
   const [mobile, setMobile] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
   const drawing = useRef<SVGGElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const sidebar = useRef<HTMLElement>(null);
+  const viewControls = useRef<HTMLDivElement>(null);
   const camera = useRef<PlanCamera>({ x: 0, y: 0, scale: 1 });
   const size = useRef<Viewport>({ width: 1, height: 1 });
   const initialized = useRef(false);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
-  const gesture = useRef<{ start: { x: number; y: number }; code?: string; moved: boolean } | null>(
-    null,
-  );
+  const gesture = useRef<{
+    start: { x: number; y: number };
+    code?: string;
+    destination?: ParkPavilionNumber;
+    moved: boolean;
+  } | null>(null);
   const paint = useCallback(
     (next: PlanCamera) => {
       camera.current = boundCamera(next, plan.bounds, size.current);
@@ -48,23 +80,33 @@ export function PavilionInterior({
       const fitted = fitPlan(plan.bounds, size.current).scale;
       svg.current?.classList.toggle("is-near", c.scale > fitted * 1.6);
       svg.current?.style.setProperty("--plan-scale", String(c.scale));
-      svg.current?.style.setProperty("--plan-number-size", `${Math.max(14, 10.5 / c.scale)}px`);
+      svg.current?.style.setProperty(
+        "--plan-number-size",
+        `${Math.min(presentation.numberLabelMaxSize ?? Infinity, Math.max(14, 10.5 / c.scale))}px`,
+      );
     },
-    [plan.bounds],
+    [plan.bounds, presentation.numberLabelMaxSize],
+  );
+  const fitViewport = useCallback(
+    (compact: boolean) => {
+      // In the narrow portrait view, the lot search toggle also needs clear space above the drawing.
+      const top = lotsMode && compact ? 48 : 0;
+      const next = fitPlan(
+        plan.bounds,
+        { ...size.current, height: Math.max(100, size.current.height - 72 - top) },
+        compact ? 20 : 40,
+      );
+      paint({ ...next, y: next.y + top });
+    },
+    [lotsMode, paint, plan.bounds],
   );
   const fit = useCallback(() => {
     if (mobile) {
       setPanelOpen(false);
       size.current.left = 0;
     }
-    paint(
-      fitPlan(
-        plan.bounds,
-        { ...size.current, height: Math.max(100, size.current.height - 72) },
-        mobile ? 20 : 40,
-      ),
-    );
-  }, [paint, plan.bounds, mobile]);
+    fitViewport(mobile);
+  }, [fitViewport, mobile]);
   const zoom = useCallback(
     (factor: number, x = size.current.width / 2, y = size.current.height / 2) => {
       paint(zoomPlan(camera.current, factor, { x, y }, plan.bounds, size.current));
@@ -78,15 +120,10 @@ export function PavilionInterior({
       const previous = size.current;
       const rect = host.getBoundingClientRect();
       size.current = { width: rect.width, height: rect.height };
-      setMobile(window.matchMedia("(max-width: 700px)").matches);
+      const compact = window.matchMedia("(max-width: 700px)").matches;
+      setMobile(compact);
       if (!initialized.current) {
-        paint(
-          fitPlan(
-            plan.bounds,
-            { ...size.current, height: Math.max(100, size.current.height - 72) },
-            rect.width < 700 ? 20 : 40,
-          ),
-        );
+        fitViewport(lotsMode ? compact : rect.width < 700);
         initialized.current = true;
       } else
         paint({
@@ -99,7 +136,7 @@ export function PavilionInterior({
     observer.observe(host);
     resize();
     return () => observer.disconnect();
-  }, [paint, plan.bounds]);
+  }, [fitViewport, lotsMode, paint]);
   // A desktop column is reserved from the first frame. Selecting never resets pan or zoom.
   // On mobile the sheet can collapse immediately, retaining the inspection context.
   useEffect(() => {
@@ -117,8 +154,8 @@ export function PavilionInterior({
         : 0;
     const left = sheet + 20,
       right = size.current.width - 20;
-    const top = 56,
-      bottom = size.current.height - 90;
+    const top = 56;
+    let bottom = size.current.height - 90;
     size.current.left = sheet;
     const points = selected.parts.flatMap((part) => part.polygon);
     if (!points.length) return;
@@ -138,6 +175,19 @@ export function PavilionInterior({
       const anchor = selected.label[0] * c.scale + c.x;
       dx = anchor < left ? left - anchor : anchor > right ? right - anchor : 0;
     }
+    if (lotsMode && mobile && panelOpen) {
+      const host = viewport.current?.getBoundingClientRect();
+      const tools = viewControls.current?.getBoundingClientRect();
+      if (
+        host &&
+        tools &&
+        tools.top - host.top > top + 20 &&
+        maxX + dx > tools.left - host.left &&
+        minX + dx < tools.right - host.left
+      ) {
+        bottom = Math.min(bottom, tools.top - host.top - 12);
+      }
+    }
     if (maxY - minY <= bottom - top)
       dy = minY < top ? top - minY : maxY > bottom ? bottom - maxY : 0;
     else {
@@ -145,7 +195,7 @@ export function PavilionInterior({
       dy = anchor < top ? top - anchor : anchor > bottom ? bottom - anchor : 0;
     }
     if (dx || dy) paint({ ...c, x: c.x + dx, y: c.y + dy });
-  }, [selected, mobile, panelOpen, paint]);
+  }, [selected, mobile, panelOpen, paint, lotsMode]);
   useEffect(() => {
     const node = svg.current;
     if (!node) return;
@@ -172,6 +222,13 @@ export function PavilionInterior({
     };
   }, [zoom]);
   const choose = (code?: string) => {
+    if (
+      lotsMode &&
+      code &&
+      !plan.environments.some((e) => e.code === code && e.kind === "commercial")
+    )
+      return;
+    setSearchError("");
     onSelect(code);
     if (code) setPanelOpen(true);
   };
@@ -187,6 +244,15 @@ export function PavilionInterior({
   const numEnvironments = plan.environments.filter((e) => /^\d{2}$/.test(e.code));
   const commercialInfo = selected?.kind === "commercial" ? commercial[selected.code] : undefined;
   const hasExternal = selected?.parts.some((part) => part.kind === "external");
+  const connections =
+    presentation.connections?.flatMap((connection) => {
+      const element = plan.architecture.find((item) => item.id === connection.elementId);
+      return element?.labelAt ? [{ ...connection, element, anchor: element.labelAt }] : [];
+    }) ?? [];
+  const openConnection = (destination: ParkPavilionNumber) => {
+    if (onConnect) onConnect(destination);
+    else window.location.assign(pavilionDestinationHref(destination));
+  };
   const stopGesture = (event: React.PointerEvent<SVGSVGElement>, cancelled = false) => {
     pointers.current.delete(event.pointerId);
     if (pointers.current.size) {
@@ -197,11 +263,14 @@ export function PavilionInterior({
     gesture.current = null;
     if (event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId);
-    if (!cancelled && candidate && !candidate.moved) choose(candidate.code);
+    if (!cancelled && candidate && !candidate.moved) {
+      if (candidate.destination) openConnection(candidate.destination);
+      else choose(candidate.code);
+    }
   };
   return (
     <main
-      className={`arq-interior ${panelOpen ? "is-panel-open" : ""}`}
+      className={`arq-interior is-pavilion-${presentation.pavilionNumber} ${panelOpen ? "is-panel-open" : ""}`}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           event.stopPropagation();
@@ -210,32 +279,66 @@ export function PavilionInterior({
       }}
     >
       <header className="arq-header">
-        <button className="arq-back" onClick={onBack}>
+        <button
+          className={`arq-back ${lotsMode ? "arq-back-compact" : ""}`}
+          onClick={onBack}
+          aria-label={lotsMode ? "Voltar ao parque" : undefined}
+          aria-describedby={lotsMode ? "pavilion-external-view-help" : undefined}
+        >
           <ArrowLeft size={17} />
-          <span>Voltar ao parque</span>
+          <span className={lotsMode ? "arq-sr-only" : undefined}>Voltar ao parque</span>
+          {lotsMode && (
+            <span role="tooltip" id="pavilion-external-view-help" className="arq-back-tooltip">
+              Voltar ao parque<small>Visualização externa</small>
+            </span>
+          )}
         </button>
-        <div className="arq-heading">
-          <span className="arq-eyebrow">Pavilhão 1</span>
-          <h1>Mostra ARQ & Design</h1>
-        </div>
-        <img
-          className="arq-signature"
-          src="/brand/arq-design/arq-design-compact.svg"
-          alt="ARQ & Design Indumóveis"
-          width="106"
-          height="81"
-        />
+        {lotsMode ? (
+          <>
+            <div className="arq-brand-led">
+              <img
+                className="arq-signature"
+                src={presentation.brandPath}
+                alt={presentation.brandAlt}
+                width="228"
+                height="79"
+              />
+              <h1 className="arq-sr-only">{presentation.title}</h1>
+            </div>
+            <span className="arq-pavilion-id">Pavilhão {presentation.pavilionNumber}</span>
+          </>
+        ) : (
+          <>
+            <div className="arq-heading">
+              <span className="arq-eyebrow">Pavilhão {presentation.pavilionNumber}</span>
+              <h1>{presentation.title}</h1>
+            </div>
+            <img
+              className="arq-signature"
+              src={presentation.brandPath}
+              alt={presentation.brandAlt}
+              width="106"
+              height="81"
+            />
+          </>
+        )}
       </header>
       <div className="arq-workspace">
         <aside
           ref={sidebar}
           className="arq-sidebar"
-          aria-label="Informações do ambiente"
+          aria-label={lotsMode ? "Informações do lote" : "Informações do ambiente"}
           hidden={mobile && !panelOpen}
         >
           <div className="arq-sidebar-top">
             <span className="arq-eyebrow">
-              {selected ? "Ambiente selecionado" : "Explore a mostra"}
+              {selected
+                ? lotsMode
+                  ? "Lote selecionado"
+                  : "Ambiente selecionado"
+                : lotsMode
+                  ? "Explore o salão"
+                  : "Explore a mostra"}
             </span>
             <button className="arq-icon" onClick={close} aria-label="Fechar painel e seleção">
               <X size={18} />
@@ -245,7 +348,13 @@ export function PavilionInterior({
             <div className="arq-information" key={selected.code}>
               {/^\d{2}$/.test(selected.code) && <span className="arq-number">{selected.code}</span>}
               <h2>{selected.name}</h2>
-              {selected.declaredAreaM2 != null && (
+              {lotsMode && (
+                <p className="arq-lot-context">
+                  Pavilhão {presentation.pavilionNumber}
+                  <span>{presentation.title}</span>
+                </p>
+              )}
+              {presentation.showAreas && selected.declaredAreaM2 != null && (
                 <p className="arq-area">
                   <span>Área</span>
                   <strong>{formatArea(selected.declaredAreaM2)}</strong>
@@ -288,53 +397,129 @@ export function PavilionInterior({
             </div>
           ) : (
             <div className="arq-intro">
-              <h2>
-                Arquitetura para
-                <br />
-                novos encontros.
-              </h2>
-              <p>Selecione um ambiente para conhecer o espaço.</p>
+              {lotsMode ? (
+                <h2>
+                  Encontre seu
+                  <br />
+                  próximo espaço.
+                </h2>
+              ) : (
+                <h2>
+                  Arquitetura para
+                  <br />
+                  novos encontros.
+                </h2>
+              )}
+              <p>
+                {lotsMode
+                  ? "Selecione um lote na planta ou busque pelo número."
+                  : "Selecione um ambiente para conhecer o espaço."}
+              </p>
               <div className="arq-index">
-                <strong>14</strong>
-                <span>espaços comerciais</span>
+                <strong>{presentation.commercialCount}</strong>
+                <span>{lotsMode ? "lotes individuais" : "espaços comerciais"}</span>
               </div>
             </div>
           )}
-          <nav className="arq-environments" aria-label="Selecionar ambiente">
-            <span className="arq-eyebrow">Ambientes</span>
-            <div className="arq-space-grid">
-              {numEnvironments.map((e) => (
-                <button
-                  key={e.id}
-                  onClick={() => choose(e.code)}
-                  aria-label={`${e.code} · ${e.name}`}
-                  aria-pressed={selected?.id === e.id}
-                >
-                  {e.code}
-                </button>
-              ))}
-            </div>
-            <button
-              className="arq-hall-link"
-              onClick={() => choose("salon")}
-              aria-pressed={selected?.code === "salon"}
+          {lotsMode ? (
+            <form
+              className="arq-lot-search"
+              noValidate
+              onSubmit={(event) => {
+                event.preventDefault();
+                const code = normalizedLotCode(lotQuery);
+                if (
+                  !code ||
+                  !plan.environments.some((e) => e.code === code && e.kind === "commercial")
+                ) {
+                  setSearchError("Informe um número de 01 a 80.");
+                  return;
+                }
+                setLotQuery(code);
+                choose(code);
+              }}
             >
-              Salão de Design <ArrowRight size={14} />
-            </button>
-          </nav>
+              <label htmlFor="pavilion-lot-search" className="arq-eyebrow">
+                Buscar lote
+              </label>
+              <div className="arq-lot-search-field">
+                <Search size={16} aria-hidden="true" />
+                <input
+                  id="pavilion-lot-search"
+                  type="search"
+                  inputMode="numeric"
+                  maxLength={2}
+                  placeholder="01–80"
+                  value={lotQuery}
+                  aria-invalid={!!searchError}
+                  aria-describedby={searchError ? "pavilion-lot-search-error" : undefined}
+                  onChange={(event) => {
+                    setLotQuery(event.target.value);
+                    setSearchError("");
+                  }}
+                />
+                <button type="submit" aria-label="Localizar lote">
+                  <ArrowRight size={17} />
+                </button>
+              </div>
+              {searchError && (
+                <p id="pavilion-lot-search-error" role="alert">
+                  {searchError}
+                </p>
+              )}
+            </form>
+          ) : (
+            <nav className="arq-environments" aria-label="Selecionar ambiente">
+              <span className="arq-eyebrow">Ambientes</span>
+              <div className="arq-space-grid">
+                {numEnvironments.map((e) => (
+                  <button
+                    key={e.id}
+                    onClick={() => choose(e.code)}
+                    aria-label={`${e.code} · ${e.name}`}
+                    aria-pressed={selected?.id === e.id}
+                  >
+                    {e.code}
+                  </button>
+                ))}
+              </div>
+              <button
+                className="arq-hall-link"
+                onClick={() => choose("salon")}
+                aria-pressed={selected?.code === "salon"}
+              >
+                Salão de Design <ArrowRight size={14} />
+              </button>
+            </nav>
+          )}
           <div className="arq-sidebar-footer">
-            <span className="arq-key">
-              <i />
-              Comercial
-            </span>
-            <span className="arq-key">
-              <i className="is-support" />
-              Apoio
-            </span>
-            <span className="arq-key">
-              <i className="is-external" />
-              Área externa
-            </span>
+            {lotsMode ? (
+              <>
+                <span className="arq-key">
+                  <i />
+                  Lotes
+                </span>
+                <span className="arq-key">
+                  <i className="is-support" />
+                  Circulação
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="arq-key">
+                  <i />
+                  Comercial
+                </span>
+                <span className="arq-key">
+                  <i className="is-support" />
+                  Apoio
+                </span>
+                <span className="arq-key">
+                  <i className="is-external" />
+                  Área externa
+                </span>
+              </>
+            )}
           </div>
         </aside>
         <div className="arq-canvas" ref={viewport}>
@@ -342,15 +527,19 @@ export function PavilionInterior({
             <button className="arq-panel-toggle" onClick={() => setPanelOpen(true)}>
               <PanelLeft size={17} />
               {selected
-                ? `${selected.code === "salon" ? "" : selected.code + " · "}${selected.name}`
-                : "Ambientes"}
+                ? lotsMode
+                  ? selected.name
+                  : `${selected.code === "salon" ? "" : selected.code + " · "}${selected.name}`
+                : lotsMode
+                  ? "Buscar lote"
+                  : "Ambientes"}
             </button>
           )}
           <svg
             ref={svg}
             className="arq-plan"
             role="group"
-            aria-label="Planta interativa do Pavilhão 1"
+            aria-label={`Planta interativa do Pavilhão ${presentation.pavilionNumber}`}
             aria-describedby="arq-navigation-help"
             tabIndex={0}
             onKeyDown={(event) => {
@@ -376,15 +565,20 @@ export function PavilionInterior({
             }}
             onPointerDown={(event) => {
               if (event.button !== 0) return;
+              const target = event.target as Element;
               const code =
-                (event.target as Element)
-                  .closest("[data-environment]")
-                  ?.getAttribute("data-environment") ?? undefined;
+                target.closest("[data-environment]")?.getAttribute("data-environment") ?? undefined;
+              const destination = parkPavilionNumber(
+                target.closest("[data-pavilion-access]")?.getAttribute("data-pavilion-access"),
+              );
+              if (destination && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey))
+                return;
               pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
               if (pointers.current.size === 1)
                 gesture.current = {
                   start: { x: event.clientX, y: event.clientY },
                   code,
+                  destination,
                   moved: false,
                 };
               else if (gesture.current) gesture.current.moved = true;
@@ -434,6 +628,52 @@ export function PavilionInterior({
             onPointerCancel={(e) => stopGesture(e, true)}
           >
             <g ref={drawing}>
+              {connections.map(({ element, anchor, destination, icon }) => {
+                const { width, height, radius, guideOffset } = connectionBadge;
+                const x = anchor[0] - width / 2;
+                const y = anchor[1] - guideOffset - height / 2;
+                const href = pavilionDestinationHref(destination);
+                return (
+                  <g key={element.id}>
+                    <path className="arq-connection-guide" d={element.path} aria-hidden="true" />
+                    <a
+                      className="arq-connection"
+                      data-pavilion-access={destination}
+                      href={href}
+                      tabIndex={0}
+                      aria-label={`Acesso ao Pavilhão ${destination}`}
+                      onClick={(event) => {
+                        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+                          return;
+                        // Pointer navigation is owned by the same click-versus-pan threshold as lots.
+                        event.preventDefault();
+                        if (event.detail === 0) openConnection(destination);
+                      }}
+                    >
+                      <title>
+                        {href.startsWith("/mapa?") ? "Localizar no mapa externo" : "Abrir interior"}
+                      </title>
+                      <rect
+                        className="arq-connection-hit"
+                        x={x}
+                        y={y}
+                        width={width}
+                        height={height}
+                        rx={radius}
+                      />
+                      <image
+                        href={icon}
+                        x={x}
+                        y={y}
+                        width={width}
+                        height={height}
+                        aria-hidden="true"
+                        pointerEvents="none"
+                      />
+                    </a>
+                  </g>
+                );
+              })}
               {plan.environments.map((environment) => (
                 <g
                   key={environment.id}
@@ -474,7 +714,7 @@ export function PavilionInterior({
                   >
                     {/^\d/.test(environment.code) ? environment.code : environment.name}
                   </text>
-                  {/^\d/.test(environment.code) && (
+                  {presentation.showAreas && /^\d/.test(environment.code) && (
                     <text
                       x={environment.label[0]}
                       y={environment.label[1] + 17}
@@ -505,20 +745,25 @@ export function PavilionInterior({
                 </g>
               ))}
               <g className="arq-architecture" aria-hidden="true">
-                {plan.architecture.map((element) => (
-                  <g key={element.id} className={`is-${element.kind}`}>
-                    <path d={element.path} style={{ strokeWidth: element.strokeWidth }} />
-                    {element.label && element.labelAt && (
-                      <text x={element.labelAt[0]} y={element.labelAt[1]} textAnchor="middle">
-                        {element.label}
-                      </text>
-                    )}
-                  </g>
-                ))}
+                {plan.architecture
+                  .filter(
+                    (element) =>
+                      !connections.some((connection) => connection.element.id === element.id),
+                  )
+                  .map((element) => (
+                    <g key={element.id} className={`is-${element.kind}`}>
+                      <path d={element.path} style={{ strokeWidth: element.strokeWidth }} />
+                      {element.label && element.labelAt && (
+                        <text x={element.labelAt[0]} y={element.labelAt[1]} textAnchor="middle">
+                          {element.label}
+                        </text>
+                      )}
+                    </g>
+                  ))}
               </g>
             </g>
           </svg>
-          <div className="arq-view-controls" aria-label="Controles da planta">
+          <div ref={viewControls} className="arq-view-controls" aria-label="Controles da planta">
             <button className="arq-icon" aria-label="Aproximar" onClick={() => zoom(1.35)}>
               <Plus size={19} />
             </button>
@@ -548,8 +793,10 @@ export function PavilionInterior({
           </span>
           <span className="arq-sr-only" aria-live="polite">
             {selected
-              ? `${/^\d/.test(selected.code) ? selected.code + " " : ""}${selected.name}${selected.declaredAreaM2 != null ? ", " + formatArea(selected.declaredAreaM2) : ""}`
-              : "Nenhum ambiente selecionado"}
+              ? `${!lotsMode && /^\d/.test(selected.code) ? selected.code + " " : ""}${selected.name}${presentation.showAreas && selected.declaredAreaM2 != null ? ", " + formatArea(selected.declaredAreaM2) : ""}`
+              : lotsMode
+                ? "Nenhum lote selecionado"
+                : "Nenhum ambiente selecionado"}
           </span>
         </div>
       </div>

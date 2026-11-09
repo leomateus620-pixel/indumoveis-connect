@@ -1,3 +1,46 @@
+# Pavilhão 13 — Salão de Imóveis — Design QA, 08/11/2026
+
+final result: passed
+
+A revisão comparou a página vetorial do PDF com a planta 2D e examinou os dois
+vãos laterais em detalhe. A sequência das três faixas, o centro contínuo, a
+entrada inferior e os fundos no alto correspondem à organização documental.
+Os 80 módulos usam dimensões visuais uniformes e números individuais. A
+verificação geométrica confirmou 80 anéis válidos sem interseções de área.
+[Fonte e coordenadas](docs/pavilion-interior/pavilion13-geometry.md),
+[comparação de geometria](docs/validation/pavilion-13/geometry-comparison.jpg) e
+[comparação dos acessos](docs/validation/pavilion-13/connections-comparison.jpg).
+
+| Janela CSS | Estado inspecionado | Evidência |
+|---|---|---|
+| 1440 × 900 | Planta inteira, cabeçalho e foco no botão de retorno | [Desktop](docs/validation/pavilion-13/desktop-full.jpg), [cabeçalho](docs/validation/pavilion-13/header-final.jpg) e [foco](docs/validation/pavilion-13/header-return-focus.jpg) |
+| 1366 × 768 | Planta inteira e controles no espaço livre | [Notebook](docs/validation/pavilion-13/notebook-full.jpg) |
+| 834 × 1112 | Planta inteira e coluna esquerda reservada | [Tablet](docs/validation/pavilion-13/tablet-full.jpg) |
+| 390 × 844 | Planta inteira e painel esquerdo com lote selecionado | [Celular](docs/validation/pavilion-13/mobile-full.jpg), [lote 63](docs/validation/pavilion-13/mobile-lot-63.jpg) e [lote 80](docs/validation/pavilion-13/mobile-lot-80.jpg) |
+| 378 × 465 | Numeração ajustada à altura disponível | [Janela compacta](docs/validation/pavilion-13/mobile-compact.jpg) |
+
+O cabeçalho reúne uma assinatura horizontal à esquerda e o botão compacto
+**Voltar ao parque**. A dica **Visualização externa** aparece no hover e no
+foco do botão. As placas verticais estreitas P3 e P8 ocupam os respectivos vãos
+laterais. O formato deixa mais espaço livre ao redor da sinalização e mantém a
+hierarquia dos números dos lotes. [Detalhe dos acessos](docs/validation/pavilion-13/connections-detail.jpg).
+
+No navegador, a revisão percorreu arraste, zoom, seleção e fechamento do painel.
+Fechar conservou a posição e a escala. Links diretos foram recarregados no P13
+e no espaço 12 do P1. A entrada pela ficha externa e o retorno pelo botão e
+pelo histórico chegaram ao P13. Os acessos laterais abriram as fichas externas
+do Pavilhão 3 à esquerda e do Pavilhão 8 à direita. [Entrada](docs/validation/pavilion-13/park-entry.jpg),
+[retorno](docs/validation/pavilion-13/park-return.jpg) e [regressão P1](docs/validation/pavilion-13/p1-regression.jpg).
+
+A rodada de desenvolvimento passou com build de produção, TypeScript, ESLint
+dos arquivos alterados e 579 testes em 86 arquivos. No Chrome com toque emulado
+(390 × 844), uma pinça elevou a escala de 0,497 a 0,956 sem selecionar um lote;
+um toque no lote 63 abriu o painel. A revisão visual usou sessão local controlada
+e as permissões foram verificadas separadamente no banco real. A validação em
+aparelho físico e a conferência de um expositor real em produção ficaram pendentes. [Comprovação no banco](docs/validation/pavilion-13/database-application.json).
+
+---
+
 # Pavilhão 1 — Mostra ARQ & Design — Design QA, 08/11/2026
 
 final result: passed

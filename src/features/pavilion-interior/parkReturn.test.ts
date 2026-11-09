@@ -76,3 +76,48 @@ describe("return from Mostra to the park", () => {
     expect(readParkReturn("edition-current")).toBeNull();
   });
 });
+
+describe("isolated park return contexts for P1 and P13", () => {
+  const p13: ParkReturn = {
+    editionId: "edition-current",
+    selectionId: "indumoveis:pavilion:13",
+    camera: { kind: "2d", x: 230, y: 84, width: 24, height: 16 },
+    view: "top",
+    orientationFree: false,
+    search: { status: "em_negociacao", deal: "p13-context-deal" },
+  };
+
+  it("keeps both saved cameras and filters while the latest visit selects the default return", () => {
+    saveParkReturn(session);
+    saveParkReturn(p13);
+    expect(readParkReturn("edition-current", 1)).toEqual(session);
+    expect(readParkReturn("edition-current", 13)).toEqual(p13);
+    expect(readParkReturn("edition-current")).toEqual(p13);
+    saveParkReturn(session);
+    expect(readParkReturn("edition-current")).toEqual(session);
+    expect(readParkReturn("edition-current", 13)).toEqual(p13);
+  });
+
+  it("uses a valid direct-entry fallback when only the other pavilion has saved context", () => {
+    saveParkReturn(session);
+    expect(readParkReturn("edition-current", 13)).toBeNull();
+    sessionStorage.clear();
+    saveParkReturn(p13);
+    expect(readParkReturn("edition-current", 1)).toBeNull();
+    expect(readParkReturn("another-edition", 13)).toBeNull();
+  });
+
+  it("rejects a cross-pavilion payload even when stored under the requested pavilion's key", () => {
+    saveParkReturn(session);
+    sessionStorage.setItem("indumoveis:pavilion-13:park-return:v1", JSON.stringify(session));
+    expect(readParkReturn("edition-current", 13)).toBeNull();
+    expect(readParkReturn("edition-current", 1)).toEqual(session);
+  });
+
+  it("does not let an unsupported building replace the saved return destination", () => {
+    saveParkReturn(p13);
+    saveParkReturn({ ...session, selectionId: "indumoveis:pavilion:14" });
+    expect(readParkReturn("edition-current")).toEqual(p13);
+    expect(readParkReturn("edition-current", 13)).toEqual(p13);
+  });
+});

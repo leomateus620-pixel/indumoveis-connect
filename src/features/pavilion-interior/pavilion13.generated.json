@@ -1,0 +1,1828 @@
+{
+  "id": "indumoveis:pavilion:13:salao-imoveis",
+  "revision": 2,
+  "pavilionNumber": 13,
+  "bounds": {
+    "minX": 32,
+    "minY": 52,
+    "maxX": 688,
+    "maxY": 1230
+  },
+  "source": {
+    "revisionName": "pavilhao-13-rev07-2026-08-17-display-v2",
+    "document": "Pav 13 - 07 - 17.08.26.pdf",
+    "page": 1,
+    "sha256": "5d33bd55d353021ba18f6e3cc6114544723f8ed292b149e0aab628625187ef67",
+    "pageWidth": 557.693,
+    "pageHeight": 815.338,
+    "coordinateSystem": "Local schematic units; origin top-left; x right; y down; uniform 112 by 30 modules; no metric conversion"
+  },
+  "environments": [
+    {
+      "id": "indumoveis:pavilion:13:environment:01",
+      "code": "01",
+      "name": "Lote 01",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 1119.0],
+      "parts": [
+        {
+          "id": "01:interior",
+          "kind": "interior",
+          "path": "M528 1104 L640 1104 L640 1134 L528 1134 Z",
+          "polygon": [
+            [528, 1104],
+            [640, 1104],
+            [640, 1134],
+            [528, 1134],
+            [528, 1104]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:02",
+      "code": "02",
+      "name": "Lote 02",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 1089.0],
+      "parts": [
+        {
+          "id": "02:interior",
+          "kind": "interior",
+          "path": "M528 1074 L640 1074 L640 1104 L528 1104 Z",
+          "polygon": [
+            [528, 1074],
+            [640, 1074],
+            [640, 1104],
+            [528, 1104],
+            [528, 1074]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:03",
+      "code": "03",
+      "name": "Lote 03",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 1059.0],
+      "parts": [
+        {
+          "id": "03:interior",
+          "kind": "interior",
+          "path": "M528 1044 L640 1044 L640 1074 L528 1074 Z",
+          "polygon": [
+            [528, 1044],
+            [640, 1044],
+            [640, 1074],
+            [528, 1074],
+            [528, 1044]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:04",
+      "code": "04",
+      "name": "Lote 04",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 1029.0],
+      "parts": [
+        {
+          "id": "04:interior",
+          "kind": "interior",
+          "path": "M528 1014 L640 1014 L640 1044 L528 1044 Z",
+          "polygon": [
+            [528, 1014],
+            [640, 1014],
+            [640, 1044],
+            [528, 1044],
+            [528, 1014]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:05",
+      "code": "05",
+      "name": "Lote 05",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 999.0],
+      "parts": [
+        {
+          "id": "05:interior",
+          "kind": "interior",
+          "path": "M528 984 L640 984 L640 1014 L528 1014 Z",
+          "polygon": [
+            [528, 984],
+            [640, 984],
+            [640, 1014],
+            [528, 1014],
+            [528, 984]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:06",
+      "code": "06",
+      "name": "Lote 06",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 969.0],
+      "parts": [
+        {
+          "id": "06:interior",
+          "kind": "interior",
+          "path": "M528 954 L640 954 L640 984 L528 984 Z",
+          "polygon": [
+            [528, 954],
+            [640, 954],
+            [640, 984],
+            [528, 984],
+            [528, 954]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:07",
+      "code": "07",
+      "name": "Lote 07",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 939.0],
+      "parts": [
+        {
+          "id": "07:interior",
+          "kind": "interior",
+          "path": "M528 924 L640 924 L640 954 L528 954 Z",
+          "polygon": [
+            [528, 924],
+            [640, 924],
+            [640, 954],
+            [528, 954],
+            [528, 924]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:08",
+      "code": "08",
+      "name": "Lote 08",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 909.0],
+      "parts": [
+        {
+          "id": "08:interior",
+          "kind": "interior",
+          "path": "M528 894 L640 894 L640 924 L528 924 Z",
+          "polygon": [
+            [528, 894],
+            [640, 894],
+            [640, 924],
+            [528, 924],
+            [528, 894]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:09",
+      "code": "09",
+      "name": "Lote 09",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 879.0],
+      "parts": [
+        {
+          "id": "09:interior",
+          "kind": "interior",
+          "path": "M528 864 L640 864 L640 894 L528 894 Z",
+          "polygon": [
+            [528, 864],
+            [640, 864],
+            [640, 894],
+            [528, 894],
+            [528, 864]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:10",
+      "code": "10",
+      "name": "Lote 10",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 849.0],
+      "parts": [
+        {
+          "id": "10:interior",
+          "kind": "interior",
+          "path": "M528 834 L640 834 L640 864 L528 864 Z",
+          "polygon": [
+            [528, 834],
+            [640, 834],
+            [640, 864],
+            [528, 864],
+            [528, 834]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:11",
+      "code": "11",
+      "name": "Lote 11",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 819.0],
+      "parts": [
+        {
+          "id": "11:interior",
+          "kind": "interior",
+          "path": "M528 804 L640 804 L640 834 L528 834 Z",
+          "polygon": [
+            [528, 804],
+            [640, 804],
+            [640, 834],
+            [528, 834],
+            [528, 804]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:12",
+      "code": "12",
+      "name": "Lote 12",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 789.0],
+      "parts": [
+        {
+          "id": "12:interior",
+          "kind": "interior",
+          "path": "M528 774 L640 774 L640 804 L528 804 Z",
+          "polygon": [
+            [528, 774],
+            [640, 774],
+            [640, 804],
+            [528, 804],
+            [528, 774]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:13",
+      "code": "13",
+      "name": "Lote 13",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 759.0],
+      "parts": [
+        {
+          "id": "13:interior",
+          "kind": "interior",
+          "path": "M528 744 L640 744 L640 774 L528 774 Z",
+          "polygon": [
+            [528, 744],
+            [640, 744],
+            [640, 774],
+            [528, 774],
+            [528, 744]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:14",
+      "code": "14",
+      "name": "Lote 14",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 729.0],
+      "parts": [
+        {
+          "id": "14:interior",
+          "kind": "interior",
+          "path": "M528 714 L640 714 L640 744 L528 744 Z",
+          "polygon": [
+            [528, 714],
+            [640, 714],
+            [640, 744],
+            [528, 744],
+            [528, 714]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:15",
+      "code": "15",
+      "name": "Lote 15",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 555.0],
+      "parts": [
+        {
+          "id": "15:interior",
+          "kind": "interior",
+          "path": "M528 540 L640 540 L640 570 L528 570 Z",
+          "polygon": [
+            [528, 540],
+            [640, 540],
+            [640, 570],
+            [528, 570],
+            [528, 540]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:16",
+      "code": "16",
+      "name": "Lote 16",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 525.0],
+      "parts": [
+        {
+          "id": "16:interior",
+          "kind": "interior",
+          "path": "M528 510 L640 510 L640 540 L528 540 Z",
+          "polygon": [
+            [528, 510],
+            [640, 510],
+            [640, 540],
+            [528, 540],
+            [528, 510]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:17",
+      "code": "17",
+      "name": "Lote 17",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 495.0],
+      "parts": [
+        {
+          "id": "17:interior",
+          "kind": "interior",
+          "path": "M528 480 L640 480 L640 510 L528 510 Z",
+          "polygon": [
+            [528, 480],
+            [640, 480],
+            [640, 510],
+            [528, 510],
+            [528, 480]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:18",
+      "code": "18",
+      "name": "Lote 18",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 465.0],
+      "parts": [
+        {
+          "id": "18:interior",
+          "kind": "interior",
+          "path": "M528 450 L640 450 L640 480 L528 480 Z",
+          "polygon": [
+            [528, 450],
+            [640, 450],
+            [640, 480],
+            [528, 480],
+            [528, 450]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:19",
+      "code": "19",
+      "name": "Lote 19",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 435.0],
+      "parts": [
+        {
+          "id": "19:interior",
+          "kind": "interior",
+          "path": "M528 420 L640 420 L640 450 L528 450 Z",
+          "polygon": [
+            [528, 420],
+            [640, 420],
+            [640, 450],
+            [528, 450],
+            [528, 420]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:20",
+      "code": "20",
+      "name": "Lote 20",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 405.0],
+      "parts": [
+        {
+          "id": "20:interior",
+          "kind": "interior",
+          "path": "M528 390 L640 390 L640 420 L528 420 Z",
+          "polygon": [
+            [528, 390],
+            [640, 390],
+            [640, 420],
+            [528, 420],
+            [528, 390]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:21",
+      "code": "21",
+      "name": "Lote 21",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 375.0],
+      "parts": [
+        {
+          "id": "21:interior",
+          "kind": "interior",
+          "path": "M528 360 L640 360 L640 390 L528 390 Z",
+          "polygon": [
+            [528, 360],
+            [640, 360],
+            [640, 390],
+            [528, 390],
+            [528, 360]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:22",
+      "code": "22",
+      "name": "Lote 22",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 345.0],
+      "parts": [
+        {
+          "id": "22:interior",
+          "kind": "interior",
+          "path": "M528 330 L640 330 L640 360 L528 360 Z",
+          "polygon": [
+            [528, 330],
+            [640, 330],
+            [640, 360],
+            [528, 360],
+            [528, 330]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:23",
+      "code": "23",
+      "name": "Lote 23",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 315.0],
+      "parts": [
+        {
+          "id": "23:interior",
+          "kind": "interior",
+          "path": "M528 300 L640 300 L640 330 L528 330 Z",
+          "polygon": [
+            [528, 300],
+            [640, 300],
+            [640, 330],
+            [528, 330],
+            [528, 300]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:24",
+      "code": "24",
+      "name": "Lote 24",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 285.0],
+      "parts": [
+        {
+          "id": "24:interior",
+          "kind": "interior",
+          "path": "M528 270 L640 270 L640 300 L528 300 Z",
+          "polygon": [
+            [528, 270],
+            [640, 270],
+            [640, 300],
+            [528, 300],
+            [528, 270]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:25",
+      "code": "25",
+      "name": "Lote 25",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 255.0],
+      "parts": [
+        {
+          "id": "25:interior",
+          "kind": "interior",
+          "path": "M528 240 L640 240 L640 270 L528 270 Z",
+          "polygon": [
+            [528, 240],
+            [640, 240],
+            [640, 270],
+            [528, 270],
+            [528, 240]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:26",
+      "code": "26",
+      "name": "Lote 26",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 225.0],
+      "parts": [
+        {
+          "id": "26:interior",
+          "kind": "interior",
+          "path": "M528 210 L640 210 L640 240 L528 240 Z",
+          "polygon": [
+            [528, 210],
+            [640, 210],
+            [640, 240],
+            [528, 240],
+            [528, 210]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:27",
+      "code": "27",
+      "name": "Lote 27",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 195.0],
+      "parts": [
+        {
+          "id": "27:interior",
+          "kind": "interior",
+          "path": "M528 180 L640 180 L640 210 L528 210 Z",
+          "polygon": [
+            [528, 180],
+            [640, 180],
+            [640, 210],
+            [528, 210],
+            [528, 180]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:28",
+      "code": "28",
+      "name": "Lote 28",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 165.0],
+      "parts": [
+        {
+          "id": "28:interior",
+          "kind": "interior",
+          "path": "M528 150 L640 150 L640 180 L528 180 Z",
+          "polygon": [
+            [528, 150],
+            [640, 150],
+            [640, 180],
+            [528, 180],
+            [528, 150]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:29",
+      "code": "29",
+      "name": "Lote 29",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [584.0, 135.0],
+      "parts": [
+        {
+          "id": "29:interior",
+          "kind": "interior",
+          "path": "M528 120 L640 120 L640 150 L528 150 Z",
+          "polygon": [
+            [528, 120],
+            [640, 120],
+            [640, 150],
+            [528, 150],
+            [528, 120]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:30",
+      "code": "30",
+      "name": "Lote 30",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 855.0],
+      "parts": [
+        {
+          "id": "30:interior",
+          "kind": "interior",
+          "path": "M304 840 L416 840 L416 870 L304 870 Z",
+          "polygon": [
+            [304, 840],
+            [416, 840],
+            [416, 870],
+            [304, 870],
+            [304, 840]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:31",
+      "code": "31",
+      "name": "Lote 31",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 825.0],
+      "parts": [
+        {
+          "id": "31:interior",
+          "kind": "interior",
+          "path": "M304 810 L416 810 L416 840 L304 840 Z",
+          "polygon": [
+            [304, 810],
+            [416, 810],
+            [416, 840],
+            [304, 840],
+            [304, 810]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:32",
+      "code": "32",
+      "name": "Lote 32",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 795.0],
+      "parts": [
+        {
+          "id": "32:interior",
+          "kind": "interior",
+          "path": "M304 780 L416 780 L416 810 L304 810 Z",
+          "polygon": [
+            [304, 780],
+            [416, 780],
+            [416, 810],
+            [304, 810],
+            [304, 780]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:33",
+      "code": "33",
+      "name": "Lote 33",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 765.0],
+      "parts": [
+        {
+          "id": "33:interior",
+          "kind": "interior",
+          "path": "M304 750 L416 750 L416 780 L304 780 Z",
+          "polygon": [
+            [304, 750],
+            [416, 750],
+            [416, 780],
+            [304, 780],
+            [304, 750]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:34",
+      "code": "34",
+      "name": "Lote 34",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 735.0],
+      "parts": [
+        {
+          "id": "34:interior",
+          "kind": "interior",
+          "path": "M304 720 L416 720 L416 750 L304 750 Z",
+          "polygon": [
+            [304, 720],
+            [416, 720],
+            [416, 750],
+            [304, 750],
+            [304, 720]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:35",
+      "code": "35",
+      "name": "Lote 35",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 705.0],
+      "parts": [
+        {
+          "id": "35:interior",
+          "kind": "interior",
+          "path": "M304 690 L416 690 L416 720 L304 720 Z",
+          "polygon": [
+            [304, 690],
+            [416, 690],
+            [416, 720],
+            [304, 720],
+            [304, 690]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:36",
+      "code": "36",
+      "name": "Lote 36",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 675.0],
+      "parts": [
+        {
+          "id": "36:interior",
+          "kind": "interior",
+          "path": "M304 660 L416 660 L416 690 L304 690 Z",
+          "polygon": [
+            [304, 660],
+            [416, 660],
+            [416, 690],
+            [304, 690],
+            [304, 660]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:37",
+      "code": "37",
+      "name": "Lote 37",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 645.0],
+      "parts": [
+        {
+          "id": "37:interior",
+          "kind": "interior",
+          "path": "M304 630 L416 630 L416 660 L304 660 Z",
+          "polygon": [
+            [304, 630],
+            [416, 630],
+            [416, 660],
+            [304, 660],
+            [304, 630]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:38",
+      "code": "38",
+      "name": "Lote 38",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 615.0],
+      "parts": [
+        {
+          "id": "38:interior",
+          "kind": "interior",
+          "path": "M304 600 L416 600 L416 630 L304 630 Z",
+          "polygon": [
+            [304, 600],
+            [416, 600],
+            [416, 630],
+            [304, 630],
+            [304, 600]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:39",
+      "code": "39",
+      "name": "Lote 39",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 585.0],
+      "parts": [
+        {
+          "id": "39:interior",
+          "kind": "interior",
+          "path": "M304 570 L416 570 L416 600 L304 600 Z",
+          "polygon": [
+            [304, 570],
+            [416, 570],
+            [416, 600],
+            [304, 600],
+            [304, 570]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:40",
+      "code": "40",
+      "name": "Lote 40",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 555.0],
+      "parts": [
+        {
+          "id": "40:interior",
+          "kind": "interior",
+          "path": "M304 540 L416 540 L416 570 L304 570 Z",
+          "polygon": [
+            [304, 540],
+            [416, 540],
+            [416, 570],
+            [304, 570],
+            [304, 540]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:41",
+      "code": "41",
+      "name": "Lote 41",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 525.0],
+      "parts": [
+        {
+          "id": "41:interior",
+          "kind": "interior",
+          "path": "M304 510 L416 510 L416 540 L304 540 Z",
+          "polygon": [
+            [304, 510],
+            [416, 510],
+            [416, 540],
+            [304, 540],
+            [304, 510]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:42",
+      "code": "42",
+      "name": "Lote 42",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 495.0],
+      "parts": [
+        {
+          "id": "42:interior",
+          "kind": "interior",
+          "path": "M304 480 L416 480 L416 510 L304 510 Z",
+          "polygon": [
+            [304, 480],
+            [416, 480],
+            [416, 510],
+            [304, 510],
+            [304, 480]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:43",
+      "code": "43",
+      "name": "Lote 43",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 465.0],
+      "parts": [
+        {
+          "id": "43:interior",
+          "kind": "interior",
+          "path": "M304 450 L416 450 L416 480 L304 480 Z",
+          "polygon": [
+            [304, 450],
+            [416, 450],
+            [416, 480],
+            [304, 480],
+            [304, 450]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:44",
+      "code": "44",
+      "name": "Lote 44",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 435.0],
+      "parts": [
+        {
+          "id": "44:interior",
+          "kind": "interior",
+          "path": "M304 420 L416 420 L416 450 L304 450 Z",
+          "polygon": [
+            [304, 420],
+            [416, 420],
+            [416, 450],
+            [304, 450],
+            [304, 420]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:45",
+      "code": "45",
+      "name": "Lote 45",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 405.0],
+      "parts": [
+        {
+          "id": "45:interior",
+          "kind": "interior",
+          "path": "M304 390 L416 390 L416 420 L304 420 Z",
+          "polygon": [
+            [304, 390],
+            [416, 390],
+            [416, 420],
+            [304, 420],
+            [304, 390]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:46",
+      "code": "46",
+      "name": "Lote 46",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 375.0],
+      "parts": [
+        {
+          "id": "46:interior",
+          "kind": "interior",
+          "path": "M304 360 L416 360 L416 390 L304 390 Z",
+          "polygon": [
+            [304, 360],
+            [416, 360],
+            [416, 390],
+            [304, 390],
+            [304, 360]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:47",
+      "code": "47",
+      "name": "Lote 47",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 345.0],
+      "parts": [
+        {
+          "id": "47:interior",
+          "kind": "interior",
+          "path": "M304 330 L416 330 L416 360 L304 360 Z",
+          "polygon": [
+            [304, 330],
+            [416, 330],
+            [416, 360],
+            [304, 360],
+            [304, 330]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:48",
+      "code": "48",
+      "name": "Lote 48",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 315.0],
+      "parts": [
+        {
+          "id": "48:interior",
+          "kind": "interior",
+          "path": "M304 300 L416 300 L416 330 L304 330 Z",
+          "polygon": [
+            [304, 300],
+            [416, 300],
+            [416, 330],
+            [304, 330],
+            [304, 300]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:49",
+      "code": "49",
+      "name": "Lote 49",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 285.0],
+      "parts": [
+        {
+          "id": "49:interior",
+          "kind": "interior",
+          "path": "M304 270 L416 270 L416 300 L304 300 Z",
+          "polygon": [
+            [304, 270],
+            [416, 270],
+            [416, 300],
+            [304, 300],
+            [304, 270]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:50",
+      "code": "50",
+      "name": "Lote 50",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 255.0],
+      "parts": [
+        {
+          "id": "50:interior",
+          "kind": "interior",
+          "path": "M304 240 L416 240 L416 270 L304 270 Z",
+          "polygon": [
+            [304, 240],
+            [416, 240],
+            [416, 270],
+            [304, 270],
+            [304, 240]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:51",
+      "code": "51",
+      "name": "Lote 51",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [360.0, 225.0],
+      "parts": [
+        {
+          "id": "51:interior",
+          "kind": "interior",
+          "path": "M304 210 L416 210 L416 240 L304 240 Z",
+          "polygon": [
+            [304, 210],
+            [416, 210],
+            [416, 240],
+            [304, 240],
+            [304, 210]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:52",
+      "code": "52",
+      "name": "Lote 52",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 135.0],
+      "parts": [
+        {
+          "id": "52:interior",
+          "kind": "interior",
+          "path": "M80 120 L192 120 L192 150 L80 150 Z",
+          "polygon": [
+            [80, 120],
+            [192, 120],
+            [192, 150],
+            [80, 150],
+            [80, 120]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:53",
+      "code": "53",
+      "name": "Lote 53",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 165.0],
+      "parts": [
+        {
+          "id": "53:interior",
+          "kind": "interior",
+          "path": "M80 150 L192 150 L192 180 L80 180 Z",
+          "polygon": [
+            [80, 150],
+            [192, 150],
+            [192, 180],
+            [80, 180],
+            [80, 150]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:54",
+      "code": "54",
+      "name": "Lote 54",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 195.0],
+      "parts": [
+        {
+          "id": "54:interior",
+          "kind": "interior",
+          "path": "M80 180 L192 180 L192 210 L80 210 Z",
+          "polygon": [
+            [80, 180],
+            [192, 180],
+            [192, 210],
+            [80, 210],
+            [80, 180]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:55",
+      "code": "55",
+      "name": "Lote 55",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 225.0],
+      "parts": [
+        {
+          "id": "55:interior",
+          "kind": "interior",
+          "path": "M80 210 L192 210 L192 240 L80 240 Z",
+          "polygon": [
+            [80, 210],
+            [192, 210],
+            [192, 240],
+            [80, 240],
+            [80, 210]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:56",
+      "code": "56",
+      "name": "Lote 56",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 255.0],
+      "parts": [
+        {
+          "id": "56:interior",
+          "kind": "interior",
+          "path": "M80 240 L192 240 L192 270 L80 270 Z",
+          "polygon": [
+            [80, 240],
+            [192, 240],
+            [192, 270],
+            [80, 270],
+            [80, 240]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:57",
+      "code": "57",
+      "name": "Lote 57",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 285.0],
+      "parts": [
+        {
+          "id": "57:interior",
+          "kind": "interior",
+          "path": "M80 270 L192 270 L192 300 L80 300 Z",
+          "polygon": [
+            [80, 270],
+            [192, 270],
+            [192, 300],
+            [80, 300],
+            [80, 270]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:58",
+      "code": "58",
+      "name": "Lote 58",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 315.0],
+      "parts": [
+        {
+          "id": "58:interior",
+          "kind": "interior",
+          "path": "M80 300 L192 300 L192 330 L80 330 Z",
+          "polygon": [
+            [80, 300],
+            [192, 300],
+            [192, 330],
+            [80, 330],
+            [80, 300]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:59",
+      "code": "59",
+      "name": "Lote 59",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 345.0],
+      "parts": [
+        {
+          "id": "59:interior",
+          "kind": "interior",
+          "path": "M80 330 L192 330 L192 360 L80 360 Z",
+          "polygon": [
+            [80, 330],
+            [192, 330],
+            [192, 360],
+            [80, 360],
+            [80, 330]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:60",
+      "code": "60",
+      "name": "Lote 60",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 375.0],
+      "parts": [
+        {
+          "id": "60:interior",
+          "kind": "interior",
+          "path": "M80 360 L192 360 L192 390 L80 390 Z",
+          "polygon": [
+            [80, 360],
+            [192, 360],
+            [192, 390],
+            [80, 390],
+            [80, 360]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:61",
+      "code": "61",
+      "name": "Lote 61",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 405.0],
+      "parts": [
+        {
+          "id": "61:interior",
+          "kind": "interior",
+          "path": "M80 390 L192 390 L192 420 L80 420 Z",
+          "polygon": [
+            [80, 390],
+            [192, 390],
+            [192, 420],
+            [80, 420],
+            [80, 390]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:62",
+      "code": "62",
+      "name": "Lote 62",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 435.0],
+      "parts": [
+        {
+          "id": "62:interior",
+          "kind": "interior",
+          "path": "M80 420 L192 420 L192 450 L80 450 Z",
+          "polygon": [
+            [80, 420],
+            [192, 420],
+            [192, 450],
+            [80, 450],
+            [80, 420]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:63",
+      "code": "63",
+      "name": "Lote 63",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 465.0],
+      "parts": [
+        {
+          "id": "63:interior",
+          "kind": "interior",
+          "path": "M80 450 L192 450 L192 480 L80 480 Z",
+          "polygon": [
+            [80, 450],
+            [192, 450],
+            [192, 480],
+            [80, 480],
+            [80, 450]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:64",
+      "code": "64",
+      "name": "Lote 64",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 495.0],
+      "parts": [
+        {
+          "id": "64:interior",
+          "kind": "interior",
+          "path": "M80 480 L192 480 L192 510 L80 510 Z",
+          "polygon": [
+            [80, 480],
+            [192, 480],
+            [192, 510],
+            [80, 510],
+            [80, 480]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:65",
+      "code": "65",
+      "name": "Lote 65",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 525.0],
+      "parts": [
+        {
+          "id": "65:interior",
+          "kind": "interior",
+          "path": "M80 510 L192 510 L192 540 L80 540 Z",
+          "polygon": [
+            [80, 510],
+            [192, 510],
+            [192, 540],
+            [80, 540],
+            [80, 510]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:66",
+      "code": "66",
+      "name": "Lote 66",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 555.0],
+      "parts": [
+        {
+          "id": "66:interior",
+          "kind": "interior",
+          "path": "M80 540 L192 540 L192 570 L80 570 Z",
+          "polygon": [
+            [80, 540],
+            [192, 540],
+            [192, 570],
+            [80, 570],
+            [80, 540]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:67",
+      "code": "67",
+      "name": "Lote 67",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 729.0],
+      "parts": [
+        {
+          "id": "67:interior",
+          "kind": "interior",
+          "path": "M80 714 L192 714 L192 744 L80 744 Z",
+          "polygon": [
+            [80, 714],
+            [192, 714],
+            [192, 744],
+            [80, 744],
+            [80, 714]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:68",
+      "code": "68",
+      "name": "Lote 68",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 759.0],
+      "parts": [
+        {
+          "id": "68:interior",
+          "kind": "interior",
+          "path": "M80 744 L192 744 L192 774 L80 774 Z",
+          "polygon": [
+            [80, 744],
+            [192, 744],
+            [192, 774],
+            [80, 774],
+            [80, 744]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:69",
+      "code": "69",
+      "name": "Lote 69",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 789.0],
+      "parts": [
+        {
+          "id": "69:interior",
+          "kind": "interior",
+          "path": "M80 774 L192 774 L192 804 L80 804 Z",
+          "polygon": [
+            [80, 774],
+            [192, 774],
+            [192, 804],
+            [80, 804],
+            [80, 774]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:70",
+      "code": "70",
+      "name": "Lote 70",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 819.0],
+      "parts": [
+        {
+          "id": "70:interior",
+          "kind": "interior",
+          "path": "M80 804 L192 804 L192 834 L80 834 Z",
+          "polygon": [
+            [80, 804],
+            [192, 804],
+            [192, 834],
+            [80, 834],
+            [80, 804]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:71",
+      "code": "71",
+      "name": "Lote 71",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 849.0],
+      "parts": [
+        {
+          "id": "71:interior",
+          "kind": "interior",
+          "path": "M80 834 L192 834 L192 864 L80 864 Z",
+          "polygon": [
+            [80, 834],
+            [192, 834],
+            [192, 864],
+            [80, 864],
+            [80, 834]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:72",
+      "code": "72",
+      "name": "Lote 72",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 879.0],
+      "parts": [
+        {
+          "id": "72:interior",
+          "kind": "interior",
+          "path": "M80 864 L192 864 L192 894 L80 894 Z",
+          "polygon": [
+            [80, 864],
+            [192, 864],
+            [192, 894],
+            [80, 894],
+            [80, 864]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:73",
+      "code": "73",
+      "name": "Lote 73",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 909.0],
+      "parts": [
+        {
+          "id": "73:interior",
+          "kind": "interior",
+          "path": "M80 894 L192 894 L192 924 L80 924 Z",
+          "polygon": [
+            [80, 894],
+            [192, 894],
+            [192, 924],
+            [80, 924],
+            [80, 894]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:74",
+      "code": "74",
+      "name": "Lote 74",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 939.0],
+      "parts": [
+        {
+          "id": "74:interior",
+          "kind": "interior",
+          "path": "M80 924 L192 924 L192 954 L80 954 Z",
+          "polygon": [
+            [80, 924],
+            [192, 924],
+            [192, 954],
+            [80, 954],
+            [80, 924]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:75",
+      "code": "75",
+      "name": "Lote 75",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 969.0],
+      "parts": [
+        {
+          "id": "75:interior",
+          "kind": "interior",
+          "path": "M80 954 L192 954 L192 984 L80 984 Z",
+          "polygon": [
+            [80, 954],
+            [192, 954],
+            [192, 984],
+            [80, 984],
+            [80, 954]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:76",
+      "code": "76",
+      "name": "Lote 76",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 999.0],
+      "parts": [
+        {
+          "id": "76:interior",
+          "kind": "interior",
+          "path": "M80 984 L192 984 L192 1014 L80 1014 Z",
+          "polygon": [
+            [80, 984],
+            [192, 984],
+            [192, 1014],
+            [80, 1014],
+            [80, 984]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:77",
+      "code": "77",
+      "name": "Lote 77",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 1029.0],
+      "parts": [
+        {
+          "id": "77:interior",
+          "kind": "interior",
+          "path": "M80 1014 L192 1014 L192 1044 L80 1044 Z",
+          "polygon": [
+            [80, 1014],
+            [192, 1014],
+            [192, 1044],
+            [80, 1044],
+            [80, 1014]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:78",
+      "code": "78",
+      "name": "Lote 78",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 1059.0],
+      "parts": [
+        {
+          "id": "78:interior",
+          "kind": "interior",
+          "path": "M80 1044 L192 1044 L192 1074 L80 1074 Z",
+          "polygon": [
+            [80, 1044],
+            [192, 1044],
+            [192, 1074],
+            [80, 1074],
+            [80, 1044]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:79",
+      "code": "79",
+      "name": "Lote 79",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 1089.0],
+      "parts": [
+        {
+          "id": "79:interior",
+          "kind": "interior",
+          "path": "M80 1074 L192 1074 L192 1104 L80 1104 Z",
+          "polygon": [
+            [80, 1074],
+            [192, 1074],
+            [192, 1104],
+            [80, 1104],
+            [80, 1074]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:13:environment:80",
+      "code": "80",
+      "name": "Lote 80",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [136.0, 1119.0],
+      "parts": [
+        {
+          "id": "80:interior",
+          "kind": "interior",
+          "path": "M80 1104 L192 1104 L192 1134 L80 1134 Z",
+          "polygon": [
+            [80, 1104],
+            [192, 1104],
+            [192, 1134],
+            [80, 1134],
+            [80, 1104]
+          ]
+        }
+      ]
+    }
+  ],
+  "architecture": [
+    {
+      "id": "p13:perimeter",
+      "kind": "wall",
+      "path": "M80 120H220 M276 120H444 M500 120H640 M80 120V570 M80 714V1164H220 M276 1164H444 M500 1164H640V714 M640 570V120",
+      "strokeWidth": 1.6
+    },
+    {
+      "id": "p13:rear-double-doors",
+      "kind": "door",
+      "path": "M220 120V92 C235.464 92 248 104.536 248 120 M276 120V92 C260.536 92 248 104.536 248 120 M444 120V92 C459.464 92 472 104.536 472 120 M500 120V92 C484.536 92 472 104.536 472 120",
+      "strokeWidth": 0.9
+    },
+    {
+      "id": "p13:rear-label",
+      "kind": "access",
+      "path": "M248 90V106 M244 102L248 106L252 102 M472 90V106 M468 102L472 106L476 102",
+      "label": "Fundos do pavilhão",
+      "labelAt": [360, 72],
+      "strokeWidth": 0.9
+    },
+    {
+      "id": "p13:main-entrance",
+      "kind": "access",
+      "path": "M248 1190V1172 M244 1176L248 1172L252 1176 M472 1190V1172 M468 1176L472 1172L476 1176",
+      "label": "Entrada do pavilhão",
+      "labelAt": [360, 1202],
+      "strokeWidth": 0.9
+    },
+    {
+      "id": "p13:left-transverse-circulation",
+      "kind": "guide",
+      "path": "M64 642H288",
+      "label": "Circulação",
+      "labelAt": [176, 666],
+      "strokeWidth": 0.65
+    },
+    {
+      "id": "p13:right-transverse-circulation",
+      "kind": "guide",
+      "path": "M432 642H656",
+      "label": "Circulação",
+      "labelAt": [544, 666],
+      "strokeWidth": 0.65
+    }
+  ]
+}
