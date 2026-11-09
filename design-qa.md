@@ -1,3 +1,19 @@
+# Pavilhão 13 · Galeria do Salão de Imóveis · Design QA, 08/11/2026
+
+final result: passed
+
+A vista anterior deixava circulação, fundo e lotes com pesos parecidos. A galeria usa um fundo quente com luz suave, paginação de carvalho nos corredores, perímetro em relevo e plintos sob os blocos. Madeira clara à esquerda, verde mineral na ilha central e argila suave à direita distinguem os setores. O novo símbolo combina um aparador e um painel de exposição. [Comparação no desktop](docs/validation/pavilion-13-galeria/comparacao-desktop.jpg) · [Identidade](docs/salao-imoveis-identity.md).
+
+Os 80 algarismos tabulares em Figtree têm contraste de 9,83:1 a 10,48:1 nas superfícies dos setores e de 8,69:1 na seleção. A vista a 1440 × 900 mede 12,5 px para a numeração. Foram conferidos os 29 lotes da esquerda, os 22 da ilha central e os 29 da direita. A 378 × 465, 834 × 1112 e 1440 × 900, todos os números permanecem dentro das respectivas células. Busca, índice por setor e zoom permitem localizar um número no enquadramento compacto. [Índice e lote 18](docs/validation/pavilion-13-galeria/depois-desktop-indice.jpg) · [Tablet](docs/validation/pavilion-13-galeria/depois-tablet.jpg).
+
+As placas para P3 e P8 foram reduzidas a 76 × 86 unidades e alinhadas à metade esquerda de suas passagens. As duas entradas e duas saídas usam os mesmos ícones do sistema. A camada de acabamento ignora o ponteiro e os 80 polígonos continuam sendo as áreas selecionáveis. [Sinalização](docs/validation/pavilion-13-galeria/sinalizacao.jpg).
+
+O navegador confirmou busca válida e inválida, índice por teclado, recarga, zoom, arraste, fechamento do painel, ida e volta pelos acessos P3 e P8 e entrada pelo parque. Na primeira revisão móvel, a seleção do último lote deixava o título acima da área visível e aproximava o lote dos controles. A 390 × 844, a seleção do lote 80 agora leva foco ao título visível no topo do painel e deixa 12 px entre o lote e os controles de zoom. [Antes e depois no celular](docs/validation/pavilion-13-galeria/comparacao-mobile-63.jpg) · [Lote 80 pelo índice](docs/validation/pavilion-13-galeria/depois-mobile-80.jpg).
+
+A suíte passou com 594 testes em 88 arquivos. TypeScript, build, ESLint e Prettier dos arquivos alterados passaram. A prévia usa dados locais e a verificação móvel foi feita no navegador integrado.
+
+---
+
 # Pavilhão 8 · Maquete industrial clara · Design QA, 08/11/2026
 
 final result: passed

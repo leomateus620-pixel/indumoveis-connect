@@ -10,6 +10,7 @@ export type InteriorWayfinding = {
   elementId: string;
   kind: keyof typeof WAYFINDING_SIGNS;
   centers: readonly InteriorPoint[];
+  hideSourcePath?: boolean;
 };
 
 export const WAYFINDING_SIGN_SIZE = { width: 64, height: 26 };

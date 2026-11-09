@@ -83,22 +83,34 @@ export const PAVILION_PRESENTATIONS: Record<InteriorPavilionNumber, InteriorPres
     mode: "lots",
     searchLots: true,
     numberLabelMaxSize: 21,
+    connectionBadge: { width: 76, height: 86, radius: 10 },
     connections: [
       {
         elementId: "p13:left-transverse-circulation",
         destination: 3,
         icon: "/brand/salao-imoveis/acesso-pavilhao-3.svg",
+        center: [148, 642],
       },
       {
         elementId: "p13:right-transverse-circulation",
         destination: 8,
         icon: "/brand/salao-imoveis/acesso-pavilhao-8.svg",
+        center: [486, 642],
       },
     ],
     commercialCount: 80,
     loadingText: "Abrindo o Salão de Imóveis…",
     loadErrorText: "Não foi possível carregar o Salão de Imóveis.",
     wayfinding: [
+      {
+        elementId: "p13:rear-label",
+        kind: "exit",
+        centers: [
+          [248, 77],
+          [472, 77],
+        ],
+        hideSourcePath: true,
+      },
       {
         elementId: "p13:main-entrance",
         kind: "entrance",
