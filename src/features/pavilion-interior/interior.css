@@ -896,6 +896,63 @@
   line-height: 1.5;
   margin-top: 10px;
 }
+
+.is-pavilion-13 .arq-header,
+.is-pavilion-13 .arq-sidebar {
+  background: #faf6ee;
+}
+.is-pavilion-13 .arq-sidebar {
+  --arq-line: #d9cdbd;
+  overflow-anchor: none;
+}
+.is-pavilion-13 .arq-intro {
+  padding-top: 18px;
+}
+.is-pavilion-13 .arq-intro h2 {
+  font-weight: 650;
+}
+.is-pavilion-13 .arq-intro > p {
+  color: #64594e;
+  margin: 10px 0 18px;
+}
+.is-pavilion-13 .arq-index {
+  padding-block: 11px;
+}
+.is-pavilion-13 .arq-index strong,
+.is-pavilion-13 .arq-number {
+  font-family: Figtree, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+.is-pavilion-13 .arq-number {
+  display: inline-block;
+  margin: 12px 0 10px;
+  padding: 4px 11px 6px;
+  border-radius: 5px;
+  border-bottom: 3px solid #b29372;
+  background: #392b34;
+  color: #fffaf1;
+  font-size: 52px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.is-pavilion-13 .arq-lot-context {
+  padding-block: 12px;
+}
+.is-pavilion-13 .arq-lot-search-field {
+  background: #fffaf2;
+  border-color: #b8a58f;
+  margin-top: 8px;
+}
+.is-pavilion-13 .arq-lot-search button {
+  width: 40px;
+  height: 40px;
+}
+.is-pavilion-13 .arq-key i.is-structure {
+  background: #625446;
+  border-color: #625446;
+}
+
 .has-lot-layout .arq-sidebar-footer {
   margin-top: 20px;
 }

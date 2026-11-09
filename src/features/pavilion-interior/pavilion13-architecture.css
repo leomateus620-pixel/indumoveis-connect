@@ -1,0 +1,133 @@
+.is-pavilion-13 {
+  --p13-left-fill: #e3d4bc;
+  --p13-center-fill: #d6dfd3;
+  --p13-right-fill: #ead5ca;
+  --p13-ink: #2e2929;
+}
+
+.is-pavilion-13.has-lot-layout .arq-canvas {
+  background:
+    repeating-linear-gradient(104deg, transparent 0 18px, #8b614208 19px, transparent 20px 42px),
+    radial-gradient(ellipse at 50% 44%, #fff4e4 0%, #f9ead8b8 41%, #f9ead800 78%),
+    linear-gradient(135deg, #e3cdb3, #e9d7c2 56%, #d4b89a);
+}
+
+.arq-p13-floor-shadow {
+  fill: #65574f;
+  opacity: 0.16;
+}
+.arq-p13-floor-edge {
+  fill: #aa9d8f;
+}
+.arq-p13-floor-joint {
+  fill: none;
+  stroke: #997452;
+  stroke-width: 0.9;
+  opacity: 0.42;
+}
+.arq-p13-board-shade {
+  fill: #93603b;
+  opacity: 0.07;
+}
+.arq-p13-board-light {
+  fill: #fff2d6;
+  opacity: 0.19;
+}
+.arq-p13-board-grain {
+  fill: none;
+  stroke: #976c46;
+  stroke-width: 0.7;
+  opacity: 0.28;
+}
+.arq-p13-plinth {
+  fill: #7f7065;
+  opacity: 0.3;
+}
+.arq-p13-wall-depth,
+.arq-p13-wall,
+.arq-p13-wall-cap {
+  fill: none;
+  stroke-linejoin: round;
+}
+.arq-p13-wall-depth {
+  stroke: #817168;
+  stroke-width: 10;
+  opacity: 0.44;
+}
+.arq-p13-wall {
+  stroke: #504742;
+  stroke-width: 7;
+}
+.arq-p13-wall-cap {
+  stroke: #9d8e80;
+  stroke-width: 2;
+}
+.arq-p13-threshold {
+  fill: #bfb09d;
+  stroke: #9c8a76;
+  stroke-width: 1;
+}
+.arq-p13-threshold.is-entrance {
+  fill: #b9c9b6;
+  stroke: #73876f;
+}
+.arq-p13-threshold.is-connection {
+  fill: #d5c1a7;
+}
+.arq-p13-sector-captions {
+  fill: #51463f;
+  font-family: Figtree, sans-serif;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.is-pavilion-13 [data-p13-sector="left"] {
+  --p13-lot-fill: var(--p13-left-fill);
+}
+.is-pavilion-13 [data-p13-sector="center"] {
+  --p13-lot-fill: var(--p13-center-fill);
+}
+.is-pavilion-13 [data-p13-sector="right"] {
+  --p13-lot-fill: var(--p13-right-fill);
+}
+.is-pavilion-13.has-lot-layout .arq-part {
+  fill: var(--p13-lot-fill, #e8dfd2);
+  stroke: #84756a;
+  stroke-width: 0.8;
+  pointer-events: fill;
+  transition: none;
+  vector-effect: non-scaling-stroke;
+}
+.is-pavilion-13.has-lot-layout .arq-environment:hover .arq-part {
+  fill: color-mix(in srgb, var(--p13-lot-fill, #e8dfd2) 79%, #9b6f54);
+  stroke: #715040;
+}
+.is-pavilion-13.has-lot-layout .arq-environment.is-selected .arq-part {
+  fill: var(--arq-plum);
+  stroke: #392732;
+  stroke-width: 1.8;
+}
+.is-pavilion-13.has-lot-layout .arq-environment .arq-part:focus-visible {
+  stroke: #6b3b28;
+  stroke-width: 2.5;
+  stroke-dasharray: 4 2;
+}
+.is-pavilion-13.has-lot-layout .arq-environment.is-selected .arq-part:focus-visible {
+  stroke: #ffe4c9;
+}
+.is-pavilion-13.has-lot-layout .arq-plan-label:not(.is-word) {
+  fill: var(--p13-ink);
+  font-family: Figtree, sans-serif;
+  font-size: clamp(16px, calc(12.5px / var(--plan-scale, 1)), 24px);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+.is-pavilion-13.has-lot-layout .arq-environment.is-selected .arq-plan-label {
+  fill: #fff8f1;
+}
+.is-pavilion-13.has-lot-layout .arq-architecture .is-door,
+.is-pavilion-13.has-lot-layout .arq-architecture .is-access {
+  stroke: #76685d;
+}

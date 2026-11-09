@@ -247,21 +247,62 @@ describe("Pavilhão 13 lot inspection", () => {
     expect(back).not.toHaveAttribute("aria-describedby");
   });
 
-  it("offers eighty separate SVG targets and compact number search instead of eighty sidebar cards", () => {
+  it("offers eighty SVG targets, number search and a compact sector directory", () => {
     const { container } = render(<Harness />);
     expect(container.querySelectorAll(".arq-environment.is-commercial")).toHaveLength(80);
     expect(container.querySelectorAll(".arq-environment.is-commercial .arq-part")).toHaveLength(80);
+    expect(
+      container.querySelectorAll(".arq-environment.is-commercial .arq-plan-label"),
+    ).toHaveLength(80);
+    expect(container.querySelector(".arq-p13-structure")).toHaveAttribute("pointer-events", "none");
     const panel = screen.getByRole("complementary", { name: "Informações do lote" });
     expect(within(panel).getByText("80", { selector: "strong" })).toBeInTheDocument();
     expect(within(panel).getByRole("searchbox", { name: "Buscar lote" })).toBeInTheDocument();
-    expect(within(panel).queryByRole("navigation")).not.toBeInTheDocument();
-    expect(within(panel).getAllByRole("button")).toHaveLength(2);
+    const directory = within(panel).getByRole("navigation", { name: "Lotes por setor" });
+    const sectors = within(directory).getAllByRole("button");
+    expect(sectors).toHaveLength(3);
+    for (const sector of sectors) expect(sector).toHaveAttribute("aria-expanded", "false");
     expect(container.querySelector(".arq-space-grid")).not.toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Salão de IMÓVEIS" })).toHaveAttribute(
       "src",
       "/brand/salao-imoveis/salao-imoveis-compact.svg",
     );
     expect(container.innerHTML).not.toMatch(/arq-design|ARQ &|Salão de Design|Recepção|Banheiros/);
+
+    fireEvent.click(within(directory).getByRole("button", { name: "Ilha central 30–51" }));
+    fireEvent.click(within(directory).getByRole("button", { name: "Lote 35" }));
+    expect(onSelect).toHaveBeenLastCalledWith("35");
+    expect(lotPath(container, "35")).toHaveAttribute("aria-pressed", "true");
+    expect(within(panel).getByRole("heading", { name: "Lote 35" })).toHaveFocus();
+  });
+
+  it("uses the shared wayfinding pair and keeps access plaques within the left side of each passage", () => {
+    render(<Harness />);
+    const plan = within(screen.getByRole("group", { name: "Planta interativa do Pavilhão 13" }));
+    for (const [label, asset] of [
+      ["Entrada", "entrada.svg"],
+      ["Saída", "saida.svg"],
+    ]) {
+      const signs = plan.getAllByRole("img", { name: label });
+      expect(signs).toHaveLength(2);
+      for (const sign of signs)
+        expect(sign).toHaveAttribute("href", `/brand/pavilion-wayfinding/${asset}`);
+    }
+
+    for (const [destination, left, midpoint] of [
+      [3, 80, 192],
+      [8, 416, 528],
+    ]) {
+      const plate = plan
+        .getByRole("link", { name: `Acesso ao Pavilhão ${destination}` })
+        .querySelector("rect")!;
+      const x = Number(plate.getAttribute("x"));
+      const y = Number(plate.getAttribute("y"));
+      expect(x).toBeGreaterThan(left);
+      expect(x + Number(plate.getAttribute("width"))).toBeLessThan(midpoint);
+      expect(y).toBeGreaterThan(570);
+      expect(y + Number(plate.getAttribute("height"))).toBeLessThan(714);
+    }
   });
 
   it("keeps split documentary groups individually selectable with a single changing left panel", () => {
@@ -382,7 +423,11 @@ describe("Pavilhão 13 lot inspection", () => {
     fireEvent.click(screen.getByRole("button", { name: "Lote 70" }));
     expect(screen.getByRole("complementary")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Lote 70" })).toBeInTheDocument();
-    expect(within(screen.getByRole("complementary")).getAllByRole("button")).toHaveLength(3);
+    const panel = within(screen.getByRole("complementary"));
+    expect(panel.getByRole("button", { name: "Ver na planta" })).toBeInTheDocument();
+    expect(panel.getByRole("button", { name: "Localizar lote" })).toBeInTheDocument();
+    const sectors = panel.getByRole("navigation", { name: "Lotes por setor" });
+    expect(within(sectors).getAllByRole("button")).toHaveLength(3);
     fireEvent.keyDown(screen.getByRole("searchbox"), { key: "Escape" });
     expect(onSelect).toHaveBeenLastCalledWith(undefined);
     expect(screen.queryByRole("complementary")).not.toBeInTheDocument();

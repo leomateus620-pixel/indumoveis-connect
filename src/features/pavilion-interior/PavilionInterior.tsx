@@ -30,6 +30,9 @@ import {
   type ParkPavilionNumber,
 } from "./connections";
 import { WAYFINDING_SIGN_SIZE, WAYFINDING_SIGNS } from "./wayfinding";
+import { Pavilion13Architecture } from "./Pavilion13Architecture";
+import { Pavilion13LotDirectory } from "./Pavilion13LotDirectory";
+import { pavilion13Sector } from "./pavilion13-sectors";
 
 type Props = {
   plan: PavilionPlan;
@@ -59,6 +62,7 @@ export function PavilionInterior({
 }: Props) {
   const selected = plan.environments.find((e) => e.code === selectedCode);
   const isPavilion8 = presentation.pavilionNumber === 8;
+  const isPavilion13 = presentation.pavilionNumber === 13;
   const lotsMode = presentation.mode === "lots";
   const searchLots = presentation.searchLots === true;
   const [lotQuery, setLotQuery] = useState("");
@@ -69,6 +73,8 @@ export function PavilionInterior({
   const drawing = useRef<SVGGElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const sidebar = useRef<HTMLElement>(null);
+  const lotTitle = useRef<HTMLHeadingElement>(null);
+  const focusDirectorySelection = useRef(false);
   const viewControls = useRef<HTMLDivElement>(null);
   const camera = useRef<PlanCamera>({ x: 0, y: 0, scale: 1 });
   const size = useRef<Viewport>({ width: 1, height: 1 });
@@ -152,6 +158,14 @@ export function PavilionInterior({
   }, [selectedCode]);
   useLayoutEffect(() => {
     if (sidebar.current) sidebar.current.scrollTop = 0;
+    if (!focusDirectorySelection.current) return;
+    focusDirectorySelection.current = false;
+    lotTitle.current?.focus({ preventScroll: true });
+    // Let the activation and route finish before restoring the details to the top.
+    const frame = requestAnimationFrame(() => {
+      if (sidebar.current) sidebar.current.scrollTop = 0;
+    });
+    return () => cancelAnimationFrame(frame);
   }, [selectedCode]);
   useEffect(() => {
     if (!selected || !panelOpen || !initialized.current) return;
@@ -183,12 +197,13 @@ export function PavilionInterior({
     if (lotsMode && mobile) {
       const host = viewport.current?.getBoundingClientRect();
       const tools = viewControls.current?.getBoundingClientRect();
+      const clearance = isPavilion13 ? 6 : 0;
       if (
         host &&
         tools &&
         tools.top - host.top > top + 20 &&
-        maxX + dx > tools.left - host.left &&
-        minX + dx < tools.right - host.left
+        maxX + dx + clearance > tools.left - host.left &&
+        minX + dx - clearance < tools.right - host.left
       ) {
         bottom = Math.min(bottom, tools.top - host.top - 12);
       }
@@ -200,7 +215,7 @@ export function PavilionInterior({
       dy = anchor < top ? top - anchor : anchor > bottom ? bottom - anchor : 0;
     }
     if (dx || dy) paint({ ...c, x: c.x + dx, y: c.y + dy });
-  }, [selected, mobile, panelOpen, paint, lotsMode]);
+  }, [selected, mobile, panelOpen, paint, lotsMode, isPavilion13]);
   useEffect(() => {
     const node = svg.current;
     if (!node) return;
@@ -368,11 +383,13 @@ export function PavilionInterior({
           {selected ? (
             <div className="arq-information" key={selected.code}>
               {/^\d{2}$/.test(selected.code) && (
-                <span className="arq-number" aria-hidden={isPavilion8 || undefined}>
+                <span className="arq-number" aria-hidden={lotsMode || undefined}>
                   {selected.code}
                 </span>
               )}
-              <h2>{selected.name}</h2>
+              <h2 ref={lotTitle} tabIndex={isPavilion13 ? -1 : undefined}>
+                {selected.name}
+              </h2>
               {lotsMode && (
                 <p className="arq-lot-context">
                   Pavilhão {presentation.pavilionNumber}
@@ -422,12 +439,8 @@ export function PavilionInterior({
             </div>
           ) : (
             <div className="arq-intro">
-              {searchLots ? (
-                <h2>
-                  Encontre seu
-                  <br />
-                  próximo espaço.
-                </h2>
+              {isPavilion13 ? (
+                <h2>Galeria de lotes</h2>
               ) : lotsMode ? (
                 <h2>Encontre um lote</h2>
               ) : (
@@ -439,7 +452,7 @@ export function PavilionInterior({
               )}
               <p>
                 {searchLots
-                  ? "Selecione um lote na planta ou busque pelo número."
+                  ? "Selecione na planta, busque pelo número ou explore por setor."
                   : lotsMode
                     ? "Selecione um espaço na planta ou pelos números abaixo."
                     : "Selecione um ambiente para conhecer o espaço."}
@@ -526,6 +539,16 @@ export function PavilionInterior({
               )}
             </nav>
           )}
+          {isPavilion13 && (
+            <Pavilion13LotDirectory
+              environments={plan.environments}
+              selectedCode={selected?.code}
+              onSelect={(code) => {
+                focusDirectorySelection.current = code !== selected?.code;
+                choose(code);
+              }}
+            />
+          )}
           <div className="arq-sidebar-footer">
             {lotsMode ? (
               <>
@@ -537,7 +560,7 @@ export function PavilionInterior({
                   <i className="is-support" />
                   Circulação
                 </span>
-                {isPavilion8 && (
+                {(isPavilion8 || isPavilion13) && (
                   <span className="arq-key">
                     <i className="is-structure" />
                     Estrutura
@@ -671,6 +694,7 @@ export function PavilionInterior({
           >
             <g ref={drawing}>
               {isPavilion8 && <Pavilion8Architecture plan={plan} />}
+              {isPavilion13 && <Pavilion13Architecture plan={plan} />}
               {connections.map(({ element, center, destination, icon }) => {
                 const { width, height, radius } =
                   presentation.connectionBadge ?? defaultConnectionBadge;
@@ -679,7 +703,7 @@ export function PavilionInterior({
                 const href = pavilionDestinationHref(destination);
                 return (
                   <g key={element.id}>
-                    {element.kind === "guide" && (
+                    {element.kind === "guide" && !isPavilion13 && (
                       <path className="arq-connection-guide" d={element.path} aria-hidden="true" />
                     )}
                     <a
@@ -724,6 +748,7 @@ export function PavilionInterior({
                 <g
                   key={environment.id}
                   data-environment={environment.code}
+                  data-p13-sector={isPavilion13 ? pavilion13Sector(environment.code) : undefined}
                   className={`arq-environment is-${environment.kind} ${selected?.id === environment.id ? "is-selected" : ""}`}
                 >
                   {environment.parts.map((part) => (
@@ -801,18 +826,21 @@ export function PavilionInterior({
                     (element) =>
                       !connections.some((connection) => connection.element.id === element.id),
                   )
-                  .map((element) => (
-                    <g key={element.id} className={`is-${element.kind}`}>
-                      <path d={element.path} style={{ strokeWidth: element.strokeWidth }} />
-                      {element.label &&
-                        element.labelAt &&
-                        !wayfinding.some((sign) => sign.elementId === element.id) && (
+                  .map((element) => {
+                    const sign = wayfinding.find((sign) => sign.elementId === element.id);
+                    return (
+                      <g key={element.id} className={`is-${element.kind}`}>
+                        {!sign?.hideSourcePath && (
+                          <path d={element.path} style={{ strokeWidth: element.strokeWidth }} />
+                        )}
+                        {element.label && element.labelAt && !sign && (
                           <text x={element.labelAt[0]} y={element.labelAt[1]} textAnchor="middle">
                             {element.label}
                           </text>
                         )}
-                    </g>
-                  ))}
+                      </g>
+                    );
+                  })}
               </g>
               {wayfinding.flatMap(({ elementId, kind, centers }) => {
                 const { width, height } = WAYFINDING_SIGN_SIZE;
