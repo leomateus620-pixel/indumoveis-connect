@@ -747,3 +747,292 @@
     font-size: max(5.6px, calc(7px / var(--plan-scale, 1)));
   }
 }
+/* Pavilhão 13 shares navigation, with an independent brand-led header. */
+.is-pavilion-13 .arq-header {
+  height: 104px;
+  grid-template-columns: 40px auto minmax(0, 1fr);
+  gap: 20px;
+  padding-inline: 24px;
+}
+.is-pavilion-13 .arq-signature {
+  width: 228px;
+  height: 79px;
+  justify-self: start;
+}
+.arq-brand-led {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.is-pavilion-13 .arq-back-compact {
+  height: 40px;
+  width: 40px;
+  min-height: 40px;
+  justify-content: center;
+  border: 1px solid #c9c0b6;
+  border-radius: 6px;
+  color: #71665f;
+  background: #fcfbf8;
+}
+.is-pavilion-13 .arq-back-compact:hover {
+  background: #eee8e1;
+  border-color: #8b7b65;
+  color: #302c2f;
+}
+.arq-pavilion-id {
+  justify-self: start;
+  border-left: 1px solid var(--arq-line);
+  padding-left: 24px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #74666d;
+}
+.is-pavilion-13 .arq-canvas {
+  background: #f5f2eb;
+}
+.is-pavilion-13 .arq-part {
+  fill: #ebe5db;
+  stroke: #9e9589;
+  stroke-width: 0.9;
+  transition:
+    fill 0.1s,
+    stroke 0.1s;
+}
+.is-pavilion-13 .arq-environment:hover .arq-part {
+  fill: #ded2d5;
+  stroke: #896c7a;
+}
+.is-pavilion-13 .arq-environment.is-selected .arq-part {
+  fill: var(--arq-plum);
+  stroke: #302c2f;
+  stroke-width: 2.5;
+}
+.is-pavilion-13 .arq-environment.is-selected .arq-plan-label {
+  fill: white;
+  font-weight: 750;
+}
+.is-pavilion-13 .arq-plan-label {
+  font-weight: 500;
+  letter-spacing: 0;
+  fill: #3d3737;
+}
+.is-pavilion-13 .arq-architecture {
+  stroke: #6c6156;
+}
+.is-pavilion-13 .arq-architecture .is-guide {
+  stroke: #bab0a3;
+  stroke-dasharray: 4 5;
+}
+.is-pavilion-13 .arq-architecture text {
+  font-size: max(12px, calc(9px / var(--plan-scale, 1)));
+  fill: #6c6156;
+}
+.is-pavilion-13 .arq-number {
+  margin-bottom: 4px;
+}
+.is-pavilion-13 .arq-information h2 {
+  margin-bottom: 20px;
+}
+.arq-lot-context {
+  border-block: 1px solid var(--arq-line);
+  padding: 18px 0;
+  font-size: 14px;
+  color: #51454c;
+  line-height: 1.5;
+}
+.arq-lot-context span {
+  display: block;
+  font-size: 12px;
+  color: #74666d;
+  margin-top: 4px;
+}
+.arq-lot-search {
+  margin-top: 36px;
+  margin-bottom: auto;
+  padding-bottom: 28px;
+}
+.arq-lot-search-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #c9beb4;
+  border-radius: 5px;
+  background: #fffdfa;
+  padding: 0 6px 0 12px;
+  margin-top: 12px;
+  color: #786d66;
+  min-height: 46px;
+}
+.arq-lot-search-field:focus-within {
+  outline: 2px solid var(--arq-plum);
+  outline-offset: 2px;
+}
+.arq-lot-search input {
+  width: 100%;
+  min-width: 0;
+  outline: none;
+  color: var(--arq-ink);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+}
+.arq-lot-search button {
+  height: 34px;
+  width: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  color: var(--arq-plum);
+}
+.arq-lot-search button:hover {
+  background: #eee5e8;
+}
+.arq-lot-search > p {
+  font-size: 12px;
+  color: #943d35;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+.is-pavilion-13 .arq-sidebar-footer {
+  margin-top: 20px;
+}
+.is-pavilion-13 .arq-key i {
+  background: #ebe5db;
+  border-color: #9e9589;
+}
+.is-pavilion-13 .arq-key i.is-support {
+  background: #f5f2eb;
+  border-color: #c9beb4;
+}
+@media (max-width: 1050px) {
+  .is-pavilion-13 .arq-header {
+    height: 96px;
+    gap: 16px;
+    padding-inline: 20px;
+  }
+  .is-pavilion-13 .arq-signature {
+    width: 210px;
+    height: 73px;
+  }
+  .arq-pavilion-id {
+    padding-left: 20px;
+  }
+}
+@media (max-width: 700px) {
+  .is-pavilion-13 .arq-header {
+    height: 98px;
+    grid-template-columns: 36px minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    gap: 12px;
+    padding-inline: 16px;
+  }
+  .is-pavilion-13 .arq-back-compact {
+    grid-row: 1;
+    grid-column: 1;
+    height: 36px;
+    min-height: 36px;
+    width: 36px;
+  }
+  .is-pavilion-13 .arq-brand-led {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .is-pavilion-13 .arq-signature {
+    width: 208px;
+    height: 72px;
+    grid-row: auto;
+    grid-column: auto;
+  }
+  .is-pavilion-13 .arq-pavilion-id {
+    position: absolute;
+    right: 16px;
+    top: 8px;
+    font-size: 8px;
+    padding-left: 0;
+    border: 0;
+  }
+  .is-pavilion-13 .arq-sidebar {
+    width: min(260px, calc(100% - 112px));
+  }
+  .is-pavilion-13 .arq-number {
+    font-size: 56px;
+  }
+  .is-pavilion-13 .arq-information h2 {
+    font-size: 20px;
+  }
+  .arq-lot-search {
+    margin-top: 26px;
+    padding-bottom: 20px;
+  }
+  .arq-lot-context {
+    padding-block: 14px;
+  }
+}
+@media (max-height: 650px) and (min-width: 701px) {
+  .is-pavilion-13 .arq-header {
+    height: 84px;
+  }
+  .is-pavilion-13 .arq-signature {
+    height: 68px;
+    width: 196px;
+  }
+}
+.arq-back-compact {
+  position: relative;
+}
+.arq-back-tooltip {
+  position: absolute;
+  z-index: 8;
+  top: calc(100% + 9px);
+  left: 0;
+  width: 174px;
+  padding: 11px 13px;
+  background: #fcfbf8;
+  border: 1px solid #d9d3ca;
+  border-radius: 5px;
+  box-shadow: 0 4px 16px #302c2f0c;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #302c2f;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.arq-back-tooltip small {
+  display: block;
+  font-size: 10px;
+  color: #74666d;
+  font-weight: 400;
+}
+.arq-back-compact:hover .arq-back-tooltip,
+.arq-back-compact:focus-visible .arq-back-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+.arq-connection-guide {
+  stroke: #bab0a3;
+  stroke-width: 0.65;
+  stroke-dasharray: 4 5;
+  fill: none;
+  pointer-events: none;
+}
+.arq-connection {
+  cursor: pointer;
+  outline: none;
+}
+.arq-connection-hit {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.arq-connection:hover .arq-connection-hit {
+  stroke: #8b7b65;
+}
+.arq-connection:focus-visible .arq-connection-hit {
+  stroke: var(--arq-plum);
+}

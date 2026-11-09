@@ -8,7 +8,10 @@ export type ParkReturn = {
   orientationFree: boolean;
   search?: { status?: string; space?: string; deal?: string };
 };
-const KEY = "indumoveis:pavilion-1:park-return:v1";
+import { interiorPavilionNumber, type InteriorPavilionNumber } from "./presentation";
+
+const key = (pavilion: InteriorPavilionNumber) => `indumoveis:pavilion-${pavilion}:park-return:v1`;
+const LAST_KEY = "indumoveis:interior:last-park-return:v1";
 const finite = (values: unknown[]) =>
   values.every((v) => typeof v === "number" && Number.isFinite(v));
 export function validCamera(value: unknown): value is MapCameraSnapshot {
@@ -29,18 +32,29 @@ export function validCamera(value: unknown): value is MapCameraSnapshot {
 }
 export function saveParkReturn(value: ParkReturn) {
   try {
-    sessionStorage.setItem(KEY, JSON.stringify(value));
+    const pavilion = interiorPavilionNumber(value.selectionId.split(":").at(-1));
+    if (!pavilion) return;
+    sessionStorage.setItem(key(pavilion), JSON.stringify(value));
+    sessionStorage.setItem(LAST_KEY, JSON.stringify({ editionId: value.editionId, pavilion }));
   } catch {
     /* Private-mode storage can be unavailable. */
   }
 }
-export function readParkReturn(editionId?: string): ParkReturn | null {
+export function readParkReturn(
+  editionId?: string,
+  pavilionNumber?: InteriorPavilionNumber,
+): ParkReturn | null {
   if (!editionId || typeof sessionStorage === "undefined") return null;
   try {
-    const value = JSON.parse(sessionStorage.getItem(KEY) ?? "null");
+    const latest = JSON.parse(sessionStorage.getItem(LAST_KEY) ?? "null");
+    const pavilion =
+      pavilionNumber ??
+      (latest?.editionId === editionId ? interiorPavilionNumber(latest.pavilion) : undefined) ??
+      1;
+    const value = JSON.parse(sessionStorage.getItem(key(pavilion)) ?? "null");
     if (
       value?.editionId !== editionId ||
-      value.selectionId !== "indumoveis:pavilion:1" ||
+      value.selectionId !== `indumoveis:pavilion:${pavilion}` ||
       !["perspective", "top", "front"].includes(value.view) ||
       (value.camera !== undefined && !validCamera(value.camera))
     )

@@ -1851,7 +1851,7 @@ export type Database = {
         Returns: Json
       }
       get_pavilion_interior_commercial: {
-        Args: { p_edition_id: string; p_floor_plan_id: string; p_revision: number }
+        Args: { p_edition_id: string; p_floor_plan_id: string; p_revision: number; p_pavilion_number?: number }
         Returns: Json
       }
       pavilion_valid_point: { Args: { p: Json }; Returns: boolean }

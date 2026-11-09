@@ -6,16 +6,25 @@ import { CommercialMapWorkspace } from "@/features/commercial-map/CommercialMapW
 import { ENTITIES } from "@/features/commercial-map/data/territory";
 import { resolveMapCommercialLinks } from "@/features/commercial-map/commercial";
 import { readParkReturn } from "@/features/pavilion-interior/parkReturn";
+import { interiorPavilionNumber } from "@/features/pavilion-interior/presentation";
+import {
+  parkPavilionNumber,
+  pavilionDestination,
+  type ParkPavilionSearch,
+} from "@/features/pavilion-interior/connections";
 
 export const Route = createFileRoute("/_authenticated/_app/mapa")({
   validateSearch: (
     s: Record<string, unknown>,
-  ): { status?: string; space?: string; deal?: string; pavilhao?: "1" } => ({
-    status: typeof s.status === "string" ? s.status : undefined,
-    space: typeof s.space === "string" ? s.space : undefined,
-    deal: typeof s.deal === "string" ? s.deal : undefined,
-    pavilhao: s.pavilhao === "1" || s.pavilhao === 1 ? "1" : undefined,
-  }),
+  ): { status?: string; space?: string; deal?: string; pavilhao?: ParkPavilionSearch } => {
+    const pavilion = parkPavilionNumber(s.pavilhao);
+    return {
+      status: typeof s.status === "string" ? s.status : undefined,
+      space: typeof s.space === "string" ? s.space : undefined,
+      deal: typeof s.deal === "string" ? s.deal : undefined,
+      pavilhao: pavilion ? (String(pavilion) as ParkPavilionSearch) : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Mapa Comercial — Sistema Indumóveis" },
@@ -45,9 +54,11 @@ function MapaPage() {
   );
   if (!can.read) return <Restricted />;
   if (!editionId) return <p role="status">Carregando mapa…</p>;
-  const saved = readParkReturn(editionId);
+  const pavilionNumber = parkPavilionNumber(search.pavilhao);
+  const savedPavilion = interiorPavilionNumber(pavilionNumber);
+  const saved = !pavilionNumber || savedPavilion ? readParkReturn(editionId, savedPavilion) : null;
   const restorePark =
-    search.pavilhao === "1" ||
+    !!savedPavilion ||
     (!!saved &&
       ["space", "status", "deal"].every(
         (key) =>
@@ -56,12 +67,19 @@ function MapaPage() {
       ));
   return (
     <CommercialMapWorkspace
-      key={editionId}
+      key={`${editionId}:${pavilionNumber ?? "park"}`}
       editionId={editionId}
       restorePark={restorePark}
-      initialPavilion={search.pavilhao === "1"}
+      initialPavilionNumber={pavilionNumber}
       parkSearch={search}
-      onOpenInterior={() => void navigate({ to: "/mapa/pavilhoes/1/interior" })}
+      onOpenInterior={async (pavilion) => {
+        await navigate({
+          to: ".",
+          search: (current) => ({ ...current, pavilhao: String(pavilion) as ParkPavilionSearch }),
+          replace: true,
+        });
+        await navigate(pavilionDestination(pavilion));
+      }}
       statuses={resolution.statuses}
       highlightedIds={resolution.filteredGeometryIds ?? resolution.highlightedGeometryIds}
       externalSelection={resolution.selectedGeometryId}

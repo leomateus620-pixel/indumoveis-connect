@@ -33,6 +33,11 @@ import { MOTION } from "./motion";
 import { readQualityPreference, writeQualityPreference } from "./qualityPreference";
 import { area, SPACE_STATUS } from "@/lib/format";
 import { readParkReturn, saveParkReturn } from "@/features/pavilion-interior/parkReturn";
+import {
+  interiorPavilionNumber,
+  type InteriorPavilionNumber,
+} from "@/features/pavilion-interior/presentation";
+import type { ParkPavilionNumber } from "@/features/pavilion-interior/connections";
 import "./map.css";
 
 type Renderer = ComponentType<MapRendererProps & RefAttributes<MapHandle>>;
@@ -63,9 +68,9 @@ function selectionReducer(state: Selection, action: Action): Selection {
 interface WorkspaceProps {
   editionId?: string;
   restorePark?: boolean;
-  initialPavilion?: boolean;
+  initialPavilionNumber?: ParkPavilionNumber;
   parkSearch?: { status?: string; space?: string; deal?: string };
-  onOpenInterior?: () => void;
+  onOpenInterior?: (pavilionNumber: InteriorPavilionNumber) => void;
   statuses?: Record<string, string>;
   highlightedIds?: string[];
   externalSelection?: string;
@@ -79,7 +84,7 @@ const emptyIds: string[] = [];
 export function CommercialMapWorkspace({
   editionId,
   restorePark = true,
-  initialPavilion,
+  initialPavilionNumber,
   parkSearch,
   onOpenInterior,
   statuses = emptyStatuses,
@@ -89,7 +94,15 @@ export function CommercialMapWorkspace({
   commercialState = "unavailable",
   onCloseExternal,
 }: WorkspaceProps) {
-  const savedPark = useRef(restorePark ? readParkReturn(editionId) : null);
+  const initialPavilionId = initialPavilionNumber
+    ? `indumoveis:pavilion:${initialPavilionNumber}`
+    : null;
+  const savedPavilion = interiorPavilionNumber(initialPavilionNumber);
+  const savedPark = useRef(
+    restorePark && (!initialPavilionNumber || savedPavilion)
+      ? readParkReturn(editionId, savedPavilion)
+      : null,
+  );
   const firstExternalSelection = useRef(true);
   const workspace = useRef<HTMLDivElement>(null),
     stage = useRef<HTMLDivElement>(null),
@@ -99,9 +112,9 @@ export function CommercialMapWorkspace({
     origin = useRef<HTMLElement | null>(null),
     closeButton = useRef<HTMLButtonElement>(null);
   const [selection, dispatch] = useReducer(selectionReducer, {
-    id: savedPark.current?.selectionId ?? (initialPavilion ? "indumoveis:pavilion:1" : null),
-    panelId: savedPark.current?.selectionId ?? (initialPavilion ? "indumoveis:pavilion:1" : null),
-    phase: savedPark.current || initialPavilion ? "open" : "closed",
+    id: savedPark.current?.selectionId ?? initialPavilionId,
+    panelId: savedPark.current?.selectionId ?? initialPavilionId,
+    phase: savedPark.current || initialPavilionId ? "open" : "closed",
     expanded: false,
   });
   const [view, setView] = useState<MapView>(savedPark.current?.view ?? "perspective");
@@ -157,6 +170,8 @@ export function CommercialMapWorkspace({
   const [landscapeLayout, setLandscapeLayout] = useState(false);
   const [compactHeader, setCompactHeader] = useState(false);
   const entity = ENTITIES.find((e) => e.id === selection.panelId);
+  const interiorPavilion =
+    entity?.kind === "pavilion" ? interiorPavilionNumber(entity.id.split(":").at(-1)) : undefined;
   const results = useMemo(
     () => [
       ...searchEntities(ENTITIES, query, location).map((entity) => ({
@@ -948,7 +963,9 @@ export function CommercialMapWorkspace({
                     <strong>{area(entity.declaredAreaM2)}</strong>
                     <span>
                       {entity.kind === "pavilion"
-                        ? "Área total declarada do edifício"
+                        ? interiorPavilion === 13
+                          ? "Área total declarada na planta"
+                          : "Área total declarada do edifício"
                         : "Área declarada na planta"}
                     </span>
                   </>
@@ -962,7 +979,7 @@ export function CommercialMapWorkspace({
                   </span>
                 )}
               </div>
-              {entity.id === "indumoveis:pavilion:1" && onOpenInterior && (
+              {interiorPavilion && onOpenInterior && (
                 <button
                   className="im-map-action im-map-action-primary"
                   style={{ margin: "0 20px 12px", width: "calc(100% - 40px)" }}
@@ -976,7 +993,7 @@ export function CommercialMapWorkspace({
                         orientationFree,
                         search: parkSearch,
                       });
-                    onOpenInterior();
+                    onOpenInterior(interiorPavilion);
                   }}
                 >
                   <ArrowRight size={18} /> Acesso Interno
@@ -1013,7 +1030,7 @@ export function CommercialMapWorkspace({
                   {entity.kind === "pavilion" && (
                     <>
                       <button
-                        className={`im-map-action ${entity.id === "indumoveis:pavilion:1" ? "" : "im-map-action-primary"}`}
+                        className={`im-map-action ${interiorPavilion ? "" : "im-map-action-primary"}`}
                         onClick={() => {
                           setInspectedId(entity.id);
                         }}
@@ -1021,7 +1038,7 @@ export function CommercialMapWorkspace({
                         <Box size={18} />
                         Inspecionar sem cobertura
                       </button>
-                      {entity.id !== "indumoveis:pavilion:1" && (
+                      {!interiorPavilion && (
                         <p>
                           Casca arquitetônica com piso e acessos. Espaços internos ainda não
                           cadastrados nesta base.

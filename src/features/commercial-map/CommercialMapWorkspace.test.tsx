@@ -255,3 +255,70 @@ describe("return from Pavilhão 1 interior", () => {
     expect(renderer).toHaveAttribute("data-view", "perspective");
   });
 });
+
+describe("Pavilhão 13 interior entry and return", () => {
+  it("opens P13 through its primary access action and saves its edition and filters separately", async () => {
+    const open = vi.fn();
+    render(
+      <CommercialMapWorkspace
+        editionId="current-edition"
+        initialPavilionNumber={13}
+        parkSearch={{ status: "disponivel", deal: "previous-deal" }}
+        onOpenInterior={open}
+      />,
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "Acesso Interno" }));
+    expect(open).toHaveBeenCalledExactlyOnceWith(13);
+    const saved = JSON.parse(sessionStorage.getItem("indumoveis:pavilion-13:park-return:v1")!);
+    expect(saved).toMatchObject({
+      editionId: "current-edition",
+      selectionId: "indumoveis:pavilion:13",
+      search: { status: "disponivel", deal: "previous-deal" },
+    });
+    expect(sessionStorage.getItem("indumoveis:pavilion-1:park-return:v1")).toBeNull();
+  });
+
+  it("restores the P13 camera when P1 has a newer saved visit", async () => {
+    const camera: MapCameraSnapshot = { kind: "2d", x: 211, y: 74, width: 26, height: 16 };
+    saveParkReturn({
+      editionId: "current-edition",
+      selectionId: "indumoveis:pavilion:13",
+      camera,
+      view: "top",
+      orientationFree: false,
+    });
+    saveParkReturn({
+      editionId: "current-edition",
+      selectionId: "indumoveis:pavilion:1",
+      camera: { kind: "3d", position: [90, 20, 50], target: [75, 0, 40] },
+      view: "front",
+      orientationFree: false,
+    });
+    render(<CommercialMapWorkspace editionId="current-edition" initialPavilionNumber={13} />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(screen.getByTestId("light-map")).toHaveAttribute(
+      "data-selected",
+      "indumoveis:pavilion:13",
+    );
+    expect(
+      JSON.parse(screen.getByTestId("light-map").getAttribute("data-initial-camera")!),
+    ).toEqual(camera);
+    expect(commands.rendererMount).not.toHaveBeenCalled();
+  });
+});
+
+it("keeps other pavilion sheets out of the two supported interior access flows", async () => {
+  const open = vi.fn();
+  render(
+    <CommercialMapWorkspace
+      editionId="current-edition"
+      externalSelection="indumoveis:pavilion:14"
+      onOpenInterior={open}
+    />,
+  );
+  await screen.findByTestId("navigation-renderer");
+  expect(screen.queryByRole("button", { name: "Acesso Interno" })).not.toBeInTheDocument();
+  expect(open).not.toHaveBeenCalled();
+});

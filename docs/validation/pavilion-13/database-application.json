@@ -1,0 +1,105 @@
+{
+  "project": {
+    "id": "188cb605-7a42-42a0-9e75-28f5097e9433",
+    "name": "Indumóveis Connect",
+    "latestConfirmedCommit": "bc5402109b4bab3527f3ce84c170ae4065dc16fd",
+    "databaseEnabled": true
+  },
+  "method": "Lovable get_database_status followed by read-only SQL inspection, then direct query_database DDL/DML. Each complete migration recorded in supabase_migrations.schema_migrations in the same transaction.",
+  "before": {
+    "p13FloorPlans": 0,
+    "p13Stock": 0,
+    "p1": {
+      "commercial": 14,
+      "environments": 19,
+      "parts": 24
+    },
+    "p1Revision": [
+      {
+        "id": "4c932cf5-ea41-4624-9185-b223001ee724",
+        "payload_hash": "90c8e9d2cd6b2b8dd4ae708d97cc49c62eb59dac5378061f7219e262671777c3",
+        "revision": 1,
+        "source_hash": "088ab9d98e61ed98c98b45834c5813416d9fd09a10af195aeeae29bfc9a4c02a"
+      }
+    ]
+  },
+  "after": {
+    "activeEdition": "49af7d79-9bef-4981-9ecd-ddf64928036e",
+    "consultaPermissionsRestored": true,
+    "fixturesRemoved": true,
+    "p1": {
+      "commercial": 14,
+      "environments": 19,
+      "hash": "90c8e9d2cd6b2b8dd4ae708d97cc49c62eb59dac5378061f7219e262671777c3",
+      "parts": 24
+    },
+    "p13": {
+      "allStockAreasNull": true,
+      "currentParts": 80,
+      "currentPolygonsValid": true,
+      "currentRevision": 2,
+      "environments": 80,
+      "externalParts": 0,
+      "revisionCount": 2,
+      "stock": 80
+    }
+  },
+  "migrations": [
+    {
+      "name": "pavilion_identity_scope",
+      "sha256": "82a6a524ec97aae5f527d39d435fe22c0493861a5f61c06a3d42be73448c73d8",
+      "version": "20261108230000"
+    },
+    {
+      "name": "pavilion_13_salao_imoveis_seed",
+      "sha256": "394ea31d1c2b959e305ac287b341466d0ac094d0f5ae81b964f4e61297a76733",
+      "version": "20261108231000"
+    },
+    {
+      "name": "pavilion_13_lot_names_revision2",
+      "sha256": "b2e69356d33867dd1e3da9505381d20c4ad2a08755fa4a7ee9c824c927aade23",
+      "version": "20261108232000"
+    }
+  ],
+  "authenticatedRoundtrip": {
+    "same": true,
+    "editionId": "49af7d79-9bef-4981-9ecd-ddf64928036e",
+    "databasePlanId": "98c9fef7-d0e2-4076-ae6e-9db66bae657a",
+    "revisionId": "3c08d64a-63e2-47cd-8a8d-59c5e2b87c7c",
+    "revision": 2
+  },
+  "rollbackPermissionChecks": {
+    "authenticated_geometry_write_denied": true,
+    "commercial_pavilion_identity_mismatch_returns_empty": true,
+    "commercial_reads_80_real_view_statuses_without_imported_exhibitors": true,
+    "commercial_rpc_denies_map_only": true,
+    "cross_edition_link_rejected": true,
+    "cross_pavilion_environment_link_rejected": true,
+    "inactive_edition_not_exposed": true,
+    "map_only_reads_80_named_lots_without_commercial_or_area_data": true,
+    "p1_payload_hash_and_14_stock_links_unchanged": true,
+    "p1_three_argument_commercial_rpc_backward_compatible": true,
+    "published_revision_immutable": true,
+    "user_without_map_permission_denied": true
+  },
+  "rollbackReexecution": {
+    "p13_current_revision": 2,
+    "p13_revisions": 2,
+    "p13_stock": 80,
+    "p1_hash": "90c8e9d2cd6b2b8dd4ae708d97cc49c62eb59dac5378061f7219e262671777c3",
+    "safe_reexecution": true
+  },
+  "rollbackExistingRecordPreservation": {
+    "existing_fields_preserved": true,
+    "existing_id_preserved": true,
+    "new_individual_areas_null": true,
+    "stock_count": 80
+  },
+  "sourcePdfSha256": "5d33bd55d353021ba18f6e3cc6114544723f8ed292b149e0aab628625187ef67",
+  "notes": [
+    "P13 revision1 retains the first published internal environment names. Revision2 is the only current revision and has canonical Lote01 through Lote80 names. Both share the same80 stable stock identities.",
+    "No company names, reservation labels, prices, aggregate area or inferred individual areas imported into the plan runtime.",
+    "Existing commercial area and other space fields preserved by reconciliation; tested with rollback fixture.",
+    "No source file uploaded to Storage; source_uri explicitly references preserved repository PDF."
+  ]
+}
