@@ -747,14 +747,14 @@
     font-size: max(5.6px, calc(7px / var(--plan-scale, 1)));
   }
 }
-/* Pavilhão 13 shares navigation, with an independent brand-led header. */
-.is-pavilion-13 .arq-header {
+/* Interiors with a lot directory share the compact, brand-led header. */
+.has-lot-layout .arq-header {
   height: 104px;
   grid-template-columns: 40px auto minmax(0, 1fr);
   gap: 20px;
   padding-inline: 24px;
 }
-.is-pavilion-13 .arq-signature {
+.has-lot-layout .arq-signature {
   width: 228px;
   height: 79px;
   justify-self: start;
@@ -764,7 +764,7 @@
   display: flex;
   align-items: center;
 }
-.is-pavilion-13 .arq-back-compact {
+.has-lot-layout .arq-back-compact {
   height: 40px;
   width: 40px;
   min-height: 40px;
@@ -774,7 +774,7 @@
   color: #71665f;
   background: #fcfbf8;
 }
-.is-pavilion-13 .arq-back-compact:hover {
+.has-lot-layout .arq-back-compact:hover {
   background: #eee8e1;
   border-color: #8b7b65;
   color: #302c2f;
@@ -788,10 +788,10 @@
   letter-spacing: 0.15em;
   color: #74666d;
 }
-.is-pavilion-13 .arq-canvas {
+.has-lot-layout .arq-canvas {
   background: #f5f2eb;
 }
-.is-pavilion-13 .arq-part {
+.has-lot-layout .arq-part {
   fill: #ebe5db;
   stroke: #9e9589;
   stroke-width: 0.9;
@@ -799,39 +799,39 @@
     fill 0.1s,
     stroke 0.1s;
 }
-.is-pavilion-13 .arq-environment:hover .arq-part {
+.has-lot-layout .arq-environment:hover .arq-part {
   fill: #ded2d5;
   stroke: #896c7a;
 }
-.is-pavilion-13 .arq-environment.is-selected .arq-part {
+.has-lot-layout .arq-environment.is-selected .arq-part {
   fill: var(--arq-plum);
   stroke: #302c2f;
   stroke-width: 2.5;
 }
-.is-pavilion-13 .arq-environment.is-selected .arq-plan-label {
+.has-lot-layout .arq-environment.is-selected .arq-plan-label {
   fill: white;
   font-weight: 750;
 }
-.is-pavilion-13 .arq-plan-label {
+.has-lot-layout .arq-plan-label {
   font-weight: 500;
   letter-spacing: 0;
   fill: #3d3737;
 }
-.is-pavilion-13 .arq-architecture {
+.has-lot-layout .arq-architecture {
   stroke: #6c6156;
 }
-.is-pavilion-13 .arq-architecture .is-guide {
+.has-lot-layout .arq-architecture .is-guide {
   stroke: #bab0a3;
   stroke-dasharray: 4 5;
 }
-.is-pavilion-13 .arq-architecture text {
+.has-lot-layout .arq-architecture text {
   font-size: max(12px, calc(9px / var(--plan-scale, 1)));
   fill: #6c6156;
 }
-.is-pavilion-13 .arq-number {
+.has-lot-layout .arq-number {
   margin-bottom: 4px;
 }
-.is-pavilion-13 .arq-information h2 {
+.has-lot-layout .arq-information h2 {
   margin-bottom: 20px;
 }
 .arq-lot-context {
@@ -896,24 +896,24 @@
   line-height: 1.5;
   margin-top: 10px;
 }
-.is-pavilion-13 .arq-sidebar-footer {
+.has-lot-layout .arq-sidebar-footer {
   margin-top: 20px;
 }
-.is-pavilion-13 .arq-key i {
+.has-lot-layout .arq-key i {
   background: #ebe5db;
   border-color: #9e9589;
 }
-.is-pavilion-13 .arq-key i.is-support {
+.has-lot-layout .arq-key i.is-support {
   background: #f5f2eb;
   border-color: #c9beb4;
 }
 @media (max-width: 1050px) {
-  .is-pavilion-13 .arq-header {
+  .has-lot-layout .arq-header {
     height: 96px;
     gap: 16px;
     padding-inline: 20px;
   }
-  .is-pavilion-13 .arq-signature {
+  .has-lot-layout .arq-signature {
     width: 210px;
     height: 73px;
   }
@@ -922,31 +922,31 @@
   }
 }
 @media (max-width: 700px) {
-  .is-pavilion-13 .arq-header {
+  .has-lot-layout .arq-header {
     height: 98px;
     grid-template-columns: 36px minmax(0, 1fr);
     grid-template-rows: 1fr;
     gap: 12px;
     padding-inline: 16px;
   }
-  .is-pavilion-13 .arq-back-compact {
+  .has-lot-layout .arq-back-compact {
     grid-row: 1;
     grid-column: 1;
     height: 36px;
     min-height: 36px;
     width: 36px;
   }
-  .is-pavilion-13 .arq-brand-led {
+  .has-lot-layout .arq-brand-led {
     grid-row: 1;
     grid-column: 2;
   }
-  .is-pavilion-13 .arq-signature {
+  .has-lot-layout .arq-signature {
     width: 208px;
     height: 72px;
     grid-row: auto;
     grid-column: auto;
   }
-  .is-pavilion-13 .arq-pavilion-id {
+  .has-lot-layout .arq-pavilion-id {
     position: absolute;
     right: 16px;
     top: 8px;
@@ -954,13 +954,13 @@
     padding-left: 0;
     border: 0;
   }
-  .is-pavilion-13 .arq-sidebar {
+  .has-lot-layout .arq-sidebar {
     width: min(260px, calc(100% - 112px));
   }
-  .is-pavilion-13 .arq-number {
+  .has-lot-layout .arq-number {
     font-size: 56px;
   }
-  .is-pavilion-13 .arq-information h2 {
+  .has-lot-layout .arq-information h2 {
     font-size: 20px;
   }
   .arq-lot-search {
@@ -972,10 +972,10 @@
   }
 }
 @media (max-height: 650px) and (min-width: 701px) {
-  .is-pavilion-13 .arq-header {
+  .has-lot-layout .arq-header {
     height: 84px;
   }
-  .is-pavilion-13 .arq-signature {
+  .has-lot-layout .arq-signature {
     height: 68px;
     width: 196px;
   }
@@ -1035,4 +1035,106 @@
 }
 .arq-connection:focus-visible .arq-connection-hit {
   stroke: var(--arq-plum);
+}
+
+.is-pavilion-8 .arq-header {
+  grid-template-columns: 40px auto minmax(0, 1fr) auto;
+}
+.is-pavilion-8 .arq-signature {
+  width: 232px;
+  height: auto;
+  aspect-ratio: 320 / 92;
+}
+.arq-total-area {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #675c56;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.arq-total-area strong {
+  color: var(--arq-ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.is-pavilion-8 .arq-canvas {
+  background: #f6f3ed;
+}
+.is-pavilion-8 .arq-part {
+  fill: #e9e1d6;
+  stroke: #8a7d72;
+  stroke-width: 1;
+  transition: none;
+  vector-effect: non-scaling-stroke;
+}
+.is-pavilion-8 .arq-environment:hover .arq-part {
+  fill: #e0d2cc;
+  stroke: #765c68;
+}
+.is-pavilion-8 .arq-environment.is-selected .arq-part {
+  fill: var(--arq-plum);
+  stroke: #3f2837;
+  stroke-width: 2;
+}
+.is-pavilion-8 .arq-environment .arq-part:focus-visible {
+  stroke: #9c4a2e;
+  stroke-width: 3;
+}
+.is-pavilion-8 .arq-plan-label:not(.is-word) {
+  font-size: max(30px, var(--plan-number-size, 14px));
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.is-pavilion-8 .arq-architecture {
+  stroke: #64574e;
+}
+.is-pavilion-8 .arq-architecture .is-door,
+.is-pavilion-8 .arq-architecture .is-access {
+  stroke: #766356;
+}
+.is-pavilion-8 .arq-architecture text {
+  fill: #655951;
+}
+.is-pavilion-8 .arq-space-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.is-pavilion-8 .arq-key i {
+  background: #e9e1d6;
+}
+.is-pavilion-8 .arq-key i.is-support {
+  background: #f6f3ed;
+}
+@media (max-width: 1050px) {
+  .is-pavilion-8 .arq-signature {
+    width: 214px;
+  }
+}
+@media (max-width: 700px) {
+  .is-pavilion-8 .arq-header {
+    height: 106px;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-rows: 1fr auto;
+    gap: 0 12px;
+    padding-block: 10px 12px;
+  }
+  .is-pavilion-8 .arq-brand-led {
+    grid-column: 2 / -1;
+  }
+  .is-pavilion-8 .arq-signature {
+    width: 188px;
+    max-width: 100%;
+  }
+  .is-pavilion-8 .arq-pavilion-id {
+    position: static;
+    grid-row: 2;
+    grid-column: 2;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+  .is-pavilion-8 .arq-total-area {
+    grid-row: 2;
+    grid-column: 3;
+    font-size: 12px;
+  }
 }

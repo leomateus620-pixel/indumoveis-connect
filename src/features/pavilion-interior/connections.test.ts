@@ -4,7 +4,7 @@ import { PAVILION_13_PLAN } from "./pavilion13";
 import { PAVILION_PRESENTATIONS } from "./presentation";
 
 describe("Pavilhão 13 lateral connections", () => {
-  it("attaches P3 on the left and P8 on the right, with a working exterior destination", () => {
+  it("points left to the P3 park sheet and right to the P8 interior", () => {
     const plan = PAVILION_13_PLAN;
     const center = (plan.bounds.minX + plan.bounds.maxX) / 2;
     const links = PAVILION_PRESENTATIONS[13].connections?.map((connection) => {
@@ -17,7 +17,7 @@ describe("Pavilhão 13 lateral connections", () => {
     });
     expect(links).toEqual([
       { side: "left", href: "/mapa?pavilhao=3" },
-      { side: "right", href: "/mapa?pavilhao=8" },
+      { side: "right", href: "/mapa/pavilhoes/8/interior" },
     ]);
   });
 

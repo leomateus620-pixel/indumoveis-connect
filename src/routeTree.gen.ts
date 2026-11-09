@@ -32,6 +32,7 @@ import { Route as AuthenticatedAppVistoriasIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppVistoriasIdRouteImport } from './routes/_authenticated/_app/vistorias.$id'
 import { Route as AuthenticatedMapaPavilhoes1InteriorRouteImport } from './routes/_authenticated/mapa.pavilhoes.1.interior'
 import { Route as AuthenticatedMapaPavilhoes13InteriorRouteImport } from './routes/_authenticated/mapa.pavilhoes.13.interior'
+import { Route as AuthenticatedMapaPavilhoes8InteriorRouteImport } from './routes/_authenticated/mapa.pavilhoes.8.interior'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -161,6 +162,12 @@ const AuthenticatedMapaPavilhoes13InteriorRoute =
     path: '/mapa/pavilhoes/13/interior',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMapaPavilhoes8InteriorRoute =
+  AuthenticatedMapaPavilhoes8InteriorRouteImport.update({
+    id: '/mapa/pavilhoes/8/interior',
+    path: '/mapa/pavilhoes/8/interior',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/vistorias/': typeof AuthenticatedAppVistoriasIndexRoute
   '/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
   '/mapa/pavilhoes/13/interior': typeof AuthenticatedMapaPavilhoes13InteriorRoute
+  '/mapa/pavilhoes/8/interior': typeof AuthenticatedMapaPavilhoes8InteriorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -204,6 +212,7 @@ export interface FileRoutesByTo {
   '/vistorias': typeof AuthenticatedAppVistoriasIndexRoute
   '/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
   '/mapa/pavilhoes/13/interior': typeof AuthenticatedMapaPavilhoes13InteriorRoute
+  '/mapa/pavilhoes/8/interior': typeof AuthenticatedMapaPavilhoes8InteriorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -230,6 +239,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/vistorias/': typeof AuthenticatedAppVistoriasIndexRoute
   '/_authenticated/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
   '/_authenticated/mapa/pavilhoes/13/interior': typeof AuthenticatedMapaPavilhoes13InteriorRoute
+  '/_authenticated/mapa/pavilhoes/8/interior': typeof AuthenticatedMapaPavilhoes8InteriorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/vistorias/'
     | '/mapa/pavilhoes/1/interior'
     | '/mapa/pavilhoes/13/interior'
+    | '/mapa/pavilhoes/8/interior'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/vistorias'
     | '/mapa/pavilhoes/1/interior'
     | '/mapa/pavilhoes/13/interior'
+    | '/mapa/pavilhoes/8/interior'
   id:
     | '__root__'
     | '/'
@@ -300,6 +312,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/vistorias/'
     | '/_authenticated/mapa/pavilhoes/1/interior'
     | '/_authenticated/mapa/pavilhoes/13/interior'
+    | '/_authenticated/mapa/pavilhoes/8/interior'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -471,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapaPavilhoes13InteriorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mapa/pavilhoes/8/interior': {
+      id: '/_authenticated/mapa/pavilhoes/8/interior'
+      path: '/mapa/pavilhoes/8/interior'
+      fullPath: '/mapa/pavilhoes/8/interior'
+      preLoaderRoute: typeof AuthenticatedMapaPavilhoes8InteriorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -558,6 +578,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedMapaPavilhoes1InteriorRoute: typeof AuthenticatedMapaPavilhoes1InteriorRoute
   AuthenticatedMapaPavilhoes13InteriorRoute: typeof AuthenticatedMapaPavilhoes13InteriorRoute
+  AuthenticatedMapaPavilhoes8InteriorRoute: typeof AuthenticatedMapaPavilhoes8InteriorRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -567,6 +588,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedMapaPavilhoes1InteriorRoute,
   AuthenticatedMapaPavilhoes13InteriorRoute:
     AuthenticatedMapaPavilhoes13InteriorRoute,
+  AuthenticatedMapaPavilhoes8InteriorRoute:
+    AuthenticatedMapaPavilhoes8InteriorRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

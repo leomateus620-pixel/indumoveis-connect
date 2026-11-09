@@ -39,7 +39,7 @@ vi.mock("@/features/commercial-map/CommercialMapWorkspace", () => ({
     initialPavilionNumber,
     restorePark,
   }: {
-    onOpenInterior: (pavilion: 1 | 13) => void;
+    onOpenInterior: (pavilion: 1 | 8 | 13) => void;
     initialPavilionNumber?: number;
     restorePark: boolean;
   }) => (
@@ -48,6 +48,7 @@ vi.mock("@/features/commercial-map/CommercialMapWorkspace", () => ({
         {initialPavilionNumber}
       </output>
       <button onClick={() => onOpenInterior(1)}>Abrir Pavilhão 1</button>
+      <button onClick={() => onOpenInterior(8)}>Abrir Pavilhão 8</button>
       <button onClick={() => onOpenInterior(13)}>Abrir Pavilhão 13</button>
     </>
   ),
@@ -61,7 +62,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("park destinations of the lateral connections", () => {
-  it.each([3, 8] as const)("accepts a connection URL and focuses Pavilhão %s", (destination) => {
+  it.each([3, 12] as const)("accepts a connection URL and focuses Pavilhão %s", (destination) => {
     const url = new URL(pavilionDestinationHref(destination), "https://indumoveis.example");
     const rawSearch = Object.fromEntries(url.searchParams);
     const validate = Route.options.validateSearch as (search: Record<string, unknown>) => {
@@ -90,6 +91,7 @@ describe("park history before opening another pavilion", () => {
   it.each([
     { previous: "13", next: 1 },
     { previous: "1", next: 13 },
+    { previous: "13", next: 8 },
   ] as const)(
     "replaces the stale P$previous park context with P$next before pushing its interior",
     async ({ previous, next }) => {

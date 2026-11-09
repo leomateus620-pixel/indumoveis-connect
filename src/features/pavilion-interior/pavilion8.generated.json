@@ -1,0 +1,360 @@
+{
+  "id": "indumoveis:pavilion:8:fornecedores-construcao-civil",
+  "revision": 1,
+  "pavilionNumber": 8,
+  "totalAreaM2": 937.32,
+  "bounds": {
+    "minX": 67,
+    "minY": 78,
+    "maxX": 528,
+    "maxY": 814
+  },
+  "source": {
+    "revisionName": "pavilhao-08-rev02-2025-11-14",
+    "document": "Pav 08 - 02 - 14.11.25.pdf",
+    "page": 1,
+    "sha256": "63e3762f7d20b34359f451da1cac63ad7e03327496695106dff4b9c11e239767",
+    "pageWidth": 595.276,
+    "pageHeight": 841.89,
+    "coordinateSystem": "Native PDF drawing points; origin page top-left; x right; y down; no metric conversion"
+  },
+  "environments": [
+    {
+      "id": "indumoveis:pavilion:8:environment:01",
+      "code": "01",
+      "name": "Lote 01",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [
+        153.589,
+        614.771
+      ],
+      "parts": [
+        {
+          "id": "01:interior",
+          "kind": "interior",
+          "path": "M90.293 488.210 L230.998 488.210 L230.998 615.214 L165.351 767.198 L90.293 767.198 Z",
+          "polygon": [
+            [
+              90.293,
+              488.21
+            ],
+            [
+              230.998,
+              488.21
+            ],
+            [
+              230.998,
+              615.214
+            ],
+            [
+              165.351,
+              767.198
+            ],
+            [
+              90.293,
+              767.198
+            ],
+            [
+              90.293,
+              488.21
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:8:environment:03",
+      "code": "03",
+      "name": "Lote 03",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [
+        160.645,
+        316.788
+      ],
+      "parts": [
+        {
+          "id": "03:interior",
+          "kind": "interior",
+          "path": "M90.293 240.002 L230.998 240.002 L230.998 393.574 L90.293 393.574 Z",
+          "polygon": [
+            [
+              90.293,
+              240.002
+            ],
+            [
+              230.998,
+              240.002
+            ],
+            [
+              230.998,
+              393.574
+            ],
+            [
+              90.293,
+              393.574
+            ],
+            [
+              90.293,
+              240.002
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:8:environment:04",
+      "code": "04",
+      "name": "Lote 04",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [
+        160.645,
+        174.336
+      ],
+      "parts": [
+        {
+          "id": "04:interior",
+          "kind": "interior",
+          "path": "M90.293 108.670 L230.998 108.670 L230.998 240.002 L90.293 240.002 Z",
+          "polygon": [
+            [
+              90.293,
+              108.67
+            ],
+            [
+              230.998,
+              108.67
+            ],
+            [
+              230.998,
+              240.002
+            ],
+            [
+              90.293,
+              240.002
+            ],
+            [
+              90.293,
+              108.67
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:8:environment:05",
+      "code": "05",
+      "name": "Lote 05",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [
+        434.549,
+        224.357
+      ],
+      "parts": [
+        {
+          "id": "05:interior",
+          "kind": "interior",
+          "path": "M364.197 152.380 L504.901 152.380 L504.901 296.335 L364.197 296.335 Z",
+          "polygon": [
+            [
+              364.197,
+              152.38
+            ],
+            [
+              504.901,
+              152.38
+            ],
+            [
+              504.901,
+              296.335
+            ],
+            [
+              364.197,
+              296.335
+            ],
+            [
+              364.197,
+              152.38
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:8:environment:06",
+      "code": "06",
+      "name": "Lote 06",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [
+        434.549,
+        497.673
+      ],
+      "parts": [
+        {
+          "id": "06:interior",
+          "kind": "interior",
+          "path": "M364.197 382.017 L504.901 382.017 L504.901 613.329 L364.197 613.329 Z",
+          "polygon": [
+            [
+              364.197,
+              382.017
+            ],
+            [
+              504.901,
+              382.017
+            ],
+            [
+              504.901,
+              613.329
+            ],
+            [
+              364.197,
+              613.329
+            ],
+            [
+              364.197,
+              382.017
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:8:environment:07",
+      "code": "07",
+      "name": "Lote 07",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [
+        449.304,
+        682.455
+      ],
+      "parts": [
+        {
+          "id": "07:interior",
+          "kind": "interior",
+          "path": "M364.197 613.329 L504.901 613.329 L504.901 767.198 L429.883 767.198 Z",
+          "polygon": [
+            [
+              364.197,
+              613.329
+            ],
+            [
+              504.901,
+              613.329
+            ],
+            [
+              504.901,
+              767.198
+            ],
+            [
+              429.883,
+              767.198
+            ],
+            [
+              364.197,
+              613.329
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:8:environment:08",
+      "code": "08",
+      "name": "Lote 08",
+      "kind": "commercial",
+      "declaredAreaM2": null,
+      "label": [
+        297.598,
+        726.63
+      ],
+      "parts": [
+        {
+          "id": "08:interior",
+          "kind": "interior",
+          "path": "M274.049 671.696 L321.146 671.696 L359.881 767.198 L235.314 767.198 Z",
+          "polygon": [
+            [
+              274.049,
+              671.696
+            ],
+            [
+              321.146,
+              671.696
+            ],
+            [
+              359.881,
+              767.198
+            ],
+            [
+              235.314,
+              767.198
+            ],
+            [
+              274.049,
+              671.696
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "architecture": [
+    {
+      "id": "p8:perimeter",
+      "kind": "wall",
+      "path": "M465.423 106.804 L87.493 106.804 L87.493 393.574 M87.493 488.210 L87.493 769.084 L165.351 769.084 M235.314 769.084 L359.881 769.084 M429.883 769.084 L507.741 769.084 L507.741 382.017 M507.741 296.335 L507.741 106.804",
+      "strokeWidth": 1.4
+    },
+    {
+      "id": "p8:main-entrance",
+      "kind": "access",
+      "path": "M200.333 789.084 L200.333 776.084 M196.823 780.244 L200.333 776.084 L203.843 780.244 M394.882 789.084 L394.882 776.084 M391.372 780.244 L394.882 776.084 L398.392 780.244",
+      "label": "Entrada do pavilhão",
+      "labelAt": [
+        297.597,
+        803
+      ],
+      "strokeWidth": 1.15
+    },
+    {
+      "id": "p8:rear-exit",
+      "kind": "access",
+      "path": "M486.582 113.804 L486.582 99.804 M482.802 104.284 L486.582 99.804 L490.362 104.284",
+      "label": "Saída dos fundos",
+      "labelAt": [
+        434.549,
+        133
+      ],
+      "strokeWidth": 1.15
+    },
+    {
+      "id": "p8:rear-label",
+      "kind": "access",
+      "path": "M290.597 95.000 L304.597 95.000",
+      "label": "Fundos do pavilhão",
+      "labelAt": [
+        297.597,
+        89
+      ],
+      "strokeWidth": 0.8
+    },
+    {
+      "id": "p8:left-passage",
+      "kind": "access",
+      "path": "M76.493 440.892 L96.493 440.892 M90.093 435.492 L96.493 440.892 L90.093 446.292",
+      "strokeWidth": 1.15
+    },
+    {
+      "id": "p8:right-passage",
+      "kind": "access",
+      "path": "M518.741 339.176 L498.741 339.176 M505.141 344.576 L498.741 339.176 L505.141 333.776",
+      "strokeWidth": 1.15
+    }
+  ]
+}
