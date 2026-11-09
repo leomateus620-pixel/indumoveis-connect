@@ -18,19 +18,18 @@ const user = {
 };
 const editionId = "22222222-2222-4222-8222-222222222222";
 const plans = {};
-for (const pavilion of [1, 13]) {
-  const source = pavilion === 1 ? "plan.generated.json" : "pavilion13.generated.json";
+for (const [pavilion, planIdDigit, revisionIdDigit] of [
+  [1, "3", "4"],
+  [8, "7", "8"],
+  [13, "5", "6"],
+]) {
+  const source = pavilion === 1 ? "plan.generated.json" : `pavilion${pavilion}.generated.json`;
   const plan = JSON.parse(await readFile(`src/features/pavilion-interior/${source}`, "utf8"));
+  const id = (digit) => "xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx".replaceAll("x", digit);
   Object.assign(plan, {
     editionId,
-    databasePlanId:
-      pavilion === 1
-        ? "33333333-3333-4333-8333-333333333333"
-        : "55555555-5555-4555-8555-555555555555",
-    revisionId:
-      pavilion === 1
-        ? "44444444-4444-4444-8444-444444444444"
-        : "66666666-6666-4666-8666-666666666666",
+    databasePlanId: id(planIdDigit),
+    revisionId: id(revisionIdDigit),
   });
   plans[pavilion] = plan;
 }
@@ -75,9 +74,9 @@ http
     }
     if (url.pathname === "/__qa/start") {
       res.setHeader("content-type", "text/html");
-      const requested = url.searchParams.get("pavilhao") === "13" ? 13 : 1;
+      const requested = Number(url.searchParams.get("pavilhao")) || 1;
       res.end(
-        `<script>localStorage.setItem('sb-127-auth-token',${JSON.stringify(JSON.stringify(session))});localStorage.setItem('indumoveis:map-quality','light');location.replace('/mapa/pavilhoes/${requested}/interior')</script>`,
+        `<script>localStorage.setItem('sb-127-auth-token',${JSON.stringify(JSON.stringify(session))});localStorage.setItem('indumoveis:map-quality','light');location.replace('/mapa/pavilhoes/${plans[requested] ? requested : 1}/interior')</script>`,
       );
       return;
     }

@@ -1,0 +1,134 @@
+{
+  "name": "Fornecedores & Construção Civil · Indumóveis",
+  "visibleCopy": [
+    "Fornecedores &",
+    "Construção Civil",
+    "Indumóveis"
+  ],
+  "format": "SVG com transparência e curvas de fonte, sem raster incorporado",
+  "palette": {
+    "graphite": "#302C2F",
+    "plum": "#643B54",
+    "stone": "#826B5B",
+    "mineral": "#F2EBDF",
+    "terracotta": "#A45F49"
+  },
+  "font": {
+    "family": "Figtree",
+    "license": "SIL OFL 1.1",
+    "source": "https://github.com/google/fonts/tree/main/ofl/figtree",
+    "numerals": "tnum"
+  },
+  "file": {
+    "name": "fornecedores-construcao-compact.svg",
+    "viewBox": [
+      0,
+      0,
+      320,
+      92
+    ],
+    "sha256": "71ea06a06ff102a199dbabe122b33ebc46f3b70f0fd2fd0319966fdb8b5042b7"
+  },
+  "numberPlate": {
+    "name": "placa-08.svg",
+    "viewBox": [
+      0,
+      0,
+      62,
+      52
+    ],
+    "sha256": "cd1a65b88a7f43adeca920031849c70d9a6632facd58b4b6e3f43bb9a39cb488",
+    "visibleCopy": "08"
+  },
+  "accessSigns": [
+    {
+      "name": "acesso-pavilhao-13.svg",
+      "viewBox": [
+        0,
+        0,
+        62,
+        68
+      ],
+      "sha256": "ccf02cc4f67bcf02eae7d73d8f100360a813f2c36118f643bb4ea748ffa818fe",
+      "visibleCopy": [
+        "Pavilhão",
+        "13"
+      ],
+      "side": "esquerda"
+    },
+    {
+      "name": "acesso-pavilhao-12.svg",
+      "viewBox": [
+        0,
+        0,
+        62,
+        68
+      ],
+      "sha256": "7cf0a6b5a69eff4ebba1e42b4996a56dc6d15c21e08f359a7717e9c5e25c71c5",
+      "visibleCopy": [
+        "Pavilhão",
+        "12"
+      ],
+      "side": "direita"
+    }
+  ],
+  "pavilionWayfinding": [
+    {
+      "name": "entrada.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "c861ca2a67c8f42512c572fd178fcf994f5c2461dcd1c2f36032cea5a37a53b7",
+      "visibleCopy": "Entrada"
+    },
+    {
+      "name": "saida.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "72cef7af8e581245c66aa8c27caad50f8c6fd360642cd36ddb06d923cbeb14ef",
+      "visibleCopy": "Saída"
+    }
+  ],
+  "sharedWayfinding": [
+    {
+      "name": "../pavilion-wayfinding/entrada.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "2dc759175d3b095880072605af7e5a0f3bd4e3a1cf0f852690f8ce1768493f04",
+      "visibleCopy": "Entrada"
+    },
+    {
+      "name": "../pavilion-wayfinding/saida.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "dea38f75e2d550341d802cdd74bede604372a0ca83695a7241500cf130f8ab86",
+      "visibleCopy": "Saída"
+    },
+    {
+      "name": "../pavilion-wayfinding/servico.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "79c5e5ccf03603ed67c98eaefa57978213ca235ad48faeb7642b680a45c5f183",
+      "visibleCopy": "Serviço"
+    }
+  ]
+}

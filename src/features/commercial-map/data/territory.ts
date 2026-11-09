@@ -340,7 +340,7 @@ const pavilions: MapEntity[] = [
   entity(
     "pavilion:8",
     "pavilion",
-    "Pavilhão 8 · Fornecedores e construção civil",
+    "Pavilhão 8 · Fornecedores e Construção Civil",
     rect(954.5698, 679.3176, 1060.5818, 860.3455),
     "Faixa dos pavilhões · entre 12 e 13",
     {
@@ -355,7 +355,7 @@ const pavilions: MapEntity[] = [
         sourcePoint([1055, 679.3176]),
       ],
       notes:
-        "937,32 m² é área total do edifício. A planta específica mostra 01 e 03–08, sem 02; corredor livre de saída preservado para o interior futuro. Acessos projetados por posição relativa na planta, sem precisão cadastral.",
+        "937,32 m² é a área total do edifício. A planta interna apresenta os sete lotes documentados, as passagens laterais e o corredor de saída nos fundos.",
     },
   ),
   entity(

@@ -1,4 +1,4 @@
-import type { PhotoBuilder } from "./photoArchitectureKit";
+import type { PhotoBuilder, PhotoVertex } from "./photoArchitectureKit";
 
 /** Photographs 3–7, 2026-11-03. The openings and construction types are
  * observed; their ratios are perspective-based estimates, not measured sizes.
@@ -91,6 +91,10 @@ function buildP13(raw: PhotoBuilder): void {
 function buildP8(raw: PhotoBuilder): void {
   const b = paintedBrickBuilder(raw);
   const { w, h, rise } = b;
+  const masonry = "#e8e1d3";
+  const plinth = "#bcb3a7";
+  const framing = "#4d5350";
+  const fronton = "#d6cdbc";
   const gateTop = h * 0.6;
   const ribbonSill = h * 0.66;
   const ribbonHead = h * 0.84;
@@ -98,25 +102,61 @@ function buildP8(raw: PhotoBuilder): void {
     [0.265, 0.46],
     [0.755, 0.895],
   ] as const;
-  let cursor = 0;
-  for (const [start, end] of doors) {
-    b.wall(cursor * w, start * w, 0.06, ribbonSill, 0, LIGHT);
-    b.gate(start * w, end * w, 0.08, gateTop, 0);
-    b.wall(start * w, end * w, gateTop, ribbonSill, 0, LIGHT);
-    cursor = end;
+  const baseHeight = h * 0.11;
+  const wallBay = (from: number, to: number, color = masonry) => {
+    b.wall(from * w, to * w, 0.06, baseHeight, 0, plinth, "concrete");
+    b.wall(from * w, to * w, baseHeight, ribbonSill, 0, color);
+  };
+  wallBay(0, doors[0][0]);
+  wallBay(doors[0][1], doors[1][0], "#dfd3c4");
+  wallBay(doors[1][1], 1);
+  for (const [from, to] of doors) {
+    const left = from * w;
+    const right = to * w;
+    const center = (left + right) / 2;
+    b.gate(left, right, 0.08, gateTop, 0);
+    b.wall(left, right, gateTop, ribbonSill, 0, masonry);
+
+    // The outer reveal reads as a separate layer from the recessed gate.
+    // Jambs and lintel stay outside the photographed opening.
+    const jambWidth = 0.085;
+    const revealBottom = 0.065;
+    const revealTop = gateTop + 0.105;
+    for (const x of [left - jambWidth / 2, right + jambWidth / 2])
+      b.box(
+        "concrete",
+        x,
+        (revealBottom + revealTop) / 2,
+        -0.026,
+        jambWidth,
+        revealTop - revealBottom,
+        0.08,
+        "#c5b9a9",
+      );
+    b.box(
+      "architecturalFrame",
+      center,
+      gateTop + 0.082,
+      -0.043,
+      right - left,
+      0.046,
+      0.075,
+      framing,
+    );
+    b.box("concrete", center, 0.029, -0.115, right - left, 0.058, 0.3, "#cec2b2");
   }
-  b.wall(cursor * w, w, 0.06, ribbonSill, 0, LIGHT);
-  b.wall(0, w * 0.078, ribbonSill, ribbonHead, 0, LIGHT);
-  b.wall(w * 0.655, w, ribbonSill, ribbonHead, 0, LIGHT);
+  b.wall(0, w * 0.078, ribbonSill, ribbonHead, 0, masonry);
+  b.wall(w * 0.655, w, ribbonSill, ribbonHead, 0, masonry);
   for (let panel = 0; panel < 3; panel++) {
     const x0 = w * (0.078 + panel * 0.193);
     const x1 = w * (0.078 + panel * 0.193 + 0.181);
     b.window(x0, x1, ribbonSill, ribbonHead, 0, 3, 2);
-    if (panel < 2) b.wall(x1, w * (0.078 + (panel + 1) * 0.193), ribbonSill, ribbonHead, 0, LIGHT);
+    if (panel < 2)
+      b.wall(x1, w * (0.078 + (panel + 1) * 0.193), ribbonSill, ribbonHead, 0, masonry);
   }
-  b.wall(w * 0.645, w * 0.655, ribbonSill, ribbonHead, 0, LIGHT);
-  b.wall(0, w, ribbonHead, h, 0.015, "#d9d3c0", "paintedSheet");
-  b.gablePanel(0, w, h, rise, 0.015, "#d9d3c0", "paintedSheet");
+  b.wall(w * 0.645, w * 0.655, ribbonSill, ribbonHead, 0, masonry);
+  b.wall(0, w, ribbonHead, h, 0.015, fronton, "paintedSheet");
+  b.gablePanel(0, w, h, rise, 0.015, fronton, "paintedSheet");
 
   const low = ribbonHead + 0.035;
   const step = 0.11;
@@ -124,11 +164,11 @@ function buildP8(raw: PhotoBuilder): void {
     for (let y = low; y < h + rise - 0.025; y += step) {
       const inset = y <= h ? 0.018 * w : (w * 0.5 * (y - h)) / Math.max(rise, 0.001);
       if (inset * 2 >= w - 0.04) continue;
-      b.box("paintedSheet", w * 0.5, y, -0.028, w - inset * 2, 0.025, 0.035, "#c7c1ae");
+      b.box("paintedSheet", w * 0.5, y, -0.028, w - inset * 2, 0.025, 0.035, "#bfb6a5");
     }
   });
-  b.box("architecturalFrame", w * 0.5, ribbonSill - 0.025, -0.045, w, 0.115, 0.13, FRAME);
-  b.box("architecturalFrame", w * 0.5, ribbonHead + 0.025, -0.045, w, 0.13, 0.14, FRAME);
+  b.box("architecturalFrame", w * 0.5, ribbonSill - 0.025, -0.045, w, 0.115, 0.13, framing);
+  b.box("architecturalFrame", w * 0.5, ribbonHead + 0.025, -0.045, w, 0.13, 0.14, framing);
   for (const x of [0.02, 0.33, 0.64, 0.985]) {
     const top = h + rise * Math.min(x, 1 - x) * 2;
     b.box(
@@ -139,18 +179,88 @@ function buildP8(raw: PhotoBuilder): void {
       0.085,
       top - ribbonHead,
       0.13,
-      FRAME,
+      framing,
     );
   }
   for (const x of [0.025, 0.985])
-    b.box("architecturalFrame", w * x, h * 0.425, -0.055, 0.13, h * 0.85, 0.16, FRAME);
-  b.pitchedCanopy(w * 0.24, w * 0.94, -1.1, 0.07, Math.max(2.22, h * 0.66), rise * 0.35);
+    b.box("architecturalFrame", w * x, h * 0.425, -0.055, 0.13, h * 0.85, 0.16, framing);
+
+  const canopyLeft = w * 0.24;
+  const canopyRight = w * 0.94;
+  const canopyFront = -1.1;
+  const canopyEave = Math.max(2.22, h * 0.66);
+  const canopyRise = rise * 0.35;
+  b.pitchedCanopy(canopyLeft, canopyRight, canopyFront, 0.07, canopyEave, canopyRise);
+  const fasciaY = canopyEave - 0.057;
+  const ridge: PhotoVertex = [(canopyLeft + canopyRight) / 2, fasciaY + canopyRise, canopyFront];
+  b.beam("paintedSheet", [canopyLeft, fasciaY, canopyFront], ridge, 0.04, "#a79e90");
+  b.beam("paintedSheet", ridge, [canopyRight, fasciaY, canopyFront], 0.04, "#a79e90");
+  buildP8Plaque(b);
 
   // The left roof-edge gutter, elbow and exposed downpipe are observed in
   // photo 5. Their diameters and the hidden rear drain run are unmeasured.
   b.beam("whitePaint", [0.04, h * 0.98, 0], [0.04, h * 0.98, -0.2], 0.045);
   b.beam("whitePaint", [0.04, h * 0.98, -0.2], [0.08, h * 0.91, -0.23], 0.045);
   b.beam("whitePaint", [0.08, h * 0.91, -0.23], [0.08, 0.09, -0.23], 0.045);
+}
+
+/** The exhibition plate is mounted on the blind central bay. It shares the
+ * interior's mineral face, terracotta accent and graphite digits. The lettering
+ * is planar geometry in the existing batch, so the light profile also renders it. */
+function buildP8Plaque(b: PhotoBuilder): void {
+  const x = b.w * 0.6075;
+  const y = b.h * 0.38;
+  const height = b.h * 0.2;
+  const width = (height * 62) / 52;
+  const faceZ = -0.068;
+  const ink = "#302c2f";
+  b.box("paintedSheet", x, y, -0.025, width, height, 0.05, "#c1af9e");
+  b.box("paintedSheet", x, y, -0.05, width * 0.965, height * 0.953, 0.02, "#f2ebdf");
+  const rect = (left: number, bottom: number, right: number, top: number, color: string) =>
+    b.quad(
+      "paintedSheet",
+      [left, bottom, faceZ],
+      [left, top, faceZ],
+      [right, top, faceZ],
+      [right, bottom, faceZ],
+      color,
+    );
+  rect(x - width * 0.395, y + height * 0.373, x - width * 0.202, y + height * 0.402, "#a45f49");
+
+  const digitWidth = width * 0.275;
+  const digitHeight = height * 0.47;
+  const digitCenter = y + height * 0.008;
+  const weight = height * 0.055;
+  const outline = (center: number, w: number, h: number): PhotoVertex[] => {
+    const left = center - w / 2;
+    const right = center + w / 2;
+    const bottom = digitCenter - h / 2;
+    const top = digitCenter + h / 2;
+    const corner = Math.min(w, h) * 0.23;
+    return [
+      [left, bottom + corner, faceZ],
+      [left, top - corner, faceZ],
+      [left + corner, top, faceZ],
+      [right - corner, top, faceZ],
+      [right, top - corner, faceZ],
+      [right, bottom + corner, faceZ],
+      [right - corner, bottom, faceZ],
+      [left + corner, bottom, faceZ],
+    ];
+  };
+  const zero = x - width * 0.185;
+  const eight = x + width * 0.185;
+  for (const digit of [zero, eight]) {
+    const outer = outline(digit, digitWidth, digitHeight);
+    const inner = outline(digit, digitWidth - 2 * weight, digitHeight - 2 * weight);
+    for (let i = 0; i < outer.length; i++) {
+      const next = (i + 1) % outer.length;
+      b.quad("paintedSheet", outer[i], outer[next], inner[next], inner[i], ink);
+    }
+  }
+  const waist = digitCenter + digitHeight * 0.025;
+  const innerHalfWidth = digitWidth / 2 - weight;
+  rect(eight - innerHalfWidth, waist - weight / 2, eight + innerHalfWidth, waist + weight / 2, ink);
 }
 
 /** P12's longitudinal rhythm follows photos 6/7: red brick, tall recessed

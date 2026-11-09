@@ -1,3 +1,42 @@
+# Pavilhão 8 · Maquete industrial clara · Design QA, 08/11/2026
+
+final result: passed
+
+A primeira revisão mostrou que piso e circulação se confundiam com o fundo, os números ficavam soltos e os seletores estavam longe da introdução. A nova planta separa laje mineral, juntas, estrutura e bordas dos lotes. As placas Figtree com algarismos tabulares ficam dentro dos polígonos, e a legenda usa as mesmas superfícies da maquete. A marca vetorial e a sinalização mantêm o texto e a leitura em escala reduzida. [Comparação do interior](docs/validation/pavilion-8-maquete/comparacao-interior.jpg) · [Identidade](docs/fornecedores-construcao-identity.md).
+
+| Janela CSS | Evidência |
+|---|---|
+| 1440 × 900 | [Planta com lote 07 selecionado](docs/validation/pavilion-8-maquete/depois-interior-07.jpg) · [Fachada oblíqua](docs/validation/pavilion-8-maquete/comparacao-fachada-obliqua.jpg) · [Inspeção sem cobertura](docs/validation/pavilion-8-maquete/depois-sem-cobertura.jpg) |
+| 1280 × 720 | [Fachada frontal](docs/validation/pavilion-8-maquete/comparacao-fachada-frontal.jpg) · [Mapa leve e ficha](docs/validation/pavilion-8-maquete/comparacao-mapa-leve.jpg) |
+| 834 × 1112 | [Tablet com lote 07](docs/validation/pavilion-8-maquete/depois-tablet-07.jpg) |
+| 390 × 844 | [Comparação do painel com lote 07](docs/validation/pavilion-8-maquete/comparacao-mobile-lote-07.jpg) |
+
+Na vista frontal, a placa 08 ocupa o pano entre os portões. Soleiras, umbrais, marquise e esquadrias ganham contraste com o embasamento. As comparações 3D repetem câmera e perfil Equilibrado em prévias locais separadas. O recorte exclui as barras de navegação. O mapa leve preserva o contorno cadastral e usa a mesma frente registrada para os dois limiares. A cumeeira some com a cobertura e os limiares continuam visíveis.
+
+No navegador integrado, os cliques dos dois lados das diagonais de 01, 07 e 08, a seleção por teclado e a recarga confirmaram o contorno de seleção. Roda e arraste preservaram o lote selecionado. Fechar o painel conservou a câmera. As ligações P8–P13 e P8–P12, o acesso pelo parque e a volta à ficha foram exercitados. No celular, o lote 07 ficou entre x=268 e x=375, à direita do painel que termina em x=260 e acima dos controles que começam em y=673. A pinça foi coberta pelos testes com dois ponteiros. O navegador integrado não oferece injeção de toque nesse fluxo e a verificação em aparelho físico ficou pendente.
+
+A base usada na comparação é a árvore da PR #16, reaplicada sobre a `main` que já contém P13. A prévia usa a edição local e as mesmas geometrias. [Base do interior e verificação do banco](docs/pavilion-interior/pavilion8-implementation.md).
+
+---
+
+# Pavilhão 8 — Fornecedores e Construção Civil — Design QA, 08/11/2026
+
+final result: passed
+
+O recorte do PDF rev. 02 e a captura da planta foram alinhados aos mesmos limites locais de 461 × 736 pontos, entrada embaixo. A comparação confirma os polígonos de 01, 07 e 08, a ilha mais larga junto à entrada, as duas passagens em alturas diferentes e o corredor acima de 05. As placas 13 e 12 foram deslocadas para as aberturas, com folga em relação aos limites comerciais. [Comparação da aplicação com a fonte](docs/validation/pavilion-8/application-comparison.jpg) · [Acessos laterais](docs/validation/pavilion-8/lateral-connections.jpg).
+
+| Janela CSS | Evidência |
+|---|---|
+| 1440 × 900 | [Planta inteira](docs/validation/pavilion-8/desktop-overview.jpg) · [Seleção 07](docs/validation/pavilion-8/desktop-lot-07.jpg) · [Detalhe da entrada](docs/validation/pavilion-8/desktop-entrance.jpg) |
+| 834 × 1112 | [Tablet](docs/validation/pavilion-8/tablet-overview.jpg) |
+| 390 × 844 | [Planta inteira](docs/validation/pavilion-8/mobile-overview.jpg) · [Painel com lote 07](docs/validation/pavilion-8/mobile-lot-07.jpg) |
+
+A assinatura vetorial mantém a hierarquia da marca e reserva a área total para texto da interface. Os números grafite usam tamanho uniforme no desenho. O contraste do lote selecionado foi conferido com branco sobre ameixa `#643b54`; a mudança de cor é imediata. Fundo quente, contorno do prédio, limites dos lotes e circulação têm pesos distintos. A família Figtree de placas usa texto e pictograma com cor por função. Foram conferidas as duas entradas de P13 e a entrada, a saída e os dois acessos de serviço de P1. [P1](docs/validation/pavilion-8/p1-wayfinding.jpg) · [P13](docs/validation/pavilion-8/p13-wayfinding.jpg).
+
+A revisão encontrou um salto ao fechar a seleção após arrastar e um recorte lateral no lote 07 com painel móvel. Após os ajustes, fechar manteve a transformação exatamente e, a 390 × 844, o lote 07 ficou entre x=268 e x=375, com painel até x=260 e controles a partir de y=673. O clique nas diagonais, a roda, a ida pelo parque, recarga, voltar/avançar e as ligações com P12 e P13 foram exercitados no navegador. A pinça passou no teste com dois ponteiros do componente compartilhado. A prévia usa sessão controlada e o banco real foi verificado separadamente. [Relatório](docs/pavilion-interior/pavilion8-implementation.md).
+
+---
+
 # Pavilhão 13 — Salão de Imóveis — Design QA, 08/11/2026
 
 final result: passed

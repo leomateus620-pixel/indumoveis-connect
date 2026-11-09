@@ -8,7 +8,7 @@ import {
   usePavilionInteriorCommercial,
 } from "@/lib/api";
 import { PavilionInterior } from "./PavilionInterior";
-import { pavilionDestination } from "./connections";
+import { pavilionDestination, type ParkPavilionSearch } from "./connections";
 import { readParkReturn } from "./parkReturn";
 import { PAVILION_PRESENTATIONS, type InteriorPavilionNumber } from "./presentation";
 
@@ -38,7 +38,7 @@ export function PavilionInteriorPage({
     const saved = readParkReturn(edition.data?.id, pavilionNumber);
     void navigate({
       to: "/mapa",
-      search: { ...saved?.search, pavilhao: String(pavilionNumber) as "1" | "13" },
+      search: { ...saved?.search, pavilhao: String(pavilionNumber) as ParkPavilionSearch },
     });
   };
   const shell = `arq-interior is-pavilion-${pavilionNumber} arq-loading`;

@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { PavilionInterior } from "./PavilionInterior";
 import { PAVILION_13_PLAN } from "./pavilion13";
+import { PAVILION_8_PLAN } from "./pavilion8";
 import { PAVILION_1_PLAN } from "./data";
 import { PAVILION_PRESENTATIONS } from "./presentation";
 
@@ -81,6 +82,89 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+});
+
+describe("Pavilhão 8 lot inspection", () => {
+  it("shows the pavilion total separately and omits an existing individual lot area", () => {
+    const plan = {
+      ...PAVILION_8_PLAN,
+      environments: PAVILION_8_PLAN.environments.map((lot) =>
+        lot.code === "07" ? { ...lot, declaredAreaM2: 123.45 } : lot,
+      ),
+    };
+    render(
+      <PavilionInterior
+        plan={plan}
+        presentation={PAVILION_PRESENTATIONS[8]}
+        selectedCode="07"
+        onBack={() => {}}
+        onSelect={onSelect}
+      />,
+    );
+    const header = screen
+      .getByRole("heading", { name: "Fornecedores e Construção Civil" })
+      .closest("header")!;
+    expect(within(header).getByText("937,32 m²")).toBeInTheDocument();
+    expect(within(header).getByText("Pavilhão 8")).toBeInTheDocument();
+    const sidebar = screen.getByRole("complementary", { name: "Informações do lote" });
+    expect(within(sidebar).getByRole("heading", { name: "Lote 07" })).toBeInTheDocument();
+    expect(sidebar).not.toHaveTextContent(/m²|123,45/);
+    expect(within(sidebar).queryByRole("button", { name: "Lote 02" })).not.toBeInTheDocument();
+    const drawing = screen.getByRole("group", { name: "Planta interativa do Pavilhão 8" });
+    expect(within(drawing).getByRole("link", { name: "Acesso ao Pavilhão 13" })).toHaveAttribute(
+      "href",
+      "/mapa/pavilhoes/13/interior",
+    );
+    expect(within(drawing).getByRole("link", { name: "Acesso ao Pavilhão 12" })).toHaveAttribute(
+      "href",
+      "/mapa?pavilhao=12",
+    );
+    const entrances = within(drawing).getAllByRole("img", { name: "Entrada" });
+    expect(entrances).toHaveLength(2);
+    for (const entrance of entrances) {
+      expect(entrance).toHaveAttribute("href", "/brand/fornecedores-construcao/entrada.svg");
+    }
+    expect(within(drawing).getByRole("img", { name: "Saída" })).toHaveAttribute(
+      "href",
+      "/brand/fornecedores-construcao/saida.svg",
+    );
+    const lot = plan.environments.find((environment) => environment.code === "07")!;
+    expect(within(drawing).getByRole("button", { name: "07 · Lote 07" })).toHaveAttribute(
+      "d",
+      lot.parts[0].path,
+    );
+    expect(drawing.querySelector(".arq-p8-structure")).toHaveAttribute("pointer-events", "none");
+    expect(drawing.querySelector(".arq-p8-lot-relief")).toHaveAttribute("pointer-events", "none");
+    expect([...drawing.querySelectorAll(".arq-plan-label")].map((e) => e.textContent)).toEqual([
+      "01",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+    ]);
+  });
+
+  it("keeps the camera on close while the router clears the selection", () => {
+    const { container } = render(
+      <PavilionInterior
+        plan={PAVILION_8_PLAN}
+        presentation={PAVILION_PRESENTATIONS[8]}
+        selectedCode="07"
+        onBack={() => {}}
+        onSelect={onSelect}
+      />,
+    );
+    const drawing = container.querySelector(".arq-plan > g")!;
+    const viewport = screen.getByRole("group", { name: "Planta interativa do Pavilhão 8" });
+    fireEvent.keyDown(viewport, { key: "ArrowDown" });
+    fireEvent.keyDown(viewport, { key: "ArrowDown" });
+    const afterPan = drawing.getAttribute("transform");
+    fireEvent.click(screen.getByRole("button", { name: "Fechar painel e seleção" }));
+    expect(onSelect).toHaveBeenCalledExactlyOnceWith(undefined);
+    expect(drawing).toHaveAttribute("transform", afterPan);
+  });
 });
 
 describe("Pavilhão 13 lot inspection", () => {

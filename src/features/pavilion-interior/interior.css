@@ -747,14 +747,14 @@
     font-size: max(5.6px, calc(7px / var(--plan-scale, 1)));
   }
 }
-/* Pavilhão 13 shares navigation, with an independent brand-led header. */
-.is-pavilion-13 .arq-header {
+/* Interiors with a lot directory share the compact, brand-led header. */
+.has-lot-layout .arq-header {
   height: 104px;
   grid-template-columns: 40px auto minmax(0, 1fr);
   gap: 20px;
   padding-inline: 24px;
 }
-.is-pavilion-13 .arq-signature {
+.has-lot-layout .arq-signature {
   width: 228px;
   height: 79px;
   justify-self: start;
@@ -764,7 +764,7 @@
   display: flex;
   align-items: center;
 }
-.is-pavilion-13 .arq-back-compact {
+.has-lot-layout .arq-back-compact {
   height: 40px;
   width: 40px;
   min-height: 40px;
@@ -774,7 +774,7 @@
   color: #71665f;
   background: #fcfbf8;
 }
-.is-pavilion-13 .arq-back-compact:hover {
+.has-lot-layout .arq-back-compact:hover {
   background: #eee8e1;
   border-color: #8b7b65;
   color: #302c2f;
@@ -788,10 +788,10 @@
   letter-spacing: 0.15em;
   color: #74666d;
 }
-.is-pavilion-13 .arq-canvas {
+.has-lot-layout .arq-canvas {
   background: #f5f2eb;
 }
-.is-pavilion-13 .arq-part {
+.has-lot-layout .arq-part {
   fill: #ebe5db;
   stroke: #9e9589;
   stroke-width: 0.9;
@@ -799,39 +799,39 @@
     fill 0.1s,
     stroke 0.1s;
 }
-.is-pavilion-13 .arq-environment:hover .arq-part {
+.has-lot-layout .arq-environment:hover .arq-part {
   fill: #ded2d5;
   stroke: #896c7a;
 }
-.is-pavilion-13 .arq-environment.is-selected .arq-part {
+.has-lot-layout .arq-environment.is-selected .arq-part {
   fill: var(--arq-plum);
   stroke: #302c2f;
   stroke-width: 2.5;
 }
-.is-pavilion-13 .arq-environment.is-selected .arq-plan-label {
+.has-lot-layout .arq-environment.is-selected .arq-plan-label {
   fill: white;
   font-weight: 750;
 }
-.is-pavilion-13 .arq-plan-label {
+.has-lot-layout .arq-plan-label {
   font-weight: 500;
   letter-spacing: 0;
   fill: #3d3737;
 }
-.is-pavilion-13 .arq-architecture {
+.has-lot-layout .arq-architecture {
   stroke: #6c6156;
 }
-.is-pavilion-13 .arq-architecture .is-guide {
+.has-lot-layout .arq-architecture .is-guide {
   stroke: #bab0a3;
   stroke-dasharray: 4 5;
 }
-.is-pavilion-13 .arq-architecture text {
+.has-lot-layout .arq-architecture text {
   font-size: max(12px, calc(9px / var(--plan-scale, 1)));
   fill: #6c6156;
 }
-.is-pavilion-13 .arq-number {
+.has-lot-layout .arq-number {
   margin-bottom: 4px;
 }
-.is-pavilion-13 .arq-information h2 {
+.has-lot-layout .arq-information h2 {
   margin-bottom: 20px;
 }
 .arq-lot-context {
@@ -896,24 +896,24 @@
   line-height: 1.5;
   margin-top: 10px;
 }
-.is-pavilion-13 .arq-sidebar-footer {
+.has-lot-layout .arq-sidebar-footer {
   margin-top: 20px;
 }
-.is-pavilion-13 .arq-key i {
+.has-lot-layout .arq-key i {
   background: #ebe5db;
   border-color: #9e9589;
 }
-.is-pavilion-13 .arq-key i.is-support {
+.has-lot-layout .arq-key i.is-support {
   background: #f5f2eb;
   border-color: #c9beb4;
 }
 @media (max-width: 1050px) {
-  .is-pavilion-13 .arq-header {
+  .has-lot-layout .arq-header {
     height: 96px;
     gap: 16px;
     padding-inline: 20px;
   }
-  .is-pavilion-13 .arq-signature {
+  .has-lot-layout .arq-signature {
     width: 210px;
     height: 73px;
   }
@@ -922,31 +922,31 @@
   }
 }
 @media (max-width: 700px) {
-  .is-pavilion-13 .arq-header {
+  .has-lot-layout .arq-header {
     height: 98px;
     grid-template-columns: 36px minmax(0, 1fr);
     grid-template-rows: 1fr;
     gap: 12px;
     padding-inline: 16px;
   }
-  .is-pavilion-13 .arq-back-compact {
+  .has-lot-layout .arq-back-compact {
     grid-row: 1;
     grid-column: 1;
     height: 36px;
     min-height: 36px;
     width: 36px;
   }
-  .is-pavilion-13 .arq-brand-led {
+  .has-lot-layout .arq-brand-led {
     grid-row: 1;
     grid-column: 2;
   }
-  .is-pavilion-13 .arq-signature {
+  .has-lot-layout .arq-signature {
     width: 208px;
     height: 72px;
     grid-row: auto;
     grid-column: auto;
   }
-  .is-pavilion-13 .arq-pavilion-id {
+  .has-lot-layout .arq-pavilion-id {
     position: absolute;
     right: 16px;
     top: 8px;
@@ -954,13 +954,13 @@
     padding-left: 0;
     border: 0;
   }
-  .is-pavilion-13 .arq-sidebar {
+  .has-lot-layout .arq-sidebar {
     width: min(260px, calc(100% - 112px));
   }
-  .is-pavilion-13 .arq-number {
+  .has-lot-layout .arq-number {
     font-size: 56px;
   }
-  .is-pavilion-13 .arq-information h2 {
+  .has-lot-layout .arq-information h2 {
     font-size: 20px;
   }
   .arq-lot-search {
@@ -972,10 +972,10 @@
   }
 }
 @media (max-height: 650px) and (min-width: 701px) {
-  .is-pavilion-13 .arq-header {
+  .has-lot-layout .arq-header {
     height: 84px;
   }
-  .is-pavilion-13 .arq-signature {
+  .has-lot-layout .arq-signature {
     height: 68px;
     width: 196px;
   }
@@ -1035,4 +1035,284 @@
 }
 .arq-connection:focus-visible .arq-connection-hit {
   stroke: var(--arq-plum);
+}
+
+.is-pavilion-8 .arq-header {
+  grid-template-columns: 40px auto minmax(0, 1fr) auto;
+  background: #fcf9f3;
+}
+.is-pavilion-8 .arq-signature {
+  width: 232px;
+  height: auto;
+  aspect-ratio: 320 / 92;
+}
+.arq-total-area {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #675c56;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.arq-total-area strong {
+  color: var(--arq-ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.is-pavilion-8 .arq-canvas {
+  background: radial-gradient(ellipse at 50% 42%, #f8f4ec, #eae3d8);
+}
+.is-pavilion-8 .arq-sidebar {
+  background: #fcf9f3;
+  border-color: #d6cbbd;
+}
+.is-pavilion-8 .arq-intro {
+  padding-top: 20px;
+}
+.is-pavilion-8 .arq-intro h2 {
+  font-weight: 650;
+}
+.is-pavilion-8 .arq-intro > p {
+  margin: 12px 0 20px;
+}
+.is-pavilion-8 .arq-index {
+  padding-block: 12px;
+}
+.is-pavilion-8 .arq-index strong,
+.is-pavilion-8 .arq-number {
+  font-family: Figtree, sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+}
+.is-pavilion-8 .arq-number {
+  display: inline-grid;
+  place-items: center;
+  min-width: 74px;
+  padding: 4px 10px;
+  border: 1px solid #302c2f;
+  border-radius: 6px;
+  margin: 14px 0 12px;
+  background: #302c2f;
+  box-shadow: inset 0 -3px #ad735b;
+  color: #fcf6ed;
+  font-size: 42px;
+  font-weight: 650;
+}
+.is-pavilion-8 .arq-environments {
+  margin-top: 0;
+  padding-block: 22px 0;
+}
+.is-pavilion-8 .arq-space-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 10px;
+}
+.is-pavilion-8 .arq-space-grid button {
+  height: 44px;
+  border-color: #c7bbae;
+  border-radius: 6px;
+  background: #f6efe4;
+  color: #403934;
+  font-size: 14px;
+  font-weight: 650;
+}
+.is-pavilion-8 .arq-space-grid button:hover {
+  background: #ede0d3;
+}
+.is-pavilion-8 .arq-space-grid button[aria-pressed="true"] {
+  border-color: var(--arq-plum);
+  background: var(--arq-plum);
+  color: #fff;
+}
+.is-pavilion-8 .arq-sidebar-footer {
+  margin-top: 22px;
+}
+.is-pavilion-8 .arq-key {
+  color: #514a44;
+  font-size: 10px;
+}
+.is-pavilion-8 .arq-key i {
+  border-color: #8c7b6d;
+  background: #eee7db;
+}
+.is-pavilion-8 .arq-key i.is-support {
+  background: #dad5cb;
+}
+.is-pavilion-8 .arq-key i.is-structure {
+  border-color: #494442;
+  background: #494442;
+}
+.is-pavilion-8 .arq-view-controls,
+.is-pavilion-8 .arq-panel-toggle {
+  border-color: #cbbdaf;
+  background: #fcf9f3;
+  box-shadow: 0 3px 12px #302c2f17;
+}
+.arq-p8-floor-shadow {
+  fill: #5f5544;
+  opacity: 0.13;
+}
+.arq-p8-floor-edge {
+  fill: #a99f91;
+}
+.arq-p8-floor-joint {
+  fill: none;
+  stroke: #877c6d;
+  stroke-width: 1;
+  opacity: 0.38;
+}
+.arq-p8-wall-shadow,
+.arq-p8-wall,
+.arq-p8-wall-cap {
+  fill: none;
+  stroke-linejoin: round;
+}
+.arq-p8-wall-shadow {
+  stroke: #6f6455;
+  stroke-width: 9;
+  opacity: 0.38;
+}
+.arq-p8-wall {
+  stroke: #514a46;
+  stroke-width: 7;
+}
+.arq-p8-wall-cap {
+  stroke: #a29a8c;
+  stroke-width: 2;
+}
+.arq-p8-threshold {
+  fill: #c3b9aa;
+  stroke: #a79b8c;
+  stroke-width: 0.8;
+}
+.arq-p8-threshold.is-entrance {
+  fill: #b9c7b5;
+  stroke: #788b76;
+}
+.arq-p8-threshold.is-exit {
+  fill: #d2b6a8;
+  stroke: #a17562;
+}
+.arq-p8-aisle-label {
+  fill: #575047;
+  font-family: Figtree, sans-serif;
+  font-size: clamp(10px, calc(9px / var(--plan-scale, 1)), 14px);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.is-pavilion-8 .arq-part {
+  fill: #eee7db;
+  stroke: #84766b;
+  stroke-width: 1;
+  pointer-events: fill;
+  transition: none;
+  vector-effect: non-scaling-stroke;
+}
+.is-pavilion-8 .arq-environment:hover .arq-part {
+  fill: #e8dbca;
+  stroke: #855d4a;
+}
+.is-pavilion-8 .arq-environment.is-selected .arq-part {
+  fill: var(--arq-plum);
+  stroke: #3f2837;
+  stroke-width: 2;
+}
+.is-pavilion-8 .arq-environment .arq-part:focus-visible {
+  stroke: #8f472f;
+  stroke-width: 3;
+  stroke-dasharray: 5 3;
+}
+.arq-p8-lot-rim,
+.arq-p8-lot-light {
+  fill: none;
+}
+.arq-p8-lot-rim {
+  stroke: #746253;
+  stroke-width: 8;
+  opacity: 0.21;
+}
+.arq-p8-lot-light {
+  stroke: #fffbf3;
+  stroke-width: 3;
+  opacity: 0.85;
+}
+.is-selected .arq-p8-lot-rim {
+  stroke: #281824;
+  opacity: 0.48;
+}
+.is-selected .arq-p8-lot-light {
+  stroke: #d4a9bf;
+  opacity: 0.38;
+}
+.arq-p8-plate-edge {
+  fill: #9b8070;
+}
+.arq-p8-plate-face {
+  fill: #fcf7ef;
+  stroke: #af9a86;
+  stroke-width: 1;
+}
+.is-selected .arq-p8-plate-edge {
+  fill: #241320;
+}
+.is-selected .arq-p8-plate-face {
+  fill: #47273d;
+  stroke: #d0afbf;
+}
+.is-pavilion-8 .arq-plan-label:not(.is-word) {
+  fill: #302c2f;
+  font-family: Figtree, sans-serif;
+  font-size: clamp(23px, calc(15px / var(--plan-scale, 1)), 32px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.is-pavilion-8 .arq-environment.is-selected .arq-plan-label {
+  fill: #fff8f3;
+}
+.is-pavilion-8 .arq-architecture {
+  stroke: #64574e;
+}
+.is-pavilion-8 .arq-architecture .is-wall {
+  stroke: #696059;
+}
+.is-pavilion-8 .arq-architecture .is-door,
+.is-pavilion-8 .arq-architecture .is-access {
+  stroke: #766356;
+}
+.is-pavilion-8 .arq-architecture text {
+  fill: #574b42;
+  font-weight: 650;
+}
+@media (max-width: 1050px) {
+  .is-pavilion-8 .arq-signature {
+    width: 214px;
+  }
+}
+@media (max-width: 700px) {
+  .is-pavilion-8 .arq-header {
+    height: 106px;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-rows: 1fr auto;
+    gap: 0 12px;
+    padding-block: 10px 12px;
+  }
+  .is-pavilion-8 .arq-brand-led {
+    grid-column: 2 / -1;
+  }
+  .is-pavilion-8 .arq-signature {
+    width: 188px;
+    max-width: 100%;
+  }
+  .is-pavilion-8 .arq-pavilion-id {
+    position: static;
+    grid-row: 2;
+    grid-column: 2;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+  .is-pavilion-8 .arq-total-area {
+    grid-row: 2;
+    grid-column: 3;
+    font-size: 12px;
+  }
 }

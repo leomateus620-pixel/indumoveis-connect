@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useId, useImperativeHandle, useRef } from "react";
 import { MAP_BOUNDS, TREES } from "./data/territory";
 import {
   PARK_CORE_ENTITIES as ENTITIES,
@@ -22,6 +22,7 @@ import {
 } from "./labelPolicy";
 import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
 import { commercialBoundaries, interiorLotAnchor, LOT_GRAPHICS } from "./commercialPresentation";
+import { getPavilionPresentation } from "./architectureOrientation";
 
 const fullWidth = MAP_BOUNDS.maxX - MAP_BOUNDS.minX;
 const fullHeight = MAP_BOUNDS.maxY - MAP_BOUNDS.minY;
@@ -49,6 +50,61 @@ const lotAnchors = new Map(
 const roadCorridors = new Map(
   roads.map((entity) => [entity.id, streetLabelCorridor(entity, roads)]),
 );
+const pavilion8Id = "indumoveis:pavilion:8";
+
+function Pavilion8MapDetail({ entity, roofVisible }: { entity: MapEntity; roofVisible: boolean }) {
+  const clip = useId();
+  const presentation = getPavilionPresentation(entity);
+  if (!presentation) return null;
+
+  const [a, b] = presentation.frontEdge;
+  const frontWidth = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const tangent = [(b[0] - a[0]) / frontWidth, (b[1] - a[1]) / frontWidth];
+  const frontMidpoint = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const [ridgeX, ridgeY] = presentation.ridgeDirection;
+  const [frontX, frontY] = presentation.frontNormal;
+  const bounds = polygonBounds(entity.polygon);
+  const reach = Math.hypot(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY);
+
+  return (
+    <g pointerEvents="none" aria-hidden="true">
+      <clipPath id={clip}>
+        <polygon points={entity.polygon.map((point) => point.join(",")).join(" ")} />
+      </clipPath>
+      <g clipPath={`url(#${clip})`}>
+        {roofVisible && (
+          <line
+            x1={frontMidpoint[0] - ridgeX * reach}
+            y1={frontMidpoint[1] - ridgeY * reach}
+            x2={frontMidpoint[0] + ridgeX * reach}
+            y2={frontMidpoint[1] + ridgeY * reach}
+            stroke="#776c63"
+            strokeWidth="1.2"
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
+        {presentation.mainEntries.map(([x, y]) => {
+          const inset = frontWidth * 0.04;
+          const halfWidth = frontWidth * 0.06;
+          return (
+            <line
+              key={`${x},${y}`}
+              x1={x - frontX * inset - tangent[0] * halfWidth}
+              y1={y - frontY * inset - tangent[1] * halfWidth}
+              x2={x - frontX * inset + tangent[0] * halfWidth}
+              y2={y - frontY * inset + tangent[1] * halfWidth}
+              stroke="#8c4e3c"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          );
+        })}
+      </g>
+    </g>
+  );
+}
+
 function entityColor(entity: MapEntity) {
   if (entity.kind === "road") return isWalkway(entity) ? VISUAL_THEME.walk : VISUAL_THEME.road;
   if (entity.kind === "lot") return "#91ad7d";
@@ -599,9 +655,12 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
               points={entity.polygon.map((p) => p.join(",")).join(" ")}
               style={{
                 display: props.inspectedId === entity.id ? "none" : undefined,
-                fill: VISUAL_THEME.roof,
+                fill: entity.id === pavilion8Id ? "#c8c2b5" : VISUAL_THEME.roof,
               }}
             />
+          )}
+          {entity.id === pavilion8Id && (
+            <Pavilion8MapDetail entity={entity} roofVisible={props.inspectedId !== entity.id} />
           )}
           {props.selectedId === entity.id && (
             <polygon

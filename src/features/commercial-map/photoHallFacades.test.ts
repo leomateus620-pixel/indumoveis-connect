@@ -61,6 +61,19 @@ describe("photographic pavilion facades", () => {
     expect(p13.some((call) => call.method === "pitchedCanopy")).toBe(true);
   });
 
+  it("mounts the P8 identification on the blind bay without occupying either portal", () => {
+    const { calls } = recordHall(8);
+    const plate = calls.find((call) => call.method === "box" && call.args[7] === "#f2ebdf");
+    expect(plate).toBeDefined();
+    const [, x, y, z, width, height, depth] = plate!.args as [string, ...number[]];
+    const [leftGate, rightGate] = calls.filter((call) => call.method === "gate");
+    expect(x - width / 2).toBeGreaterThan(Number(leftGate.args[1]));
+    expect(x + width / 2).toBeLessThan(Number(rightGate.args[0]));
+    expect(y + height / 2).toBeLessThan(Number(leftGate.args[3]));
+    const canopy = calls.find((call) => call.method === "pitchedCanopy")!;
+    expect(z - depth / 2).toBeGreaterThan(Number(canopy.args[2]));
+  });
+
   it("gives P12 tall glazing and a braced eave, preserving its longitudinal identity", () => {
     const { calls, builder } = recordHall(12);
     const windows = calls.filter((call) => call.method === "window");
