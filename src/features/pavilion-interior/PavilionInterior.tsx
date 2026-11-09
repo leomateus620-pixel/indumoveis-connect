@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { SPACE_STATUS } from "@/lib/format";
+import { Pavilion1Architecture, Pavilion1NumberPlate } from "./Pavilion1Architecture";
 import {
   Pavilion8Architecture,
   Pavilion8LotRelief,
@@ -24,6 +25,7 @@ import {
   type InteriorPresentation,
 } from "./presentation";
 import "./interior.css";
+import "./pavilion1-shell.css";
 import {
   parkPavilionNumber,
   pavilionDestinationHref,
@@ -61,6 +63,7 @@ export function PavilionInterior({
   onConnect,
 }: Props) {
   const selected = plan.environments.find((e) => e.code === selectedCode);
+  const isPavilion1 = presentation.pavilionNumber === 1;
   const isPavilion8 = presentation.pavilionNumber === 8;
   const isPavilion13 = presentation.pavilionNumber === 13;
   const lotsMode = presentation.mode === "lots";
@@ -173,8 +176,9 @@ export function PavilionInterior({
     const sideMargin = sheet ? 8 : 20;
     const left = sheet + sideMargin,
       right = size.current.width - sideMargin;
-    const top = 56;
-    let bottom = size.current.height - 90;
+    const gallerySheet = isPavilion1 && mobile;
+    const top = gallerySheet ? 12 : 56;
+    let bottom = size.current.height - (gallerySheet ? 12 : 90);
     size.current.left = sheet;
     const points = selected.parts.flatMap((part) => part.polygon);
     if (!points.length) return;
@@ -188,34 +192,37 @@ export function PavilionInterior({
     let dx = 0,
       dy = 0;
     // Reveal only an obscured selection; never reset a user's chosen scale.
-    if (maxX - minX <= right - left)
-      dx = minX < left ? left - minX : maxX > right ? right - maxX : 0;
+    const fitsHorizontally = maxX - minX <= right - left;
+    const anchorX = selected.label[0] * c.scale + c.x;
+    if (fitsHorizontally) dx = minX < left ? left - minX : maxX > right ? right - maxX : 0;
     else {
-      const anchor = selected.label[0] * c.scale + c.x;
-      dx = anchor < left ? left - anchor : anchor > right ? right - anchor : 0;
+      const margin = gallerySheet ? 12 : 0;
+      dx = Math.min(right - margin, Math.max(left + margin, anchorX)) - anchorX;
     }
-    if (lotsMode && mobile) {
+    if ((lotsMode && mobile) || gallerySheet) {
       const host = viewport.current?.getBoundingClientRect();
       const tools = viewControls.current?.getBoundingClientRect();
-      const clearance = isPavilion13 ? 6 : 0;
+      const anchorOnly = gallerySheet && !fitsHorizontally;
+      const clearance = anchorOnly ? 12 : isPavilion13 ? 6 : 0;
       if (
         host &&
         tools &&
         tools.top - host.top > top + 20 &&
-        maxX + dx + clearance > tools.left - host.left &&
-        minX + dx - clearance < tools.right - host.left
+        (anchorOnly ? anchorX : maxX) + dx + clearance > tools.left - host.left &&
+        (anchorOnly ? anchorX : minX) + dx - clearance < tools.right - host.left
       ) {
         bottom = Math.min(bottom, tools.top - host.top - 12);
       }
     }
-    if (maxY - minY <= bottom - top)
+    if (maxY - minY <= bottom - top && !(gallerySheet && !fitsHorizontally))
       dy = minY < top ? top - minY : maxY > bottom ? bottom - maxY : 0;
     else {
       const anchor = selected.label[1] * c.scale + c.y;
-      dy = anchor < top ? top - anchor : anchor > bottom ? bottom - anchor : 0;
+      const margin = gallerySheet ? 12 : 0;
+      dy = Math.min(bottom - margin, Math.max(top + margin, anchor)) - anchor;
     }
     if (dx || dy) paint({ ...c, x: c.x + dx, y: c.y + dy });
-  }, [selected, mobile, panelOpen, paint, lotsMode, isPavilion13]);
+  }, [selected, mobile, panelOpen, paint, lotsMode, isPavilion1, isPavilion13]);
   useEffect(() => {
     const node = svg.current;
     if (!node) return;
@@ -309,52 +316,48 @@ export function PavilionInterior({
     >
       <header className="arq-header">
         <button
-          className={`arq-back ${lotsMode ? "arq-back-compact" : ""}`}
+          className="arq-back arq-back-compact"
           onClick={onBack}
-          aria-label={lotsMode ? "Voltar ao parque" : undefined}
-          aria-describedby={lotsMode ? "pavilion-external-view-help" : undefined}
+          aria-label="Voltar ao parque"
+          aria-describedby="pavilion-external-view-help"
         >
           <ArrowLeft size={17} />
-          <span className={lotsMode ? "arq-sr-only" : undefined}>Voltar ao parque</span>
-          {lotsMode && (
-            <span role="tooltip" id="pavilion-external-view-help" className="arq-back-tooltip">
-              Voltar ao parque<small>Visualização externa</small>
-            </span>
-          )}
+          <span className="arq-sr-only">Voltar ao parque</span>
+          <span role="tooltip" id="pavilion-external-view-help" className="arq-back-tooltip">
+            Voltar ao parque<small>Visualização externa</small>
+          </span>
         </button>
-        {lotsMode ? (
-          <>
-            <div className="arq-brand-led">
+        <div className="arq-brand-led">
+          {isPavilion1 ? (
+            <picture>
+              <source
+                media="(min-width: 701px)"
+                srcSet="/brand/arq-design/arq-design-primary.svg"
+              />
               <img
                 className="arq-signature"
                 src={presentation.brandPath}
                 alt={presentation.brandAlt}
-                width="228"
-                height="79"
+                width="106"
+                height="81"
               />
-              <h1 className="arq-sr-only">{presentation.title}</h1>
-            </div>
-            <span className="arq-pavilion-id">Pavilhão {presentation.pavilionNumber}</span>
-            {plan.totalAreaM2 != null && (
-              <p className="arq-total-area">
-                <span>Área total:</span> <strong>{formatArea(plan.totalAreaM2)}</strong>
-              </p>
-            )}
-          </>
-        ) : (
-          <>
-            <div className="arq-heading">
-              <span className="arq-eyebrow">Pavilhão {presentation.pavilionNumber}</span>
-              <h1>{presentation.title}</h1>
-            </div>
+            </picture>
+          ) : (
             <img
               className="arq-signature"
               src={presentation.brandPath}
               alt={presentation.brandAlt}
-              width="106"
-              height="81"
+              width="228"
+              height="79"
             />
-          </>
+          )}
+          <h1 className="arq-sr-only">{presentation.title}</h1>
+        </div>
+        <span className="arq-pavilion-id">Pavilhão {presentation.pavilionNumber}</span>
+        {lotsMode && plan.totalAreaM2 != null && (
+          <p className="arq-total-area">
+            <span>Área total:</span> <strong>{formatArea(plan.totalAreaM2)}</strong>
+          </p>
         )}
       </header>
       <div className="arq-workspace">
@@ -444,11 +447,7 @@ export function PavilionInterior({
               ) : lotsMode ? (
                 <h2>Encontre um lote</h2>
               ) : (
-                <h2>
-                  Arquitetura para
-                  <br />
-                  novos encontros.
-                </h2>
+                <h2>Arquitetura para novos encontros.</h2>
               )}
               <p>
                 {searchLots
@@ -523,6 +522,12 @@ export function PavilionInterior({
                     onClick={() => choose(e.code)}
                     aria-label={lotsMode ? e.name : `${e.code} · ${e.name}`}
                     aria-pressed={selected?.id === e.id}
+                    data-p1-linked={
+                      isPavilion1 && e.parts.some((part) => part.kind === "external")
+                        ? true
+                        : undefined
+                    }
+                    data-p1-support={isPavilion1 && e.kind === "support" ? true : undefined}
                   >
                     {e.code}
                   </button>
@@ -693,6 +698,7 @@ export function PavilionInterior({
             onPointerCancel={(e) => stopGesture(e, true)}
           >
             <g ref={drawing}>
+              {isPavilion1 && <Pavilion1Architecture plan={plan} />}
               {isPavilion8 && <Pavilion8Architecture plan={plan} />}
               {isPavilion13 && <Pavilion13Architecture plan={plan} />}
               {connections.map(({ element, center, destination, icon }) => {
@@ -780,6 +786,9 @@ export function PavilionInterior({
                       <Pavilion8LotRelief key={part.id} path={part.path} />
                     ))}
                   {isPavilion8 && <Pavilion8NumberPlate center={environment.label} />}
+                  {isPavilion1 && /^\d{2}$/.test(environment.code) && (
+                    <Pavilion1NumberPlate center={environment.label} />
+                  )}
                   <text
                     x={environment.label[0]}
                     y={environment.label[1]}
@@ -842,6 +851,13 @@ export function PavilionInterior({
                     );
                   })}
               </g>
+              {isPavilion1 && selected && (
+                <g className="arq-p1-selection" aria-hidden="true" pointerEvents="none">
+                  {selected.parts.map((part) => (
+                    <path key={part.id} d={part.path} vectorEffect="non-scaling-stroke" />
+                  ))}
+                </g>
+              )}
               {wayfinding.flatMap(({ elementId, kind, centers }) => {
                 const { width, height } = WAYFINDING_SIGN_SIZE;
                 const { asset, label } = WAYFINDING_SIGNS[kind];

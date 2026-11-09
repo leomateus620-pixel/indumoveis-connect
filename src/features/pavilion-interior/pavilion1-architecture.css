@@ -1,0 +1,194 @@
+.arq-p1-slab-shadow {
+  fill: #544039;
+  stroke: #544039;
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+  opacity: 0.14;
+}
+.arq-p1-slab-edge {
+  fill: #ac9688;
+  stroke: #ac9688;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.arq-p1-slab {
+  fill: #b6a196;
+  stroke: #a58e83;
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+}
+.arq-p1-mineral-joint,
+.arq-p1-salon-joint,
+.arq-p1-terrace-joint,
+.arq-p1-support-joint {
+  fill: none;
+  stroke-width: 0.72;
+}
+.arq-p1-mineral-joint {
+  stroke: #9c8074;
+  opacity: 0.28;
+}
+.arq-p1-salon-joint {
+  stroke: #a88863;
+  opacity: 0.36;
+}
+.arq-p1-terrace-joint {
+  stroke: #67775d;
+  opacity: 0.32;
+}
+.arq-p1-support-joint {
+  stroke: #6f776b;
+  opacity: 0.25;
+}
+.arq-p1-rear-inlay {
+  fill: none;
+  stroke: #875866;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  opacity: 0.62;
+}
+.arq-p1-threshold {
+  fill: #c9bcaa;
+  stroke: #968574;
+  stroke-width: 0.7;
+}
+.arq-p1-threshold.is-entrance {
+  fill: #a1b39a;
+  stroke: #5a7355;
+}
+.arq-p1-threshold.is-exit {
+  fill: #c79782;
+  stroke: #915a45;
+}
+
+.is-pavilion-1 .arq-plan .arq-environment .arq-part {
+  fill: transparent;
+  stroke: #9a8177;
+  stroke-width: 0.82;
+  pointer-events: fill;
+}
+.is-pavilion-1 .arq-environment.is-circulation .arq-part {
+  stroke: #979c8d;
+}
+.is-pavilion-1 .arq-environment .arq-part.is-external {
+  stroke: #75846b;
+  stroke-width: 1.1;
+}
+.is-pavilion-1 .arq-environment:not(.is-circulation, .is-selected):hover .arq-part {
+  fill: #6d3d551a;
+  stroke: #765063;
+  stroke-width: 1.6;
+}
+.is-pavilion-1 .arq-environment.is-selected .arq-part {
+  fill: #5c2e49d6;
+  stroke: #50263d;
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
+}
+.is-pavilion-1 .arq-environment.is-selected .arq-part.is-external {
+  fill: #6d3d555c;
+  stroke: #50263d;
+  stroke-width: 1.8;
+}
+.is-pavilion-1 .arq-plan .arq-environment .arq-part:focus {
+  outline: none;
+}
+.is-pavilion-1 .arq-plan .arq-environment .arq-part:focus-visible {
+  stroke: #2458a5;
+  stroke-width: 3.5;
+  vector-effect: non-scaling-stroke;
+}
+.arq-p1-selection {
+  fill: none;
+  stroke: #3974bf;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.arq-p1-number-plate {
+  --p1-number-size: min(var(--plan-number-size, 14px), 31px);
+}
+.is-support .arq-p1-number-plate {
+  --p1-number-size: min(var(--plan-number-size, 14px), 22px);
+}
+.arq-p1-plate-edge,
+.arq-p1-plate-face {
+  x: calc(-1.16 * var(--p1-number-size));
+  width: calc(2.32 * var(--p1-number-size));
+  height: calc(1.49 * var(--p1-number-size));
+  rx: calc(0.14 * var(--p1-number-size));
+}
+.arq-p1-plate-edge {
+  y: calc(-0.62 * var(--p1-number-size));
+  fill: #594335;
+  opacity: 0.24;
+}
+.arq-p1-plate-face {
+  y: calc(-0.745 * var(--p1-number-size));
+  fill: #fff9ee;
+  stroke: #a8877d;
+  stroke-width: 0.62;
+}
+.is-pavilion-1 .arq-environment.is-selected .arq-p1-plate-edge {
+  fill: #351c2a;
+  opacity: 0.58;
+}
+.is-pavilion-1 .arq-environment.is-selected .arq-p1-plate-face {
+  fill: #4e263d;
+  stroke: #e6bac9;
+  stroke-width: 1.15;
+}
+.is-pavilion-1 .arq-plan-label:not(.is-word) {
+  fill: #49303e;
+  font-family: Figtree, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+}
+.is-pavilion-1 .arq-environment.is-hall .arq-plan-label {
+  fill: #513840;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: clamp(14px, calc(var(--plan-number-size, 14px) * 0.9), 28px);
+  font-weight: 650;
+  letter-spacing: 0.018em;
+}
+.is-pavilion-1 .arq-environment.is-circulation .arq-plan-label {
+  fill: #464d41;
+  font-size: 7.4px;
+  font-weight: 650;
+}
+.is-pavilion-1 .arq-plan-detail {
+  fill: #57454b;
+  font-size: 8px;
+  font-weight: 650;
+}
+.is-pavilion-1 .arq-external-label {
+  fill: #364432;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+.is-pavilion-1 .arq-environment.is-selected .arq-external-label {
+  fill: #291a24;
+}
+.is-pavilion-1 .arq-environment.is-selected .arq-plan-label,
+.is-pavilion-1 .arq-environment.is-selected .arq-plan-detail {
+  fill: #fffaf5;
+}
+.is-pavilion-1 .arq-architecture {
+  stroke: #5e4a47;
+}
+.is-pavilion-1 .arq-architecture .is-door {
+  stroke: #736358;
+}
+.is-pavilion-1 .arq-architecture .is-guide {
+  stroke: #815c6b;
+  stroke-dasharray: 2 2.2;
+}
+
+@media (max-width: 700px) {
+  .is-pavilion-1 .arq-plan.is-near .arq-external-label {
+    display: block;
+    font-size: 12px;
+  }
+}

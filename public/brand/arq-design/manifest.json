@@ -9,7 +9,7 @@
   "palette": {
     "graphite": "#302C2F",
     "plum": "#643B54",
-    "projection": "#A69C8E",
+    "projection": "#8B7466",
     "suggestedBackground": "#F8F6F1"
   },
   "fonts": [
@@ -29,7 +29,7 @@
   "files": [
     {
       "name": "arq-design-primary.svg",
-      "sha256": "c7d375814d9ab3f268f32f93f05bdcfcc2f9abe44fdb64f37e54a8a6a7e2aa40",
+      "sha256": "d863f4118f3f3a0b6f77aeebe1efeda61570dba81efff32f16ee8e7927a4da9d",
       "viewBox": [
         0,
         0,
@@ -39,7 +39,7 @@
     },
     {
       "name": "arq-design-compact.svg",
-      "sha256": "b4ff1a5d5bb5c76d2398d33062bbb48bba709327bd877099adc658fc01a8dd9d",
+      "sha256": "cfc2482ed8acca8cc421dad68d65642be30b6bdf3bad55774f1f3fac72987db1",
       "viewBox": [
         0,
         0,
@@ -49,7 +49,7 @@
     },
     {
       "name": "arq-design-monochrome.svg",
-      "sha256": "f4c7d198164a76b63a2f8b1bd12ccc6dc48890464b3c90b05e79c655f268de63",
+      "sha256": "bc32a8f101c7dce24a47a27d92f60180982485b2b14b3689b194a93971f3b61d",
       "viewBox": [
         0,
         0,
@@ -58,6 +58,6 @@
       ]
     }
   ],
-  "provenance": "Deterministic typographic composition using licensed font curves, not a raster-to-vector conversion. Creative Production exact-content and deterministic-exports workflow.",
+  "provenance": "Licensed font curves composed deterministically with section markers and open architectural projections. Creative Production exact-content and deterministic-exports workflow.",
   "capabilityNote": "creative_production_board is not exposed in this session; no board was generated."
 }
