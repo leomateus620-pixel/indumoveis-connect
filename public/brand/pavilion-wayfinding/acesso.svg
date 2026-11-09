@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="26" viewBox="0 0 64 26" role="img" aria-labelledby="access-title">
+  <title id="access-title">Acesso lateral</title>
+  <rect x=".6" y=".6" width="62.8" height="24.8" rx="6" fill="#F7F1E7" stroke="#B9AB97" stroke-width="1.2"/>
+  <path d="M7 10h11l-3-3M18 16H7l3 3" fill="none" stroke="#584C3E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="23" y="16.5" fill="#584C3E" font-family="system-ui, sans-serif" font-size="9.5" font-weight="650">Acesso</text>
+</svg>

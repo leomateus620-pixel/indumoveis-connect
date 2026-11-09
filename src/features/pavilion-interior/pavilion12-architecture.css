@@ -1,0 +1,182 @@
+.is-pavilion-12 {
+  --p12-ink: #392f2a;
+  --p12-lot: #fcf6eb;
+  --p12-lot-boundary: #9b8777;
+  --p12-selection: #236589;
+  --p12-selection-fill: #d7e9f1;
+}
+
+.is-pavilion-12.has-lot-layout .arq-header {
+  grid-template-columns: 40px auto minmax(0, 1fr) auto;
+  background: #fcf9f3;
+}
+
+.is-pavilion-12.has-lot-layout .arq-signature {
+  width: 212px;
+  height: auto;
+  max-width: 100%;
+  aspect-ratio: 424 / 130;
+}
+
+.is-pavilion-12.has-lot-layout .arq-sidebar {
+  background: #fcf9f3;
+  border-color: #d8cabe;
+}
+
+.is-pavilion-12.has-lot-layout .arq-canvas {
+  background: radial-gradient(ellipse at 49% 43%, #faf6ee, #eee5d7);
+}
+
+.arq-p12-floor-shadow {
+  fill: #675548;
+  opacity: 0.12;
+}
+
+.arq-p12-plank-warm {
+  fill: #a77a56;
+  opacity: 0.07;
+}
+
+.arq-p12-plank-light {
+  fill: #fff5e5;
+  opacity: 0.16;
+}
+
+.arq-p12-plank-joint {
+  fill: none;
+  stroke: #987655;
+  stroke-width: 0.6;
+  opacity: 0.24;
+}
+
+.arq-p12-perimeter {
+  fill: none;
+  stroke: #736055;
+  stroke-width: 2.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arq-p12-island-edge {
+  fill: none;
+  stroke: #947c6b;
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.is-pavilion-12.has-lot-layout .arq-architecture {
+  stroke: #786357;
+}
+
+.is-pavilion-12.has-lot-layout .arq-architecture .is-door,
+.is-pavilion-12.has-lot-layout .arq-architecture .is-access {
+  stroke: #806956;
+}
+
+.is-pavilion-12.has-lot-layout .arq-environment .arq-part {
+  fill: var(--p12-lot);
+  stroke: var(--p12-lot-boundary);
+  stroke-width: 0.65;
+  vector-effect: non-scaling-stroke;
+  pointer-events: fill;
+}
+
+.is-pavilion-12.has-lot-layout .arq-environment:hover .arq-part {
+  fill: #efe0cd;
+  stroke: #7e624e;
+}
+
+.is-pavilion-12.has-lot-layout .arq-environment.is-selected .arq-part {
+  fill: var(--p12-selection-fill);
+  stroke: var(--p12-selection);
+  stroke-width: 1.4;
+}
+
+.is-pavilion-12 .arq-part:focus {
+  outline: none;
+}
+
+.is-pavilion-12.has-lot-layout .arq-environment .arq-part:focus-visible {
+  stroke: var(--p12-selection);
+  stroke-width: 1.9;
+  stroke-dasharray: 3 2;
+}
+
+.is-pavilion-12 .arq-p12-selection {
+  fill: none;
+  stroke: var(--p12-selection);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.is-pavilion-12.has-lot-layout .arq-plan-label:not(.is-word) {
+  fill: var(--p12-ink);
+  font-family: Figtree, system-ui, sans-serif;
+  font-size: clamp(6.4px, calc(11px / var(--plan-scale, 1)), 7.4px);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.is-pavilion-12.has-lot-layout .arq-environment.is-selected .arq-plan-label {
+  fill: #153e55;
+  font-weight: 800;
+}
+
+.is-pavilion-12 .arq-view-plan {
+  background: #245a78;
+  color: #fff;
+}
+
+.is-pavilion-12 .arq-view-plan:hover {
+  background: #1d4a64;
+}
+
+@media (max-width: 1050px) {
+  .is-pavilion-12.has-lot-layout .arq-signature {
+    width: 196px;
+  }
+}
+
+@media (max-width: 700px) {
+  .is-pavilion-12.has-lot-layout .arq-header {
+    height: 102px;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-rows: 1fr auto;
+    gap: 0 12px;
+    padding-block: 8px 12px;
+  }
+
+  .is-pavilion-12.has-lot-layout .arq-brand-led {
+    grid-column: 2 / -1;
+  }
+
+  .is-pavilion-12.has-lot-layout .arq-signature {
+    width: 176px;
+  }
+
+  .is-pavilion-12.has-lot-layout .arq-pavilion-id {
+    position: static;
+    grid-row: 2;
+    grid-column: 2;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  .is-pavilion-12.has-lot-layout .arq-total-area {
+    grid-row: 2;
+    grid-column: 3;
+    font-size: 12px;
+  }
+
+  .is-pavilion-12.has-lot-layout .arq-sidebar {
+    width: min(236px, 58vw);
+    padding-inline: clamp(12px, 4vw, 20px);
+  }
+
+  .is-pavilion-12 .arq-view-plan,
+  .is-pavilion-12 .arq-lot-search-field button {
+    min-height: 44px;
+  }
+}

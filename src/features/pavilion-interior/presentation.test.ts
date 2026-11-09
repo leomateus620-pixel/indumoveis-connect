@@ -4,6 +4,7 @@ import {
   interiorPavilionNumber,
   normalizedLotCode,
   validatePavilion8Search,
+  validatePavilion12Search,
   validatePavilion13Search,
 } from "./presentation";
 
@@ -30,6 +31,8 @@ describe("pavilion-specific presentation and P13 URL", () => {
     ["1", 1],
     [8, 8],
     ["8", 8],
+    [12, 12],
+    ["12", 12],
     [13, 13],
     ["13", 13],
   ])("identifies supported pavilion %s", (value, expected) => {
@@ -94,6 +97,15 @@ describe("pavilion-specific presentation and P13 URL", () => {
     expect(validatePavilion8Search({ lote: 7 })).toEqual({ lote: "07" });
     for (const lote of ["02", 2, "09", "13", ["07"], "07/08"]) {
       expect(validatePavilion8Search({ lote, zoom: 2 })).toEqual({ lote: undefined });
+    }
+  });
+
+  it("validates unpadded P12 lot codes from 1 to 254", () => {
+    expect(validatePavilion12Search({ lote: 172 })).toEqual({ lote: "172" });
+    expect(validatePavilion12Search({ lote: "01" })).toEqual({ lote: "1" });
+    expect(validatePavilion12Search({ lote: "254", zoom: 2 })).toEqual({ lote: "254" });
+    for (const lote of ["0", 255, "1.5", "1–11", [], undefined]) {
+      expect(validatePavilion12Search({ lote })).toEqual({ lote: undefined });
     }
   });
 });

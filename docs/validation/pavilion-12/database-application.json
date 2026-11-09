@@ -1,0 +1,104 @@
+{
+  "project": {
+    "name": "Indumóveis Connect",
+    "confirmedCommit": "83eca95a7a4490cf439f794025185a787007ef0d",
+    "database": "Supabase enabled"
+  },
+  "method": "Direct Lovable get_database_status and query_database. Both versioned files and exact history records were applied in a single transaction.",
+  "before": {
+    "p12FloorPlans": 0,
+    "p12Revisions": 0,
+    "p12Environments": 0,
+    "p12StockCandidates": []
+  },
+  "after": {
+    "fixtures_removed": true,
+    "p12": {
+      "architecture": 6,
+      "canonical_stock_codes": true,
+      "environments": 254,
+      "external_parts": 0,
+      "null_declared_areas": 254,
+      "null_stock_areas": 254,
+      "payload_sha256": "39f59918aa9b7bd1ca23ce59954fa87e38eb608ce88a1a663167576372289011",
+      "plan_id": "a5e28498-9cd2-4a19-ae7c-e2b283d0895d",
+      "revision": 1,
+      "revision_id": "a434649d-a64b-4940-9d73-b7153e95179b",
+      "source_sha256": "f933d506774daf59c7cdd2749bea6eafd3784de10f2a99a814abf76e2db96c37",
+      "stock": 254,
+      "total_area_m2": 1650,
+      "valid_interior_parts": 254
+    },
+    "registered_migrations": [
+      {
+        "name": "pavilion_12_code_scope",
+        "sha256": "ef339a381aeb6d9da8cba6069758ff953f73034a6d0267254b241b315152c0b4",
+        "version": "20261109002700"
+      },
+      {
+        "name": "pavilion_12_moveis_seriados_seed",
+        "sha256": "3e9c8fbb13f64cc55ffc523ded56af029b1f977bfdbd7c636505d18fb93cadce",
+        "version": "20261109002800"
+      }
+    ],
+    "other_pavilions_match_baseline": true,
+    "history_matches_repo": true
+  },
+  "authenticatedRoundtrip": {
+    "lot_count": 254,
+    "matches_frozen_fixture": true,
+    "pavilion": "12",
+    "plan_id": "a5e28498-9cd2-4a19-ae7c-e2b283d0895d",
+    "revision": 1,
+    "revision_id": "a434649d-a64b-4940-9d73-b7153e95179b"
+  },
+  "dryRunPermissions": {
+    "authenticated_revision_write_denied": true,
+    "commercial_pavilion_identity_mismatch_returns_empty": true,
+    "commercial_reads_254_live_view_statuses_with_company_permission_guard": true,
+    "commercial_rpc_denies_map_only": true,
+    "cross_edition_part_rejected": true,
+    "cross_pavilion_environment_link_rejected": true,
+    "inactive_edition_not_exposed": true,
+    "map_only_reads_254_canonical_lots_total_and_null_individual_areas": true,
+    "out_of_scope_codes_0_01_255_rejected": true,
+    "published_total_immutable": true,
+    "user_without_map_permission_denied": true
+  },
+  "postApplicationPermissions": {
+    "authenticated_revision_write_denied": true,
+    "commercial_pavilion_identity_mismatch_returns_empty": true,
+    "commercial_reads_254_live_view_statuses_with_company_permission_guard": true,
+    "commercial_rpc_denies_map_only": true,
+    "cross_edition_part_rejected": true,
+    "cross_pavilion_environment_link_rejected": true,
+    "inactive_edition_not_exposed": true,
+    "map_only_reads_254_canonical_lots_total_and_null_individual_areas": true,
+    "out_of_scope_codes_0_01_255_rejected": true,
+    "published_total_immutable": true,
+    "user_without_map_permission_denied": true
+  },
+  "rollbackReexecution": {
+    "p12_current": 1,
+    "p12_revisions": 1,
+    "p12_stock": 254,
+    "stock_identities_match": true
+  },
+  "rollbackPreservation": {
+    "legacy_contract_link_preserved": true,
+    "legacy_deal_link_preserved": true,
+    "legacy_fields_preserved": true,
+    "legacy_id_preserved": true,
+    "new_individual_areas_null": true,
+    "p12_stock_count": 254,
+    "unrelated_bare_code_not_linked": true
+  },
+  "cleanup": {
+    "probe_companies_remaining": 0,
+    "probe_editions_remaining": 0,
+    "probe_roles_remaining": 0,
+    "probe_stocks_remaining": 0,
+    "source_is_metadata_only": true
+  },
+  "frozenSourceJsonSha256": "0979439f8a8d085ec8a8cd199fda52a8de53989e70a8d529219234d3ffd37e04"
+}

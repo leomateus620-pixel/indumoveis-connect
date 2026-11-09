@@ -257,7 +257,7 @@ describe("return from Pavilhão 1 interior", () => {
 });
 
 describe("pavilion interior entry and return", () => {
-  it.each([8, 13] as const)("opens P%s and saves its own edition and filters", async (pavilion) => {
+  it.each([8, 12, 13] as const)("opens P%s and saves park state", async (pavilion) => {
     const open = vi.fn();
     render(
       <CommercialMapWorkspace

@@ -24,5 +24,6 @@ describe("Pavilhão 13 lateral connections", () => {
   it("opens registered interiors through their dedicated routes", () => {
     expect(pavilionDestination(1)).toEqual({ to: "/mapa/pavilhoes/1/interior" });
     expect(pavilionDestination(13)).toEqual({ to: "/mapa/pavilhoes/13/interior" });
+    expect(pavilionDestination(12)).toEqual({ to: "/mapa/pavilhoes/12/interior" });
   });
 });

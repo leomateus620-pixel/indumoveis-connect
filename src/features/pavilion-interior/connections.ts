@@ -1,7 +1,7 @@
 import type { InteriorPavilionNumber } from "./presentation";
 import type { InteriorPoint } from "./data";
 
-export type ParkPavilionNumber = InteriorPavilionNumber | 3 | 12;
+export type ParkPavilionNumber = InteriorPavilionNumber | 3;
 export type ParkPavilionSearch = `${ParkPavilionNumber}`;
 export type InteriorConnection = {
   elementId: string;
@@ -15,6 +15,7 @@ export type InteriorConnection = {
 const interiorRoutes = {
   1: "/mapa/pavilhoes/1/interior",
   8: "/mapa/pavilhoes/8/interior",
+  12: "/mapa/pavilhoes/12/interior",
   13: "/mapa/pavilhoes/13/interior",
 } as const satisfies { [Number in ParkPavilionNumber]?: `/mapa/pavilhoes/${Number}/interior` };
 
