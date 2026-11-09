@@ -34,24 +34,12 @@
   min-height: 44px;
   color: #51454c;
 }
-.arq-heading {
-  border-left: 1px solid var(--arq-line);
-  padding-left: 28px;
-}
 .arq-eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 10px;
   font-weight: 650;
   color: #74666d;
-}
-.arq-heading h1 {
-  font-family: "Plus Jakarta Sans", sans-serif;
-  letter-spacing: -0.035em;
-  font-size: 24px;
-  line-height: 1.4;
-  font-weight: 550;
-  margin-top: 4px;
 }
 .arq-signature {
   width: 106px;
@@ -521,12 +509,6 @@
     padding-inline: 20px;
     gap: 16px;
   }
-  .arq-heading {
-    padding-left: 20px;
-  }
-  .arq-heading h1 {
-    font-size: 20px;
-  }
   .arq-workspace {
     grid-template-columns: 244px minmax(0, 1fr);
   }
@@ -566,21 +548,8 @@
     grid-row: 1;
     gap: 7px;
   }
-  .arq-heading {
-    border: 0;
-    padding: 0;
-    grid-row: 2;
-    grid-column: 1;
-  }
   .arq-eyebrow {
     font-size: 9px;
-  }
-  .arq-heading .arq-eyebrow {
-    display: none;
-  }
-  .arq-heading h1 {
-    font-size: 16px;
-    margin: 0;
   }
   .arq-signature {
     width: 85px;

@@ -4,7 +4,6 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import { PavilionInterior } from "./PavilionInterior";
 import { PAVILION_13_PLAN } from "./pavilion13";
 import { PAVILION_8_PLAN } from "./pavilion8";
-import { PAVILION_1_PLAN } from "./data";
 import { PAVILION_PRESENTATIONS } from "./presentation";
 
 type Props = ComponentProps<typeof PavilionInterior>;
@@ -223,28 +222,6 @@ describe("Pavilhão 13 lot inspection", () => {
     expect(tooltip).toHaveAttribute("role", "tooltip");
     expect(tooltip).toHaveTextContent("Voltar ao parque");
     expect(tooltip).toHaveTextContent("Visualização externa");
-  });
-
-  it("preserves the P1 heading, vertical identity and written return action", () => {
-    const { container } = render(
-      <PavilionInterior plan={PAVILION_1_PLAN} onSelect={() => {}} onBack={() => {}} />,
-    );
-    const header = container.querySelector(".arq-header")!;
-    const heading = within(header as HTMLElement).getByRole("heading", {
-      level: 1,
-      name: "Mostra ARQ & Design",
-    });
-    expect(heading.closest(".arq-heading")).toBeInTheDocument();
-    expect(heading).not.toHaveClass("arq-sr-only");
-    expect(header.querySelector(".arq-brand-led")).not.toBeInTheDocument();
-    expect(within(header as HTMLElement).getAllByRole("img")).toHaveLength(1);
-    expect(
-      within(header as HTMLElement).getByRole("img", { name: "ARQ & Design Indumóveis" }),
-    ).toHaveAttribute("src", "/brand/arq-design/arq-design-compact.svg");
-    const back = within(header as HTMLElement).getByRole("button", { name: "Voltar ao parque" });
-    expect(back).not.toHaveClass("arq-back-compact");
-    expect(back.querySelector("span")).not.toHaveClass("arq-sr-only");
-    expect(back).not.toHaveAttribute("aria-describedby");
   });
 
   it("offers eighty SVG targets, number search and a compact sector directory", () => {

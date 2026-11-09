@@ -1,0 +1,324 @@
+.is-pavilion-1 {
+  --p1-shell: #fbf7ef;
+  --p1-rule: #ded2c5;
+  --p1-muted: #68575b;
+  --p1-terrace: #758167;
+  --p1-editorial: Georgia, "Times New Roman", serif;
+}
+
+.is-pavilion-1 .arq-header {
+  height: 94px;
+  grid-template-columns: 44px auto minmax(0, 1fr);
+  gap: 16px;
+  padding: 0 clamp(16px, 3vw, 36px);
+  background: var(--p1-shell);
+  border-color: var(--p1-rule);
+  position: relative;
+  z-index: 6;
+}
+
+.is-pavilion-1 .arq-back-compact {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  justify-content: center;
+  border: 1px solid #bdaeb0;
+  border-radius: 7px;
+  color: var(--arq-plum);
+  background: #fffaf3;
+}
+
+.is-pavilion-1 .arq-back-compact:hover {
+  background: #efe4e8;
+  border-color: var(--arq-plum);
+}
+
+.is-pavilion-1 .arq-brand-led picture {
+  display: block;
+}
+
+.is-pavilion-1 .arq-brand-led .arq-signature {
+  display: block;
+  width: 106px;
+  height: 82px;
+}
+
+.is-pavilion-1 .arq-pavilion-id {
+  padding-left: 16px;
+  border-color: var(--p1-rule);
+  color: var(--p1-muted);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.is-pavilion-1 .arq-sidebar {
+  padding: 14px clamp(18px, 1.8vw, 28px) 0;
+  background: var(--p1-shell);
+  border-color: var(--p1-rule);
+  overflow-anchor: none;
+}
+
+.is-pavilion-1 .arq-canvas {
+  background: radial-gradient(ellipse at 48% 34%, #f7f2ea 0%, #eee6da 100%);
+}
+
+.is-pavilion-1 .arq-sidebar .arq-eyebrow {
+  color: var(--p1-muted);
+}
+
+.is-pavilion-1 .arq-intro {
+  padding-top: 12px;
+}
+
+.is-pavilion-1 .arq-intro h2,
+.is-pavilion-1 .arq-information h2 {
+  color: var(--arq-plum);
+  font-family: var(--p1-editorial);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+}
+
+.is-pavilion-1 .arq-intro h2 {
+  font-size: clamp(23px, 2.1vw, 30px);
+}
+
+.is-pavilion-1 .arq-intro > p {
+  color: var(--p1-muted);
+  margin: 10px 0 14px;
+  line-height: 1.5;
+}
+
+.is-pavilion-1 .arq-index {
+  gap: 9px;
+  padding-block: 8px;
+  border-color: var(--p1-rule);
+}
+
+.is-pavilion-1 .arq-index strong {
+  font-size: 27px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+
+.is-pavilion-1 .arq-index span {
+  max-width: none;
+  color: var(--p1-muted);
+}
+
+.is-pavilion-1 .arq-information:not(:has(> .arq-number)) {
+  padding-top: 18px;
+}
+
+.is-pavilion-1 .arq-number {
+  display: inline-grid;
+  place-items: center;
+  margin: 8px 0 10px;
+  min-width: 57px;
+  padding: 6px 10px;
+  border-bottom: 3px solid #aa7b8e;
+  border-radius: 4px;
+  background: var(--arq-plum);
+  color: #fffaf3;
+  font-family: Figtree, system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.is-pavilion-1 .arq-information h2 {
+  margin: 0 0 12px;
+  font-size: 29px;
+}
+
+.is-pavilion-1 .arq-information:has(> .arq-number) h2 {
+  font-size: 26px;
+}
+
+.is-pavilion-1 .arq-information h2:focus-visible {
+  outline: 2px solid var(--arq-plum);
+  outline-offset: 3px;
+}
+
+.is-pavilion-1 .arq-area {
+  flex-flow: row wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 3px 8px;
+  padding: 9px 0;
+  border-color: var(--p1-rule);
+  margin-bottom: 9px;
+}
+
+.is-pavilion-1 .arq-area strong {
+  font-size: 18px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.is-pavilion-1 .arq-function,
+.is-pavilion-1 .arq-external {
+  margin: 9px 0;
+}
+
+.is-pavilion-1 .arq-external > span {
+  flex-shrink: 0;
+  background: #e4e7d9;
+  border-color: var(--p1-terrace);
+}
+
+.is-pavilion-1 .arq-commercial {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-color: var(--p1-rule);
+}
+
+.is-pavilion-1 .arq-commercial dd {
+  margin: 4px 0 9px;
+}
+
+.is-pavilion-1 .arq-environments {
+  margin-top: 0;
+  padding: 14px 0 0;
+}
+
+.is-pavilion-1 .arq-space-grid {
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.is-pavilion-1 .arq-space-grid button {
+  height: 37px;
+  border-color: #d4c5c6;
+  border-radius: 5px;
+  background: #fffaf3;
+  color: #503c48;
+  font-weight: 650;
+}
+
+.is-pavilion-1 .arq-space-grid button[data-p1-linked="true"] {
+  box-shadow: inset 0 -3px 0 var(--p1-terrace);
+}
+
+.is-pavilion-1 .arq-space-grid button[data-p1-support="true"] {
+  background: #ebe6dd;
+}
+
+.is-pavilion-1 .arq-space-grid button:hover {
+  background: #eee1e7;
+  border-color: #9e7a8c;
+}
+
+.is-pavilion-1 .arq-space-grid button[aria-pressed="true"] {
+  border-color: var(--arq-plum);
+  background: var(--arq-plum);
+  color: #fff;
+}
+
+.is-pavilion-1 .arq-hall-link {
+  gap: 5px;
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 8px 0;
+  border: 0;
+  color: var(--arq-plum);
+  text-align: left;
+}
+
+.is-pavilion-1 .arq-hall-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.is-pavilion-1 .arq-sidebar-footer {
+  gap: 6px 10px;
+  border-color: var(--p1-rule);
+  padding: 11px 0;
+  margin-top: 0;
+}
+
+.is-pavilion-1 .arq-key {
+  color: var(--p1-muted);
+  font-size: 10px;
+}
+
+.is-pavilion-1 .arq-key i.is-external {
+  background: #e4e7d9;
+  border-color: var(--p1-terrace);
+}
+
+.is-pavilion-1 .arq-view-plan {
+  min-height: 44px;
+  gap: 8px;
+  padding: 8px 10px;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.is-pavilion-1 .arq-view-plan:hover {
+  background: #4e2e43;
+}
+
+@media (max-height: 650px) and (min-width: 701px) {
+  .is-pavilion-1 .arq-header {
+    height: 80px;
+  }
+
+  .is-pavilion-1 .arq-brand-led .arq-signature {
+    height: 70px;
+    width: 90px;
+  }
+}
+
+@media (max-width: 700px) {
+  .is-pavilion-1 .arq-header {
+    height: 78px;
+    grid-template-rows: 1fr;
+    gap: 11px;
+    padding-inline: 12px;
+  }
+
+  .is-pavilion-1 .arq-brand-led .arq-signature {
+    width: 88px;
+    height: 68px;
+  }
+
+  .is-pavilion-1 .arq-pavilion-id {
+    padding-left: 11px;
+    font-size: 9px;
+  }
+
+  .is-pavilion-1 .arq-sidebar {
+    width: min(240px, 58vw);
+    padding: 8px clamp(10px, 3vw, 16px) 0;
+    box-shadow: 6px 0 20px #39252f1a;
+  }
+
+  .is-pavilion-1 .arq-intro h2 {
+    font-size: 22px;
+  }
+
+  .is-pavilion-1 .arq-information h2,
+  .is-pavilion-1 .arq-information:has(> .arq-number) h2 {
+    font-size: 22px;
+  }
+
+  .is-pavilion-1 .arq-space-grid {
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  }
+
+  .is-pavilion-1 .arq-space-grid button,
+  .is-pavilion-1 .arq-sidebar .arq-icon,
+  .is-pavilion-1 .arq-view-controls .arq-icon {
+    min-width: 44px;
+    height: 44px;
+  }
+
+  .is-pavilion-1 .arq-panel-toggle,
+  .is-pavilion-1 .arq-query-error button {
+    min-height: 44px;
+  }
+}

@@ -8,15 +8,15 @@ type Props = ComponentProps<typeof PavilionInterior>;
 const onSelect = vi.fn(),
   onBack = vi.fn();
 let mobile = false;
-const rect = (width: number, height: number, left = 0): DOMRect => ({
+const rect = (width: number, height: number, left = 0, top = 0): DOMRect => ({
   x: left,
-  y: 0,
+  y: top,
   left,
-  top: 0,
+  top,
   width,
   height,
   right: left + width,
-  bottom: height,
+  bottom: top + height,
   toJSON: () => ({}),
 });
 function Harness({ initial, commercial }: { initial?: string; commercial?: Props["commercial"] }) {
@@ -79,7 +79,8 @@ beforeEach(() => {
     dispatchEvent: () => false,
   }));
   vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
-    if (this.classList.contains("arq-sidebar")) return rect(mobile ? 304 : 272, 650);
+    if (this.classList.contains("arq-sidebar")) return rect(mobile ? 226 : 272, 650);
+    if (mobile && this.classList.contains("arq-view-controls")) return rect(54, 142, 322, 486);
     return rect(mobile ? 390 : 1100, 650);
   });
   Object.defineProperties(SVGElement.prototype, {
@@ -95,6 +96,18 @@ afterEach(() => {
 });
 
 describe("Mostra pavilion interaction", () => {
+  it("shows the gallery signature while keeping the full title and return action accessible", () => {
+    const { container } = render(<Harness />);
+    const header = within(container.querySelector(".arq-header")!);
+    expect(header.getByRole("heading", { level: 1, name: "Mostra ARQ & Design" })).toHaveClass(
+      "arq-sr-only",
+    );
+    expect(header.getByRole("img", { name: "ARQ & Design Indumóveis" })).toBeInTheDocument();
+    expect(header.getByRole("button", { name: "Voltar ao parque" })).toHaveAccessibleDescription(
+      /Visualização externa/,
+    );
+  });
+
   it("shows fifteen numbered choices and a single contextual left panel", () => {
     const { container } = render(<Harness />);
     const panel = screen.getByRole("complementary", { name: "Informações do ambiente" });
@@ -189,6 +202,23 @@ describe("Mostra pavilion interaction", () => {
     expect(container.querySelector(".arq-environment.is-selected")).not.toBeInTheDocument();
   });
 
+  it("draws the selection line on the exact hall or linked room paths", () => {
+    const { container } = render(<Harness />);
+    const selection = () => container.querySelector(".arq-p1-selection")!;
+    const contours = () =>
+      [...selection().querySelectorAll("path")].map((part) => part.getAttribute("d"));
+
+    fireEvent.click(path(container, "salon"));
+    expect(selection()).toHaveAttribute("pointer-events", "none");
+    expect(contours()).toEqual([path(container, "salon").getAttribute("d")]);
+
+    fireEvent.click(path(container, "12", "external"));
+    expect(contours()).toEqual([
+      path(container, "12").getAttribute("d"),
+      path(container, "12", "external").getAttribute("d"),
+    ]);
+  });
+
   it("does not select an environment after a cancelled pointer gesture", () => {
     const { container } = render(<Harness />);
     const space = path(container, "11");
@@ -275,8 +305,25 @@ describe("Mostra pavilion interaction", () => {
     )!.label;
     const camera = readCamera(container);
     const selectedScreenX = label[0] * camera.scale + camera.x;
-    expect(selectedScreenX).toBeGreaterThan(304);
+    expect(selectedScreenX).toBeGreaterThan(226);
     expect(selectedScreenX).toBeLessThan(390);
+  });
+
+  it("reveals a selected label above the mobile controls while preserving the current zoom", () => {
+    mobile = true;
+    const { container } = render(<Harness />);
+    const plan = screen.getByRole("group", { name: "Planta interativa do Pavilhão 1" });
+    fireEvent.keyDown(plan, { key: "ArrowLeft" });
+    for (let step = 0; step < 6; step++) fireEvent.keyDown(plan, { key: "ArrowUp" });
+    const before = readCamera(container);
+    const [x, y] = PAVILION_1_PLAN.environments.find(({ code }) => code === "01")!.label;
+    expect(x * before.scale + before.x).toBeGreaterThan(322);
+    expect(y * before.scale + before.y).toBeGreaterThan(486);
+
+    fireEvent.click(path(container, "01"));
+    const after = readCamera(container);
+    expect(after.scale).toBe(before.scale);
+    expect(y * after.scale + after.y).toBeLessThan(486);
   });
 
   it("returns to the park through the dedicated back action", () => {
