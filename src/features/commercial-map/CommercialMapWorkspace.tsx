@@ -934,7 +934,14 @@ export function CommercialMapWorkspace({
               <div className="im-map-detail-heading">
                 <div className="im-map-detail-top">
                   <span className="im-map-detail-kind">
-                    {entity.kind === "pavilion" ? (
+                    {interiorPavilion === 8 ? (
+                      <img
+                        src="/brand/fornecedores-construcao/placa-08.svg"
+                        alt=""
+                        width={32}
+                        height={27}
+                      />
+                    ) : entity.kind === "pavilion" ? (
                       <Box aria-hidden="true" />
                     ) : (
                       <MapIcon aria-hidden="true" />

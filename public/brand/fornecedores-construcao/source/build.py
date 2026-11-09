@@ -1,4 +1,4 @@
-"""Build the Pavilhão 8 signature and access signs from local Figtree outlines."""
+"""Build the Pavilhão 8 identity and wayfinding from local Figtree outlines."""
 
 import hashlib
 import json
@@ -16,6 +16,7 @@ WAYFINDING_DESTINATION = DESTINATION.parent / "pavilion-wayfinding"
 VIEW_BOX = (0, 0, 320, 92)
 BADGE_VIEW_BOX = (0, 0, 62, 68)
 WAYFINDING_VIEW_BOX = (0, 0, 64, 26)
+NUMBER_VIEW_BOX = (0, 0, 62, 52)
 COPY = ("Fornecedores &", "Construção Civil", "Indumóveis")
 ACCESS_SIGNS = (
     (13, "esquerda", "M43 14H19m6-6-6 6 6 6"),
@@ -29,20 +30,40 @@ WAYFINDING_SIGNS = (
 GRAPHITE = "#302C2F"
 PLUM = "#643B54"
 STONE = "#826B5B"
+MINERAL = "#F2EBDF"
+SEAM = "#C1AF9E"
+LIP = "#DDD0C1"
+TERRACOTTA = "#A45F49"
 FONT_SOURCE = "https://github.com/google/fonts/tree/main/ofl/figtree"
 
 
-def draw_text(font, text, *, weight, size, x, baseline, color, spacing=0, centered=False):
+def tabular_substitutions(face):
+    table = face["GSUB"].table
+    return {
+        glyph: replacement
+        for record in table.FeatureList.FeatureRecord
+        if record.FeatureTag == "tnum"
+        for index in record.Feature.LookupListIndex
+        for subtable in table.LookupList.Lookup[index].SubTable
+        for glyph, replacement in subtable.mapping.items()
+    }
+
+
+def draw_text(font, text, *, weight, size, x, baseline, color, spacing=0, centered=False, tabular=False):
     face = instantiateVariableFont(font, {"wght": weight})
     glyphs = face.getGlyphSet()
     cmap = face.getBestCmap()
     scale = size / face["head"].unitsPerEm
+    names = [cmap[ord(character)] for character in text]
+    if tabular:
+        substitutions = tabular_substitutions(face)
+        names = [substitutions[name] for name in names]
     if centered:
-        advance = sum(glyphs[cmap[ord(character)]].width for character in text) * scale
+        advance = sum(glyphs[name].width for name in names) * scale
         x -= (advance + (len(text) - 1) * spacing) / 2
     paths = []
-    for character in text:
-        glyph = glyphs[cmap[ord(character)]]
+    for name in names:
+        glyph = glyphs[name]
         pen = SVGPathPen(glyphs, ntos=lambda value: f"{value:.3f}".rstrip("0").rstrip("."))
         glyph.draw(TransformPen(pen, (scale, 0, 0, -scale, x, baseline)))
         data = pen.getCommands()
@@ -55,18 +76,24 @@ def draw_text(font, text, *, weight, size, x, baseline, color, spacing=0, center
 def build_svg(font):
     _, _, width, height = VIEW_BOX
     name, title, event = COPY
-    name_paths = draw_text(font, name, weight=540, size=26, x=82, baseline=30, spacing=0.14, color=GRAPHITE)
-    title_paths = draw_text(font, title, weight=660, size=30, x=82, baseline=57, spacing=0.14, color=PLUM)
-    event_paths = draw_text(font, event, weight=570, size=15.5, x=82, baseline=81, spacing=1.5, color="#5D4F49")
+    name_paths = draw_text(font, name, weight=565, size=26.5, x=85, baseline=30, spacing=0.12, color=GRAPHITE)
+    title_paths = draw_text(font, title, weight=710, size=29.4, x=85, baseline=58, spacing=0.06, color=PLUM)
+    event_paths = draw_text(font, event, weight=600, size=15, x=85, baseline=81, spacing=1.05, color="#5D4F49")
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="p8-signature-title p8-signature-description">
   <title id="p8-signature-title">Fornecedores &amp; Construção Civil · Indumóveis</title>
-  <desc id="p8-signature-description">Assinatura horizontal com três fiadas em composição escalonada.</desc>
-  <g aria-hidden="true">
-    <path d="M13 48H35V65H13Z" fill="#E9DCE1"/>
-    <path d="M48 31H68V48H48Z" fill="#EFE5D8"/>
-    <path d="M13 65V48H61V65Z M20 48V31H68V48H61 M29 31V14H61V31 M48 31V48" fill="none" stroke="{STONE}" stroke-width="2.2" stroke-linejoin="round"/>
-    <path d="M35 48V65 M9 74H69" fill="none" stroke="{PLUM}" stroke-width="2.2" stroke-linecap="round"/>
+  <desc id="p8-signature-description">Assinatura horizontal com módulos de alvenaria sobre uma base mineral.</desc>
+  <g aria-hidden="true" stroke="{STONE}" stroke-width="1.45" stroke-linejoin="round">
+    <path d="M8 68H65l7 5H15Z" fill="#F8F3EA"/>
+    <path d="M8 68l7 5h57v5H15l-7-5Z" fill="{LIP}"/>
+    <path d="M15 50H61l6 4v14H21l-6-4Z" fill="{LIP}"/>
+    <path d="M21 54H67v14H21Z" fill="{MINERAL}"/>
+    <path d="M21 34H63l6 4v16H27l-6-4Z" fill="#D2C3B4"/>
+    <path d="M27 38H69v16H27Z" fill="#F9F5ED"/>
+    <path d="M29 15H56l6 4v19H35l-6-4Z" fill="{LIP}"/>
+    <path d="M35 19H62v19H35Z" fill="{MINERAL}"/>
+    <path d="M47 38v16M42 54v14" fill="none"/>
   </g>
+  <path d="M22 78H37" stroke="{TERRACOTTA}" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"/>
 {name_paths}
 {title_paths}
 {event_paths}
@@ -76,14 +103,15 @@ def build_svg(font):
 
 def build_access_svg(font, pavilion, side, arrow):
     _, _, width, height = BADGE_VIEW_BOX
-    label = draw_text(font, "Pavilhão", weight=650, size=14, x=31, baseline=36.5, color=GRAPHITE, centered=True)
-    number = draw_text(font, str(pavilion), weight=680, size=29, x=31, baseline=60.5, color=PLUM, centered=True)
+    label = draw_text(font, "Pavilhão", weight=640, size=13.5, x=31, baseline=36.5, color=GRAPHITE, centered=True)
+    number = draw_text(font, str(pavilion), weight=710, size=29, x=31, baseline=59.5, color=PLUM, centered=True, tabular=True)
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="access-p{pavilion}-title access-p{pavilion}-description">
   <title id="access-p{pavilion}-title">Acesso ao Pavilhão {pavilion}</title>
   <desc id="access-p{pavilion}-description">Passagem lateral à {side} do Pavilhão 8.</desc>
-  <rect x="0.75" y="0.75" width="60.5" height="66.5" rx="7" fill="#FBF8F2" stroke="#B6A595" stroke-width="1.5"/>
-  <path d="{arrow}" fill="none" stroke="{PLUM}" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M24 23H38" fill="none" stroke="{STONE}" stroke-width="1.4" stroke-linecap="round"/>
+  <rect x="1.1" y="2.8" width="59.8" height="64.2" rx="5" fill="{LIP}" stroke="{SEAM}"/>
+  <rect x="1.1" y="1" width="59.8" height="63.2" rx="5" fill="#F8F3EA" stroke="{SEAM}"/>
+  <path d="{arrow}" fill="none" stroke="{GRAPHITE}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 24H38" fill="none" stroke="{TERRACOTTA}" stroke-width="1.5" stroke-linecap="round"/>
 {label}
 {number}
 </svg>
@@ -102,13 +130,44 @@ def build_wayfinding_svg(font, slug, title, ink, paper, border, icon):
 '''
 
 
+def build_pavilion_wayfinding_svg(font, slug, title, ink, paper, border, icon):
+    _, _, width, height = WAYFINDING_VIEW_BOX
+    label = draw_text(font, title, weight=700, size=10.75, x=23.5, baseline=16.6, spacing=-0.1, color=ink)
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="p8-wayfinding-{slug}">
+  <title id="p8-wayfinding-{slug}">{title}</title>
+  <rect x="1" y="2" width="62" height="23" rx="4" fill="{LIP}" stroke="{border}"/>
+  <rect x="1" y="0.8" width="62" height="22.4" rx="4" fill="#FBF8F2" stroke="{border}"/>
+  <path d="M5 1.3h15.8v21.4H5a3.5 3.5 0 0 1-3.5-3.5V4.8A3.5 3.5 0 0 1 5 1.3Z" fill="{paper}" aria-hidden="true"/>
+  <path d="M20.8 1.4v21.2" stroke="{border}" aria-hidden="true"/>
+  <path d="{icon}" transform="translate(0.5 -0.8)" fill="none" stroke="{ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"/>
+{label}
+</svg>
+'''
+
+
+def build_number_svg(font):
+    _, _, width, height = NUMBER_VIEW_BOX
+    number = draw_text(font, "08", weight=700, size=34, x=31, baseline=37.5, color=GRAPHITE, centered=True, tabular=True)
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="p8-plate-title">
+  <title id="p8-plate-title">Pavilhão 08</title>
+  <rect x="1.2" y="2.6" width="59.6" height="48.4" rx="3.5" fill="{LIP}" stroke="{SEAM}"/>
+  <rect x="1.2" y="1" width="59.6" height="48" rx="3.5" fill="{MINERAL}" stroke="{SEAM}"/>
+  <path d="M6.5 5.8h12" stroke="{TERRACOTTA}" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"/>
+{number}
+</svg>
+'''
+
+
 def main():
     export = DESTINATION / "fornecedores-construcao-compact.svg"
+    number_plate = DESTINATION / "placa-08.svg"
     access_files = []
     wayfinding_files = []
+    pavilion_wayfinding_files = []
     WAYFINDING_DESTINATION.mkdir(exist_ok=True)
     with TTFont(SOURCE / "Figtree.ttf") as font:
         export.write_text(build_svg(font), encoding="utf-8")
+        number_plate.write_text(build_number_svg(font), encoding="utf-8")
         for pavilion, side, arrow in ACCESS_SIGNS:
             badge = DESTINATION / f"acesso-pavilhao-{pavilion}.svg"
             badge.write_text(build_access_svg(font, pavilion, side, arrow), encoding="utf-8")
@@ -128,18 +187,40 @@ def main():
                 "sha256": hashlib.sha256(sign.read_bytes()).hexdigest(),
                 "visibleCopy": title,
             })
+            if slug in ("entrada", "saida"):
+                pavilion_sign = DESTINATION / f"{slug}.svg"
+                pavilion_sign.write_text(build_pavilion_wayfinding_svg(font, slug, title, ink, paper, border, icon), encoding="utf-8")
+                pavilion_wayfinding_files.append({
+                    "name": pavilion_sign.name,
+                    "viewBox": WAYFINDING_VIEW_BOX,
+                    "sha256": hashlib.sha256(pavilion_sign.read_bytes()).hexdigest(),
+                    "visibleCopy": title,
+                })
     manifest = {
         "name": "Fornecedores & Construção Civil · Indumóveis",
         "visibleCopy": COPY,
         "format": "SVG com transparência e curvas de fonte, sem raster incorporado",
-        "palette": {"graphite": GRAPHITE, "plum": PLUM, "stone": STONE},
-        "font": {"family": "Figtree", "license": "SIL OFL 1.1", "source": FONT_SOURCE},
+        "palette": {
+            "graphite": GRAPHITE,
+            "plum": PLUM,
+            "stone": STONE,
+            "mineral": MINERAL,
+            "terracotta": TERRACOTTA,
+        },
+        "font": {"family": "Figtree", "license": "SIL OFL 1.1", "source": FONT_SOURCE, "numerals": "tnum"},
         "file": {
             "name": export.name,
             "viewBox": VIEW_BOX,
             "sha256": hashlib.sha256(export.read_bytes()).hexdigest(),
         },
+        "numberPlate": {
+            "name": number_plate.name,
+            "viewBox": NUMBER_VIEW_BOX,
+            "sha256": hashlib.sha256(number_plate.read_bytes()).hexdigest(),
+            "visibleCopy": "08",
+        },
         "accessSigns": access_files,
+        "pavilionWayfinding": pavilion_wayfinding_files,
         "sharedWayfinding": wayfinding_files,
     }
     (DESTINATION / "manifest.json").write_text(

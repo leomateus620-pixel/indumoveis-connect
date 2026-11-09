@@ -9,12 +9,15 @@
   "palette": {
     "graphite": "#302C2F",
     "plum": "#643B54",
-    "stone": "#826B5B"
+    "stone": "#826B5B",
+    "mineral": "#F2EBDF",
+    "terracotta": "#A45F49"
   },
   "font": {
     "family": "Figtree",
     "license": "SIL OFL 1.1",
-    "source": "https://github.com/google/fonts/tree/main/ofl/figtree"
+    "source": "https://github.com/google/fonts/tree/main/ofl/figtree",
+    "numerals": "tnum"
   },
   "file": {
     "name": "fornecedores-construcao-compact.svg",
@@ -24,7 +27,18 @@
       320,
       92
     ],
-    "sha256": "71c3efb0f52167adcd9f085749670c0bfaeead4d99b72908cf77a1d2bbfd779c"
+    "sha256": "71ea06a06ff102a199dbabe122b33ebc46f3b70f0fd2fd0319966fdb8b5042b7"
+  },
+  "numberPlate": {
+    "name": "placa-08.svg",
+    "viewBox": [
+      0,
+      0,
+      62,
+      52
+    ],
+    "sha256": "cd1a65b88a7f43adeca920031849c70d9a6632facd58b4b6e3f43bb9a39cb488",
+    "visibleCopy": "08"
   },
   "accessSigns": [
     {
@@ -35,7 +49,7 @@
         62,
         68
       ],
-      "sha256": "a35a16d2c094e02d82aa28881bcf8dee51d95d665e3a3dbc9d64f84db973a48b",
+      "sha256": "ccf02cc4f67bcf02eae7d73d8f100360a813f2c36118f643bb4ea748ffa818fe",
       "visibleCopy": [
         "Pavilhão",
         "13"
@@ -50,12 +64,36 @@
         62,
         68
       ],
-      "sha256": "70846d6bee7d18ea5251860dd836db2e1baf57c2461a1f9d0b5bd0ab5491c703",
+      "sha256": "7cf0a6b5a69eff4ebba1e42b4996a56dc6d15c21e08f359a7717e9c5e25c71c5",
       "visibleCopy": [
         "Pavilhão",
         "12"
       ],
       "side": "direita"
+    }
+  ],
+  "pavilionWayfinding": [
+    {
+      "name": "entrada.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "c861ca2a67c8f42512c572fd178fcf994f5c2461dcd1c2f36032cea5a37a53b7",
+      "visibleCopy": "Entrada"
+    },
+    {
+      "name": "saida.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "72cef7af8e581245c66aa8c27caad50f8c6fd360642cd36ddb06d923cbeb14ef",
+      "visibleCopy": "Saída"
     }
   ],
   "sharedWayfinding": [

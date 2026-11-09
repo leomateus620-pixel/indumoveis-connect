@@ -119,8 +119,22 @@ describe("Pavilhão 8 lot inspection", () => {
       "href",
       "/mapa?pavilhao=12",
     );
-    expect(within(drawing).getAllByRole("img", { name: "Entrada" })).toHaveLength(2);
-    expect(within(drawing).getByRole("img", { name: "Saída" })).toBeInTheDocument();
+    const entrances = within(drawing).getAllByRole("img", { name: "Entrada" });
+    expect(entrances).toHaveLength(2);
+    for (const entrance of entrances) {
+      expect(entrance).toHaveAttribute("href", "/brand/fornecedores-construcao/entrada.svg");
+    }
+    expect(within(drawing).getByRole("img", { name: "Saída" })).toHaveAttribute(
+      "href",
+      "/brand/fornecedores-construcao/saida.svg",
+    );
+    const lot = plan.environments.find((environment) => environment.code === "07")!;
+    expect(within(drawing).getByRole("button", { name: "07 · Lote 07" })).toHaveAttribute(
+      "d",
+      lot.parts[0].path,
+    );
+    expect(drawing.querySelector(".arq-p8-structure")).toHaveAttribute("pointer-events", "none");
+    expect(drawing.querySelector(".arq-p8-lot-relief")).toHaveAttribute("pointer-events", "none");
     expect([...drawing.querySelectorAll(".arq-plan-label")].map((e) => e.textContent)).toEqual([
       "01",
       "03",

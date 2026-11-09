@@ -1039,6 +1039,7 @@
 
 .is-pavilion-8 .arq-header {
   grid-template-columns: 40px auto minmax(0, 1fr) auto;
+  background: #fcf9f3;
 }
 .is-pavilion-8 .arq-signature {
   width: 232px;
@@ -1059,18 +1060,157 @@
   font-variant-numeric: tabular-nums;
 }
 .is-pavilion-8 .arq-canvas {
-  background: #f6f3ed;
+  background: radial-gradient(ellipse at 50% 42%, #f8f4ec, #eae3d8);
+}
+.is-pavilion-8 .arq-sidebar {
+  background: #fcf9f3;
+  border-color: #d6cbbd;
+}
+.is-pavilion-8 .arq-intro {
+  padding-top: 20px;
+}
+.is-pavilion-8 .arq-intro h2 {
+  font-weight: 650;
+}
+.is-pavilion-8 .arq-intro > p {
+  margin: 12px 0 20px;
+}
+.is-pavilion-8 .arq-index {
+  padding-block: 12px;
+}
+.is-pavilion-8 .arq-index strong,
+.is-pavilion-8 .arq-number {
+  font-family: Figtree, sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+}
+.is-pavilion-8 .arq-number {
+  display: inline-grid;
+  place-items: center;
+  min-width: 74px;
+  padding: 4px 10px;
+  border: 1px solid #302c2f;
+  border-radius: 6px;
+  margin: 14px 0 12px;
+  background: #302c2f;
+  box-shadow: inset 0 -3px #ad735b;
+  color: #fcf6ed;
+  font-size: 42px;
+  font-weight: 650;
+}
+.is-pavilion-8 .arq-environments {
+  margin-top: 0;
+  padding-block: 22px 0;
+}
+.is-pavilion-8 .arq-space-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 10px;
+}
+.is-pavilion-8 .arq-space-grid button {
+  height: 44px;
+  border-color: #c7bbae;
+  border-radius: 6px;
+  background: #f6efe4;
+  color: #403934;
+  font-size: 14px;
+  font-weight: 650;
+}
+.is-pavilion-8 .arq-space-grid button:hover {
+  background: #ede0d3;
+}
+.is-pavilion-8 .arq-space-grid button[aria-pressed="true"] {
+  border-color: var(--arq-plum);
+  background: var(--arq-plum);
+  color: #fff;
+}
+.is-pavilion-8 .arq-sidebar-footer {
+  margin-top: 22px;
+}
+.is-pavilion-8 .arq-key {
+  color: #514a44;
+  font-size: 10px;
+}
+.is-pavilion-8 .arq-key i {
+  border-color: #8c7b6d;
+  background: #eee7db;
+}
+.is-pavilion-8 .arq-key i.is-support {
+  background: #dad5cb;
+}
+.is-pavilion-8 .arq-key i.is-structure {
+  border-color: #494442;
+  background: #494442;
+}
+.is-pavilion-8 .arq-view-controls,
+.is-pavilion-8 .arq-panel-toggle {
+  border-color: #cbbdaf;
+  background: #fcf9f3;
+  box-shadow: 0 3px 12px #302c2f17;
+}
+.arq-p8-floor-shadow {
+  fill: #5f5544;
+  opacity: 0.13;
+}
+.arq-p8-floor-edge {
+  fill: #a99f91;
+}
+.arq-p8-floor-joint {
+  fill: none;
+  stroke: #877c6d;
+  stroke-width: 1;
+  opacity: 0.38;
+}
+.arq-p8-wall-shadow,
+.arq-p8-wall,
+.arq-p8-wall-cap {
+  fill: none;
+  stroke-linejoin: round;
+}
+.arq-p8-wall-shadow {
+  stroke: #6f6455;
+  stroke-width: 9;
+  opacity: 0.38;
+}
+.arq-p8-wall {
+  stroke: #514a46;
+  stroke-width: 7;
+}
+.arq-p8-wall-cap {
+  stroke: #a29a8c;
+  stroke-width: 2;
+}
+.arq-p8-threshold {
+  fill: #c3b9aa;
+  stroke: #a79b8c;
+  stroke-width: 0.8;
+}
+.arq-p8-threshold.is-entrance {
+  fill: #b9c7b5;
+  stroke: #788b76;
+}
+.arq-p8-threshold.is-exit {
+  fill: #d2b6a8;
+  stroke: #a17562;
+}
+.arq-p8-aisle-label {
+  fill: #575047;
+  font-family: Figtree, sans-serif;
+  font-size: clamp(10px, calc(9px / var(--plan-scale, 1)), 14px);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 .is-pavilion-8 .arq-part {
-  fill: #e9e1d6;
-  stroke: #8a7d72;
+  fill: #eee7db;
+  stroke: #84766b;
   stroke-width: 1;
+  pointer-events: fill;
   transition: none;
   vector-effect: non-scaling-stroke;
 }
 .is-pavilion-8 .arq-environment:hover .arq-part {
-  fill: #e0d2cc;
-  stroke: #765c68;
+  fill: #e8dbca;
+  stroke: #855d4a;
 }
 .is-pavilion-8 .arq-environment.is-selected .arq-part {
   fill: var(--arq-plum);
@@ -1078,32 +1218,70 @@
   stroke-width: 2;
 }
 .is-pavilion-8 .arq-environment .arq-part:focus-visible {
-  stroke: #9c4a2e;
+  stroke: #8f472f;
   stroke-width: 3;
+  stroke-dasharray: 5 3;
+}
+.arq-p8-lot-rim,
+.arq-p8-lot-light {
+  fill: none;
+}
+.arq-p8-lot-rim {
+  stroke: #746253;
+  stroke-width: 8;
+  opacity: 0.21;
+}
+.arq-p8-lot-light {
+  stroke: #fffbf3;
+  stroke-width: 3;
+  opacity: 0.85;
+}
+.is-selected .arq-p8-lot-rim {
+  stroke: #281824;
+  opacity: 0.48;
+}
+.is-selected .arq-p8-lot-light {
+  stroke: #d4a9bf;
+  opacity: 0.38;
+}
+.arq-p8-plate-edge {
+  fill: #9b8070;
+}
+.arq-p8-plate-face {
+  fill: #fcf7ef;
+  stroke: #af9a86;
+  stroke-width: 1;
+}
+.is-selected .arq-p8-plate-edge {
+  fill: #241320;
+}
+.is-selected .arq-p8-plate-face {
+  fill: #47273d;
+  stroke: #d0afbf;
 }
 .is-pavilion-8 .arq-plan-label:not(.is-word) {
-  font-size: max(30px, var(--plan-number-size, 14px));
-  font-weight: 650;
+  fill: #302c2f;
+  font-family: Figtree, sans-serif;
+  font-size: clamp(23px, calc(15px / var(--plan-scale, 1)), 32px);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+.is-pavilion-8 .arq-environment.is-selected .arq-plan-label {
+  fill: #fff8f3;
 }
 .is-pavilion-8 .arq-architecture {
   stroke: #64574e;
+}
+.is-pavilion-8 .arq-architecture .is-wall {
+  stroke: #696059;
 }
 .is-pavilion-8 .arq-architecture .is-door,
 .is-pavilion-8 .arq-architecture .is-access {
   stroke: #766356;
 }
 .is-pavilion-8 .arq-architecture text {
-  fill: #655951;
-}
-.is-pavilion-8 .arq-space-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-.is-pavilion-8 .arq-key i {
-  background: #e9e1d6;
-}
-.is-pavilion-8 .arq-key i.is-support {
-  background: #f6f3ed;
+  fill: #574b42;
+  font-weight: 650;
 }
 @media (max-width: 1050px) {
   .is-pavilion-8 .arq-signature {

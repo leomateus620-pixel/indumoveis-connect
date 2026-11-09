@@ -11,6 +11,11 @@ import {
   X,
 } from "lucide-react";
 import { SPACE_STATUS } from "@/lib/format";
+import {
+  Pavilion8Architecture,
+  Pavilion8LotRelief,
+  Pavilion8NumberPlate,
+} from "./Pavilion8Architecture";
 import { boundCamera, fitPlan, zoomPlan, type PlanCamera, type Viewport } from "./navigation";
 import type { PavilionPlan } from "./data";
 import {
@@ -53,6 +58,7 @@ export function PavilionInterior({
   onConnect,
 }: Props) {
   const selected = plan.environments.find((e) => e.code === selectedCode);
+  const isPavilion8 = presentation.pavilionNumber === 8;
   const lotsMode = presentation.mode === "lots";
   const searchLots = presentation.searchLots === true;
   const [lotQuery, setLotQuery] = useState("");
@@ -361,7 +367,11 @@ export function PavilionInterior({
           </div>
           {selected ? (
             <div className="arq-information" key={selected.code}>
-              {/^\d{2}$/.test(selected.code) && <span className="arq-number">{selected.code}</span>}
+              {/^\d{2}$/.test(selected.code) && (
+                <span className="arq-number" aria-hidden={isPavilion8 || undefined}>
+                  {selected.code}
+                </span>
+              )}
               <h2>{selected.name}</h2>
               {lotsMode && (
                 <p className="arq-lot-context">
@@ -431,7 +441,7 @@ export function PavilionInterior({
                 {searchLots
                   ? "Selecione um lote na planta ou busque pelo número."
                   : lotsMode
-                    ? "Selecione na planta ou pelo número."
+                    ? "Selecione um espaço na planta ou pelos números abaixo."
                     : "Selecione um ambiente para conhecer o espaço."}
               </p>
               <div className="arq-index">
@@ -527,6 +537,12 @@ export function PavilionInterior({
                   <i className="is-support" />
                   Circulação
                 </span>
+                {isPavilion8 && (
+                  <span className="arq-key">
+                    <i className="is-structure" />
+                    Estrutura
+                  </span>
+                )}
               </>
             ) : (
               <>
@@ -654,6 +670,7 @@ export function PavilionInterior({
             onPointerCancel={(e) => stopGesture(e, true)}
           >
             <g ref={drawing}>
+              {isPavilion8 && <Pavilion8Architecture plan={plan} />}
               {connections.map(({ element, center, destination, icon }) => {
                 const { width, height, radius } =
                   presentation.connectionBadge ?? defaultConnectionBadge;
@@ -733,6 +750,11 @@ export function PavilionInterior({
                       }}
                     />
                   ))}
+                  {isPavilion8 &&
+                    environment.parts.map((part) => (
+                      <Pavilion8LotRelief key={part.id} path={part.path} />
+                    ))}
+                  {isPavilion8 && <Pavilion8NumberPlate center={environment.label} />}
                   <text
                     x={environment.label[0]}
                     y={environment.label[1]}
@@ -795,10 +817,14 @@ export function PavilionInterior({
               {wayfinding.flatMap(({ elementId, kind, centers }) => {
                 const { width, height } = WAYFINDING_SIGN_SIZE;
                 const { asset, label } = WAYFINDING_SIGNS[kind];
+                const directory =
+                  isPavilion8 && kind !== "service"
+                    ? "fornecedores-construcao"
+                    : "pavilion-wayfinding";
                 return centers.map(([x, y]) => (
                   <image
                     key={`${elementId}:${x}:${y}`}
-                    href={`/brand/pavilion-wayfinding/${asset}`}
+                    href={`/brand/${directory}/${asset}`}
                     x={x - width / 2}
                     y={y - height / 2}
                     width={width}
