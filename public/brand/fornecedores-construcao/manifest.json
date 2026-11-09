@@ -1,0 +1,96 @@
+{
+  "name": "Fornecedores & Construção Civil · Indumóveis",
+  "visibleCopy": [
+    "Fornecedores &",
+    "Construção Civil",
+    "Indumóveis"
+  ],
+  "format": "SVG com transparência e curvas de fonte, sem raster incorporado",
+  "palette": {
+    "graphite": "#302C2F",
+    "plum": "#643B54",
+    "stone": "#826B5B"
+  },
+  "font": {
+    "family": "Figtree",
+    "license": "SIL OFL 1.1",
+    "source": "https://github.com/google/fonts/tree/main/ofl/figtree"
+  },
+  "file": {
+    "name": "fornecedores-construcao-compact.svg",
+    "viewBox": [
+      0,
+      0,
+      320,
+      92
+    ],
+    "sha256": "71c3efb0f52167adcd9f085749670c0bfaeead4d99b72908cf77a1d2bbfd779c"
+  },
+  "accessSigns": [
+    {
+      "name": "acesso-pavilhao-13.svg",
+      "viewBox": [
+        0,
+        0,
+        62,
+        68
+      ],
+      "sha256": "a35a16d2c094e02d82aa28881bcf8dee51d95d665e3a3dbc9d64f84db973a48b",
+      "visibleCopy": [
+        "Pavilhão",
+        "13"
+      ],
+      "side": "esquerda"
+    },
+    {
+      "name": "acesso-pavilhao-12.svg",
+      "viewBox": [
+        0,
+        0,
+        62,
+        68
+      ],
+      "sha256": "70846d6bee7d18ea5251860dd836db2e1baf57c2461a1f9d0b5bd0ab5491c703",
+      "visibleCopy": [
+        "Pavilhão",
+        "12"
+      ],
+      "side": "direita"
+    }
+  ],
+  "sharedWayfinding": [
+    {
+      "name": "../pavilion-wayfinding/entrada.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "2dc759175d3b095880072605af7e5a0f3bd4e3a1cf0f852690f8ce1768493f04",
+      "visibleCopy": "Entrada"
+    },
+    {
+      "name": "../pavilion-wayfinding/saida.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "dea38f75e2d550341d802cdd74bede604372a0ca83695a7241500cf130f8ab86",
+      "visibleCopy": "Saída"
+    },
+    {
+      "name": "../pavilion-wayfinding/servico.svg",
+      "viewBox": [
+        0,
+        0,
+        64,
+        26
+      ],
+      "sha256": "79c5e5ccf03603ed67c98eaefa57978213ca235ad48faeb7642b680a45c5f183",
+      "visibleCopy": "Serviço"
+    }
+  ]
+}

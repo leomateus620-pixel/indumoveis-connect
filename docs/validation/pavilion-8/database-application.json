@@ -1,0 +1,166 @@
+{
+  "project": {
+    "name": "Indumóveis Connect",
+    "id": "188cb605-7a42-42a0-9e75-28f5097e9433",
+    "repository": "leomateus620-pixel/indumoveis-connect",
+    "editorCommitObserved": "bc5402109b4bab3527f3ce84c170ae4065dc16fd",
+    "backend": "supabase",
+    "databaseAlreadyEnabled": true
+  },
+  "activeEdition": {
+    "name": "Indumóveis 2027",
+    "id": "49af7d79-9bef-4981-9ecd-ddf64928036e"
+  },
+  "source": {
+    "path": "docs/references/pavilion-8/fornecedores-construcao-civil-rev02.pdf",
+    "sha256": "63e3762f7d20b34359f451da1cac63ad7e03327496695106dff4b9c11e239767"
+  },
+  "application": {
+    "connector": "Lovable query_database",
+    "committed": true,
+    "atomicMigrationAndHistory": true,
+    "migrations": [
+      {
+        "bytes": 3016,
+        "name": "pavilion_8_plan_scope",
+        "sha256": "128a97d9dab908176d1825df7ccc907bb78bacb1b021ee81a999e4c55ba981bc",
+        "version": "20261109002500"
+      },
+      {
+        "bytes": 10832,
+        "name": "pavilion_8_fornecedores_seed",
+        "sha256": "729e62ee2915dfdecf1a7ec098ba65ba3c09050287b2ea9202f0539ca55ab242",
+        "version": "20261109002600"
+      }
+    ]
+  },
+  "revision": {
+    "pavilionNumber": 8,
+    "id": "83cede9f-0436-47fe-bd4f-994f928b41eb",
+    "floorPlanId": "36773ab4-3423-4f91-a8c5-5aed8f61f8a9",
+    "revision": 1,
+    "isCurrent": true,
+    "totalAreaM2": 937.32,
+    "payloadSha256": "cab6d83a76bb3990b1bc6f4bd68331c93ec686cf5d27887b8176db95c279c85d",
+    "environmentCount": 7,
+    "validPolygonCount": 7,
+    "architectureElementCount": 6
+  },
+  "stock": {
+    "beforePavilion8Count": 0,
+    "beforeUndrawn02Found": false,
+    "afterCount": 7,
+    "codes": [
+      "01",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08"
+    ],
+    "stockCodes": [
+      "P8-01",
+      "P8-03",
+      "P8-04",
+      "P8-05",
+      "P8-06",
+      "P8-07",
+      "P8-08"
+    ],
+    "stockAreasAllNull": true,
+    "allWithoutActiveDeal": true,
+    "liveCommercialStatuses": [
+      {
+        "code": "01",
+        "status": "disponivel"
+      },
+      {
+        "code": "03",
+        "status": "disponivel"
+      },
+      {
+        "code": "04",
+        "status": "disponivel"
+      },
+      {
+        "code": "05",
+        "status": "disponivel"
+      },
+      {
+        "code": "06",
+        "status": "disponivel"
+      },
+      {
+        "code": "07",
+        "status": "disponivel"
+      },
+      {
+        "code": "08",
+        "status": "disponivel"
+      }
+    ],
+    "statusSource": "space_status_v"
+  },
+  "authenticatedGeometry": {
+    "matchesCanonicalFixture": true,
+    "ignoredDatabaseMetadata": [
+      "editionId",
+      "databasePlanId",
+      "revisionId",
+      "coordinateSystem"
+    ],
+    "ignoredNullOptionalFields": [
+      "functionLabel"
+    ],
+    "p8PayloadMd5": "7f6b108c5a6d9bb29bfb6b73c7a90b2d",
+    "p1p13PayloadHashes": [
+      {
+        "pavilionNumber": 1,
+        "before": "87c294c92371f430317c1a2958aa74f5",
+        "after": "87c294c92371f430317c1a2958aa74f5"
+      },
+      {
+        "pavilionNumber": 13,
+        "before": "b072e0f5ccdb8bbec4df537d744f93c8",
+        "after": "b072e0f5ccdb8bbec4df537d744f93c8"
+      }
+    ]
+  },
+  "permissionChecks": {
+    "authenticated_revision_write_denied": true,
+    "commercial_pavilion_identity_mismatch_returns_empty": true,
+    "commercial_reads_seven_live_view_statuses": true,
+    "commercial_rpc_denies_map_only": true,
+    "cross_pavilion_environment_link_rejected": true,
+    "inactive_edition_not_exposed": true,
+    "lot_02_rejected_by_pavilion_constraint": true,
+    "map_only_reads_seven_lots_and_total_without_commercial_data": true,
+    "p1_p13_contracts_unchanged": true,
+    "published_total_immutable": true,
+    "user_without_map_permission_denied": true
+  },
+  "rolledBackChecks": {
+    "rawSqlReexecution": {
+      "current_revision": "83cede9f-0436-47fe-bd4f-994f928b41eb",
+      "linked_stock_count": 7,
+      "registered_migrations": 2,
+      "revision_count": 1,
+      "stock_count": 7
+    },
+    "legacyStockReconciliation": {
+      "all_legacy_stock_bytes_preserved": true,
+      "legacy_02_unmapped": true,
+      "legacy_03_reused": true,
+      "new_null_stock_areas": 6,
+      "null_revision_areas": 7,
+      "unrelated_01_not_reused": true
+    },
+    "fixtureCleanup": {
+      "activeEdition": "49af7d79-9bef-4981-9ecd-ddf64928036e",
+      "lot02Stock": 0,
+      "qaEdition": 0,
+      "qaUsers": 0
+    }
+  }
+}

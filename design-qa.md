@@ -1,3 +1,21 @@
+# Pavilhão 8 — Fornecedores e Construção Civil — Design QA, 08/11/2026
+
+final result: passed
+
+O recorte do PDF rev. 02 e a captura da planta foram alinhados aos mesmos limites locais de 461 × 736 pontos, entrada embaixo. A comparação confirma os polígonos de 01, 07 e 08, a ilha mais larga junto à entrada, as duas passagens em alturas diferentes e o corredor acima de 05. As placas 13 e 12 foram deslocadas para as aberturas, com folga em relação aos limites comerciais. [Comparação da aplicação com a fonte](docs/validation/pavilion-8/application-comparison.jpg) · [Acessos laterais](docs/validation/pavilion-8/lateral-connections.jpg).
+
+| Janela CSS | Evidência |
+|---|---|
+| 1440 × 900 | [Planta inteira](docs/validation/pavilion-8/desktop-overview.jpg) · [Seleção 07](docs/validation/pavilion-8/desktop-lot-07.jpg) · [Detalhe da entrada](docs/validation/pavilion-8/desktop-entrance.jpg) |
+| 834 × 1112 | [Tablet](docs/validation/pavilion-8/tablet-overview.jpg) |
+| 390 × 844 | [Planta inteira](docs/validation/pavilion-8/mobile-overview.jpg) · [Painel com lote 07](docs/validation/pavilion-8/mobile-lot-07.jpg) |
+
+A assinatura vetorial mantém a hierarquia da marca e reserva a área total para texto da interface. Os números grafite usam tamanho uniforme no desenho. O contraste do lote selecionado foi conferido com branco sobre ameixa `#643b54`; a mudança de cor é imediata. Fundo quente, contorno do prédio, limites dos lotes e circulação têm pesos distintos. A família Figtree de placas usa texto e pictograma com cor por função. Foram conferidas as duas entradas de P13 e a entrada, a saída e os dois acessos de serviço de P1. [P1](docs/validation/pavilion-8/p1-wayfinding.jpg) · [P13](docs/validation/pavilion-8/p13-wayfinding.jpg).
+
+A revisão encontrou um salto ao fechar a seleção após arrastar e um recorte lateral no lote 07 com painel móvel. Após os ajustes, fechar manteve a transformação exatamente e, a 390 × 844, o lote 07 ficou entre x=268 e x=375, com painel até x=260 e controles a partir de y=673. O clique nas diagonais, a roda, a ida pelo parque, recarga, voltar/avançar e as ligações com P12 e P13 foram exercitados no navegador. A pinça passou no teste com dois ponteiros do componente compartilhado. A prévia usa sessão controlada e o banco real foi verificado separadamente. [Relatório](docs/pavilion-interior/pavilion8-implementation.md).
+
+---
+
 # Pavilhão 13 — Salão de Imóveis — Design QA, 08/11/2026
 
 final result: passed
