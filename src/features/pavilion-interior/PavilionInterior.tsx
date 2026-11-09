@@ -12,15 +12,17 @@ import {
 } from "lucide-react";
 import { SPACE_STATUS } from "@/lib/format";
 import { Pavilion1Architecture, Pavilion1NumberPlate } from "./Pavilion1Architecture";
+import { Pavilion12Architecture } from "./Pavilion12Architecture";
 import {
   Pavilion8Architecture,
   Pavilion8LotRelief,
   Pavilion8NumberPlate,
 } from "./Pavilion8Architecture";
 import { boundCamera, fitPlan, zoomPlan, type PlanCamera, type Viewport } from "./navigation";
-import type { PavilionPlan } from "./data";
+import type { InteriorEnvironment, PavilionPlan } from "./data";
 import {
   PAVILION_PRESENTATIONS,
+  normalizePavilion12LotCode,
   normalizedLotCode,
   type InteriorPresentation,
 } from "./presentation";
@@ -35,6 +37,7 @@ import { WAYFINDING_SIGN_SIZE, WAYFINDING_SIGNS } from "./wayfinding";
 import { Pavilion13Architecture } from "./Pavilion13Architecture";
 import { Pavilion13LotDirectory } from "./Pavilion13LotDirectory";
 import { pavilion13Sector } from "./pavilion13-sectors";
+import { pavilion12Neighbor } from "./pavilion12-keyboard";
 
 type Props = {
   plan: PavilionPlan;
@@ -47,8 +50,8 @@ type Props = {
   onBack: () => void;
   onConnect?: (pavilion: ParkPavilionNumber) => void;
 };
-const formatArea = (value: number) =>
-  `${value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²`;
+const formatArea = (value: number, minimumFractionDigits = 2) =>
+  `${value.toLocaleString("pt-BR", { minimumFractionDigits, maximumFractionDigits: 2 })} m²`;
 const defaultConnectionBadge = { width: 92, height: 104, radius: 12 };
 
 export function PavilionInterior({
@@ -65,11 +68,13 @@ export function PavilionInterior({
   const selected = plan.environments.find((e) => e.code === selectedCode);
   const isPavilion1 = presentation.pavilionNumber === 1;
   const isPavilion8 = presentation.pavilionNumber === 8;
+  const isPavilion12 = presentation.pavilionNumber === 12;
   const isPavilion13 = presentation.pavilionNumber === 13;
   const lotsMode = presentation.mode === "lots";
   const searchLots = presentation.searchLots === true;
   const [lotQuery, setLotQuery] = useState("");
   const [searchError, setSearchError] = useState("");
+  const [keyboardLot, setKeyboardLot] = useState<string>();
   const [panelOpen, setPanelOpen] = useState(!!selected);
   const [mobile, setMobile] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
@@ -259,14 +264,49 @@ export function PavilionInterior({
     onSelect(code);
     if (code) setPanelOpen(true);
   };
-  const collapse = () => {
+  const collapse = (focusTarget: SVGElement | null = svg.current) => {
     setPanelOpen(false);
     size.current.left = 0;
-    requestAnimationFrame(() => svg.current?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
   };
   const close = () => {
     onSelect(undefined);
     collapse();
+  };
+  const locateSelected = () => {
+    if (!selected) return;
+    if (mobile) {
+      collapse(
+        drawing.current?.querySelector<SVGPathElement>(
+          `[data-environment="${selected.code}"] [data-part="interior"]`,
+        ) ?? svg.current,
+      );
+    }
+    const { width, height } = size.current;
+    const scale = Math.max(
+      camera.current.scale,
+      fitPlan(plan.bounds, size.current).scale * 2.15,
+      1.6,
+    );
+    const [x, y] = selected.label;
+    paint({ scale, x: width / 2 - x * scale, y: (height - 52) / 2 - y * scale });
+  };
+  const focusAdjacentLot = (environment: InteriorEnvironment, key: string) => {
+    const next = pavilion12Neighbor(plan.environments, environment, key);
+    if (!next) return;
+    const target = drawing.current?.querySelector<SVGPathElement>(
+      `[data-environment="${next.code}"] [data-part="interior"]`,
+    );
+    if (!target) return;
+    const c = camera.current;
+    const x = next.label[0] * c.scale + c.x;
+    const y = next.label[1] * c.scale + c.y;
+    const panelWidth =
+      mobile && panelOpen ? (sidebar.current?.getBoundingClientRect().width ?? 0) : 0;
+    const safeX = Math.max(panelWidth + 16, Math.min(size.current.width - 16, x));
+    const safeY = Math.max(16, Math.min(size.current.height - 86, y));
+    if (safeX !== x || safeY !== y) paint({ ...c, x: c.x + safeX - x, y: c.y + safeY - y });
+    target.focus({ preventScroll: true });
   };
   const numEnvironments = plan.environments.filter(
     (e) => /^\d{2}$/.test(e.code) && (!lotsMode || e.kind === "commercial"),
@@ -356,7 +396,8 @@ export function PavilionInterior({
         <span className="arq-pavilion-id">Pavilhão {presentation.pavilionNumber}</span>
         {lotsMode && plan.totalAreaM2 != null && (
           <p className="arq-total-area">
-            <span>Área total:</span> <strong>{formatArea(plan.totalAreaM2)}</strong>
+            <span>Área total:</span>{" "}
+            <strong>{formatArea(plan.totalAreaM2, isPavilion12 ? 0 : 2)}</strong>
           </p>
         )}
       </header>
@@ -373,7 +414,7 @@ export function PavilionInterior({
                 ? lotsMode
                   ? "Lote selecionado"
                   : "Ambiente selecionado"
-                : searchLots
+                : isPavilion13
                   ? "Explore o salão"
                   : lotsMode
                     ? "Planta do pavilhão"
@@ -390,7 +431,7 @@ export function PavilionInterior({
                   {selected.code}
                 </span>
               )}
-              <h2 ref={lotTitle} tabIndex={isPavilion13 ? -1 : undefined}>
+              <h2 ref={lotTitle} tabIndex={isPavilion13 || isPavilion12 ? -1 : undefined}>
                 {selected.name}
               </h2>
               {lotsMode && (
@@ -434,10 +475,16 @@ export function PavilionInterior({
                   )}
                 </dl>
               )}
-              {mobile && (
-                <button className="arq-view-plan" onClick={collapse}>
-                  Ver na planta <ArrowRight size={16} />
+              {isPavilion12 ? (
+                <button className="arq-view-plan" onClick={locateSelected}>
+                  Localizar na planta <Scan size={16} />
                 </button>
+              ) : (
+                mobile && (
+                  <button className="arq-view-plan" onClick={() => collapse()}>
+                    Ver na planta <ArrowRight size={16} />
+                  </button>
+                )
               )}
             </div>
           ) : (
@@ -450,11 +497,13 @@ export function PavilionInterior({
                 <h2>Arquitetura para novos encontros.</h2>
               )}
               <p>
-                {searchLots
+                {isPavilion13
                   ? "Selecione na planta, busque pelo número ou explore por setor."
-                  : lotsMode
-                    ? "Selecione um espaço na planta ou pelos números abaixo."
-                    : "Selecione um ambiente para conhecer o espaço."}
+                  : isPavilion12
+                    ? "Selecione na planta ou busque pelo número."
+                    : lotsMode
+                      ? "Selecione um espaço na planta ou pelos números abaixo."
+                      : "Selecione um ambiente para conhecer o espaço."}
               </p>
               <div className="arq-index">
                 <strong>{presentation.commercialCount}</strong>
@@ -468,15 +517,25 @@ export function PavilionInterior({
               noValidate
               onSubmit={(event) => {
                 event.preventDefault();
-                const code = normalizedLotCode(lotQuery);
+                const code = isPavilion12
+                  ? normalizePavilion12LotCode(lotQuery)
+                  : normalizedLotCode(lotQuery);
                 if (
                   !code ||
                   !plan.environments.some((e) => e.code === code && e.kind === "commercial")
                 ) {
-                  setSearchError("Informe um número de 01 a 80.");
+                  setSearchError(
+                    isPavilion12
+                      ? "Informe um número de 1 a 254."
+                      : "Informe um número de 01 a 80.",
+                  );
                   return;
                 }
                 setLotQuery(code);
+                if (isPavilion12 && code !== selectedCode) {
+                  setKeyboardLot(code);
+                  focusDirectorySelection.current = true;
+                }
                 choose(code);
               }}
             >
@@ -489,8 +548,8 @@ export function PavilionInterior({
                   id="pavilion-lot-search"
                   type="search"
                   inputMode="numeric"
-                  maxLength={2}
-                  placeholder="01–80"
+                  maxLength={isPavilion12 ? 3 : 2}
+                  placeholder={isPavilion12 ? "1–254" : "01–80"}
                   value={lotQuery}
                   aria-invalid={!!searchError}
                   aria-describedby={searchError ? "pavilion-lot-search-error" : undefined}
@@ -565,12 +624,10 @@ export function PavilionInterior({
                   <i className="is-support" />
                   Circulação
                 </span>
-                {(isPavilion8 || isPavilion13) && (
-                  <span className="arq-key">
-                    <i className="is-structure" />
-                    Estrutura
-                  </span>
-                )}
+                <span className="arq-key">
+                  <i className="is-structure" />
+                  Estrutura
+                </span>
               </>
             ) : (
               <>
@@ -592,7 +649,13 @@ export function PavilionInterior({
         </aside>
         <div className="arq-canvas" ref={viewport}>
           {mobile && !panelOpen && (
-            <button className="arq-panel-toggle" onClick={() => setPanelOpen(true)}>
+            <button
+              className="arq-panel-toggle"
+              aria-label={
+                isPavilion12 && selected ? `Abrir informações do lote ${selected.code}` : undefined
+              }
+              onClick={() => setPanelOpen(true)}
+            >
               <PanelLeft size={17} />
               {selected
                 ? lotsMode
@@ -700,6 +763,7 @@ export function PavilionInterior({
             <g ref={drawing}>
               {isPavilion1 && <Pavilion1Architecture plan={plan} />}
               {isPavilion8 && <Pavilion8Architecture plan={plan} />}
+              {isPavilion12 && <Pavilion12Architecture plan={plan} />}
               {isPavilion13 && <Pavilion13Architecture plan={plan} />}
               {connections.map(({ element, center, destination, icon }) => {
                 const { width, height, radius } =
@@ -765,14 +829,28 @@ export function PavilionInterior({
                       className={`arq-part is-${part.kind}`}
                       role={environment.kind === "circulation" ? undefined : "button"}
                       tabIndex={
-                        part.kind === "interior" && environment.kind !== "circulation" ? 0 : -1
+                        part.kind === "interior" &&
+                        environment.kind !== "circulation" &&
+                        (!isPavilion12 || environment.code === (keyboardLot ?? selectedCode ?? "1"))
+                          ? 0
+                          : -1
                       }
-                      aria-label={`${environment.code.match(/^\d/) ? environment.code + " · " : ""}${environment.name}${part.kind === "external" ? " · área externa vinculada" : ""}`}
+                      aria-label={`${!isPavilion12 && environment.code.match(/^\d/) ? environment.code + " · " : ""}${environment.name}${part.kind === "external" ? " · área externa vinculada" : ""}`}
                       aria-pressed={selected?.id === environment.id}
+                      onFocus={isPavilion12 ? () => setKeyboardLot(environment.code) : undefined}
                       onClick={(e) => {
                         if (e.detail === 0) choose(environment.code);
                       }}
                       onKeyDown={(e) => {
+                        if (
+                          isPavilion12 &&
+                          ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)
+                        ) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          focusAdjacentLot(environment, e.key);
+                          return;
+                        }
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           e.stopPropagation();
@@ -833,7 +911,10 @@ export function PavilionInterior({
                 {plan.architecture
                   .filter(
                     (element) =>
-                      !connections.some((connection) => connection.element.id === element.id),
+                      !(
+                        isPavilion12 &&
+                        (element.id === "p12:floor-outline" || element.id === "p12:perimeter")
+                      ) && !connections.some((connection) => connection.element.id === element.id),
                   )
                   .map((element) => {
                     const sign = wayfinding.find((sign) => sign.elementId === element.id);
@@ -851,8 +932,12 @@ export function PavilionInterior({
                     );
                   })}
               </g>
-              {isPavilion1 && selected && (
-                <g className="arq-p1-selection" aria-hidden="true" pointerEvents="none">
+              {(isPavilion1 || isPavilion12) && selected && (
+                <g
+                  className={isPavilion12 ? "arq-p12-selection" : "arq-p1-selection"}
+                  aria-hidden="true"
+                  pointerEvents="none"
+                >
                   {selected.parts.map((part) => (
                     <path key={part.id} d={part.path} vectorEffect="non-scaling-stroke" />
                   ))}
@@ -908,7 +993,7 @@ export function PavilionInterior({
           <span className="arq-sr-only" id="arq-navigation-help">
             Arraste para deslocar. Use a roda ou pinça para ampliar. Com a planta em foco, use as
             setas, mais, menos e zero para ajustar à tela. Enter seleciona um ambiente; Escape fecha
-            a seleção.
+            a seleção. {isPavilion12 && "Com um lote em foco, as setas navegam entre lotes."}
           </span>
           <span className="arq-sr-only" aria-live="polite">
             {selected

@@ -320,7 +320,7 @@ const pavilions: MapEntity[] = [
   entity(
     "pavilion:12",
     "pavilion",
-    "Pavilhão 12 · Móveis e seriados",
+    "Pavilhão 12 · Móveis e Seriados",
     sourcePolygon([
       [647.1247, 703.7982],
       [934.3511, 703.7982],
@@ -334,7 +334,7 @@ const pavilions: MapEntity[] = [
       source: `${main}; ${SOURCES[4].file}`,
       accesses: [sourcePoint([648, 785]), sourcePoint([935, 785]), sourcePoint([817, 871.56])],
       notes:
-        "1.650 m² é área total declarada do edifício, não área vendável. Duas ilhas e acessos laterais da planta específica preparados para revisão posterior; sem estandes nesta fase.",
+        "A planta interna reúne 254 lotes em quatro faixas de exposição, com duas ilhas centrais e acessos laterais.",
     },
   ),
   entity(

@@ -2,7 +2,8 @@ import type { InteriorConnection } from "./connections";
 import { PAVILION_8_LOT_CODES } from "./pavilion8-codes";
 import type { InteriorWayfinding } from "./wayfinding";
 
-export type InteriorPavilionNumber = 1 | 8 | 13;
+export type InteriorPavilionNumber = 1 | 8 | 12 | 13;
+const PAVILION_12_LOT_COUNT = 254;
 export type InteriorPresentation = {
   pavilionNumber: InteriorPavilionNumber;
   title: string;
@@ -74,6 +75,38 @@ export const PAVILION_PRESENTATIONS: Record<InteriorPavilionNumber, InteriorPres
       { elementId: "p8:rear-exit", kind: "exit", centers: [[486.582, 128]] },
     ],
   },
+  12: {
+    pavilionNumber: 12,
+    title: "Móveis e Seriados",
+    brandPath: "/brand/moveis-seriados/moveis-seriados-compact.svg",
+    brandAlt: "Móveis e Seriados · Indumóveis",
+    showAreas: false,
+    mode: "lots",
+    searchLots: true,
+    commercialCount: PAVILION_12_LOT_COUNT,
+    loadingText: "Abrindo o Pavilhão 12…",
+    loadErrorText: "Não foi possível carregar o Pavilhão 12.",
+    wayfinding: [
+      {
+        elementId: "p12:left-access",
+        kind: "access",
+        centers: [[50.41, 306.77]],
+        hideSourcePath: true,
+      },
+      {
+        elementId: "p12:right-access",
+        kind: "access",
+        centers: [[767.99, 306.77]],
+        hideSourcePath: true,
+      },
+      {
+        elementId: "p12:main-entrance",
+        kind: "entrance",
+        centers: [[491.36, 517.72]],
+        hideSourcePath: true,
+      },
+    ],
+  },
   13: {
     pavilionNumber: 13,
     title: "Salão de Imóveis",
@@ -125,6 +158,7 @@ export const PAVILION_PRESENTATIONS: Record<InteriorPavilionNumber, InteriorPres
 export function interiorPavilionNumber(value: unknown): InteriorPavilionNumber | undefined {
   if (value === 1 || value === "1") return 1;
   if (value === 8 || value === "8") return 8;
+  if (value === 12 || value === "12") return 12;
   if (value === 13 || value === "13") return 13;
   return undefined;
 }
@@ -141,6 +175,18 @@ export function normalizedLotCode(value: unknown): string | undefined {
 }
 export function validatePavilion13Search(search: Record<string, unknown>): { lote?: string } {
   return { lote: normalizedLotCode(search.lote) };
+}
+
+export function normalizePavilion12LotCode(value: unknown): string | undefined {
+  if (typeof value !== "string" && typeof value !== "number") return undefined;
+  const text = String(value).trim();
+  if (!/^\d{1,3}$/.test(text)) return undefined;
+  const number = Number(text);
+  return number >= 1 && number <= PAVILION_12_LOT_COUNT ? String(number) : undefined;
+}
+
+export function validatePavilion12Search(search: Record<string, unknown>): { lote?: string } {
+  return { lote: normalizePavilion12LotCode(search.lote) };
 }
 
 export function validatePavilion8Search(search: Record<string, unknown>): { lote?: string } {

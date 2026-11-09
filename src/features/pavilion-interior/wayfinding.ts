@@ -1,6 +1,7 @@
 import type { InteriorPoint } from "./data";
 
 export const WAYFINDING_SIGNS = {
+  access: { asset: "acesso.svg", label: "Acesso lateral" },
   entrance: { asset: "entrada.svg", label: "Entrada" },
   exit: { asset: "saida.svg", label: "Saída" },
   service: { asset: "servico.svg", label: "Acesso de serviço" },

@@ -31,6 +31,7 @@ import { Route as AuthenticatedAppEmpresasIdRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppVistoriasIndexRouteImport } from './routes/_authenticated/_app/vistorias.index'
 import { Route as AuthenticatedAppVistoriasIdRouteImport } from './routes/_authenticated/_app/vistorias.$id'
 import { Route as AuthenticatedMapaPavilhoes1InteriorRouteImport } from './routes/_authenticated/mapa.pavilhoes.1.interior'
+import { Route as AuthenticatedMapaPavilhoes12InteriorRouteImport } from './routes/_authenticated/mapa.pavilhoes.12.interior'
 import { Route as AuthenticatedMapaPavilhoes13InteriorRouteImport } from './routes/_authenticated/mapa.pavilhoes.13.interior'
 import { Route as AuthenticatedMapaPavilhoes8InteriorRouteImport } from './routes/_authenticated/mapa.pavilhoes.8.interior'
 
@@ -156,6 +157,12 @@ const AuthenticatedMapaPavilhoes1InteriorRoute =
     path: '/mapa/pavilhoes/1/interior',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMapaPavilhoes12InteriorRoute =
+  AuthenticatedMapaPavilhoes12InteriorRouteImport.update({
+    id: '/mapa/pavilhoes/12/interior',
+    path: '/mapa/pavilhoes/12/interior',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMapaPavilhoes13InteriorRoute =
   AuthenticatedMapaPavilhoes13InteriorRouteImport.update({
     id: '/mapa/pavilhoes/13/interior',
@@ -190,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/empresas/': typeof AuthenticatedAppEmpresasIndexRoute
   '/vistorias/': typeof AuthenticatedAppVistoriasIndexRoute
   '/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
+  '/mapa/pavilhoes/12/interior': typeof AuthenticatedMapaPavilhoes12InteriorRoute
   '/mapa/pavilhoes/13/interior': typeof AuthenticatedMapaPavilhoes13InteriorRoute
   '/mapa/pavilhoes/8/interior': typeof AuthenticatedMapaPavilhoes8InteriorRoute
 }
@@ -211,6 +219,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof AuthenticatedAppEmpresasIndexRoute
   '/vistorias': typeof AuthenticatedAppVistoriasIndexRoute
   '/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
+  '/mapa/pavilhoes/12/interior': typeof AuthenticatedMapaPavilhoes12InteriorRoute
   '/mapa/pavilhoes/13/interior': typeof AuthenticatedMapaPavilhoes13InteriorRoute
   '/mapa/pavilhoes/8/interior': typeof AuthenticatedMapaPavilhoes8InteriorRoute
 }
@@ -238,6 +247,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/empresas/': typeof AuthenticatedAppEmpresasIndexRoute
   '/_authenticated/_app/vistorias/': typeof AuthenticatedAppVistoriasIndexRoute
   '/_authenticated/mapa/pavilhoes/1/interior': typeof AuthenticatedMapaPavilhoes1InteriorRoute
+  '/_authenticated/mapa/pavilhoes/12/interior': typeof AuthenticatedMapaPavilhoes12InteriorRoute
   '/_authenticated/mapa/pavilhoes/13/interior': typeof AuthenticatedMapaPavilhoes13InteriorRoute
   '/_authenticated/mapa/pavilhoes/8/interior': typeof AuthenticatedMapaPavilhoes8InteriorRoute
 }
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/empresas/'
     | '/vistorias/'
     | '/mapa/pavilhoes/1/interior'
+    | '/mapa/pavilhoes/12/interior'
     | '/mapa/pavilhoes/13/interior'
     | '/mapa/pavilhoes/8/interior'
   fileRoutesByTo: FileRoutesByTo
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/vistorias'
     | '/mapa/pavilhoes/1/interior'
+    | '/mapa/pavilhoes/12/interior'
     | '/mapa/pavilhoes/13/interior'
     | '/mapa/pavilhoes/8/interior'
   id:
@@ -311,6 +323,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/empresas/'
     | '/_authenticated/_app/vistorias/'
     | '/_authenticated/mapa/pavilhoes/1/interior'
+    | '/_authenticated/mapa/pavilhoes/12/interior'
     | '/_authenticated/mapa/pavilhoes/13/interior'
     | '/_authenticated/mapa/pavilhoes/8/interior'
   fileRoutesById: FileRoutesById
@@ -477,6 +490,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapaPavilhoes1InteriorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mapa/pavilhoes/12/interior': {
+      id: '/_authenticated/mapa/pavilhoes/12/interior'
+      path: '/mapa/pavilhoes/12/interior'
+      fullPath: '/mapa/pavilhoes/12/interior'
+      preLoaderRoute: typeof AuthenticatedMapaPavilhoes12InteriorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mapa/pavilhoes/13/interior': {
       id: '/_authenticated/mapa/pavilhoes/13/interior'
       path: '/mapa/pavilhoes/13/interior'
@@ -577,6 +597,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRouteRoute: typeof AuthenticatedAppRouteRouteWithChildren
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedMapaPavilhoes1InteriorRoute: typeof AuthenticatedMapaPavilhoes1InteriorRoute
+  AuthenticatedMapaPavilhoes12InteriorRoute: typeof AuthenticatedMapaPavilhoes12InteriorRoute
   AuthenticatedMapaPavilhoes13InteriorRoute: typeof AuthenticatedMapaPavilhoes13InteriorRoute
   AuthenticatedMapaPavilhoes8InteriorRoute: typeof AuthenticatedMapaPavilhoes8InteriorRoute
 }
@@ -586,6 +607,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedMapaPavilhoes1InteriorRoute:
     AuthenticatedMapaPavilhoes1InteriorRoute,
+  AuthenticatedMapaPavilhoes12InteriorRoute:
+    AuthenticatedMapaPavilhoes12InteriorRoute,
   AuthenticatedMapaPavilhoes13InteriorRoute:
     AuthenticatedMapaPavilhoes13InteriorRoute,
   AuthenticatedMapaPavilhoes8InteriorRoute:

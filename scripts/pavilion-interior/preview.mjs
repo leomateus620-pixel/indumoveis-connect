@@ -5,7 +5,8 @@
  */
 import http from "node:http";
 import { readFile } from "node:fs/promises";
-const port = 4000;
+const port = Number(process.env.PAVILION_QA_PORT ?? 4000);
+const vitePort = Number(process.env.PAVILION_QA_VITE_PORT ?? 3001);
 const origin = `http://127.0.0.1:${port}`;
 const user = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -21,6 +22,7 @@ const plans = {};
 for (const [pavilion, planIdDigit, revisionIdDigit] of [
   [1, "3", "4"],
   [8, "7", "8"],
+  [12, "9", "a"],
   [13, "5", "6"],
 ]) {
   const source = pavilion === 1 ? "plan.generated.json" : `pavilion${pavilion}.generated.json`;
@@ -116,8 +118,8 @@ http
       return;
     }
     const proxy = http.request(
-      new URL(req.url, "http://127.0.0.1:3001"),
-      { method: req.method, headers: { ...req.headers, host: "127.0.0.1:3001" } },
+      new URL(req.url, `http://127.0.0.1:${vitePort}`),
+      { method: req.method, headers: { ...req.headers, host: `127.0.0.1:${vitePort}` } },
       (incoming) => {
         res.writeHead(incoming.statusCode, incoming.headers);
         incoming.pipe(res);

@@ -116,7 +116,7 @@ describe("Pavilhão 8 lot inspection", () => {
     );
     expect(within(drawing).getByRole("link", { name: "Acesso ao Pavilhão 12" })).toHaveAttribute(
       "href",
-      "/mapa?pavilhao=12",
+      "/mapa/pavilhoes/12/interior",
     );
     const entrances = within(drawing).getAllByRole("img", { name: "Entrada" });
     expect(entrances).toHaveLength(2);

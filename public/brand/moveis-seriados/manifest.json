@@ -1,0 +1,30 @@
+{
+  "name": "Móveis e Seriados · Indumóveis",
+  "visibleCopy": [
+    "Móveis e Seriados",
+    "Indumóveis"
+  ],
+  "viewBox": [
+    0,
+    0,
+    424,
+    130
+  ],
+  "asset": "moveis-seriados-compact.svg",
+  "sha256": "5bbbe04db55c7d2a2cf8d8dec28a8ca050360558b897fcad1c9252899fdbfc55",
+  "format": "SVG with outlined Figtree lettering and a transparent background",
+  "palette": {
+    "plum": "#643B54",
+    "graphite": "#4F433E",
+    "wood": "#A77A56"
+  },
+  "font": {
+    "family": "Figtree",
+    "weights": [
+      650,
+      580
+    ],
+    "license": "SIL OFL 1.1",
+    "source": "https://github.com/google/fonts/tree/main/ofl/figtree"
+  }
+}
