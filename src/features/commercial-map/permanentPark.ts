@@ -4,6 +4,7 @@ import {
   PARK_CONTEXT_BLOCKS,
   PARK_RENDER_ENTITIES,
   PARK_GATES,
+  MAIN_GATE_PORTAL,
   ARENA_APPROACH,
   ARENA_APPROACH_POLYGONS,
   PERMANENT_PARK_LANDMARKS,
@@ -894,15 +895,73 @@ export function createPermanentPark(
       }
       clip = undefined;
     }
-    // Indicate evidenced gate openings with low flank posts only. There is no
-    // evidence for a replicated ornamental portal, canopy or gatehouse.
+    // Secondary openings keep low flank posts: there is no evidence for a
+    // portal, canopy or gatehouse at them.
     for (const gate of PARK_GATES) {
+      if (gate.id === "A3") continue;
       const [x, z] = gate.point,
         [dx, dz] = gate.axis;
       for (const sign of [-1, 1]) {
         const px = x - dz * gate.width * 0.65 * sign,
           pz = z + dx * gate.width * 0.65 * sign;
         box("concrete", px - 0.12, -0.15, pz - 0.12, px + 0.12, 1.1, pz + 0.12, "#dadbd0");
+      }
+    }
+    // Main gate (A3 / Portão 03): the orthophoto shows one roofed portal across
+    // the whole carriageway where the public avenue ends. Piers, beam and a
+    // shallow roof give it real thickness; no name, number or ornament is
+    // invented. Heights are presentation estimates in drawing units.
+    {
+      const portal = MAIN_GATE_PORTAL,
+        [x0, x1] = portal.x,
+        [z0, z1] = portal.z;
+      for (const [pz0, pz1] of portal.piers) {
+        box("masonryBrick", x0 + 0.35, -0.15, pz0, x1 - 0.35, 0.5, pz1, "#ffffff");
+        box("paintedWall", x0 + 0.4, 0.5, pz0 + 0.05, x1 - 0.4, portal.beam, pz1 - 0.05, "#e2ded2");
+      }
+      box("concrete", x0 + 0.12, portal.beam, z0 + 0.1, x1 - 0.12, portal.eave, z1 - 0.1, "#d2d0c5");
+      const overhang = 0.4,
+        ridgeX = (x0 + x1) / 2,
+        top = portal.eave + portal.rise;
+      quad(
+        "paintedSheet",
+        [x0 - overhang, portal.eave, z0 - overhang],
+        [x0 - overhang, portal.eave, z1 + overhang],
+        [ridgeX, top, z1 + overhang],
+        [ridgeX, top, z0 - overhang],
+        "#7f8a8c",
+      );
+      quad(
+        "paintedSheet",
+        [ridgeX, top, z0 - overhang],
+        [ridgeX, top, z1 + overhang],
+        [x1 + overhang, portal.eave, z1 + overhang],
+        [x1 + overhang, portal.eave, z0 - overhang],
+        "#899496",
+      );
+      for (const z of [z0 - overhang, z1 + overhang]) {
+        const a: Vertex = [x0 - overhang, portal.eave, z],
+          b: Vertex = [x1 + overhang, portal.eave, z],
+          c: Vertex = [ridgeX, top, z];
+        if (z < z0) tri("paintedWall", a, c, b, "#d9d6ca");
+        else tri("paintedWall", a, b, c, "#d9d6ca");
+      }
+      box(
+        "exposedMetal",
+        x0 - overhang,
+        portal.eave - 0.08,
+        z0 - overhang,
+        x1 + overhang,
+        portal.eave,
+        z1 + overhang,
+        "#5d6866",
+      );
+      // Open leaves folded back along the internal street: thin metal frames.
+      for (const z of [portal.piers[0][1] + 0.06, portal.piers[2][0] - 0.12]) {
+        box("exposedMetal", x1 - 0.3, 0.05, z, x1 + 1.5, 0.11, z + 0.06, "#4f5a58");
+        box("exposedMetal", x1 - 0.3, 1.25, z, x1 + 1.5, 1.31, z + 0.06, "#4f5a58");
+        for (let x = x1 - 0.3; x <= x1 + 1.47; x += 0.3)
+          box("exposedMetal", x, 0.05, z, x + 0.04, 1.31, z + 0.06, "#4f5a58");
       }
     }
     const pista = PARK_REFERENCE_BUILDINGS.find((e) => e.id === "PISTA-CAMPEIRA")!;

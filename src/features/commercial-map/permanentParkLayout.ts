@@ -303,6 +303,31 @@ export const PARK_GATES = PARK_REFERENCE_GATES.map((gate) => {
     existingOwner: gate.id === "A3" ? "indumoveis:support:gate-03" : undefined,
   };
 });
+/** Main gate portal (A3 / Portão 03). The registered orthophoto shows a single
+ * roofed structure spanning the carriageway where the public avenue ends; its
+ * plan extent is read from that image (about +/-1 unit) and anchored to the
+ * A2 passage point. Heights are presentation estimates, not a survey. */
+export const MAIN_GATE_PORTAL = (() => {
+  const gate = PARK_GATES.find((item) => item.id === "A3")!;
+  const x: [number, number] = [gate.point[0] - 2.6, gate.point[0] + 0.2];
+  const z: [number, number] = [93.0, 103.5];
+  const middle = (z[0] + z[1]) / 2;
+  return {
+    gateId: gate.id,
+    owner: "indumoveis:support:gate-03",
+    x,
+    z,
+    piers: [
+      [z[0], z[0] + 0.7],
+      [middle - 0.35, middle + 0.35],
+      [z[1] - 0.7, z[1]],
+    ] as [number, number][],
+    beam: 2.3,
+    eave: 2.62,
+    rise: 0.42,
+    source: "A2 gate A3 passage point; orthophoto roof outline (layout reference only)",
+  };
+})();
 /** Architectural approach adaptation anchored to the actual A2 buildings.
  * Mirante source bounds 4004,2440–4072,2748 supply the local z proportions;
  * the source stair/plaza split 388:408 is retained across the measured drawing

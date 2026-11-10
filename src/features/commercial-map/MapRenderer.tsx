@@ -745,7 +745,9 @@ function initializeMapRuntime(
     foundationMaterial: track(
       new THREE.MeshLambertMaterial({
         name: "indumoveis-preserved-circulation-initial",
-        color: surfaces.materials.concrete.color,
+        // The space between a registered street and a lot or building is a
+        // grass verge in the reference, not a concrete band.
+        color: surfaces.materials.grass.color,
         vertexColors: true,
       }),
     ),
@@ -1548,7 +1550,7 @@ function initializeMapRuntime(
         },
         {
           mesh: foundationMesh,
-          material: surfaces.materials.concrete,
+          material: surfaces.materials.grass,
           failure: "circulation-surface-preparation",
           prepared: false,
           attempted: false,

@@ -330,7 +330,32 @@ export const REFERENCE_WAYS: Record<string, { nodes: string[]; tags: Record<stri
 
 const ANCHOR_ID = "2470629442";
 const CAMPEIRA_BENVENUTO_ID = "2132115382";
-const ANCHOR_WORLD: Point = [143.9, 98.175];
+/** Registration revision 2026-11-09. The former anchor [143.9, 98.175] placed
+ * the mapped gate node on the plan's road seam. Comparing a georeferenced
+ * orthophoto (layout reference only, never a product texture) with the park
+ * drawing showed every registered pavilion, lot block and permanent building
+ * displaced by one consistent translation of about +4.3 / +0.5 drawing units
+ * against the OSM streets, with no measurable scale or rotation change. The
+ * commercial geometry is the fixed constraint, so only this external anchor
+ * moves. Visual registration: roughly +/-1 unit, not a cadastral measure. */
+export const URBAN_REGISTRATION = {
+  previousAnchor: [143.9, 98.175] as Point,
+  translation: [4.3, 0.5] as Point,
+  toleranceUnits: 1,
+  controlPoints: [
+    { id: "p14-roof", plan: [52.2, 79.5], observed: [47.8, 78.9] },
+    { id: "p12-roof", plan: [81.3, 79.7], observed: [77.25, 78.75] },
+    { id: "administrative-centre", plan: [139.03, 82.63], observed: [134.55, 82.25] },
+    { id: "event-centre", plan: [161.94, 35.93], observed: [157.9, 35.85] },
+    { id: "main-gate-portal", plan: [146.9, 96.69], observed: [141, 96.25] },
+  ],
+  condition:
+    "Observed values are roof/portal centres read from the orthophoto in the previous frame; plan minus observed averages the applied translation.",
+} as const;
+const ANCHOR_WORLD: Point = [
+  URBAN_REGISTRATION.previousAnchor[0] + URBAN_REGISTRATION.translation[0],
+  URBAN_REGISTRATION.previousAnchor[1] + URBAN_REGISTRATION.translation[1],
+];
 const RADIANS = Math.PI / 180;
 const METRES_PER_RADIAN = 6378137;
 const referenceScale = 0.195;
@@ -406,8 +431,22 @@ const secondaryNodeIds = [...new Set(REFERENCE_WAYS["833033188"].nodes)];
 const fittedSecondary = fitCircle(secondaryNodeIds.map(projectReferenceNode));
 export const URBAN_REFERENCE = {
   avenueNorth: 93.3,
-  avenueSouth: 103.05,
+  avenueSouth: 103.2,
   avenueCenter: ANCHOR_WORLD[1],
+  /** Cross-section read from the orthophoto after registration, north to
+   * south: angled parking painted on the asphalt, two lanes each way and the
+   * south kerb. The avenue is a public road only up to the main gate. */
+  avenueSection: {
+    asphaltNorth: 93.3,
+    parkingSouth: 95.9,
+    centerLine: 99.4,
+    asphaltSouth: 103.2,
+    southWalkWidth: 1.05,
+    parkingStart: -18,
+  },
+  /** Passage point of the park's main gate (A3 / Portão 03) in the registered
+   * park drawing. The mapped OSM gate node lands within about 1.3 units. */
+  mainGate: { x: 146.9, north: 92.9, south: 103.5 },
   center: ANCHOR_WORLD[1],
   referenceScale,
   unitsPerMetre,
@@ -567,11 +606,11 @@ export const REFERENCE_ROADS: ReferenceRoad[] = [
       "Avenida Benvenuto de Conti",
       ["953262435", "1553497179"],
       ["2132115382", "8787950866", "6770753557", "14102589768", "7776485898"],
-      9.75,
+      9.9,
       ["benvenuto", "campeira", "roundabout"],
     ),
     path: [
-      [26.36, ANCHOR_WORLD[1]],
+      [26.36, (URBAN_REFERENCE.avenueNorth + URBAN_REFERENCE.avenueSouth) / 2],
       ...["2132115382", "8787950866", "6770753557", "14102589768", "7776485898"].map(
         projectReferenceNode,
       ),

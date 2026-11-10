@@ -110,8 +110,10 @@ const polygonEdges = (polygon: readonly Point[]): Edge[] =>
   polygon.map((a, i) => ({ a, b: polygon[(i + 1) % polygon.length] }));
 
 /** Source IDs resolve physical function, not commercial state or a road name.
- * The two street-facing avenue surfaces share their public paint owner with
- * urbanContext. All other authored roads lie inside the park circulation.
+ * Only Av. Benvenuto de Conti is a public road: it ends at the main gate and
+ * its paint is owned by urbanContext. Avenida dos Imigrantes carries an avenue
+ * name on the plan but is park circulation that starts at that gate, so it is
+ * finished like every other internal street (no lane paint, no public kerb).
  * New context roads are internal until their public function is established. */
 export function classifyRoad(entity: Pick<MapEntity, "id">): RoadPhysicalClass {
   if (entity.id.startsWith("indumoveis:context:walk:")) return "park-pedestrian";
@@ -121,7 +123,6 @@ export function classifyRoad(entity: Pick<MapEntity, "id">): RoadPhysicalClass {
     case "indumoveis:road:east-walk-lower":
       return "park-pedestrian";
     case "indumoveis:road:benvenuto":
-    case "indumoveis:road:imigrantes":
       return "public-external";
     default:
       return "park-internal";
