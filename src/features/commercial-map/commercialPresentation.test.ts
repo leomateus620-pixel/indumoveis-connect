@@ -8,6 +8,7 @@ import {
   lotLabelAxis,
   lotLabelExtent,
   lotLabelFacing,
+  lotLabelProjection,
   lotNumberFit,
   LOT_GRAPHICS,
 } from "./commercialPresentation";
@@ -208,6 +209,41 @@ describe("commercial cadastral presentation", () => {
       );
     expect(side).toBe(1);
     expect(lotLabelFacing(axis, [0, 0], -1)).toBe(-1);
+  });
+
+  it("measures a number as the eye reads it and drops slivers seen along their baseline", () => {
+    const axis: Point = [1, 0];
+    // Straight down: one world unit is one unit both ways.
+    const top = lotLabelProjection(axis, [1, 0], [0, -1]);
+    expect(top.height).toBeCloseTo(1);
+    expect(top.baseline).toBeCloseTo(1);
+    // Pitched 60 degrees from vertical, looking north: only the height shrinks.
+    const pitched = lotLabelProjection(axis, [1, 0], [0, -0.5]);
+    expect(pitched.height).toBeCloseTo(0.5);
+    expect(pitched.baseline).toBeCloseTo(1);
+    // The same pitch seen along the baseline: glyphs keep their thickness but
+    // collapse sideways, which a height-only test would call legible.
+    const endOn = lotLabelProjection(axis, [0, 1], [0.12, 0]);
+    expect(endOn.baseline).toBeLessThan(LOT_GRAPHICS.numberMinBaseline);
+    // A diagonal grazing view shears the number; its perpendicular height is
+    // far smaller than either projected axis suggests.
+    const azimuth = Math.PI / 4,
+      grazing = 0.12;
+    const sheared = lotLabelProjection(
+      axis,
+      [Math.cos(azimuth), Math.sin(azimuth)],
+      [Math.sin(azimuth) * grazing, -Math.cos(azimuth) * grazing],
+    );
+    expect(sheared.height).toBeLessThan(0.2);
+    expect(sheared.height).toBeGreaterThan(0);
+    // Orientation of the baseline never changes the measure of a top view.
+    for (let degrees = 0; degrees < 360; degrees += 15) {
+      const a = (degrees * Math.PI) / 180;
+      const result = lotLabelProjection([Math.cos(a), Math.sin(a)], [1, 0], [0, -1]);
+      expect(result.height).toBeCloseTo(1);
+      expect(result.baseline).toBeCloseTo(1);
+    }
+    expect(lotLabelProjection(axis, [0, 0], [0, 0])).toEqual({ baseline: 0, height: 0 });
   });
 
   it("keeps persisted status colours independent from hover and selection ink", () => {

@@ -17,6 +17,9 @@ export const LOT_GRAPHICS = {
   numberAlongShare: 0.72,
   /** cos(105 deg): the viewer must pass well beyond side-on before a flip. */
   numberFlipHysteresis: 0.26,
+  /** A number seen almost along its own baseline is a sliver, not a number:
+   * below this screen compression of the baseline it is not drawn. */
+  numberMinBaseline: 0.32,
 } as const;
 
 export type CommercialBoundary = { a: Point; b: Point; owners: string[] };
@@ -200,4 +203,18 @@ export function lotLabelFacing(axis: Point, cameraRight: Point, previous: 1 | -1
   if (length < 1e-9) return previous;
   const alignment = ((axis[0] * cameraRight[0] + axis[1] * cameraRight[1]) / length) * previous;
   return alignment < -LOT_GRAPHICS.numberFlipHysteresis ? (-previous as 1 | -1) : previous;
+}
+
+/** Screen footprint of one world unit of a ground number: `height` is measured
+ * perpendicular to the drawn baseline (what the eye reads as glyph height),
+ * `baseline` is the compression along it. `cameraRight` / `cameraUp` are the
+ * ground (x, z) components of the camera's right and up vectors. */
+export function lotLabelProjection(axis: Point, cameraRight: Point, cameraUp: Point) {
+  const rx = axis[0] * cameraRight[0] + axis[1] * cameraRight[1],
+    ry = axis[0] * cameraUp[0] + axis[1] * cameraUp[1],
+    // The glyph-height direction on the ground is the baseline turned 90 deg.
+    ux = axis[1] * cameraRight[0] - axis[0] * cameraRight[1],
+    uy = axis[1] * cameraUp[0] - axis[0] * cameraUp[1];
+  const baseline = Math.hypot(rx, ry);
+  return { baseline, height: baseline > 1e-9 ? Math.abs(rx * uy - ry * ux) / baseline : 0 };
 }

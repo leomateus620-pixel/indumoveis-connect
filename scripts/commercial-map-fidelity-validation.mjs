@@ -50,7 +50,11 @@ const extra = (process.env.MAP_FIDELITY_EXTRA ?? "")
   .filter(Boolean)
   .map((entry) => {
     const [name, position, target] = entry.split(":");
-    return { name, position: position.split(",").map(Number), target: target.split(",").map(Number) };
+    return {
+      name,
+      position: position.split(",").map(Number),
+      target: target.split(",").map(Number),
+    };
   });
 const poses = [
   ...(only ? FIDELITY_POSES.filter((pose) => only.includes(pose.name)) : FIDELITY_POSES),
@@ -132,7 +136,13 @@ async function capture(page, layout, captures) {
         tier: d.tier,
         lotLabels: d.lotLabels
           .filter((label) => label.visible)
-          .map((label) => ({ id: label.id, textHeightPx: label.textHeightPx, rect: label.rect })),
+          .map((label) => ({
+            id: label.id,
+            textHeightPx: label.textHeightPx,
+            rect: label.rect,
+            axis: label.axis,
+            facing: label.facing,
+          })),
       };
     });
     const file = `${layout}-${pose.name}.png`;
@@ -140,6 +150,64 @@ async function capture(page, layout, captures) {
     await canvas.screenshot({ path: path.join(artifactDir, file) });
     captures.push({ layout, name: pose.name, file, requested: pose, ...state });
   }
+}
+
+/** Full camera orbit over the lot blocks in 10 degree steps. A lot number
+ * must keep one world baseline; only its reading side may reverse. Renderers
+ * that predate the fixed baseline do not report an axis and are skipped. */
+async function lotLabelOrbit(page) {
+  const steps = 36,
+    target = [96, 46],
+    radius = 52,
+    height = 40;
+  const seen = new Map();
+  for (let step = 0; step <= steps; step++) {
+    const angle = (step / steps) * Math.PI * 2;
+    await page.evaluate(
+      ({ position, target }) => window.__indumoveisMap.setReferencePose(position, target),
+      {
+        position: [
+          target[0] + Math.sin(angle) * radius,
+          height,
+          target[1] + Math.cos(angle) * radius,
+        ],
+        target,
+      },
+    );
+    await settle(page);
+    const labels = await page.evaluate(() =>
+      window.__indumoveisMap.lotLabels.map((label) => ({
+        id: label.id,
+        visible: label.visible,
+        axis: label.axis,
+        facing: label.facing,
+      })),
+    );
+    if (!labels.length || !labels[0].axis) return null;
+    for (const label of labels) {
+      const entry = seen.get(label.id) ?? { baselines: new Set(), facings: [], visible: 0 };
+      entry.baselines.add(label.axis.map((value) => value.toFixed(6)).join(","));
+      entry.facings.push(label.facing);
+      if (label.visible) entry.visible++;
+      seen.set(label.id, entry);
+    }
+  }
+  const entries = [...seen.values()];
+  const flips = entries.map(
+    (entry) => entry.facings.filter((value, i) => i > 0 && value !== entry.facings[i - 1]).length,
+  );
+  return {
+    steps,
+    stepDegrees: 360 / steps,
+    lots: entries.length,
+    maxBaselinesPerLot: Math.max(...entries.map((entry) => entry.baselines.size)),
+    maxOrientationsPerLot: Math.max(
+      ...entries.map((entry) => entry.baselines.size * new Set(entry.facings).size),
+    ),
+    maxFlipsPerLot: Math.max(...flips),
+    minFlipsPerLot: Math.min(...flips),
+    lotsVisibleInEveryStep: entries.filter((entry) => entry.visible === steps + 1).length,
+  };
 }
 
 async function benchmark(page) {
@@ -271,6 +339,7 @@ for (const layout of [
   });
   const entry = { layout: layout.name, viewport: layout.viewport, usableMs, completeMs, ...info };
   await capture(page, layout.name, output.captures);
+  entry.lotLabelOrbit = await lotLabelOrbit(page);
   await context.close();
   if (!process.env.MAP_FIDELITY_SKIP_BENCH) {
     // Navigation is sampled with the product's automatic profile.

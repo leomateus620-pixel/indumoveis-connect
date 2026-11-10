@@ -33,6 +33,7 @@ import {
   lotLabelAxis,
   lotLabelExtent,
   lotLabelFacing,
+  lotLabelProjection,
   lotNumberFit,
   LOT_GRAPHICS,
 } from "./commercialPresentation";
@@ -572,6 +573,7 @@ function initializeMapRuntime(
     axis: Point;
     extent: { along: number; across: number };
     facing: 1 | -1;
+    legible: boolean;
   }[] = [];
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -1114,6 +1116,7 @@ function initializeMapRuntime(
       axis,
       extent,
       facing: 1,
+      legible: true,
       priority:
         entity.kind === "lot"
           ? 1
@@ -1152,6 +1155,8 @@ function initializeMapRuntime(
   labelsMesh.frustumCulled = false;
   commercialGroup.add(labelsMesh);
   const collisionRects: { x: number; y: number; w: number; h: number }[] = [];
+  const bandX = [0, 0, 0, 0],
+    bandY = [0, 0, 0, 0];
   const sortedLabels = [...labels];
   let labelSelection: string | null | undefined;
   function updateLabels() {
@@ -1198,9 +1203,12 @@ function initializeMapRuntime(
         lotRz = label.axis[1] * label.facing,
         lotUx = lotRz,
         lotUz = -lotRx;
-      // Screen length of one world unit of glyph height in this orientation.
-      const projectedAxis = lot
-        ? Math.max(0.08, Math.hypot(lotUx * m[0] + lotUz * m[2], lotUx * m[4] + lotUz * m[6]))
+      // Glyph height as read on screen: perpendicular to the drawn baseline.
+      const lotProjection = lot
+        ? lotLabelProjection([lotRx, lotRz], [m[0], m[2]], [m[4], m[6]])
+        : null;
+      const projectedAxis = lotProjection
+        ? Math.max(0.08, lotProjection.height)
         : billboard
           ? 1
           : label.vertical
@@ -1231,7 +1239,11 @@ function initializeMapRuntime(
       const projectedHeight = (labelHeight / worldUnitsPerPixel) * projectedAxis;
       if (lot) {
         label.textHeightPx = (projectedHeight * label.glyphHeight) / cellHeight;
-        label.visible = label.textHeightPx >= (label.visible ? 6.8 : 7.5);
+        // Legible height and a baseline that is not seen end-on. Both
+        // thresholds are hysteretic, so a number never flickers at a limit.
+        label.visible =
+          label.textHeightPx >= (label.visible ? 6.8 : 7.5) &&
+          lotProjection!.baseline >= LOT_GRAPHICS.numberMinBaseline * (label.visible ? 0.9 : 1);
         if (!label.visible) continue;
         y = 0.16;
       }
@@ -1328,6 +1340,8 @@ function initializeMapRuntime(
           .project(camera);
         const sx = ((projection.x + 1) * width) / 2,
           sy = ((1 - projection.y) * height) / 2;
+        bandX[corner] = sx;
+        bandY[corner] = sy;
         minX = Math.min(minX, sx);
         maxX = Math.max(maxX, sx);
         minY = Math.min(minY, sy);
@@ -1337,7 +1351,32 @@ function initializeMapRuntime(
       rect.y = (minY + maxY) / 2;
       rect.w = maxX - minX;
       rect.h = maxY - minY;
-      if (lot) label.textHeightPx = (rect.h * label.glyphHeight) / (label.textHeight * cellHeight);
+      if (lot) {
+        // True perspective measure of the drawn band, perpendicular to its
+        // baseline: quad area over baseline length. A fixed-baseline number
+        // is not screen-aligned, so its bounding box would overstate it.
+        let area = 0;
+        for (let corner = 0; corner < 4; corner++) {
+          const next = (corner + 1) % 4;
+          area += bandX[corner] * bandY[next] - bandX[next] * bandY[corner];
+        }
+        const baseline =
+          (Math.hypot(bandX[1] - bandX[0], bandY[1] - bandY[0]) +
+            Math.hypot(bandX[2] - bandX[3], bandY[2] - bandY[3])) /
+          2;
+        label.textHeightPx =
+          baseline > 1e-6
+            ? (Math.abs(area) / 2 / baseline) *
+              (label.glyphHeight / (label.textHeight * cellHeight))
+            : 0;
+        // Perspective can squash a number far more than the estimate at its
+        // anchor predicts (grazing views). An illegible sliver is not drawn.
+        label.legible = label.textHeightPx >= (label.legible ? 6.2 : 7);
+        if (!label.legible) {
+          label.visible = false;
+          continue;
+        }
+      }
       let collides = false;
       if (!selected)
         for (const other of collisionRects) {
