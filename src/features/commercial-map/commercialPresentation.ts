@@ -12,6 +12,11 @@ export const LOT_GRAPHICS = {
   separationPixels: 0.8,
   numberPixels: 11,
   selectedNumberPixels: 13,
+  /** Largest share of the lot a number may occupy across / along its baseline. */
+  numberAcrossShare: 0.42,
+  numberAlongShare: 0.72,
+  /** cos(105 deg): the viewer must pass well beyond side-on before a flip. */
+  numberFlipHysteresis: 0.26,
 } as const;
 
 export type CommercialBoundary = { a: Point; b: Point; owners: string[] };
@@ -113,10 +118,66 @@ export function interiorLotAnchor(polygon: readonly Point[], preferred?: Point):
   return preferred && boundaryDistance(preferred, polygon) >= clearance * 0.92 ? preferred : best;
 }
 
-/** Conservative clearance cap for a ground number's X/Z footprint. A
- * circle around the anchor is guaranteed inside even for reentrant polygons. */
-export function lotNumberHeight(
-  radius: number,
+/** Fixed reading direction of a lot number: the lot edge closest to the
+ * block frontage (drawing +X), so every number in a block shares one
+ * baseline like a printed plan. It never depends on the camera. */
+export function lotLabelAxis(polygon: readonly Point[]): Point {
+  let longest = 0;
+  const edges = polygon.map((a, i) => {
+    const b = polygon[(i + 1) % polygon.length],
+      dx = b[0] - a[0],
+      dz = b[1] - a[1],
+      length = Math.hypot(dx, dz);
+    longest = Math.max(longest, length);
+    return { dx, dz, length };
+  });
+  let best: Point = [1, 0],
+    score = -1;
+  for (const edge of edges) {
+    // Chamfers and survey jogs cannot set the direction of a whole lot.
+    if (edge.length < longest * 0.35 || edge.length < 1e-9) continue;
+    const alignment = Math.abs(edge.dx) / edge.length;
+    if (alignment <= score + 1e-9) continue;
+    score = alignment;
+    const sign = edge.dx < 0 ? -1 : 1;
+    best = [(edge.dx / edge.length) * sign, (edge.dz / edge.length) * sign];
+  }
+  return best;
+}
+
+/** Free length through the anchor along and across the reading direction.
+ * Each value is twice the nearer boundary hit, because the number is centred
+ * on its anchor. */
+export function lotLabelExtent(polygon: readonly Point[], anchor: Point, axis: Point) {
+  const chord = (dx: number, dz: number) => {
+    let forward = Infinity,
+      backward = Infinity;
+    polygon.forEach((a, i) => {
+      const b = polygon[(i + 1) % polygon.length],
+        ex = b[0] - a[0],
+        ez = b[1] - a[1],
+        denominator = dx * ez - dz * ex;
+      if (Math.abs(denominator) < 1e-12) return;
+      const ox = a[0] - anchor[0],
+        oz = a[1] - anchor[1],
+        t = (ox * ez - oz * ex) / denominator,
+        u = (ox * dz - oz * dx) / denominator;
+      if (u < -1e-9 || u > 1 + 1e-9) return;
+      if (t >= 0) forward = Math.min(forward, t);
+      else backward = Math.min(backward, -t);
+    });
+    const half = Math.min(forward, backward);
+    return Number.isFinite(half) ? half * 2 : 0;
+  };
+  return { along: chord(axis[0], axis[1]), across: chord(-axis[1], axis[0]) };
+}
+
+/** World height of a lot number. The pixel target governs while the lot is
+ * large on screen; the lot itself caps the number so it can neither cross a
+ * boundary nor dominate its polygon. Returning less than the legibility
+ * threshold is how distant numbers leave the view progressively. */
+export function lotNumberFit(
+  extent: { along: number; across: number },
   worldUnitsPerPixel: number,
   textAspect: number,
   selected: boolean,
@@ -124,6 +185,19 @@ export function lotNumberHeight(
   const desired =
     ((selected ? LOT_GRAPHICS.selectedNumberPixels : LOT_GRAPHICS.numberPixels) + 3) *
     worldUnitsPerPixel;
-  const safe = (radius * 1.78) / Math.hypot(1, textAspect);
-  return Math.min(desired, safe);
+  const safe = Math.min(
+    extent.across * LOT_GRAPHICS.numberAcrossShare,
+    (extent.along * LOT_GRAPHICS.numberAlongShare) / Math.max(textAspect, 1e-6),
+  );
+  return Math.max(0, Math.min(desired, safe));
+}
+
+/** Reading side of a fixed lot number. The baseline never turns with the
+ * camera; it only reverses, once, when the viewer is clearly on the far side,
+ * so a number is never upside down and never oscillates near 90 degrees. */
+export function lotLabelFacing(axis: Point, cameraRight: Point, previous: 1 | -1): 1 | -1 {
+  const length = Math.hypot(cameraRight[0], cameraRight[1]);
+  if (length < 1e-9) return previous;
+  const alignment = ((axis[0] * cameraRight[0] + axis[1] * cameraRight[1]) / length) * previous;
+  return alignment < -LOT_GRAPHICS.numberFlipHysteresis ? (-previous as 1 | -1) : previous;
 }

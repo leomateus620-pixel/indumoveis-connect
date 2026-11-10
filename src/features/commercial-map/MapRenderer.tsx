@@ -28,9 +28,11 @@ import { EXPLORATION_POLYGONS } from "./urbanReference";
 import { createParkDetails, lotStatusBands } from "./parkDetails";
 import { createCommercialBoundaries } from "./commercialBoundaries";
 import {
-  boundaryDistance,
   interiorLotAnchor,
-  lotNumberHeight,
+  lotLabelAxis,
+  lotLabelExtent,
+  lotLabelFacing,
+  lotNumberFit,
   LOT_GRAPHICS,
 } from "./commercialPresentation";
 import { createSolarShadows } from "./solarShadows";
@@ -128,6 +130,9 @@ type Diagnostic = {
     textHeightPx: number;
     rect: { x: number; y: number; w: number; h: number };
     anchor: Point;
+    /** Fixed baseline in drawing coordinates and its current reading side. */
+    axis: Point;
+    facing: 1 | -1;
   }[];
   dpr: number;
   buffer: [number, number];
@@ -544,7 +549,6 @@ function initializeMapRuntime(
   const labels: {
     entity: MapEntity;
     anchor: Point;
-    radius: number;
     multiline: boolean;
     glyphHeight: number;
     text: string;
@@ -561,6 +565,9 @@ function initializeMapRuntime(
     textHeightPx: number;
     drawn: boolean;
     rect: { x: number; y: number; w: number; h: number };
+    axis: Point;
+    extent: { along: number; across: number };
+    facing: 1 | -1;
   }[] = [];
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -1059,7 +1066,8 @@ function initializeMapRuntime(
     const labelWidth = (size * cellWidth) / cellHeight;
     const y = getArchitectureDefinition(entity) ? architectureVisualHeight(entity) + 0.6 : 0.23;
     const anchor = lot ? interiorLotAnchor(entity.polygon, entity.anchor) : entity.anchor;
-    const radius = lot ? boundaryDistance(anchor, entity.polygon) : 0;
+    const axis: Point = lot ? lotLabelAxis(entity.polygon) : [1, 0];
+    const extent = lot ? lotLabelExtent(entity.polygon, anchor, axis) : { along: 0, across: 0 };
     const [x, z] = anchor;
     const vertex = labelPositions.length / 3;
     labelPositions.push(
@@ -1084,7 +1092,6 @@ function initializeMapRuntime(
     labels.push({
       entity,
       anchor,
-      radius,
       multiline,
       glyphHeight,
       text,
@@ -1100,6 +1107,9 @@ function initializeMapRuntime(
       textHeightPx: 0,
       drawn: false,
       rect: { x: 0, y: 0, w: 0, h: 0 },
+      axis,
+      extent,
+      facing: 1,
       priority:
         entity.kind === "lot"
           ? 1
@@ -1176,15 +1186,17 @@ function initializeMapRuntime(
       const worldUnitsPerPixel =
         (2 * Math.max(distance, 1) * Math.tan((camera.fov * Math.PI) / 360)) / height;
       const m = camera.matrixWorld.elements;
-      // A ground number follows camera azimuth continuously, retaining a
-      // horizontal plane. There is no compass threshold or 180-degree flip.
-      const groundRightLength = Math.hypot(m[0], m[2]) || 1;
-      const lotRx = m[0] / groundRightLength,
-        lotRz = m[2] / groundRightLength,
+      // A ground number keeps the baseline of its own lot, like a printed
+      // plan: it never turns with camera azimuth. Only its reading side
+      // reverses, with hysteresis, once the viewer is on the far side.
+      if (lot) label.facing = lotLabelFacing(label.axis, [m[0], m[2]], label.facing);
+      const lotRx = label.axis[0] * label.facing,
+        lotRz = label.axis[1] * label.facing,
         lotUx = lotRz,
         lotUz = -lotRx;
+      // Screen length of one world unit of glyph height in this orientation.
       const projectedAxis = lot
-        ? Math.max(0.08, Math.abs(lotUx * m[4] + lotUz * m[6]))
+        ? Math.max(0.08, Math.hypot(lotUx * m[0] + lotUz * m[2], lotUx * m[4] + lotUz * m[6]))
         : billboard
           ? 1
           : label.vertical
@@ -1204,8 +1216,8 @@ function initializeMapRuntime(
       if (lot) {
         const badgeAspect = ((cellWidth / cellHeight) * label.textWidth) / label.textHeight;
         labelHeight =
-          lotNumberHeight(
-            label.radius,
+          lotNumberFit(
+            label.extent,
             (worldUnitsPerPixel * (label.multiline ? 1.9 : 1)) / projectedAxis,
             badgeAspect,
             selected,
@@ -1364,6 +1376,8 @@ function initializeMapRuntime(
           textHeightPx: label.textHeightPx,
           rect: { ...label.rect },
           anchor: label.anchor,
+          axis: label.axis,
+          facing: label.facing,
         }));
   }
 
