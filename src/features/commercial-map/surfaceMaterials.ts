@@ -25,7 +25,9 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   // Pavement/aprons read as grey concrete under the fixed daylight, while
   // white paint and pale pavilion facades retain their separate identities.
   concrete: "#a2a6a0",
-  asphalt: VISUAL_THEME.road,
+  // Aged municipal asphalt is a neutral mid grey in the orthophoto; the
+  // blue-slate 2D road colour reads as wet navy under the fixed daylight.
+  asphalt: "#8e9091",
   whitePaint: "#f3f1e6",
   paintedSheet: VISUAL_THEME.roof,
   exposedMetal: VISUAL_THEME.metal,

@@ -23,7 +23,7 @@ import {
   PARK_RENDER_ENTITIES,
 } from "./permanentParkLayout";
 import type { PermanentParkLandmark } from "./permanentParkLayout";
-import { deriveUrbanHouses } from "./urbanLayout";
+import { deriveUrbanHouses, deriveUrbanVacantLots } from "./urbanLayout";
 import { EXPLORATION_POLYGONS } from "./urbanReference";
 import { createParkDetails, lotStatusBands } from "./parkDetails";
 import { createCommercialBoundaries } from "./commercialBoundaries";
@@ -235,6 +235,7 @@ const CONTEXT_EXPLORATION = [
   ...EXPLORATION_POLYGONS,
   ...PERMANENT_PARK_EXPLORATION,
   ...deriveUrbanHouses().map((house) => house.parcel),
+  ...deriveUrbanVacantLots().map((lot) => lot.parcel),
   ...PARK_WOODLAND_MASSES.map((mass) => mass.polygon),
   ...CONTEXT_WOODLAND.map((tree) =>
     Array.from({ length: 12 }, (_, i): Point => [

@@ -18,6 +18,7 @@ import {
 import {
   URBAN_CONTEXT,
   deriveUrbanHouses,
+  deriveUrbanVacantLots,
   deriveUrbanRoads,
   deriveResidentialBuffer,
   type UrbanHouse,
@@ -26,6 +27,7 @@ export {
   URBAN_CONTEXT,
   urbanPolygonAllowed,
   deriveUrbanHouses,
+  deriveUrbanVacantLots,
   deriveUrbanRoads,
   deriveResidentialBuffer,
 } from "./urbanLayout";
@@ -216,8 +218,10 @@ function houseGeometry(house: UrbanHouse, index: number, batches: Record<Categor
       ];
     }),
     URBAN_CONTEXT.groundY,
-    URBAN_CONTEXT.palette.garden[index % 4],
-    true,
+    house.ground === "lawn"
+      ? URBAN_CONTEXT.palette.garden[index % 4]
+      : URBAN_CONTEXT.ground[house.ground],
+    house.ground === "lawn",
   );
   const front = -d / 2;
   if (house.roadAccess) {
@@ -494,6 +498,7 @@ export function createUrbanContext(
     };
     const architectureMetadata: ReturnType<typeof houseGeometry>[] = [];
     const houses = deriveUrbanHouses(),
+      vacantLots = deriveUrbanVacantLots(),
       clusters: {
         group: THREE.Group;
         detail: THREE.Mesh | null;
@@ -516,6 +521,17 @@ export function createUrbanContext(
       const members = houses.filter((house) => house.cluster === cluster);
       for (const house of members)
         architectureMetadata.push(houseGeometry(house, houses.indexOf(house), batches));
+      // Open ground keeps its photographed character and receives no wall.
+      for (const [index, lot] of vacantLots.entries())
+        if (lot.cluster === cluster)
+          floor(
+            batches.garden,
+            lot.parcel,
+            URBAN_CONTEXT.groundY,
+            lot.ground === "lawn"
+              ? URBAN_CONTEXT.palette.garden[index % 4]
+              : URBAN_CONTEXT.ground[lot.ground],
+          );
       for (const key of ["garden", "walls", "roof", "glass"] as const)
         add(parent, batches[key], key);
       const persistentDetailIndices = batches.detail.position.length / 3;
@@ -790,6 +806,7 @@ export function createUrbanContext(
         },
         source: "Imagem do ChatGPT 17 de out. de 2026, 21_33_52.jpg",
         houseCount: houses.length,
+        vacantLots: vacantLots.length,
         blockCount: 3,
         roadGraph,
         roundabout: {
