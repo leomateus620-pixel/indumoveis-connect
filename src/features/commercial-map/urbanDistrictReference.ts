@@ -8,13 +8,7 @@
  * otherwise an even split between neighbouring roofs. */
 export type DistrictGround = "lawn" | "soil" | "beds" | "paved";
 export type DistrictTypology =
-  | "hip-villa"
-  | "courtyard"
-  | "gable"
-  | "flat-modern"
-  | "split-level"
-  | "long-shed"
-  | "shed";
+  "hip-villa" | "courtyard" | "gable" | "flat-modern" | "split-level" | "long-shed" | "shed";
 export type DistrictRecord = {
   block: "Q1" | "Q2" | "Q3" | "Q4" | "E" | "W";
   /** [minX, minZ, maxX, maxZ] */
@@ -551,10 +545,10 @@ export const DISTRICT_REFERENCE: readonly DistrictRecord[] = [
   // diagonal. Envelopes are clipped against the diagonal corridor.
   {
     block: "W",
-    parcel: [-34, 104.6, -19.8, 119],
+    parcel: [-34, 105.05, -19.8, 119],
     pool: true,
     house: {
-      center: [-25.4, 107.4],
+      center: [-25.4, 107.8],
       size: [7.4, 5.2],
       typology: "hip-villa",
       storeys: 1,

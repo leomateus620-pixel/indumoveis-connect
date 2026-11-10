@@ -210,7 +210,10 @@ export function deriveUrbanHouses(): UrbanHouse[] {
   const sideRoads = ACTIVE_REFERENCE_ROADS.filter((road) =>
     ["campeira", "musicanto", "10-de-agosto", "fenasoja"].includes(road.id),
   );
-  const occupied = [...houses.map((house) => house.parcel), ...deriveUrbanVacantLots().map((lot) => lot.parcel)];
+  const occupied = [
+    ...houses.map((house) => house.parcel),
+    ...deriveUrbanVacantLots().map((lot) => lot.parcel),
+  ];
   for (const house of houses) {
     if (house.form === "shed") continue;
     const direction = Math.sign(Math.sin(house.heading));
@@ -253,7 +256,9 @@ export function deriveUrbanHouses(): UrbanHouse[] {
           reach,
         );
     const linkBounds = polygonBounds(roadLink);
-    if (occupied.some((other) => other !== house.parcel && overlap(linkBounds, polygonBounds(other))))
+    if (
+      occupied.some((other) => other !== house.parcel && overlap(linkBounds, polygonBounds(other)))
+    )
       continue;
     house.frontageDistance = distance;
     house.roadAccess = true;

@@ -268,21 +268,44 @@ describe("static presentation architecture", () => {
   it("keeps the authorised event-center model and its picking volume inside its existing footprint", () => {
     const entity = ENTITIES.find((entry) => entry.id === "indumoveis:support:events")!;
     const before = JSON.stringify(entity);
-    expect(getArchitectureDefinition(entity)?.profile).toBe("event-center-gable");
+    expect(getArchitectureDefinition(entity)?.profile).toBe("event-center-hip-lantern");
     const model = buildArchitecture([entity]);
     try {
       const [minX, minZ] = entity.polygon[0];
       const [maxX, maxZ] = entity.polygon[2];
-      model.group.traverse((object) => {
+      // Walls, glazing, frames and picking stay inside the registered
+      // footprint. Only the roof sheet may project, by one eave (about 20 cm).
+      const roofSheets = new Set<THREE.Object3D>(model.roofs.get(entity.id)!.children);
+      expect(roofSheets.size).toBeGreaterThan(0);
+      const check = (object: THREE.Object3D) => {
         if (!(object instanceof THREE.Mesh)) return;
+        const eave = roofSheets.has(object) ? 0.1 : 0.00002;
         const positions = object.geometry.getAttribute("position");
+        for (let i = 0; i < positions.count; i++) {
+          expect(positions.getX(i)).toBeGreaterThanOrEqual(minX - eave);
+          expect(positions.getX(i)).toBeLessThanOrEqual(maxX + eave);
+          expect(positions.getZ(i)).toBeGreaterThanOrEqual(minZ - eave);
+          expect(positions.getZ(i)).toBeLessThanOrEqual(maxZ + eave);
+        }
+      };
+      model.group.traverse(check);
+      for (const pickable of model.pickables) {
+        const positions = pickable.geometry.getAttribute("position");
         for (let i = 0; i < positions.count; i++) {
           expect(positions.getX(i)).toBeGreaterThanOrEqual(minX - 0.00002);
           expect(positions.getX(i)).toBeLessThanOrEqual(maxX + 0.00002);
           expect(positions.getZ(i)).toBeGreaterThanOrEqual(minZ - 0.00002);
           expect(positions.getZ(i)).toBeLessThanOrEqual(maxZ + 0.00002);
         }
-      });
+      }
+      // The four-water roof converges on a raised lantern above the eave.
+      const sheet = [...roofSheets][0] as THREE.Mesh;
+      sheet.geometry.computeBoundingBox();
+      const walls = model.group.getObjectByName("walls") as THREE.Mesh;
+      walls.geometry.computeBoundingBox();
+      expect(sheet.geometry.boundingBox!.max.y).toBeGreaterThan(
+        walls.geometry.boundingBox!.max.y * 1.3,
+      );
       const ray = new THREE.Raycaster(
         new THREE.Vector3(minX - 1, 1, (minZ + maxZ) / 2),
         new THREE.Vector3(1, 0, 0),
@@ -380,6 +403,13 @@ describe("static presentation architecture", () => {
       const families = new Set<THREE.Material>();
       model.group.traverse((object) => {
         if (!(object instanceof THREE.Mesh)) return;
+        // The Centro Administrativo garden is planting, not construction: it
+        // follows the landscape convention (unlit-map vertex colour foliage).
+        if (object.name === "administrative-centre-garden") {
+          expect((object.material as THREE.MeshLambertMaterial).isMeshLambertMaterial).toBe(true);
+          expect(object.castShadow).toBe(true);
+          return;
+        }
         const material = object.material as THREE.MeshStandardMaterial;
         families.add(material);
         expect(material.isMeshStandardMaterial).toBe(true);

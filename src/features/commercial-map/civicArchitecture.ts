@@ -192,10 +192,30 @@ export function buildAdministrativeCentre<B>(kit: CivicKit<B>) {
         n,
       );
       // Reveals close the recess so the band reads as depth, not a decal.
-      quad(b.walls, [x, sill, bandStart], [x, sill, bandEnd], [gx, sill, bandEnd], [gx, sill, bandStart], wallShade, [0, 1, 0]);
-      quad(b.walls, [x, head, bandStart], [x, head, bandEnd], [gx, head, bandEnd], [gx, head, bandStart], wallShade, [0, -1, 0]);
+      quad(
+        b.walls,
+        [x, sill, bandStart],
+        [x, sill, bandEnd],
+        [gx, sill, bandEnd],
+        [gx, sill, bandStart],
+        wallShade,
+        [0, 1, 0],
+      );
+      quad(
+        b.walls,
+        [x, head, bandStart],
+        [x, head, bandEnd],
+        [gx, head, bandEnd],
+        [gx, head, bandStart],
+        wallShade,
+        [0, -1, 0],
+      );
       for (const z of [bandStart, bandEnd])
-        quad(b.walls, [x, sill, z], [x, head, z], [gx, head, z], [gx, sill, z], wallShade, [0, 0, z === bandStart ? 1 : -1]);
+        quad(b.walls, [x, sill, z], [x, head, z], [gx, head, z], [gx, sill, z], wallShade, [
+          0,
+          0,
+          z === bandStart ? 1 : -1,
+        ]);
       const bays = Math.max(2, Math.round((bandEnd - bandStart) / 0.82));
       for (let i = 0; i <= bays; i++) {
         const z = bandStart + ((bandEnd - bandStart) * i) / bays;
@@ -232,7 +252,15 @@ export function buildAdministrativeCentre<B>(kit: CivicKit<B>) {
     const z = south ? D : 0,
       n: CivicVertex = [0, 0, south ? 1 : -1];
     quad(b.accent, [0, 0, z], [W, 0, z], [W, plinthTop, z], [0, plinthTop, z], plinth, n);
-    quad(b.walls, [0, plinthTop, z], [W, plinthTop, z], [W, E, z], [0, E, z], south ? wall : mural, n);
+    quad(
+      b.walls,
+      [0, plinthTop, z],
+      [W, plinthTop, z],
+      [W, E, z],
+      [0, E, z],
+      south ? wall : mural,
+      n,
+    );
     triangle(b.roofWalls, [0, E, z], [W, E, z], [mid, ridge, z], gable, n);
     quad(b.picking, [0, 0.08, z], [W, 0.08, z], [W, E, z], [0, E, z], "#ffffff");
     triangle(b.picking, [0, E, z], [W, E, z], [mid, ridge, z], "#ffffff");
@@ -271,7 +299,11 @@ export function buildAdministrativeCentre<B>(kit: CivicKit<B>) {
     quad(b.roof, a, c, r1, r0, fascia, [0, -1, 0]);
     quad(b.picking, a, c, r1, r0, "#ffffff", [0, 1, 0]);
     // Eave and rake fascias give the sheet a visible edge from the ground.
-    quad(b.roof, [x, eaveY - 0.1, -over], [x, eaveY - 0.1, D + over], c, a, fascia, [side ? 1 : -1, 0, 0]);
+    quad(b.roof, [x, eaveY - 0.1, -over], [x, eaveY - 0.1, D + over], c, a, fascia, [
+      side ? 1 : -1,
+      0,
+      0,
+    ]);
     for (const z of [-over, D + over])
       quad(
         b.roof,
@@ -316,7 +348,17 @@ export function buildAdministrativeCentre<B>(kit: CivicKit<B>) {
     );
   }
   for (const x of [canopyX0, canopyX1]) {
-    box(b.metal, x - 0.035, canopyY - 0.09, canopyNorth, x + 0.035, canopyY, canopySouth, steel, true);
+    box(
+      b.metal,
+      x - 0.035,
+      canopyY - 0.09,
+      canopyNorth,
+      x + 0.035,
+      canopyY,
+      canopySouth,
+      steel,
+      true,
+    );
     for (let i = 0; i < 4; i++) {
       const z = canopyNorth + 0.12 + ((canopySouth - canopyNorth - 0.24) * i) / 3;
       box(b.metal, x - 0.04, ground, z - 0.04, x + 0.04, canopyY - 0.09, z + 0.04, steel);
@@ -349,7 +391,17 @@ export function buildAdministrativeCentre<B>(kit: CivicKit<B>) {
     signX0 = canopyX0 - 0.22,
     signX1 = canopyX1 + 0.22,
     signZ = canopyNorth - 0.05;
-  box(b.structure, signX0, signY0, signZ, signX1, signY1, signZ + 0.05, tint("concrete", "#eeeee8"), true);
+  box(
+    b.structure,
+    signX0,
+    signY0,
+    signZ,
+    signX1,
+    signY1,
+    signZ + 0.05,
+    tint("concrete", "#eeeee8"),
+    true,
+  );
 
   const stairX0 = 0.2,
     stairX1 = 1.72,
@@ -366,7 +418,16 @@ export function buildAdministrativeCentre<B>(kit: CivicKit<B>) {
   }
   box(b.metal, stairX1, landingY - 0.05, stairZ0, landingX1, landingY, stairZ1, steel, true);
   for (const x of [stairX1 + 0.05, landingX1 - 0.05])
-    box(b.metal, x - 0.03, ground, stairZ0 + 0.03, x + 0.03, landingY - 0.05, stairZ0 + 0.09, steel);
+    box(
+      b.metal,
+      x - 0.03,
+      ground,
+      stairZ0 + 0.03,
+      x + 0.03,
+      landingY - 0.05,
+      stairZ0 + 0.09,
+      steel,
+    );
   for (const z of [stairZ0, stairZ1]) {
     const n: CivicVertex = [0, 0, -1];
     // Stringer under the treads, then handrail and mid rail above them.
@@ -444,7 +505,17 @@ export function buildAdministrativeCentre<B>(kit: CivicKit<B>) {
     );
   }
   // Condenser unit high on the gable, as photographed.
-  box(b.structure, W * 0.72, E + 0.08, -0.14, W * 0.72 + 0.3, E + 0.3, 0, tint("concrete", "#e6e6df"), true);
+  box(
+    b.structure,
+    W * 0.72,
+    E + 0.08,
+    -0.14,
+    W * 0.72 + 0.3,
+    E + 0.3,
+    0,
+    tint("concrete", "#e6e6df"),
+    true,
+  );
 
   const planting: CivicPlanting[] = [
     // The mature tree beside the access and the palms on the lawn side.
@@ -716,11 +787,7 @@ export function buildEventCentreRoof<B>(kit: CivicKit<B>) {
       up,
     );
     // Eave edge and the wall proxy used for selection.
-    const outward: CivicVertex = [
-      corners[j][2] - corners[i][2],
-      0,
-      corners[i][0] - corners[j][0],
-    ];
+    const outward: CivicVertex = [corners[j][2] - corners[i][2], 0, corners[i][0] - corners[j][0]];
     quad(
       b.roof,
       [corners[i][0], E - 0.16, corners[i][2]],
@@ -798,7 +865,15 @@ export function buildEventCentreRoof<B>(kit: CivicKit<B>) {
       west,
     );
   }
-  quad(b.frames, [0, E - 0.02, left[2]], [0, E - 0.02, right[2]], [0, E + 0.12, right[2]], [0, E + 0.12, left[2]], frame, west);
+  quad(
+    b.frames,
+    [0, E - 0.02, left[2]],
+    [0, E - 0.02, right[2]],
+    [0, E + 0.12, right[2]],
+    [0, E + 0.12, left[2]],
+    frame,
+    west,
+  );
   for (const t of [-0.5, 0, 0.5]) {
     const z = cz + half * t,
       top = E + (gableRidge - E) * (1 - Math.abs(t)) - 0.12;
@@ -810,7 +885,16 @@ export function buildEventCentreRoof<B>(kit: CivicKit<B>) {
     doorTop = E * 0.66;
   for (const z of [cz - doorHalf, cz - doorHalf / 3, cz + doorHalf / 3, cz + doorHalf])
     box(b.frames, 0, 0, z - 0.06, 0.02, doorTop, z + 0.06, frame);
-  box(b.frames, 0, doorTop, cz - doorHalf - 0.06, 0.02, doorTop + 0.14, cz + doorHalf + 0.06, frame);
+  box(
+    b.frames,
+    0,
+    doorTop,
+    cz - doorHalf - 0.06,
+    0.02,
+    doorTop + 0.14,
+    cz + doorHalf + 0.06,
+    frame,
+  );
   quad(
     b.glass,
     [0.012, 0.05, cz - doorHalf],

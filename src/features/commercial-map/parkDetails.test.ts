@@ -49,7 +49,9 @@ describe("satellite-inspired surface details preserve cadastral surfaces", () =>
     const source = JSON.stringify(ENTITIES),
       details = deriveParkDetails(ENTITIES);
     expect(details.concrete.length).toBeGreaterThan(4);
-    expect(details.paint.length).toBeGreaterThan(30);
+    // Angled bays belong to the avenue's single owner (urbanContext), painted
+    // on its asphalt; nothing is striped on the kerbside walk here.
+    expect(details.paint).toEqual([]);
     for (const cell of details.concrete) {
       const center: [number, number] = [
         cell.reduce((s, p) => s + p[0], 0) / cell.length,
@@ -173,7 +175,7 @@ describe("satellite-inspired surface details preserve cadastral surfaces", () =>
     const details = deriveParkDetails(ENTITIES);
     expect(details.lanePaint).toEqual([]);
     expect(details.laneArrows).toEqual([]);
-    expect(details.paint.length).toBeGreaterThan(0); // external parking remains
+    expect(details.paint).toEqual([]); // avenue bays are owned by urbanContext
     const surfaces = createSurfaceMaterials({ maps: false });
     const model = createParkDetails(ENTITIES, surfaces);
     try {

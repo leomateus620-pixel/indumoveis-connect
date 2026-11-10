@@ -1,13 +1,7 @@
 import * as THREE from "three";
 
 export type HouseForm =
-  | "courtyard"
-  | "split"
-  | "villa"
-  | "compact"
-  | "two-storey"
-  | "gable"
-  | "shed";
+  "courtyard" | "split" | "villa" | "compact" | "two-storey" | "gable" | "shed";
 export type HouseStructuralInput = {
   center: readonly [number, number];
   width: number;

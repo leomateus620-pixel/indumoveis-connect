@@ -168,11 +168,11 @@ export function getArchitectureDefinition(entity: MapEntity): ArchitectureDefini
           ? 0.018
           : entity.id === "indumoveis:pavilion:14"
             ? 0.045
-          : entity.id === "indumoveis:pavilion:3"
-            ? 0.035
-            : entity.kind === "pavilion"
-              ? 0.11
-              : 0.085);
+            : entity.id === "indumoveis:pavilion:3"
+              ? 0.035
+              : entity.kind === "pavilion"
+                ? 0.11
+                : 0.085);
   const roofThickness = span * 0.013;
   return {
     profile,

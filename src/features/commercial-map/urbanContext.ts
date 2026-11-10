@@ -331,7 +331,9 @@ function houseGeometry(house: UrbanHouse, index: number, batches: Record<Categor
  * side, one dashed lane line each way and a continuous centre line that opens
  * at the mapped side streets. Proportions are a drawing estimate, not a count
  * of real parking spaces. No direction arrows are painted. */
-export function deriveAvenuePaint(roads: readonly { id: string; path: readonly Point[]; width: number }[]) {
+export function deriveAvenuePaint(
+  roads: readonly { id: string; path: readonly Point[]; width: number }[],
+) {
   const from = SECTION.parkingStart,
     to = AVENUE_END - 3.2;
   const stalls: Point[][] = [],

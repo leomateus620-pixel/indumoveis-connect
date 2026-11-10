@@ -919,7 +919,16 @@ export function createPermanentPark(
         box("masonryBrick", x0 + 0.35, -0.15, pz0, x1 - 0.35, 0.5, pz1, "#ffffff");
         box("paintedWall", x0 + 0.4, 0.5, pz0 + 0.05, x1 - 0.4, portal.beam, pz1 - 0.05, "#e2ded2");
       }
-      box("concrete", x0 + 0.12, portal.beam, z0 + 0.1, x1 - 0.12, portal.eave, z1 - 0.1, "#d2d0c5");
+      box(
+        "concrete",
+        x0 + 0.12,
+        portal.beam,
+        z0 + 0.1,
+        x1 - 0.12,
+        portal.eave,
+        z1 - 0.1,
+        "#d2d0c5",
+      );
       const overhang = 0.4,
         ridgeX = (x0 + x1) / 2,
         top = portal.eave + portal.rise;
