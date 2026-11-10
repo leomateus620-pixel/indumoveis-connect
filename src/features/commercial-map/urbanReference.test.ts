@@ -10,6 +10,7 @@ import {
   REFERENCE_EXCLUSIONS,
   REFERENCE_WAYS,
   URBAN_REFERENCE,
+  URBAN_REGISTRATION,
   URBAN_REFERENCE_PROVENANCE,
 } from "./urbanReference";
 
@@ -34,8 +35,33 @@ describe("selected OpenStreetMap context aligned to the approved schematic", () 
       ENTITIES.find((e) => e.id === "indumoveis:road:benvenuto")!.polygon,
     );
     const anchor = projectReferenceNode("2470629442");
-    expect(anchor[0]).toBe(avenue.maxX);
-    expect(anchor[1]).toBe((avenue.minY + URBAN_REFERENCE.avenueSouth) / 2);
+    // Territorial registration: the external street frame moved by one rigid
+    // translation onto the orthophoto. Scale and rotation are untouched, so
+    // the metric checks below still hold, and no lot polygon is distorted.
+    const { previousAnchor, translation, controlPoints, toleranceUnits } = URBAN_REGISTRATION;
+    expect(previousAnchor).toEqual([avenue.maxX, 98.175]);
+    expect(anchor[0]).toBeCloseTo(previousAnchor[0] + translation[0], 9);
+    expect(anchor[1]).toBeCloseTo(previousAnchor[1] + translation[1], 9);
+    expect(anchor).toEqual(URBAN_REFERENCE.anchor.world);
+    expect(anchor[1]).toBeGreaterThan(URBAN_REFERENCE.avenueSection.asphaltNorth);
+    expect(anchor[1]).toBeLessThan(URBAN_REFERENCE.avenueSection.asphaltSouth);
+    const residuals = controlPoints.map((point) =>
+      Math.hypot(
+        point.plan[0] - point.observed[0] - translation[0],
+        point.plan[1] - point.observed[1] - translation[1],
+      ),
+    );
+    // Roof centres agree within the stated tolerance. The gate portal is the
+    // weakest control (a thin structure under tree cover) and stays under two
+    // drawing units; it is reported, not hidden, in the fidelity document.
+    expect(Math.max(...residuals.slice(0, 4))).toBeLessThan(toleranceUnits);
+    expect(Math.max(...residuals)).toBeLessThan(2);
+    const mean = [0, 1].map(
+      (axis) =>
+        controlPoints.reduce((sum, point) => sum + point.plan[axis] - point.observed[axis], 0) /
+        controlPoints.length,
+    );
+    expect(Math.hypot(mean[0] - translation[0], mean[1] - translation[1])).toBeLessThan(0.5);
     expect(evidence.sourceEvidence.nodeHighwayWayIds["2470629442"].sort()).toEqual([
       "953224596",
       "953224597",

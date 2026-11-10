@@ -181,4 +181,37 @@ describe("engine-independent territorial fallback", () => {
     fireEvent.pointerUp(svg, { button: 0, clientX: 20, clientY: 20 });
     expect(close).toHaveBeenCalledOnce();
   });
+  it("identifies a permanent structure on click without selecting or closing a commercial session", () => {
+    Object.defineProperty(window, "PointerEvent", { configurable: true, value: MouseEvent });
+    const close = vi.fn(),
+      select = vi.fn(),
+      identify = vi.fn();
+    const a = ENTITIES.find((entry) => entry.kind === "lot")!;
+    const { container } = render(
+      <Map2D
+        {...props}
+        selectedId={a.id}
+        onSelect={select}
+        onDeselect={close}
+        onLandmark={identify}
+      />,
+    );
+    const svg = container.querySelector("svg")!;
+    svg.setPointerCapture = () => {};
+    const structures = [...container.querySelectorAll("[data-landmark]")];
+    expect(structures.length).toBeGreaterThan(4);
+    // No permanent structure carries a visible name plate in the plan.
+    expect(container.querySelectorAll("[data-landmark] text")).toHaveLength(0);
+    const structure = structures[0];
+    fireEvent.pointerDown(structure, { button: 0, clientX: 20, clientY: 20 });
+    fireEvent.pointerUp(svg, { button: 0, clientX: 20, clientY: 20 });
+    expect(identify).toHaveBeenLastCalledWith(structure.getAttribute("data-landmark"));
+    expect(select).not.toHaveBeenCalled();
+    expect(close).not.toHaveBeenCalled();
+    // Empty ground clears the identification and closes the inspection.
+    fireEvent.pointerDown(svg, { button: 0, clientX: 20, clientY: 20 });
+    fireEvent.pointerUp(svg, { button: 0, clientX: 20, clientY: 20 });
+    expect(identify).toHaveBeenLastCalledWith(null);
+    expect(close).toHaveBeenCalledOnce();
+  });
 });

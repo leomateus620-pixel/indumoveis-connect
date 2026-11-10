@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ENTITIES, MAP_BOUNDS, sourcePoint, TREES } from "./data/territory";
+import { ENTITIES, MAP_BOUNDS, RETIRED_EXTERNAL_LOTS, sourcePoint, TREES } from "./data/territory";
 import {
   declaredAreaDifference,
   hasSelfIntersections,
@@ -68,8 +68,17 @@ describe("Indumóveis source geometry", () => {
   it("covers each external number once and keeps unverifiable subdivisions aggregated", () => {
     const lots = ENTITIES.filter((entity) => entity.kind === "lot");
     const numbers = lots.flatMap((entity) => entity.numbers ?? []).sort((a, b) => a - b);
-    expect(numbers).toEqual(Array.from({ length: 70 }, (_, i) => i + 1));
-    expect(lots).toHaveLength(59);
+    // 69 and 70 were never saleable ground: they are the Centro
+    // Administrativo garden and the east green sector, kept as context only.
+    expect(numbers).toEqual(Array.from({ length: 68 }, (_, i) => i + 1));
+    expect(lots).toHaveLength(57);
+    for (const retired of RETIRED_EXTERNAL_LOTS) {
+      expect(ENTITIES.some((entity) => entity.id === retired.formerId)).toBe(false);
+      const context = ENTITIES.find((entity) => entity.id === retired.contextId)!;
+      expect(context.kind).toBe("landscape");
+      expect(context.numbers).toBeUndefined();
+      expect(context.polygon).toEqual(retired.polygon);
+    }
     expect(lots.filter((entity) => (entity.numbers?.length ?? 0) > 1)).toHaveLength(7);
     const combined = lots.find((entity) => entity.numbers?.includes(35));
     expect(combined?.numbers).toEqual([35, 36, 49, 50]);
@@ -119,9 +128,14 @@ describe("Indumóveis source geometry", () => {
   });
 
   it("leaves numbered terrain distinct from green unnumbered areas and circulation", () => {
-    const lot70 = ENTITIES.find((entity) => entity.numbers?.[0] === 70)!;
-    expect(pointInPolygon(sourcePoint([1600, 800]), lot70.polygon)).toBe(true);
-    expect(pointInPolygon(sourcePoint([1750, 800]), lot70.polygon)).toBe(false);
+    const eastGarden = ENTITIES.find((entity) => entity.id === "indumoveis:landscape:east-garden")!;
+    expect(pointInPolygon(sourcePoint([1600, 800]), eastGarden.polygon)).toBe(true);
+    expect(pointInPolygon(sourcePoint([1750, 800]), eastGarden.polygon)).toBe(false);
+    expect(
+      ENTITIES.filter((entity) => entity.kind === "lot").some((lot) =>
+        pointInPolygon(sourcePoint([1600, 800]), lot.polygon),
+      ),
+    ).toBe(false);
     const grove = ENTITIES.find((entity) => entity.id === "indumoveis:landscape:grove")!;
     expect(TREES.slice(0, 13).every((point) => pointInPolygon(point, grove.polygon))).toBe(true);
     expect(

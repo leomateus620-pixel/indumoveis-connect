@@ -18,6 +18,7 @@ import {
 import {
   URBAN_CONTEXT,
   deriveUrbanHouses,
+  deriveUrbanVacantLots,
   deriveUrbanRoads,
   deriveResidentialBuffer,
   type UrbanHouse,
@@ -26,6 +27,7 @@ export {
   URBAN_CONTEXT,
   urbanPolygonAllowed,
   deriveUrbanHouses,
+  deriveUrbanVacantLots,
   deriveUrbanRoads,
   deriveResidentialBuffer,
 } from "./urbanLayout";
@@ -36,6 +38,16 @@ const AVENUE_BOUNDS = polygonBounds(AVENUE.polygon);
 const AVENUE_SOUTH = URBAN_REFERENCE.avenueSouth;
 const ROUNDABOUT = URBAN_REFERENCE.roundabout.center;
 const PROTECTED_GROUND = deriveProtectedGround(ENTITIES);
+const AVENUE_BLOCKERS = ENTITIES.filter(
+  (e) =>
+    e.kind === "lot" ||
+    e.kind === "pavilion" ||
+    (e.kind === "support" && e.id !== "indumoveis:support:gate-03"),
+).map((e) => e.polygon);
+const SECTION = URBAN_REFERENCE.avenueSection;
+/** The public avenue stops at the park's main gate. East of it the registered
+ * park drawing owns the internal circulation, with its own width and finish. */
+const AVENUE_END = URBAN_REFERENCE.mainGate.x - 0.3;
 
 type Vertex = [number, number, number];
 type Bucket = { position: number[]; color: number[]; uv: number[] };
@@ -79,17 +91,14 @@ function floor(
   polygon: readonly Point[],
   y: number,
   color: string,
-  sharedAvenuePaint = false,
+  publicAvenue = false,
 ) {
   if (polygon.some(([, z]) => z < URBAN_CONTEXT.minimumZ)) return;
   let cells = [[...polygon]];
-  // A corner of Brasilia meets the avenue's south edge. Cut that exact source
-  // footprint out of the added band instead of dropping the entire widening.
-  const blockers = sharedAvenuePaint
-    ? ENTITIES.filter(
-        (e) => !["indumoveis:road:benvenuto", "indumoveis:road:imigrantes"].includes(e.id),
-      ).map((e) => e.polygon)
-    : PROTECTED_GROUND;
+  // The public avenue is one physical surface from its north kerb to the south
+  // kerb. Only real volumes (lots, halls, supports) can cut it; superseded
+  // source road outlines are not obstacles to their own carriageway.
+  const blockers = publicAvenue ? AVENUE_BLOCKERS : PROTECTED_GROUND;
   for (const polygon of blockers) {
     const bounds = polygonBounds(polygon);
     if (!cells.some((cell) => overlap(polygonBounds(cell), bounds))) continue;
@@ -209,8 +218,10 @@ function houseGeometry(house: UrbanHouse, index: number, batches: Record<Categor
       ];
     }),
     URBAN_CONTEXT.groundY,
-    URBAN_CONTEXT.palette.garden[index % 4],
-    true,
+    house.ground === "lawn"
+      ? URBAN_CONTEXT.palette.garden[index % 4]
+      : URBAN_CONTEXT.ground[house.ground],
+    house.ground === "lawn",
   );
   const front = -d / 2;
   if (house.roadAccess) {
@@ -314,6 +325,63 @@ function houseGeometry(house: UrbanHouse, index: number, batches: Record<Categor
     }
   }
   return { ...architectural, landscape };
+}
+
+/** Avenue paint read from the registered orthophoto: angled stalls on the north
+ * side, one dashed lane line each way and a continuous centre line that opens
+ * at the mapped side streets. Proportions are a drawing estimate, not a count
+ * of real parking spaces. No direction arrows are painted. */
+export function deriveAvenuePaint(
+  roads: readonly { id: string; path: readonly Point[]; width: number }[],
+) {
+  const from = SECTION.parkingStart,
+    to = AVENUE_END - 3.2;
+  const stalls: Point[][] = [],
+    laneDashes: Point[][] = [],
+    centerLine: Point[][] = [];
+  const stallNorth = SECTION.asphaltNorth + 0.55,
+    stallSouth = SECTION.parkingSouth,
+    lean = (stallSouth - stallNorth) * 0.55;
+  for (let x = from; x < to; x += 1.25)
+    stalls.push([
+      [x + lean, stallNorth],
+      [x + lean + 0.05, stallNorth],
+      [x + 0.05, stallSouth],
+      [x, stallSouth],
+    ]);
+  for (const z of [
+    (SECTION.parkingSouth + SECTION.centerLine) / 2,
+    (SECTION.centerLine + SECTION.asphaltSouth) / 2,
+  ])
+    for (let x = from; x < to; x += 2.9)
+      laneDashes.push([
+        [x, z - 0.024],
+        [x + 0.95, z - 0.024],
+        [x + 0.95, z + 0.024],
+        [x, z + 0.024],
+      ]);
+  const mouths = roads
+    .filter((r) => ["campeira", "musicanto", "10-de-agosto", "fenasoja"].includes(r.id))
+    .map((r) => ({ x: r.path[0][0], half: r.width / 2 + 0.9 }))
+    .sort((a, b) => a.x - b.x);
+  let cursor = from;
+  const strip = (x0: number, x1: number) => {
+    if (x1 - x0 < 0.5) return;
+    for (const offset of [-0.06, 0.06])
+      centerLine.push([
+        [x0, SECTION.centerLine + offset - 0.022],
+        [x1, SECTION.centerLine + offset - 0.022],
+        [x1, SECTION.centerLine + offset + 0.022],
+        [x0, SECTION.centerLine + offset + 0.022],
+      ]);
+  };
+  for (const mouth of mouths) {
+    if (mouth.x + mouth.half < from || mouth.x - mouth.half > to) continue;
+    strip(cursor, mouth.x - mouth.half);
+    cursor = mouth.x + mouth.half;
+  }
+  strip(cursor, to);
+  return { stalls, laneDashes, centerLine };
 }
 
 /** Static spatial batches; no house becomes selectable or a dynamic shadow
@@ -432,6 +500,7 @@ export function createUrbanContext(
     };
     const architectureMetadata: ReturnType<typeof houseGeometry>[] = [];
     const houses = deriveUrbanHouses(),
+      vacantLots = deriveUrbanVacantLots(),
       clusters: {
         group: THREE.Group;
         detail: THREE.Mesh | null;
@@ -454,6 +523,17 @@ export function createUrbanContext(
       const members = houses.filter((house) => house.cluster === cluster);
       for (const house of members)
         architectureMetadata.push(houseGeometry(house, houses.indexOf(house), batches));
+      // Open ground keeps its photographed character and receives no wall.
+      for (const [index, lot] of vacantLots.entries())
+        if (lot.cluster === cluster)
+          floor(
+            batches.garden,
+            lot.parcel,
+            URBAN_CONTEXT.groundY,
+            lot.ground === "lawn"
+              ? URBAN_CONTEXT.palette.garden[index % 4]
+              : URBAN_CONTEXT.ground[lot.ground],
+          );
       for (const key of ["garden", "walls", "roof", "glass"] as const)
         add(parent, batches[key], key);
       const persistentDetailIndices = batches.detail.position.length / 3;
@@ -477,40 +557,27 @@ export function createUrbanContext(
       island = bucket(),
       paint = bucket();
     const roadGraph = deriveUrbanRoads();
-    // One contiguous widening of each original avenue segment, never a
-    // parallel road or a green gap. Source polygons/picking stay untouched.
+    // External avenue: a single carriageway from the parking edge to the
+    // south kerb, ending at the main gate. Nothing is drawn east of the gate.
     floor(
       roads,
       [
-        [AVENUE_BOUNDS.minX, AVENUE_BOUNDS.maxY],
-        [AVENUE_BOUNDS.maxX, AVENUE_BOUNDS.maxY],
-        [AVENUE_BOUNDS.maxX, AVENUE_SOUTH],
+        [AVENUE_BOUNDS.minX, SECTION.asphaltNorth],
+        [AVENUE_END, SECTION.asphaltNorth],
+        [AVENUE_END, AVENUE_SOUTH],
         [AVENUE_BOUNDS.minX, AVENUE_SOUTH],
       ],
       -0.025,
       roadColor,
+      true,
     );
-    const imigrantes = ENTITIES.find((e) => e.id === "indumoveis:road:imigrantes");
-    const east = imigrantes ? polygonBounds(imigrantes.polygon) : AVENUE_BOUNDS;
-    if (imigrantes)
-      floor(
-        roads,
-        [
-          [east.minX, east.maxY],
-          [east.maxX, east.maxY],
-          [east.maxX, AVENUE_SOUTH],
-          [east.minX, AVENUE_SOUTH],
-        ],
-        -0.025,
-        roadColor,
-      );
     floor(
       walks,
       [
         [AVENUE_BOUNDS.minX, AVENUE_SOUTH],
-        [east.maxX, AVENUE_SOUTH],
-        [east.maxX, AVENUE_SOUTH + 1.05],
-        [AVENUE_BOUNDS.minX, AVENUE_SOUTH + 1.05],
+        [AVENUE_END, AVENUE_SOUTH],
+        [AVENUE_END, AVENUE_SOUTH + SECTION.southWalkWidth],
+        [AVENUE_BOUNDS.minX, AVENUE_SOUTH + SECTION.southWalkWidth],
       ],
       -0.04,
       options.sharedSurfaces ? "#ffffff" : "#989f9b",
@@ -570,18 +637,6 @@ export function createUrbanContext(
     };
     for (const r of [URBAN_REFERENCE.roundabout, URBAN_REFERENCE.secondaryJunction])
       ring(r.center, r.centerlineRadius, r.roadWidth);
-    const allRoads = [
-      ...roadGraph,
-      {
-        id: "approved-avenue",
-        path: [
-          [AVENUE_BOUNDS.minX, URBAN_REFERENCE.avenueCenter],
-          [east.maxX, URBAN_REFERENCE.avenueCenter],
-        ] as Point[],
-        width: AVENUE_SOUTH - AVENUE_BOUNDS.minY,
-        sourceWayIds: [] as string[],
-      },
-    ];
     const segmentDistance = (p: Point, a: Point, b: Point) => {
       const dx = b[0] - a[0],
         dz = b[1] - a[1],
@@ -592,18 +647,21 @@ export function createUrbanContext(
         );
       return Math.hypot(p[0] - a[0] - dx * t, p[1] - a[1] - dz * t);
     };
-    for (const r of allRoads) {
-      const oneWay = r.sourceWayIds.some((id) => REFERENCE_WAYS[id]?.tags.oneway === "yes");
+    // Lane paint follows the reference: discreet centre dashes on the two
+    // through roads only. Residential dead ends and internal streets carry no
+    // centre line, and no road receives oversized direction arrows.
+    const marked = roadGraph.filter((r) => ["tuparendi", "tuparendi-southwest"].includes(r.id));
+    for (const r of marked) {
       const marks = markRoadLanes(r.path, r.width, {
         roadClass: "public-external",
-        dashLength: 1.35,
-        dashGap: 1.9,
-        lineWidth: 0.075,
-        arrowSpacing: 24,
+        dashLength: 1.1,
+        dashGap: 2.2,
+        lineWidth: 0.055,
+        arrowSpacing: 1e6,
         edges: false,
       });
       const valid = (p: Point[]) =>
-        !allRoads.some(
+        !roadGraph.some(
           (other) =>
             other !== r &&
             other.path
@@ -611,14 +669,20 @@ export function createUrbanContext(
               .some((b, i) =>
                 p.some((v) => segmentDistance(v, other.path[i], b) < other.width / 2 + 0.15),
               ),
+        ) &&
+        !p.some(
+          (v) =>
+            Math.hypot(v[0] - ROUNDABOUT[0], v[1] - ROUNDABOUT[1]) <
+            URBAN_REFERENCE.roundabout.centerlineRadius +
+              URBAN_REFERENCE.roundabout.roadWidth / 2 +
+              0.3,
         );
-      if (!oneWay)
-        for (const p of marks.centerDashes.filter(valid))
-          floor(paint, p, -0.017, "#c7b46c", r.id === "approved-avenue");
-      if (!oneWay)
-        for (const p of marks.directionArrows.filter(valid))
-          floor(paint, p, -0.017, "#e4e1d1", r.id === "approved-avenue");
+      for (const p of marks.centerDashes.filter(valid)) floor(paint, p, -0.017, "#cfc089");
     }
+    const avenuePaint = deriveAvenuePaint(roadGraph);
+    for (const p of avenuePaint.stalls) floor(paint, p, -0.017, "#e2e0d4", true);
+    for (const p of avenuePaint.laneDashes) floor(paint, p, -0.017, "#e2e0d4", true);
+    for (const p of avenuePaint.centerLine) floor(paint, p, -0.017, "#cfc089", true);
     // Secondary portal is an approximate representation of the access confirmed
     // by the user; OSM maps its approach and circle, not the gate hardware.
     const access = roadGraph.find((r) => r.id === "brasil-access")!.path;
@@ -734,9 +798,17 @@ export function createUrbanContext(
           sourceSouthEdge: AVENUE_BOUNDS.maxY,
           southEdge: AVENUE_SOUTH,
           width: AVENUE_SOUTH - AVENUE_BOUNDS.minY,
+          endsAtGate: AVENUE_END,
+          paint: {
+            stalls: avenuePaint.stalls.length,
+            laneDashes: avenuePaint.laneDashes.length,
+            centerLine: avenuePaint.centerLine.length,
+            arrows: 0,
+          },
         },
         source: "Imagem do ChatGPT 17 de out. de 2026, 21_33_52.jpg",
         houseCount: houses.length,
+        vacantLots: vacantLots.length,
         blockCount: 3,
         roadGraph,
         roundabout: {

@@ -146,6 +146,18 @@ export function CommercialMapWorkspace({
   const [query, setQuery] = useState(""),
     [location, setLocation] = useState("");
   const [landmarkNotice, setLandmarkNotice] = useState("");
+  // Contextual identification of a permanent structure after a click on it.
+  // It is transient and never competes with the commercial inspection.
+  const [identified, setIdentified] = useState<string | null>(null);
+  const identifiedName = useMemo(
+    () => PERMANENT_PARK_LANDMARKS.find((landmark) => landmark.id === identified)?.name ?? null,
+    [identified],
+  );
+  useEffect(() => {
+    if (!identified) return;
+    const timer = window.setTimeout(() => setIdentified(null), 6000);
+    return () => window.clearTimeout(timer);
+  }, [identified]);
   const [inspectedId, setInspectedId] = useState<string | null>(null);
   const [Renderer, setRenderer] = useState<Renderer | null>(null);
   const [engineWanted, setEngineWanted] = useState(savedPark.current?.camera?.kind !== "2d");
@@ -442,6 +454,7 @@ export function CommercialMapWorkspace({
     insets,
     onSelect: select,
     onDeselect: close,
+    onLandmark: setIdentified,
     onReady: () => {},
     onFailure: fail,
     statuses,
@@ -678,6 +691,17 @@ export function CommercialMapWorkspace({
         {(notice || commercialState === "unavailable") && (
           <div className="im-map-notice" role="status">
             {notice || "Situação comercial não confirmada."}
+          </div>
+        )}
+        {identifiedName && (
+          <div
+            className="im-map-identity"
+            role="status"
+            aria-live="polite"
+            style={{ bottom: Math.max(5, insets.bottom + 5) + 28 }}
+          >
+            <strong>{identifiedName}</strong>
+            <span>Estrutura permanente do parque · sem situação comercial</span>
           </div>
         )}
         {displayedMenu && (

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
-export type HouseForm = "courtyard" | "split" | "villa" | "compact" | "two-storey" | "gable";
+export type HouseForm =
+  "courtyard" | "split" | "villa" | "compact" | "two-storey" | "gable" | "shed";
 export type HouseStructuralInput = {
   center: readonly [number, number];
   width: number;
@@ -9,6 +10,9 @@ export type HouseStructuralInput = {
   roof: "hip" | "gable" | "flat";
   facing: -1 | 1;
   form: HouseForm;
+  /** Photo-read colours; the modular palette is used when absent. */
+  roofColor?: string;
+  wallColor?: string;
 };
 export type HouseArchitectureBucket = { position: number[]; color: number[]; uv: number[] };
 export type HouseArchitectureBatches = Record<
@@ -55,8 +59,8 @@ export function appendHouseArchitecture(
   )
     throw new Error("urban-architecture-invalid-dimensions");
   const { width: w, depth: d, height: h } = house;
-  const wallColor = WALLS[Math.abs(index) % WALLS.length];
-  const roofColor = ROOFS[Math.abs(index) % ROOFS.length];
+  const wallColor = house.wallColor ?? WALLS[Math.abs(index) % WALLS.length];
+  const roofColor = house.roofColor ?? ROOFS[Math.abs(index) % ROOFS.length];
   const mirror = -house.facing;
   // Repeated forms in the denser blocks alternate the entire attached plan,
   // not only roof colours: entry court, garage and cross-ridge swap together.
@@ -236,6 +240,11 @@ export function appendHouseArchitecture(
       entry = volume(-w * 0.15, d * 0.03, w * 0.65, d * 0.87, wallHeight, "main", "gable");
       volume(w * 0.325, -d * 0.14, w * 0.3, d * 0.58, wallHeight * 0.91, "garage", "gable", 0, "x");
       volume(w * 0.29, d * 0.345, w * 0.34, d * 0.24, wallHeight * 0.82, "wing", "hip", 0, "x");
+      break;
+    case "shed":
+      // One plain volume: outbuildings and institutional blocks have no
+      // garage, wing or veranda to invent.
+      entry = volume(0, 0, w, d, wallHeight, "main", house.roof, 0, w > d ? "x" : "z");
       break;
   }
 
@@ -704,7 +713,7 @@ export function appendHouseArchitecture(
         front + 0.035,
         "#969d96",
       );
-  } else {
+  } else if (house.form !== "shed") {
     const x = (entry.x0 + entry.x1) / 2;
     veranda(x - 0.56, x + 0.56, entry.z0 - 0.2, entry.z0 + 0.08, entry.height * 0.84, 2);
   }

@@ -1,0 +1,2148 @@
+{
+ "generatedAt": "2026-11-10T00:03:00.375Z",
+ "phase": "before",
+ "baseURL": "http://127.0.0.1:3000",
+ "host": {
+  "os": "linux 6.12.113+",
+  "cpu": "Intel(R) Xeon(R) Processor",
+  "logicalCores": 4,
+  "memoryGiB": 16,
+  "browser": "156.0.8078.47",
+  "gpuRequest": "software"
+ },
+ "captureQuality": "detailed",
+ "layouts": [
+  {
+   "layout": "desktop",
+   "viewport": {
+    "width": 1366,
+    "height": 768
+   },
+   "usableMs": 4605,
+   "completeMs": 8899,
+   "renderer": {
+    "vendor": "WebKit",
+    "renderer": "WebKit WebGL",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "unmaskedVendor": "Google Inc. (Google)",
+    "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "gpuTimerQueryAvailable": true,
+    "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+   },
+   "tier": "detailed",
+   "textureBytes": 21889137,
+   "geometries": 114,
+   "textures": 13,
+   "programs": 32,
+   "softwareRasterizer": true,
+   "optionalFailures": [],
+   "readyAtMs": 4532.199999999953,
+   "pbr": {
+    "loaded": true,
+    "textureBytes": 2097264,
+    "source": "basis",
+    "compressed": true
+   },
+   "longTasks": [
+    {
+     "start": 654.8000000000466,
+     "duration": 54
+    },
+    {
+     "start": 822.9000000000233,
+     "duration": 55
+    },
+    {
+     "start": 1359,
+     "duration": 79
+    },
+    {
+     "start": 1634.5999999999767,
+     "duration": 1685
+    },
+    {
+     "start": 3347.3000000000466,
+     "duration": 1178
+    },
+    {
+     "start": 4532.5,
+     "duration": 58
+    },
+    {
+     "start": 4777.400000000023,
+     "duration": 565
+    },
+    {
+     "start": 5466.900000000023,
+     "duration": 196
+    },
+    {
+     "start": 5663.199999999953,
+     "duration": 393
+    },
+    {
+     "start": 6307.699999999953,
+     "duration": 258
+    },
+    {
+     "start": 6587.599999999977,
+     "duration": 106
+    },
+    {
+     "start": 6761.099999999977,
+     "duration": 983
+    },
+    {
+     "start": 7744.400000000023,
+     "duration": 364
+    }
+   ],
+   "automatic": {
+    "usableMs": 3597,
+    "completeMs": 5903,
+    "tier": "light",
+    "textureBytes": 11927665,
+    "geometries": 115,
+    "textures": 8,
+    "programs": 28,
+    "drawCalls": 153,
+    "triangles": 247361,
+    "longTasks": [
+     {
+      "start": 539,
+      "duration": 52
+     },
+     {
+      "start": 715.7000000000698,
+      "duration": 58
+     },
+     {
+      "start": 1249.4000000000233,
+      "duration": 81
+     },
+     {
+      "start": 1590.7000000000698,
+      "duration": 1123
+     },
+     {
+      "start": 2766,
+      "duration": 753
+     },
+     {
+      "start": 3526,
+      "duration": 55
+     },
+     {
+      "start": 3682.20000000007,
+      "duration": 148
+     },
+     {
+      "start": 3884.3000000000466,
+      "duration": 80
+     },
+     {
+      "start": 4044.5,
+      "duration": 184
+     },
+     {
+      "start": 4483.400000000023,
+      "duration": 252
+     },
+     {
+      "start": 4763.5,
+      "duration": 91
+     },
+     {
+      "start": 4908.800000000047,
+      "duration": 807
+     }
+    ],
+    "navigation": {
+     "gestures": [
+      {
+       "label": "pan-overview",
+       "frameIntervalMs": {
+        "samples": 50,
+        "p50": 216.60000000000036,
+        "p95": 450,
+        "max": 483.3999999999978
+       },
+       "renderDurationMs": {
+        "samples": 53,
+        "p50": 1.6999999999534339,
+        "p95": 7,
+        "max": 7.200000000069849
+       },
+       "drawCalls": 152,
+       "triangles": 242458,
+       "dpr": 0.5,
+       "buffer": [
+        647,
+        327
+       ],
+       "adaptiveResolution": 0.5
+      },
+      {
+       "label": "orbit-overview",
+       "frameIntervalMs": {
+        "samples": 52,
+        "p50": 166.70000000000073,
+        "p95": 433.3999999999978,
+        "max": 633.4000000000015
+       },
+       "renderDurationMs": {
+        "samples": 54,
+        "p50": 1.599999999976717,
+        "p95": 7.799999999930151,
+        "max": 622.6999999999534
+       },
+       "drawCalls": 151,
+       "triangles": 242457,
+       "dpr": 0.4,
+       "buffer": [
+        517,
+        262
+       ],
+       "adaptiveResolution": 0.4
+      },
+      {
+       "label": "wheel-approach-building",
+       "frameIntervalMs": {
+        "samples": 62,
+        "p50": 33.400000000001455,
+        "p95": 116.5,
+        "max": 166.70000000000073
+       },
+       "renderDurationMs": {
+        "samples": 64,
+        "p50": 0.5999999999767169,
+        "p95": 6,
+        "max": 101
+       },
+       "drawCalls": 47,
+       "triangles": 58561,
+       "dpr": 0.4,
+       "buffer": [
+        517,
+        262
+       ],
+       "adaptiveResolution": 0.4
+      }
+     ],
+     "idleAfterInteraction": {
+      "dpr": 0.4,
+      "buffer": [
+       517,
+       262
+      ],
+      "adaptiveResolution": 0.4,
+      "tier": "light"
+     },
+     "selectionResponseMs": 41.20000000006985
+    }
+   }
+  },
+  {
+   "layout": "mobile",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "usableMs": 3410,
+   "completeMs": 7223,
+   "renderer": {
+    "vendor": "WebKit",
+    "renderer": "WebKit WebGL",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "unmaskedVendor": "Google Inc. (Google)",
+    "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "gpuTimerQueryAvailable": true,
+    "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+   },
+   "tier": "detailed",
+   "textureBytes": 21889137,
+   "geometries": 118,
+   "textures": 13,
+   "programs": 32,
+   "softwareRasterizer": true,
+   "optionalFailures": [],
+   "readyAtMs": 3316.3000000000466,
+   "pbr": {
+    "loaded": true,
+    "textureBytes": 2097264,
+    "source": "basis",
+    "compressed": true
+   },
+   "longTasks": [
+    {
+     "start": 526.0999999999767,
+     "duration": 51
+    },
+    {
+     "start": 677.0999999999767,
+     "duration": 55
+    },
+    {
+     "start": 1239.4000000000233,
+     "duration": 70
+    },
+    {
+     "start": 1640.3000000000466,
+     "duration": 873
+    },
+    {
+     "start": 2595,
+     "duration": 716
+    },
+    {
+     "start": 3316.8000000000466,
+     "duration": 82
+    },
+    {
+     "start": 3409.9000000000233,
+     "duration": 364
+    },
+    {
+     "start": 3785.9000000000233,
+     "duration": 126
+    },
+    {
+     "start": 4074.20000000007,
+     "duration": 211
+    },
+    {
+     "start": 4286.400000000023,
+     "duration": 1226
+    },
+    {
+     "start": 5513.900000000023,
+     "duration": 215
+    },
+    {
+     "start": 5748.800000000047,
+     "duration": 208
+    },
+    {
+     "start": 5970.5,
+     "duration": 142
+    },
+    {
+     "start": 6175,
+     "duration": 801
+    }
+   ],
+   "automatic": {
+    "usableMs": 2566,
+    "completeMs": 4594,
+    "tier": "light",
+    "textureBytes": 11927665,
+    "geometries": 119,
+    "textures": 8,
+    "programs": 28,
+    "drawCalls": 154,
+    "triangles": 245454,
+    "longTasks": [
+     {
+      "start": 675.3000000000466,
+      "duration": 59
+     },
+     {
+      "start": 1204.8999999999069,
+      "duration": 68
+     },
+     {
+      "start": 1560,
+      "duration": 488
+     },
+     {
+      "start": 2121.399999999907,
+      "duration": 372
+     },
+     {
+      "start": 2502.899999999907,
+      "duration": 50
+     },
+     {
+      "start": 2945.5,
+      "duration": 181
+     },
+     {
+      "start": 3200.3000000000466,
+      "duration": 229
+     },
+     {
+      "start": 3455.0999999998603,
+      "duration": 126
+     },
+     {
+      "start": 3648.0999999998603,
+      "duration": 811
+     }
+    ],
+    "navigation": {
+     "gestures": [
+      {
+       "label": "pan-overview",
+       "frameIntervalMs": {
+        "samples": 53,
+        "p50": 116.70000000000073,
+        "p95": 266.60000000000036,
+        "max": 316.59999999999854
+       },
+       "renderDurationMs": {
+        "samples": 55,
+        "p50": 1.2000000001862645,
+        "p95": 5.5,
+        "max": 6.800000000046566
+       },
+       "drawCalls": 146,
+       "triangles": 242396,
+       "dpr": 0.5,
+       "buffer": [
+        195,
+        344
+       ],
+       "adaptiveResolution": 0.5
+      },
+      {
+       "label": "orbit-overview",
+       "frameIntervalMs": {
+        "samples": 52,
+        "p50": 100,
+        "p95": 300.10000000000036,
+        "max": 316.7000000000007
+       },
+       "renderDurationMs": {
+        "samples": 54,
+        "p50": 1.2000000001862645,
+        "p95": 4.599999999860302,
+        "max": 302.39999999990687
+       },
+       "drawCalls": 97,
+       "triangles": 196712,
+       "dpr": 0.4,
+       "buffer": [
+        156,
+        275
+       ],
+       "adaptiveResolution": 0.4
+      },
+      {
+       "label": "wheel-approach-building",
+       "frameIntervalMs": {
+        "samples": 91,
+        "p50": 16.700000000000728,
+        "p95": 33.400000000001455,
+        "max": 150.09999999999854
+       },
+       "renderDurationMs": {
+        "samples": 93,
+        "p50": 0.5,
+        "p95": 1.1000000000931323,
+        "max": 3
+       },
+       "drawCalls": 44,
+       "triangles": 54803,
+       "dpr": 0.4,
+       "buffer": [
+        156,
+        275
+       ],
+       "adaptiveResolution": 0.4
+      }
+     ],
+     "idleAfterInteraction": {
+      "dpr": 0.4,
+      "buffer": [
+       156,
+       275
+      ],
+      "adaptiveResolution": 0.4,
+      "tier": "light"
+     },
+     "selectionResponseMs": 17.800000000046566
+    }
+   }
+  }
+ ],
+ "captures": [
+  {
+   "layout": "desktop",
+   "name": "overview-top",
+   "requested": {
+    "name": "overview-top",
+    "position": [
+     96,
+     300,
+     78
+    ],
+    "target": [
+     96,
+     76
+    ]
+   },
+   "position": [
+    96,
+    300,
+    77.9999999999983
+   ],
+   "target": [
+    96,
+    76
+   ],
+   "drawCalls": 157,
+   "triangles": 248608,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 2,
+    "minTextPx": 8.0,
+    "maxTextPx": 11.3
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "overview-oblique-avenue",
+   "requested": {
+    "name": "overview-oblique-avenue",
+    "position": [
+     62,
+     120,
+     268
+    ],
+    "target": [
+     70,
+     84
+    ]
+   },
+   "position": [
+    61.999999999999986,
+    120,
+    268
+   ],
+   "target": [
+    69.99999999999999,
+    84
+   ],
+   "drawCalls": 155,
+   "triangles": 246534,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 1,
+    "minTextPx": 11.4,
+    "maxTextPx": 11.4
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "overview-oblique-park",
+   "requested": {
+    "name": "overview-oblique-park",
+    "position": [
+     118,
+     96,
+     -92
+    ],
+    "target": [
+     98,
+     66
+    ]
+   },
+   "position": [
+    118.00000000000004,
+    96.00000000000003,
+    -92.00000000000006
+   ],
+   "target": [
+    98,
+    66
+   ],
+   "drawCalls": 154,
+   "triangles": 248586,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 1,
+    "minTextPx": 11.5,
+    "maxTextPx": 11.5
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "avenue-roundabout",
+   "requested": {
+    "name": "avenue-roundabout",
+    "position": [
+     -78,
+     34,
+     150
+    ],
+    "target": [
+     -18,
+     100
+    ]
+   },
+   "position": [
+    -78,
+    33.99999999999999,
+    150
+   ],
+   "target": [
+    -17.999999999999996,
+    100
+   ],
+   "drawCalls": 155,
+   "triangles": 267440,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 1,
+    "minTextPx": 3.5,
+    "maxTextPx": 3.5
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "avenue-length",
+   "requested": {
+    "name": "avenue-length",
+    "position": [
+     -30,
+     16,
+     112
+    ],
+    "target": [
+     60,
+     97
+    ]
+   },
+   "position": [
+    -29.754833711184403,
+    17.357822078142686,
+    111.95913895186406
+   ],
+   "target": [
+    60,
+    97
+   ],
+   "drawCalls": 144,
+   "triangles": 192323,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "avenue-gate",
+   "requested": {
+    "name": "avenue-gate",
+    "position": [
+     166,
+     26,
+     128
+    ],
+    "target": [
+     141,
+     93
+    ]
+   },
+   "position": [
+    166,
+    26,
+    127.99999999999999
+   ],
+   "target": [
+    141,
+    92.99999999999999
+   ],
+   "drawCalls": 126,
+   "triangles": 240447,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 39,
+    "minTextPx": 3.4,
+    "maxTextPx": 11.9
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "gate-close",
+   "requested": {
+    "name": "gate-close",
+    "position": [
+     150,
+     7.5,
+     104
+    ],
+    "target": [
+     142,
+     92
+    ]
+   },
+   "position": [
+    150,
+    7.500000000000001,
+    104
+   ],
+   "target": [
+    142,
+    92
+   ],
+   "drawCalls": 94,
+   "triangles": 184567,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 23,
+    "minTextPx": 2.6,
+    "maxTextPx": 6.3
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "administrative-east",
+   "requested": {
+    "name": "administrative-east",
+    "position": [
+     158,
+     9,
+     74
+    ],
+    "target": [
+     139,
+     81
+    ]
+   },
+   "position": [
+    158,
+    8.999999999999998,
+    74
+   ],
+   "target": [
+    139,
+    81
+   ],
+   "drawCalls": 141,
+   "triangles": 272908,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 12,
+    "minTextPx": 3.2,
+    "maxTextPx": 17.6
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "administrative-mural",
+   "requested": {
+    "name": "administrative-mural",
+    "position": [
+     127,
+     8,
+     55
+    ],
+    "target": [
+     138,
+     76
+    ]
+   },
+   "position": [
+    127,
+    8.000000000000002,
+    54.999999999999986
+   ],
+   "target": [
+    138,
+    76
+   ],
+   "drawCalls": 73,
+   "triangles": 97639,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 3,
+    "minTextPx": 8.6,
+    "maxTextPx": 28.1
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "administrative-top",
+   "requested": {
+    "name": "administrative-top",
+    "position": [
+     139,
+     46,
+     86
+    ],
+    "target": [
+     139,
+     80
+    ]
+   },
+   "position": [
+    139,
+    46,
+    85.99999999999999
+   ],
+   "target": [
+    139,
+    80
+   ],
+   "drawCalls": 64,
+   "triangles": 78784,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 2,
+    "minTextPx": 11.0,
+    "maxTextPx": 12.1
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "event-centre-front",
+   "requested": {
+    "name": "event-centre-front",
+    "position": [
+     140,
+     13,
+     36
+    ],
+    "target": [
+     160,
+     36
+    ]
+   },
+   "position": [
+    140,
+    13,
+    36
+   ],
+   "target": [
+    160,
+    36
+   ],
+   "drawCalls": 35,
+   "triangles": 44603,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "event-centre-oblique",
+   "requested": {
+    "name": "event-centre-oblique",
+    "position": [
+     132,
+     30,
+     8
+    ],
+    "target": [
+     160,
+     36
+    ]
+   },
+   "position": [
+    132,
+    30,
+    8.000000000000007
+   ],
+   "target": [
+    160,
+    36
+   ],
+   "drawCalls": 56,
+   "triangles": 77815,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 12,
+    "minTextPx": 8.2,
+    "maxTextPx": 19.0
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "event-centre-top",
+   "requested": {
+    "name": "event-centre-top",
+    "position": [
+     161,
+     62,
+     40
+    ],
+    "target": [
+     161,
+     36
+    ]
+   },
+   "position": [
+    161,
+    62,
+    39.99999999999998
+   ],
+   "target": [
+    161,
+    36
+   ],
+   "drawCalls": 47,
+   "triangles": 84761,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 18,
+    "minTextPx": 11.4,
+    "maxTextPx": 14.1
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "lots-oblique",
+   "requested": {
+    "name": "lots-oblique",
+    "position": [
+     96,
+     44,
+     96
+    ],
+    "target": [
+     96,
+     46
+    ]
+   },
+   "position": [
+    96.00000000000001,
+    44,
+    95.99999999999999
+   ],
+   "target": [
+    96.00000000000001,
+    46
+   ],
+   "drawCalls": 78,
+   "triangles": 115689,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 56,
+    "minTextPx": 8.6,
+    "maxTextPx": 16.7
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "lots-close",
+   "requested": {
+    "name": "lots-close",
+    "position": [
+     90,
+     16,
+     66
+    ],
+    "target": [
+     90,
+     52
+    ]
+   },
+   "position": [
+    90,
+    16,
+    66
+   ],
+   "target": [
+    90,
+    52
+   ],
+   "drawCalls": 47,
+   "triangles": 85262,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 16,
+    "minTextPx": 7.7,
+    "maxTextPx": 19.0
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "lots-grazing",
+   "requested": {
+    "name": "lots-grazing",
+    "position": [
+     70,
+     5.5,
+     74
+    ],
+    "target": [
+     92,
+     52
+    ]
+   },
+   "position": [
+    66.98776957778824,
+    6.74769109875039,
+    77.01223042221176
+   ],
+   "target": [
+    92,
+    52
+   ],
+   "drawCalls": 62,
+   "triangles": 84554,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 20,
+    "minTextPx": 5.2,
+    "maxTextPx": 24.5
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "residential-oblique",
+   "requested": {
+    "name": "residential-oblique",
+    "position": [
+     52,
+     58,
+     196
+    ],
+    "target": [
+     58,
+     124
+    ]
+   },
+   "position": [
+    52,
+    58,
+    196
+   ],
+   "target": [
+    58,
+    124
+   ],
+   "drawCalls": 147,
+   "triangles": 263493,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 23,
+    "minTextPx": 4.3,
+    "maxTextPx": 9.5
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "residential-wedge",
+   "requested": {
+    "name": "residential-wedge",
+    "position": [
+     -58,
+     44,
+     168
+    ],
+    "target": [
+     -20,
+     116
+    ]
+   },
+   "position": [
+    -58.00000000000003,
+    44,
+    168
+   ],
+   "target": [
+    -20,
+    116
+   ],
+   "drawCalls": 129,
+   "triangles": 254407,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "internal-streets",
+   "requested": {
+    "name": "internal-streets",
+    "position": [
+     120,
+     20,
+     22
+    ],
+    "target": [
+     100,
+     46
+    ]
+   },
+   "position": [
+    120,
+    20.000000000000007,
+    21.99999999999999
+   ],
+   "target": [
+    100,
+    46
+   ],
+   "drawCalls": 125,
+   "triangles": 287877,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 28,
+    "minTextPx": 7.0,
+    "maxTextPx": 18.3
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "livestock-pavilions",
+   "requested": {
+    "name": "livestock-pavilions",
+    "position": [
+     52,
+     44,
+     34
+    ],
+    "target": [
+     52,
+     -30
+    ]
+   },
+   "position": [
+    52.00000000000001,
+    44,
+    34
+   ],
+   "target": [
+    52.00000000000001,
+    -30.000000000000004
+   ],
+   "drawCalls": 33,
+   "triangles": 40399,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "stage",
+   "requested": {
+    "name": "stage",
+    "position": [
+     136,
+     12,
+     46
+    ],
+    "target": [
+     157,
+     54
+    ]
+   },
+   "position": [
+    136,
+    12.000000000000002,
+    46
+   ],
+   "target": [
+    157,
+    54
+   ],
+   "drawCalls": 38,
+   "triangles": 48748,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 2,
+    "minTextPx": 9.1,
+    "maxTextPx": 19.8
+   }
+  },
+  {
+   "layout": "desktop",
+   "name": "arena",
+   "requested": {
+    "name": "arena",
+    "position": [
+     178,
+     44,
+     62
+    ],
+    "target": [
+     228,
+     5
+    ]
+   },
+   "position": [
+    178,
+    44,
+    62.00000000000001
+   ],
+   "target": [
+    228,
+    5
+   ],
+   "drawCalls": 27,
+   "triangles": 29996,
+   "dpr": 1,
+   "buffer": [
+    1294,
+    655
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "overview-top",
+   "requested": {
+    "name": "overview-top",
+    "position": [
+     96,
+     300,
+     78
+    ],
+    "target": [
+     96,
+     76
+    ]
+   },
+   "position": [
+    96,
+    300,
+    77.9999999999983
+   ],
+   "target": [
+    96,
+    76
+   ],
+   "drawCalls": 113,
+   "triangles": 110405,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 4,
+    "minTextPx": 7.9,
+    "maxTextPx": 11.3
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "overview-oblique-avenue",
+   "requested": {
+    "name": "overview-oblique-avenue",
+    "position": [
+     62,
+     120,
+     268
+    ],
+    "target": [
+     70,
+     84
+    ]
+   },
+   "position": [
+    61.999999999999986,
+    120,
+    268
+   ],
+   "target": [
+    69.99999999999999,
+    84
+   ],
+   "drawCalls": 110,
+   "triangles": 139552,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "overview-oblique-park",
+   "requested": {
+    "name": "overview-oblique-park",
+    "position": [
+     118,
+     96,
+     -92
+    ],
+    "target": [
+     98,
+     66
+    ]
+   },
+   "position": [
+    118.00000000000004,
+    96.00000000000003,
+    -92.00000000000006
+   ],
+   "target": [
+    98,
+    66
+   ],
+   "drawCalls": 86,
+   "triangles": 93057,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 1,
+    "minTextPx": 9.9,
+    "maxTextPx": 9.9
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "avenue-roundabout",
+   "requested": {
+    "name": "avenue-roundabout",
+    "position": [
+     -78,
+     34,
+     150
+    ],
+    "target": [
+     -18,
+     100
+    ]
+   },
+   "position": [
+    -78,
+    33.99999999999999,
+    150
+   ],
+   "target": [
+    -17.999999999999996,
+    100
+   ],
+   "drawCalls": 103,
+   "triangles": 220757,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "avenue-length",
+   "requested": {
+    "name": "avenue-length",
+    "position": [
+     -30,
+     16,
+     112
+    ],
+    "target": [
+     60,
+     97
+    ]
+   },
+   "position": [
+    -29.754833711184403,
+    17.357822078142686,
+    111.95913895186406
+   ],
+   "target": [
+    60,
+    97
+   ],
+   "drawCalls": 106,
+   "triangles": 109066,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "avenue-gate",
+   "requested": {
+    "name": "avenue-gate",
+    "position": [
+     166,
+     26,
+     128
+    ],
+    "target": [
+     141,
+     93
+    ]
+   },
+   "position": [
+    166,
+    26,
+    127.99999999999999
+   ],
+   "target": [
+    141,
+    92.99999999999999
+   ],
+   "drawCalls": 71,
+   "triangles": 93349,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 26,
+    "minTextPx": 3.1,
+    "maxTextPx": 8.9
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "gate-close",
+   "requested": {
+    "name": "gate-close",
+    "position": [
+     150,
+     7.5,
+     104
+    ],
+    "target": [
+     142,
+     92
+    ]
+   },
+   "position": [
+    150,
+    7.500000000000001,
+    104
+   ],
+   "target": [
+    142,
+    92
+   ],
+   "drawCalls": 56,
+   "triangles": 68535,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 9,
+    "minTextPx": 2.8,
+    "maxTextPx": 4.0
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "administrative-east",
+   "requested": {
+    "name": "administrative-east",
+    "position": [
+     158,
+     9,
+     74
+    ],
+    "target": [
+     139,
+     81
+    ]
+   },
+   "position": [
+    158,
+    8.999999999999998,
+    74
+   ],
+   "target": [
+    139,
+    81
+   ],
+   "drawCalls": 88,
+   "triangles": 105728,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "administrative-mural",
+   "requested": {
+    "name": "administrative-mural",
+    "position": [
+     127,
+     8,
+     55
+    ],
+    "target": [
+     138,
+     76
+    ]
+   },
+   "position": [
+    127,
+    8.000000000000002,
+    54.999999999999986
+   ],
+   "target": [
+    138,
+    76
+   ],
+   "drawCalls": 57,
+   "triangles": 77624,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "administrative-top",
+   "requested": {
+    "name": "administrative-top",
+    "position": [
+     139,
+     46,
+     86
+    ],
+    "target": [
+     139,
+     80
+    ]
+   },
+   "position": [
+    139,
+    46,
+    85.99999999999999
+   ],
+   "target": [
+    139,
+    80
+   ],
+   "drawCalls": 50,
+   "triangles": 60180,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 1,
+    "minTextPx": 11.0,
+    "maxTextPx": 11.0
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "event-centre-front",
+   "requested": {
+    "name": "event-centre-front",
+    "position": [
+     140,
+     13,
+     36
+    ],
+    "target": [
+     160,
+     36
+    ]
+   },
+   "position": [
+    140,
+    13,
+    36
+   ],
+   "target": [
+    160,
+    36
+   ],
+   "drawCalls": 37,
+   "triangles": 53773,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "event-centre-oblique",
+   "requested": {
+    "name": "event-centre-oblique",
+    "position": [
+     132,
+     30,
+     8
+    ],
+    "target": [
+     160,
+     36
+    ]
+   },
+   "position": [
+    132,
+    30,
+    8.000000000000007
+   ],
+   "target": [
+    160,
+    36
+   ],
+   "drawCalls": 35,
+   "triangles": 47031,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 1,
+    "minTextPx": 15.2,
+    "maxTextPx": 15.2
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "event-centre-top",
+   "requested": {
+    "name": "event-centre-top",
+    "position": [
+     161,
+     62,
+     40
+    ],
+    "target": [
+     161,
+     36
+    ]
+   },
+   "position": [
+    161,
+    62,
+    39.99999999999998
+   ],
+   "target": [
+    161,
+    36
+   ],
+   "drawCalls": 34,
+   "triangles": 44751,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "lots-oblique",
+   "requested": {
+    "name": "lots-oblique",
+    "position": [
+     96,
+     44,
+     96
+    ],
+    "target": [
+     96,
+     46
+    ]
+   },
+   "position": [
+    96.00000000000001,
+    44,
+    95.99999999999999
+   ],
+   "target": [
+    96.00000000000001,
+    46
+   ],
+   "drawCalls": 56,
+   "triangles": 79681,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 24,
+    "minTextPx": 8.6,
+    "maxTextPx": 13.6
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "lots-close",
+   "requested": {
+    "name": "lots-close",
+    "position": [
+     90,
+     16,
+     66
+    ],
+    "target": [
+     90,
+     52
+    ]
+   },
+   "position": [
+    90,
+    16,
+    66
+   ],
+   "target": [
+    90,
+    52
+   ],
+   "drawCalls": 44,
+   "triangles": 75386,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 4,
+    "minTextPx": 7.7,
+    "maxTextPx": 15.8
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "lots-grazing",
+   "requested": {
+    "name": "lots-grazing",
+    "position": [
+     70,
+     5.5,
+     74
+    ],
+    "target": [
+     92,
+     52
+    ]
+   },
+   "position": [
+    66.98776957778824,
+    6.74769109875039,
+    77.01223042221176
+   ],
+   "target": [
+    92,
+    52
+   ],
+   "drawCalls": 52,
+   "triangles": 79610,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 8,
+    "minTextPx": 6.5,
+    "maxTextPx": 18.9
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "residential-oblique",
+   "requested": {
+    "name": "residential-oblique",
+    "position": [
+     52,
+     58,
+     196
+    ],
+    "target": [
+     58,
+     124
+    ]
+   },
+   "position": [
+    52,
+    58,
+    196
+   ],
+   "target": [
+    58,
+    124
+   ],
+   "drawCalls": 85,
+   "triangles": 109737,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 15,
+    "minTextPx": 4.0,
+    "maxTextPx": 5.6
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "residential-wedge",
+   "requested": {
+    "name": "residential-wedge",
+    "position": [
+     -58,
+     44,
+     168
+    ],
+    "target": [
+     -20,
+     116
+    ]
+   },
+   "position": [
+    -58.00000000000003,
+    44,
+    168
+   ],
+   "target": [
+    -20,
+    116
+   ],
+   "drawCalls": 93,
+   "triangles": 219195,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "internal-streets",
+   "requested": {
+    "name": "internal-streets",
+    "position": [
+     120,
+     20,
+     22
+    ],
+    "target": [
+     100,
+     46
+    ]
+   },
+   "position": [
+    120,
+    20.000000000000007,
+    21.99999999999999
+   ],
+   "target": [
+    100,
+    46
+   ],
+   "drawCalls": 68,
+   "triangles": 102968,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 12,
+    "minTextPx": 7.0,
+    "maxTextPx": 14.7
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "livestock-pavilions",
+   "requested": {
+    "name": "livestock-pavilions",
+    "position": [
+     52,
+     44,
+     34
+    ],
+    "target": [
+     52,
+     -30
+    ]
+   },
+   "position": [
+    52.00000000000001,
+    44,
+    34
+   ],
+   "target": [
+    52.00000000000001,
+    -30.000000000000004
+   ],
+   "drawCalls": 32,
+   "triangles": 39961,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "stage",
+   "requested": {
+    "name": "stage",
+    "position": [
+     136,
+     12,
+     46
+    ],
+    "target": [
+     157,
+     54
+    ]
+   },
+   "position": [
+    136,
+    12.000000000000002,
+    46
+   ],
+   "target": [
+    157,
+    54
+   ],
+   "drawCalls": 35,
+   "triangles": 63192,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  },
+  {
+   "layout": "mobile",
+   "name": "arena",
+   "requested": {
+    "name": "arena",
+    "position": [
+     178,
+     44,
+     62
+    ],
+    "target": [
+     228,
+     5
+    ]
+   },
+   "position": [
+    178,
+    44,
+    62.00000000000001
+   ],
+   "target": [
+    228,
+    5
+   ],
+   "drawCalls": 27,
+   "triangles": 29996,
+   "dpr": 1,
+   "buffer": [
+    390,
+    689
+   ],
+   "tier": "detailed",
+   "lotNumbers": {
+    "visible": 0,
+    "minTextPx": null,
+    "maxTextPx": null
+   }
+  }
+ ],
+ "errors": [],
+ "consoleErrors": [
+  "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+  "Failed to load resource: the server responded with a status of 404 ()"
+ ],
+ "unexpectedRequests": []
+}

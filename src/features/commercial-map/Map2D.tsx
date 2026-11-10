@@ -154,6 +154,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     id: number;
     start: Point;
     entity?: string;
+    landmark?: string;
     moved: boolean;
     touch: boolean;
   } | null>(null);
@@ -522,6 +523,10 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           entity:
             (e.target as Element).closest("[data-entity]")?.getAttribute("data-entity") ??
             undefined,
+          // Read at press time: pointer capture retargets the release.
+          landmark:
+            (e.target as Element).closest("[data-landmark]")?.getAttribute("data-landmark") ??
+            undefined,
           moved: false,
           touch: e.pointerType === "touch",
         };
@@ -569,8 +574,14 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           !c.moved &&
           isClick({ x: c.start[0], y: c.start[1], touch: c.touch }, e.clientX, e.clientY)
         ) {
-          if (c.entity) props.onSelect(c.entity);
-          else if (props.selectedId) props.onDeselect?.();
+          if (c.entity) {
+            props.onLandmark?.(null);
+            props.onSelect(c.entity);
+          } else {
+            const landmark = c.landmark ?? null;
+            props.onLandmark?.(landmark);
+            if (!landmark && props.selectedId) props.onDeselect?.();
+          }
         }
         pointers.current.delete(e.pointerId);
         if (!pointers.current.size) {
@@ -621,6 +632,8 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
         {PERMANENT_PARK_LANDMARKS.filter((l) => !l.existingOwner).map((l) => (
           <polygon
             key={l.id}
+            data-landmark={l.id}
+            pointerEvents="all"
             points={l.polygon.map((p) => p.join(",")).join(" ")}
             fill={VISUAL_THEME.roof}
             stroke="#68736b"

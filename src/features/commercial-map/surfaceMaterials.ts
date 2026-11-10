@@ -25,7 +25,9 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   // Pavement/aprons read as grey concrete under the fixed daylight, while
   // white paint and pale pavilion facades retain their separate identities.
   concrete: "#a2a6a0",
-  asphalt: VISUAL_THEME.road,
+  // Aged municipal asphalt is a neutral mid grey in the orthophoto; the
+  // blue-slate 2D road colour reads as wet navy under the fixed daylight.
+  asphalt: "#8e9091",
   whitePaint: "#f3f1e6",
   paintedSheet: VISUAL_THEME.roof,
   exposedMetal: VISUAL_THEME.metal,
@@ -34,9 +36,10 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   masonryBrick: "#a9604c",
   paintedMasonry: "#e6e5db",
   architecturalFrame: "#40504a",
-  // The commercial floor stays lighter than surrounding landscape so thin
-  // parcel borders and status bands keep their contrast in overview.
-  grass: "#83ad70",
+  // One grass for lots, verges and planted ground, matched to the open
+  // terrain around the park so no polygon reads as a rectangular green patch.
+  // Parcel borders and status bands carry the commercial contrast instead.
+  grass: "#97b787",
 };
 
 export interface SurfaceMaterials {

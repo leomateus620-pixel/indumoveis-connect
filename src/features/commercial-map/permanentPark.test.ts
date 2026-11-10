@@ -52,11 +52,13 @@ describe("one registered physical park with protected commercial cadastre", () =
         notes,
       }),
     );
+    // Digest of the 57 saleable lots. It equals the digest of the previous
+    // 59-lot cadastre with only 69 and 70 removed: no surviving lot changed.
     expect(createHash("sha256").update(JSON.stringify(snapshot)).digest("hex")).toBe(
-      "01b9fc09a1a915761dbb9334e90c83e58b4dd9bab2436552cf10fff307ad563b",
+      "fdf9346217e0233f05c2f5ed4f8b0c1b283b5563b909f62162c3999429966b20",
     );
-    expect(lots).toHaveLength(59);
-    expect(lots.flatMap((e) => e.numbers ?? [])).toHaveLength(70);
+    expect(lots).toHaveLength(57);
+    expect(lots.flatMap((e) => e.numbers ?? [])).toHaveLength(68);
     for (const lot of lots) expect(PARK_CORE_ENTITIES.find((e) => e.id === lot.id)).toBe(lot);
     for (const block of PARK_PHYSICAL_BLOCKS.filter(
       (b) => b.coverage === "whole-commercial-envelope",

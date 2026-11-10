@@ -7,6 +7,18 @@ import { buildPhotoP3Facade } from "./photoP3Facade";
 import { buildPhotoHallFacade } from "./photoHallFacades";
 import { buildPhotoFrameFacade } from "./photoFrameFacades";
 import {
+  ADMINISTRATIVE_ANNEX_IDS,
+  ADMINISTRATIVE_ARTWORK,
+  ADMINISTRATIVE_CENTRE_ID,
+  CIVIC_PROPORTIONS,
+  EVENT_CENTRE_ID,
+  buildAdministrativeCentre,
+  buildEventCentreRoof,
+  paintAdministrativeArtwork,
+  type CivicVertex,
+} from "./civicArchitecture";
+import { appendCivicPlanting, type UrbanLandscapeBucket } from "./urbanLandscape";
+import {
   createSurfaceMaterials,
   type SurfaceMaterials,
   type SurfaceFamily,
@@ -22,7 +34,8 @@ export type RoofProfile =
   | "p8-gable"
   | "p13-gable"
   | "triple-gable"
-  | "event-center-gable"
+  | "event-center-hip-lantern"
+  | "administrative-gable"
   | "support-gable"
   | "support-shed";
 
@@ -35,13 +48,13 @@ const PAVILION_PROFILES: Record<string, RoofProfile> = {
   "indumoveis:pavilion:3": "triple-gable",
 };
 const SUPPORT_PROFILES: Record<string, RoofProfile> = {
-  "indumoveis:support:b7": "support-gable",
+  "indumoveis:support:b7": "administrative-gable",
   "indumoveis:support:b7-annex-a": "support-shed",
   "indumoveis:support:b7-annex-b": "support-shed",
   "indumoveis:support:cafe": "support-gable",
   "indumoveis:support:bar": "support-gable",
   "indumoveis:support:restaurant": "support-gable",
-  "indumoveis:support:events": "event-center-gable",
+  "indumoveis:support:events": "event-center-hip-lantern",
 };
 const FOOD_HALL_IDS = new Set([
   "indumoveis:support:cafe",
@@ -147,15 +160,19 @@ export function getArchitectureDefinition(entity: MapEntity): ArchitectureDefini
   // moderate gables. All pitches remain estimates in drawing units.
   const roofRise =
     (FOOD_HALL_IDS.has(entity.id) ? frame.width : span) *
-    (entity.id === "indumoveis:pavilion:1"
-      ? 0.018
-      : entity.id === "indumoveis:pavilion:14"
-        ? 0.045
-        : entity.id === "indumoveis:pavilion:3"
-          ? 0.035
-          : entity.kind === "pavilion"
-            ? 0.11
-            : 0.085);
+    (entity.id === ADMINISTRATIVE_CENTRE_ID
+      ? CIVIC_PROPORTIONS.administrativeRise
+      : entity.id === EVENT_CENTRE_ID
+        ? CIVIC_PROPORTIONS.eventRise
+        : entity.id === "indumoveis:pavilion:1"
+          ? 0.018
+          : entity.id === "indumoveis:pavilion:14"
+            ? 0.045
+            : entity.id === "indumoveis:pavilion:3"
+              ? 0.035
+              : entity.kind === "pavilion"
+                ? 0.11
+                : 0.085);
   const roofThickness = span * 0.013;
   return {
     profile,
@@ -458,6 +475,7 @@ export function buildArchitecture(
   const ownedTextures = new Set<THREE.Texture>();
   const ownedMaterials = new Set<THREE.Material>();
   let signBytes = 0;
+  const civicGarden: UrbanLandscapeBucket = { position: [], color: [], uv: [] };
   const fineBuckets = new Map<SurfaceFamily, Bucket>();
   const photoBuckets = new Map<SurfaceFamily, Bucket>();
   const photoBounds = new Map<string, { min: number[]; max: number[] }>();
@@ -504,6 +522,9 @@ export function buildArchitecture(
     const panelOuter = insetPolygon(polygon, definition.wallThickness * 0.12);
     const structuralInner = insetPolygon(polygon, definition.wallThickness * 1.8);
     const photographed = entity.kind === "pavilion";
+    const administrative = entity.id === ADMINISTRATIVE_CENTRE_ID,
+      eventCentre = entity.id === EVENT_CENTRE_ID,
+      brickAnnex = ADMINISTRATIVE_ANNEX_IDS.has(entity.id);
     const foundationTop = photographed ? 0.06 : definition.eaveHeight * 0.095;
     const openingTop = definition.eaveHeight * 0.72;
     // The roof fascia occupies this last thickness band. Walls end exactly at
@@ -568,7 +589,8 @@ export function buildArchitecture(
       }
       return { ...nearest, main };
     });
-    for (let i = 0; i < polygon.length; i++) {
+    // The Centro Administrativo owns its complete photographed envelope.
+    for (let i = 0; i < (administrative ? 0 : polygon.length); i++) {
       const a = polygon[i],
         b = polygon[(i + 1) % polygon.length];
       const ia = inner[i],
@@ -640,7 +662,8 @@ export function buildArchitecture(
           // protected footprint. Other faces remain conservative estimates.
           const frontRibbon =
             ["indumoveis:pavilion:8", "indumoveis:pavilion:13"].includes(entity.id) && front;
-          const eventFront = entity.id === "indumoveis:support:events" && i === 3;
+          // Rua Brasília front: the edge lying on the frame's x minimum.
+          const eventFront = eventCentre && Math.max(a[0], b[0]) < frame.width * 0.05;
           const foodFront = FOOD_HALL_IDS.has(entity.id) && i === 1;
           const p12Front = entity.id === "indumoveis:pavilion:12" && front;
           const p3Front = entity.id === "indumoveis:pavilion:3" && front;
@@ -650,7 +673,7 @@ export function buildArchitecture(
           const p1Side =
             entity.id === "indumoveis:pavilion:1" &&
             Math.abs(worldB[1] - worldA[1]) < Math.abs(worldB[0] - worldA[0]) * 0.1;
-          const panel = p12Front ? localBrick : localWalls;
+          const panel = p12Front || brickAnnex ? localBrick : localWalls;
           const shade = bay % 2 ? "#f0f3f2" : "#ffffff";
           if (frontRibbon || eventFront || foodFront || p12Front || p3Front || p14Front || p1Side) {
             const sill =
@@ -824,7 +847,7 @@ export function buildArchitecture(
         }
       }
     }
-    for (let index = 0; index < segments.length; index++) {
+    for (let index = 0; index < (administrative || eventCentre ? 0 : segments.length); index++) {
       const segment = segments[index];
       const clipped = clipArchitecturePolygon(
         clipArchitecturePolygon(polygon, axis, min + segment.start * extent, true),
@@ -950,29 +973,98 @@ export function buildArchitecture(
         }
       }
     }
-    if (entity.id === "indumoveis:support:events") {
-      // Interpreted transverse entrance gable, clipped to the authorised
-      // existing support area. Its axis crosses the main hall; no origin
-      // coordinates, brands, new accesses or commercial records are imported.
-      const x0 = frame.width * 0.012,
-        x1 = frame.width * 0.34;
-      const z0 = frame.depth * 0.385,
-        z1 = frame.depth * 0.615,
-        zm = frame.depth * 0.5;
-      const eave = definition.eaveHeight + definition.roofRise * 0.08;
-      const ridge = definition.eaveHeight + definition.roofRise * 0.92;
-      const a: Vertex = [x0, eave, z0],
-        b: Vertex = [x1, eave, z0];
-      const c: Vertex = [x1, ridge, zm],
-        d: Vertex = [x0, ridge, zm];
-      const e: Vertex = [x1, eave, z1],
-        f: Vertex = [x0, eave, z1];
-      for (const target of [roof, picking]) {
-        quad(target, a, b, c, d, "#ffffff", [0, 1, 0]);
-        quad(target, d, c, e, f, "#ffffff", [0, 1, 0]);
+    const civicKit = {
+      buckets: {
+        floor: localFloor,
+        walls: localWalls,
+        brick: localBrick,
+        frames: localFrames,
+        structure: localStructure,
+        glass: localGlass,
+        metal: localMetal,
+        accent: localAccent,
+        roof,
+        roofWalls,
+        roofGlass,
+        picking,
+      },
+      quad,
+      triangle,
+      width: frame.width,
+      depth: frame.depth,
+      eave: definition.eaveHeight,
+      rise: definition.roofRise,
+    };
+    let civicExtent: { min: number[]; max: number[] } | null = null;
+    if (eventCentre) buildEventCentreRoof(civicKit);
+    if (administrative) {
+      const civic = buildAdministrativeCentre(civicKit);
+      const toWorld = ([x, y, z]: CivicVertex): CivicVertex => {
+        const [wx, wz] = worldPoint([x, z], frame);
+        return [wx, y, wz];
+      };
+      const { minX, maxX, minZ, maxZ, maxY } = civic.extent;
+      const reach = [
+        [minX, minZ],
+        [maxX, minZ],
+        [maxX, maxZ],
+        [minX, maxZ],
+      ].map((p) => worldPoint(p as Point, frame));
+      civicExtent = {
+        min: [Math.min(...reach.map((p) => p[0])), 0, Math.min(...reach.map((p) => p[1]))],
+        max: [Math.max(...reach.map((p) => p[0])), maxY, Math.max(...reach.map((p) => p[1]))],
+      };
+      appendCivicPlanting(
+        civicGarden,
+        civic.planting.map((item) => ({ ...item, point: worldPoint(item.point, frame) })),
+        -0.08,
+      );
+      if (typeof CanvasRenderingContext2D !== "undefined") {
+        const canvas = document.createElement("canvas");
+        canvas.width = ADMINISTRATIVE_ARTWORK.width;
+        canvas.height = ADMINISTRATIVE_ARTWORK.height;
+        const context = canvas.getContext("2d");
+        if (context) {
+          paintAdministrativeArtwork(context);
+          const texture = new THREE.CanvasTexture(canvas);
+          texture.colorSpace = THREE.SRGBColorSpace;
+          texture.name = "administrative-centre-mural-and-sign";
+          texture.anisotropy = 4;
+          ownedTextures.add(texture);
+          signBytes += Math.ceil((canvas.width * canvas.height * 4 * 4) / 3);
+          const material = new THREE.MeshStandardMaterial({
+            map: texture,
+            roughness: 0.9,
+            metalness: 0,
+          });
+          ownedMaterials.add(material);
+          const positions: number[] = [],
+            uvs: number[] = [];
+          for (const decal of civic.decals) {
+            const [u0, v0, u1, v1] = decal.uv;
+            const corner = [
+              [u0, v0],
+              [u1, v0],
+              [u1, v1],
+              [u0, v1],
+            ];
+            for (const i of [0, 1, 2, 0, 2, 3]) {
+              positions.push(...toWorld(decal.corners[i]));
+              uvs.push(...corner[i]);
+            }
+          }
+          const geometry = new THREE.BufferGeometry();
+          geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+          geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+          geometry.computeVertexNormals();
+          geometries.add(geometry);
+          const artwork = new THREE.Mesh(geometry, material);
+          artwork.name = "administrative-centre-mural-and-sign";
+          artwork.raycast = () => {};
+          artwork.receiveShadow = true;
+          group.add(artwork);
+        }
       }
-      triangle(roofGlass, a, d, f, "#ffffff", [-1, 0, 0]);
-      triangle(picking, a, d, f, "#ffffff", [-1, 0, 0]);
     }
     if (entity.id === "indumoveis:pavilion:1" && presentation) {
       const [a, b] = presentation.frontEdge.map((p): Point => [
@@ -1086,7 +1178,7 @@ export function buildArchitecture(
         }
       }
     }
-    const extra = photoBounds.get(entity.id);
+    const extra = photoBounds.get(entity.id) ?? civicExtent;
     visualBounds.set(entity.id, {
       minX: Math.min(...entity.polygon.map((p) => p[0]), extra?.min[0] ?? Infinity),
       maxX: Math.max(...entity.polygon.map((p) => p[0]), extra?.max[0] ?? -Infinity),
@@ -1116,6 +1208,46 @@ export function buildArchitecture(
       layer.name = `photo-${family}`;
       group.add(layer);
     }
+  }
+  if (civicGarden.position.length) {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(civicGarden.position, 3));
+    geometry.setAttribute("color", new THREE.Float32BufferAttribute(civicGarden.color, 3));
+    geometry.computeVertexNormals();
+    // Round crown lobes: average the facet normals of coincident vertices.
+    const p = geometry.getAttribute("position"),
+      n = geometry.getAttribute("normal");
+    const sums = new Map<string, THREE.Vector3>();
+    const keyAt = (i: number) =>
+      `${Math.round(p.getX(i) * 1e4)}:${Math.round(p.getY(i) * 1e4)}:${Math.round(p.getZ(i) * 1e4)}`;
+    for (let i = 0; i < p.count; i++) {
+      const key = keyAt(i),
+        sum = sums.get(key) ?? new THREE.Vector3();
+      sum.x += n.getX(i);
+      sum.y += n.getY(i);
+      sum.z += n.getZ(i);
+      sums.set(key, sum);
+    }
+    for (const sum of sums.values()) sum.normalize();
+    for (let i = 0; i < p.count; i++) {
+      const sum = sums.get(keyAt(i))!;
+      n.setXYZ(i, sum.x, sum.y, sum.z);
+    }
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    geometries.add(geometry);
+    const material = new THREE.MeshLambertMaterial({
+      name: "civic-garden-foliage",
+      vertexColors: true,
+      side: THREE.DoubleSide,
+    });
+    ownedMaterials.add(material);
+    const garden = new THREE.Mesh(geometry, material);
+    garden.name = "administrative-centre-garden";
+    garden.raycast = () => {};
+    garden.castShadow = true;
+    garden.receiveShadow = false;
+    group.add(garden);
   }
   for (const [family, data] of fineBuckets) {
     const layer = mesh(data, family);

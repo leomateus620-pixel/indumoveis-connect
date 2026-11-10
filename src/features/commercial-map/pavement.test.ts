@@ -84,8 +84,10 @@ describe("derived park pavement", () => {
       expect(classes[`indumoveis:road:${id}`]).toBe("park-internal");
     for (const id of ["arvoredo", "east-walk-upper", "east-walk-lower"])
       expect(classes[`indumoveis:road:${id}`]).toBe("park-pedestrian");
-    for (const id of ["benvenuto", "imigrantes"])
-      expect(classes[`indumoveis:road:${id}`]).toBe("public-external");
+    // The avenue ends at the main gate. Its continuation inside the fence,
+    // Avenida dos Imigrantes, is park circulation and not a public highway.
+    expect(classes["indumoveis:road:benvenuto"]).toBe("public-external");
+    expect(classes["indumoveis:road:imigrantes"]).toBe("park-internal");
     expect(classifyRoad({ id: "park-context:road:bruno-schwartz" })).toBe("park-internal");
     expect(classifyRoad({ id: "indumoveis:context:walk:gate-2-woodland-connector:0" })).toBe(
       "park-pedestrian",

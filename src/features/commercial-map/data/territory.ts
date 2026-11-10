@@ -247,26 +247,31 @@ for (let i = 0; i < 3; i++)
       227,
     ),
   );
-lots.push(
-  lot(
-    [69],
-    [1383.4439, 678.7583, 1477.5605, 744.147],
-    "Faixa dos pavilhões · ao lado da estrutura B7",
-  ),
-);
-const lot70: MapEntity = lot(
-  [70],
-  [1528.9597, 669.8046, 1679.597, 874.3336],
-  "Setor leste · Rua Brasília / Av. dos Imigrantes",
-);
-lot70.polygon = sourcePolygon([
-  [1528.9597, 669.8046],
-  [1679.597, 671.1031],
-  [1672.4548, 874.3336],
-  [1531.8811, 870.1128],
-]);
-lot70.anchor = center(lot70.polygon);
-lots.push(lot70);
+/** External lots 69 and 70 left the commercial presentation in the 2026-11
+ * territorial review: the registered orthophoto shows the Centro
+ * Administrativo garden and the east green sector there, not saleable ground.
+ * Their source outlines survive only as physical context envelopes below; the
+ * numbers are no longer lots, labels, search results or selectable geometry.
+ * Pavilion interiors keep their own, unrelated lot numbering. */
+export const RETIRED_EXTERNAL_LOTS = [
+  {
+    number: 69,
+    formerId: "indumoveis:external:lot:69",
+    contextId: "indumoveis:landscape:administrative-garden",
+    polygon: rect(1383.4439, 678.7583, 1477.5605, 744.147),
+  },
+  {
+    number: 70,
+    formerId: "indumoveis:external:lot:70",
+    contextId: "indumoveis:landscape:east-garden",
+    polygon: sourcePolygon([
+      [1528.9597, 669.8046],
+      [1679.597, 671.1031],
+      [1672.4548, 874.3336],
+      [1531.8811, 870.1128],
+    ]),
+  },
+] as const;
 
 function entity(
   id: string,
@@ -462,14 +467,19 @@ const roads: MapEntity[] = [
     "road",
     "Av. Benvenuto de Conti",
     rect(263.6, 933, 1439, 958),
-    "Borda inferior · orientação da planta",
+    "Via pública · da rotatória ao Portão 03",
+    { notes: "Avenida externa; termina no Portão 03, limite de acesso ao parque." },
   ),
   entity(
     "road:imigrantes",
     "road",
     "Avenida dos Imigrantes",
     rect(1439, 941, 1841.3, 979),
-    "Contexto inferior direito",
+    "Circulação interna · após o Portão 03",
+    {
+      notes:
+        "Via interna do parque que começa no Portão 03. Não é continuação pública da Av. Benvenuto de Conti, que termina no portão.",
+    },
   ),
   entity(
     "road:arvoredo",
@@ -497,8 +507,8 @@ const roads: MapEntity[] = [
       [1725.3326, 671.4586],
       [1679.161, 671.0135],
     ]),
-    "Ao lado do lote 70",
-    { notes: "Circulação; não cortar nem estender a geometria comercial do lote 70." },
+    "Setor leste · ao lado da área verde",
+    { notes: "Circulação junto à área verde do setor leste; sem numeração comercial." },
   ),
 ];
 
@@ -530,10 +540,14 @@ const supports: MapEntity[] = [
   entity(
     "support:events",
     "support",
-    "Espaço de eventos",
+    "Centro de Eventos",
     rect(1529.9915, 260.7521, 1690.0435, 446.0663),
     "Leste · Rua Brasília",
-    { height: 2.4 },
+    {
+      height: 2.6,
+      notes:
+        "Salão de eventos do parque: telhado de quatro águas com lanternim central e frontão envidraçado na entrada.",
+    },
   ),
   entity(
     "support:mao-na-massa",
@@ -551,29 +565,29 @@ const supports: MapEntity[] = [
   entity(
     "support:b7",
     "support",
-    "Estrutura B7",
+    "Centro Administrativo",
     rect(1356.4854, 752.0209, 1411.6757, 878.6145),
-    "Leste dos pavilhões · Portão 03",
+    "Leste dos pavilhões · Rua Brasília, junto ao Portão 03",
     {
-      height: 2.8,
+      height: 3,
       notes:
-        "B7 é o código impresso na planta Indumóveis; não equivale ao B7 da FenaSoja e sua função não foi inferida.",
+        "Sede administrativa do parque, em dois pavimentos, com mural na empena voltada à Rua Argentina. Na planta de origem aparece com o código impresso B7, que não equivale ao B7 de outros planos.",
     },
   ),
   entity(
     "support:b7-annex-a",
     "support",
-    "Apoio B7",
+    "Apoio do Centro Administrativo",
     rect(1423.4598, 752.0232, 1447.3624, 775.9269),
-    "Ao lado da estrutura B7",
+    "Ao lado do Centro Administrativo",
     { height: 1.8 },
   ),
   entity(
     "support:b7-annex-b",
     "support",
-    "Apoio B7",
+    "Apoio do Centro Administrativo",
     rect(1423.4598, 786.6041, 1447.3624, 810.507),
-    "Ao lado da estrutura B7",
+    "Ao lado do Centro Administrativo",
     { height: 1.8 },
   ),
   entity(
@@ -693,15 +707,31 @@ const landscapes: MapEntity[] = [
       [1830.2335, 878.5535],
       [1718.6715, 875.6321],
     ]),
-    "Leste do lote 70 · além do passeio",
-    { notes: "Sem número; não pertence automaticamente ao lote 70." },
+    "Setor leste · além do passeio",
+    { notes: "Área verde sem número e sem situação comercial." },
   ),
   entity(
     "landscape:b7-west",
     "landscape",
-    "Área aberta · B7",
+    "Área aberta · Centro Administrativo",
     rect(1309.0014, 678.7583, 1383.4439, 752.0209),
-    "Entre pavilhão 3 e B7",
+    "Entre o pavilhão 3 e o Centro Administrativo",
+  ),
+  entity(
+    "landscape:administrative-garden",
+    "landscape",
+    "Jardim do Centro Administrativo",
+    [...RETIRED_EXTERNAL_LOTS[0].polygon],
+    "Entre a Rua Argentina e o Centro Administrativo",
+    { notes: "Área verde arborizada, sem número e sem situação comercial." },
+  ),
+  entity(
+    "landscape:east-garden",
+    "landscape",
+    "Área verde · setor leste",
+    [...RETIRED_EXTERNAL_LOTS[1].polygon],
+    "Setor leste · Rua Brasília / Avenida dos Imigrantes",
+    { notes: "Área verde com caminhos e arborização, sem número e sem situação comercial." },
   ),
   entity(
     "landscape:frontage",

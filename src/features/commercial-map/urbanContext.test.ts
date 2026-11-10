@@ -12,6 +12,7 @@ import {
   createUrbanContext,
   deriveUrbanHouses,
   deriveUrbanRoads,
+  deriveUrbanVacantLots,
   deriveResidentialBuffer,
   urbanPolygonAllowed,
   URBAN_CONTEXT,
@@ -44,11 +45,26 @@ describe("approximate residential context outside the source park", () => {
     const a = deriveUrbanHouses(),
       b = deriveUrbanHouses();
     expect(a).toEqual(b);
-    // The source counts built complexes, including two institutional volumes.
-    expect(a).toHaveLength(42);
+    // One building per roof digitised from the registered orthophoto: four
+    // residential blocks, the institutional volume east of the gate and the
+    // two structures of the triangular wedge by the roundabout.
+    expect(a).toHaveLength(DISTRICT_REFERENCE.filter((record) => record.house).length);
+    expect(a).toHaveLength(39);
     expect([0, 1, 2, 3, 4].map((cluster) => a.filter((h) => h.cluster === cluster).length)).toEqual(
-      [9, 11, 12, 8, 2],
+      [10, 9, 11, 7, 2],
     );
+    const vacant = deriveUrbanVacantLots();
+    expect(vacant).toHaveLength(DISTRICT_REFERENCE.filter((record) => !record.house).length);
+    expect(vacant.length).toBeGreaterThanOrEqual(5);
+    for (const lot of vacant) {
+      expect(urbanPolygonAllowed(lot.parcel)).toBe(true);
+      // An empty lot never hides under a house or its parcel.
+      const centre: [number, number] = [
+        lot.parcel.reduce((sum, p) => sum + p[0], 0) / lot.parcel.length,
+        lot.parcel.reduce((sum, p) => sum + p[1], 0) / lot.parcel.length,
+      ];
+      expect(a.some((house) => pointInPolygon(centre, house.parcel))).toBe(false);
+    }
     expect(new Set(a.map((h) => h.roof))).toEqual(new Set(["hip", "gable", "flat"]));
     expect(a.filter((h) => h.pool).length).toBeGreaterThanOrEqual(8);
     for (const house of a) {
@@ -95,13 +111,16 @@ describe("approximate residential context outside the source park", () => {
   });
   it("orients source frontages and draws direct entrances only where a clear road edge exists", () => {
     const houses = deriveUrbanHouses();
-    const sectors = houses.filter((house) => house.cluster !== 4);
-    expect(sectors).toHaveLength(DISTRICT_REFERENCE.length);
-    for (const [index, house] of sectors.entries()) {
-      const frontage = DISTRICT_REFERENCE[index].frontage;
+    const records = DISTRICT_REFERENCE.filter((record) => record.house);
+    expect(houses).toHaveLength(records.length);
+    expect(houses.filter((house) => house.roadAccess).length).toBeGreaterThan(30);
+    for (const [index, house] of houses.entries()) {
+      const frontage = records[index].house!.frontage;
       expect(house.heading).toBe(
-        frontage === "north" ? Math.PI / 2 : frontage === "south" ? -Math.PI / 2 : 0,
+        frontage === "east" ? Math.PI / 2 : frontage === "west" ? -Math.PI / 2 : 0,
       );
+      // Sheds and outbuildings are reached through their lot, not a driveway.
+      if (house.form === "shed") expect(house.roadAccess).toBe(false);
       if (!house.roadAccess) continue;
       expect(house.frontageDistance).toBeGreaterThan(house.depth / 2);
       // Sample the full driveway and footpath width; neither may pass through
@@ -142,8 +161,8 @@ describe("approximate residential context outside the source park", () => {
       );
       expect(nearAvenue || nearSidewalk).toBe(true);
     }
-    expect(sectors.some((house) => house.roadAccess)).toBe(true);
-    expect(sectors.some((house) => !house.roadAccess)).toBe(true);
+    expect(houses.some((house) => house.roadAccess)).toBe(true);
+    expect(houses.some((house) => !house.roadAccess)).toBe(true);
   });
   it("has finite south-side geometry and explicit noncommercial picking even when raycast recursively includes the whole context", () => {
     const context = createUrbanContext();
@@ -473,7 +492,11 @@ describe("approximate residential context outside the source park", () => {
       for (const x of [50, 80, 110]) {
         expect(asphaltAt([x, 95.81])).toBe(true);
         expect(asphaltAt([x, 102.9])).toBe(true);
-        expect(asphaltAt([x, 94.5])).toBe(false);
+        // The north band is angled parking painted on the same asphalt; the
+        // kerbs bound the carriageway on both sides.
+        expect(asphaltAt([x, 94.5])).toBe(true);
+        expect(asphaltAt([x, URBAN_REFERENCE.avenueSection.asphaltNorth - 0.3])).toBe(false);
+        expect(asphaltAt([x, URBAN_REFERENCE.avenueSection.asphaltSouth + 0.3])).toBe(false);
       }
       const graph = deriveUrbanRoads();
       expect(graph.find((r) => r.id === "campeira")!.connects).toContain("tuparendi");
@@ -503,10 +526,32 @@ describe("approximate residential context outside the source park", () => {
             return true;
         return false;
       };
-      // Both directions remain complete across the seam with source asphalt;
-      // the north arrow used to be cut by the commercial floor protection.
+      // The avenue carries only proportional markings: a double centre line
+      // (open at side-street mouths), lane dashes and angled bays on the
+      // north band. No direction arrow is painted in either carriageway.
+      const section = URBAN_REFERENCE.avenueSection;
       for (const side of [-1, 1])
-        expect(paintAt([62.36, URBAN_REFERENCE.avenueCenter + (side * 9.75) / 4])).toBe(true);
+        expect(paintAt([62.36, section.centerLine + side * 0.06])).toBe(true);
+      const lanes = [
+        (section.parkingSouth + section.centerLine) / 2,
+        (section.centerLine + section.asphaltSouth) / 2,
+      ];
+      for (const z of lanes) {
+        let painted = 0;
+        const samples = 400;
+        for (let i = 0; i < samples; i++) if (paintAt([40 + (i * 30) / samples, z])) painted++;
+        // Dashes, not a solid stripe and not an arrow body.
+        expect(painted).toBeGreaterThan(samples * 0.2);
+        expect(painted).toBeLessThan(samples * 0.5);
+        for (const offset of [0.25, 0.6])
+          for (let i = 0; i < samples; i += 4)
+            expect(paintAt([40 + (i * 30) / samples, z + offset])).toBe(false);
+      }
+      expect(context.metadata.avenue.paint.arrows).toBe(0);
+      expect(context.metadata.avenue.paint.stalls).toBeGreaterThan(80);
+      // The public avenue stops at the main gate.
+      expect(context.metadata.avenue.endsAtGate).toBeCloseTo(URBAN_REFERENCE.mainGate.x, 0);
+      expect(asphaltAt([URBAN_REFERENCE.mainGate.x - 6, section.centerLine])).toBe(true);
       for (const r of [URBAN_REFERENCE.roundabout, URBAN_REFERENCE.secondaryJunction]) {
         expect(asphaltAt(r.center)).toBe(false);
         for (let i = 0; i < 200; i++) {
@@ -527,11 +572,11 @@ describe("approximate residential context outside the source park", () => {
         shared: true,
         duplicate: false,
         sourceId: "indumoveis:road:benvenuto",
-        southEdge: 103.05,
+        southEdge: section.asphaltSouth,
       });
-      expect(context.houses.filter((h) => h.cluster === 3)).toHaveLength(8);
+      expect(context.houses.filter((h) => h.cluster === 3)).toHaveLength(7);
       expect(context.houses.filter((h) => h.cluster === 4)).toHaveLength(2);
-      expect(new Set(context.houses.map((h) => h.form)).size).toBe(6);
+      expect(new Set(context.houses.map((h) => h.form)).size).toBe(7);
       expect(JSON.stringify(ENTITIES)).toBe(before);
     } finally {
       context.dispose();

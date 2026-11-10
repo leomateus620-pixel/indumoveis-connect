@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { configureMapInput, prepareSecondaryPan } from "./mapInput";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
-import { createSurfaceMaterials } from "./surfaceMaterials";
+import { createSurfaceMaterials, SURFACE_PALETTE } from "./surfaceMaterials";
 import { createSoftwareMaterials } from "./softwareMaterials";
 import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
 import { createPhotoPavilionSetting } from "./photoPavilionSettingGeometry";
@@ -23,14 +23,18 @@ import {
   PARK_RENDER_ENTITIES,
 } from "./permanentParkLayout";
 import type { PermanentParkLandmark } from "./permanentParkLayout";
-import { deriveUrbanHouses } from "./urbanLayout";
+import { deriveUrbanHouses, deriveUrbanVacantLots } from "./urbanLayout";
 import { EXPLORATION_POLYGONS } from "./urbanReference";
+import { pointInPolygon } from "./geometry";
 import { createParkDetails, lotStatusBands } from "./parkDetails";
 import { createCommercialBoundaries } from "./commercialBoundaries";
 import {
-  boundaryDistance,
   interiorLotAnchor,
-  lotNumberHeight,
+  lotLabelAxis,
+  lotLabelExtent,
+  lotLabelFacing,
+  lotLabelProjection,
+  lotNumberFit,
   LOT_GRAPHICS,
 } from "./commercialPresentation";
 import { createSolarShadows } from "./solarShadows";
@@ -128,6 +132,9 @@ type Diagnostic = {
     textHeightPx: number;
     rect: { x: number; y: number; w: number; h: number };
     anchor: Point;
+    /** Fixed baseline in drawing coordinates and its current reading side. */
+    axis: Point;
+    facing: 1 | -1;
   }[];
   dpr: number;
   buffer: [number, number];
@@ -231,10 +238,14 @@ const SMALLEST_LOT_SPAN = smallestSelectableSpan(
   ENTITIES.filter((entity) => entity.kind === "lot").map((entity) => entity.polygon),
 );
 const COMMERCIAL_POLYGONS = ENTITIES.map((entity) => entity.polygon);
+/** Generous illustrative height (about 13 m) for identifying a permanent
+ * structure by a click on its walls or roof; not a surveyed level. */
+const LANDMARK_PICK_HEIGHT = 6;
 const CONTEXT_EXPLORATION = [
   ...EXPLORATION_POLYGONS,
   ...PERMANENT_PARK_EXPLORATION,
   ...deriveUrbanHouses().map((house) => house.parcel),
+  ...deriveUrbanVacantLots().map((lot) => lot.parcel),
   ...PARK_WOODLAND_MASSES.map((mass) => mass.polygon),
   ...CONTEXT_WOODLAND.map((tree) =>
     Array.from({ length: 12 }, (_, i): Point => [
@@ -543,7 +554,6 @@ function initializeMapRuntime(
   const labels: {
     entity: MapEntity;
     anchor: Point;
-    radius: number;
     multiline: boolean;
     glyphHeight: number;
     text: string;
@@ -560,6 +570,10 @@ function initializeMapRuntime(
     textHeightPx: number;
     drawn: boolean;
     rect: { x: number; y: number; w: number; h: number };
+    axis: Point;
+    extent: { along: number; across: number };
+    facing: 1 | -1;
+    legible: boolean;
   }[] = [];
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -745,7 +759,9 @@ function initializeMapRuntime(
     foundationMaterial: track(
       new THREE.MeshLambertMaterial({
         name: "indumoveis-preserved-circulation-initial",
-        color: surfaces.materials.concrete.color,
+        // The space between a registered street and a lot or building is a
+        // grass verge in the reference, not a concrete band.
+        color: surfaces.materials.grass.color,
         vertexColors: true,
       }),
     ),
@@ -806,7 +822,7 @@ function initializeMapRuntime(
       const start = positions.length / 3;
       positions.push(...data);
       const color = new THREE.Color(
-        kind === "lot" ? "#ffffff" : kind === "landscape" ? PALETTE.landscape : PALETTE.support,
+        kind === "lot" ? "#ffffff" : kind === "landscape" ? SURFACE_PALETTE.grass : PALETTE.support,
       );
       for (let i = 0; i < data.length; i += 3) {
         // Broad deterministic shading gives the planted ground a little depth
@@ -1056,7 +1072,8 @@ function initializeMapRuntime(
     const labelWidth = (size * cellWidth) / cellHeight;
     const y = getArchitectureDefinition(entity) ? architectureVisualHeight(entity) + 0.6 : 0.23;
     const anchor = lot ? interiorLotAnchor(entity.polygon, entity.anchor) : entity.anchor;
-    const radius = lot ? boundaryDistance(anchor, entity.polygon) : 0;
+    const axis: Point = lot ? lotLabelAxis(entity.polygon) : [1, 0];
+    const extent = lot ? lotLabelExtent(entity.polygon, anchor, axis) : { along: 0, across: 0 };
     const [x, z] = anchor;
     const vertex = labelPositions.length / 3;
     labelPositions.push(
@@ -1081,7 +1098,6 @@ function initializeMapRuntime(
     labels.push({
       entity,
       anchor,
-      radius,
       multiline,
       glyphHeight,
       text,
@@ -1097,6 +1113,10 @@ function initializeMapRuntime(
       textHeightPx: 0,
       drawn: false,
       rect: { x: 0, y: 0, w: 0, h: 0 },
+      axis,
+      extent,
+      facing: 1,
+      legible: true,
       priority:
         entity.kind === "lot"
           ? 1
@@ -1135,6 +1155,8 @@ function initializeMapRuntime(
   labelsMesh.frustumCulled = false;
   commercialGroup.add(labelsMesh);
   const collisionRects: { x: number; y: number; w: number; h: number }[] = [];
+  const bandX = [0, 0, 0, 0],
+    bandY = [0, 0, 0, 0];
   const sortedLabels = [...labels];
   let labelSelection: string | null | undefined;
   function updateLabels() {
@@ -1173,15 +1195,20 @@ function initializeMapRuntime(
       const worldUnitsPerPixel =
         (2 * Math.max(distance, 1) * Math.tan((camera.fov * Math.PI) / 360)) / height;
       const m = camera.matrixWorld.elements;
-      // A ground number follows camera azimuth continuously, retaining a
-      // horizontal plane. There is no compass threshold or 180-degree flip.
-      const groundRightLength = Math.hypot(m[0], m[2]) || 1;
-      const lotRx = m[0] / groundRightLength,
-        lotRz = m[2] / groundRightLength,
+      // A ground number keeps the baseline of its own lot, like a printed
+      // plan: it never turns with camera azimuth. Only its reading side
+      // reverses, with hysteresis, once the viewer is on the far side.
+      if (lot) label.facing = lotLabelFacing(label.axis, [m[0], m[2]], label.facing);
+      const lotRx = label.axis[0] * label.facing,
+        lotRz = label.axis[1] * label.facing,
         lotUx = lotRz,
         lotUz = -lotRx;
-      const projectedAxis = lot
-        ? Math.max(0.08, Math.abs(lotUx * m[4] + lotUz * m[6]))
+      // Glyph height as read on screen: perpendicular to the drawn baseline.
+      const lotProjection = lot
+        ? lotLabelProjection([lotRx, lotRz], [m[0], m[2]], [m[4], m[6]])
+        : null;
+      const projectedAxis = lotProjection
+        ? Math.max(0.08, lotProjection.height)
         : billboard
           ? 1
           : label.vertical
@@ -1201,8 +1228,8 @@ function initializeMapRuntime(
       if (lot) {
         const badgeAspect = ((cellWidth / cellHeight) * label.textWidth) / label.textHeight;
         labelHeight =
-          lotNumberHeight(
-            label.radius,
+          lotNumberFit(
+            label.extent,
             (worldUnitsPerPixel * (label.multiline ? 1.9 : 1)) / projectedAxis,
             badgeAspect,
             selected,
@@ -1212,7 +1239,11 @@ function initializeMapRuntime(
       const projectedHeight = (labelHeight / worldUnitsPerPixel) * projectedAxis;
       if (lot) {
         label.textHeightPx = (projectedHeight * label.glyphHeight) / cellHeight;
-        label.visible = label.textHeightPx >= (label.visible ? 6.8 : 7.5);
+        // Legible height and a baseline that is not seen end-on. Both
+        // thresholds are hysteretic, so a number never flickers at a limit.
+        label.visible =
+          label.textHeightPx >= (label.visible ? 6.8 : 7.5) &&
+          lotProjection!.baseline >= LOT_GRAPHICS.numberMinBaseline * (label.visible ? 0.9 : 1);
         if (!label.visible) continue;
         y = 0.16;
       }
@@ -1309,6 +1340,8 @@ function initializeMapRuntime(
           .project(camera);
         const sx = ((projection.x + 1) * width) / 2,
           sy = ((1 - projection.y) * height) / 2;
+        bandX[corner] = sx;
+        bandY[corner] = sy;
         minX = Math.min(minX, sx);
         maxX = Math.max(maxX, sx);
         minY = Math.min(minY, sy);
@@ -1318,7 +1351,32 @@ function initializeMapRuntime(
       rect.y = (minY + maxY) / 2;
       rect.w = maxX - minX;
       rect.h = maxY - minY;
-      if (lot) label.textHeightPx = (rect.h * label.glyphHeight) / (label.textHeight * cellHeight);
+      if (lot) {
+        // True perspective measure of the drawn band, perpendicular to its
+        // baseline: quad area over baseline length. A fixed-baseline number
+        // is not screen-aligned, so its bounding box would overstate it.
+        let area = 0;
+        for (let corner = 0; corner < 4; corner++) {
+          const next = (corner + 1) % 4;
+          area += bandX[corner] * bandY[next] - bandX[next] * bandY[corner];
+        }
+        const baseline =
+          (Math.hypot(bandX[1] - bandX[0], bandY[1] - bandY[0]) +
+            Math.hypot(bandX[2] - bandX[3], bandY[2] - bandY[3])) /
+          2;
+        label.textHeightPx =
+          baseline > 1e-6
+            ? (Math.abs(area) / 2 / baseline) *
+              (label.glyphHeight / (label.textHeight * cellHeight))
+            : 0;
+        // Perspective can squash a number far more than the estimate at its
+        // anchor predicts (grazing views). An illegible sliver is not drawn.
+        label.legible = label.textHeightPx >= (label.legible ? 6.2 : 7);
+        if (!label.legible) {
+          label.visible = false;
+          continue;
+        }
+      }
       let collides = false;
       if (!selected)
         for (const other of collisionRects) {
@@ -1361,6 +1419,8 @@ function initializeMapRuntime(
           textHeightPx: label.textHeightPx,
           rect: { ...label.rect },
           anchor: label.anchor,
+          axis: label.axis,
+          facing: label.facing,
         }));
   }
 
@@ -1548,7 +1608,7 @@ function initializeMapRuntime(
         },
         {
           mesh: foundationMesh,
-          material: surfaces.materials.concrete,
+          material: surfaces.materials.grass,
           failure: "circulation-surface-preparation",
           prepared: false,
           attempted: false,
@@ -2193,6 +2253,34 @@ function initializeMapRuntime(
         string | undefined) ?? null
     );
   }
+  /** Permanent structures carry no commercial pick. A click identifies them
+   * through their registered volume, nearest first; call after `pick`. */
+  const landmarkBox = new THREE.Box3();
+  function pickLandmark() {
+    if (!permanentPark?.group.visible) return null;
+    let nearest: string | null = null,
+      distance = Infinity;
+    for (const landmark of PERMANENT_PARK_LANDMARKS) {
+      if (landmark.existingOwner) continue;
+      const [x0, z0, x1, z1] = landmark.bounds;
+      landmarkBox.min.set(x0, 0, z0);
+      landmarkBox.max.set(x1, LANDMARK_PICK_HEIGHT, z1);
+      const hit = raycaster.ray.intersectBox(landmarkBox, scratch2);
+      if (!hit) continue;
+      // Bounds are axis-aligned; the footprint decides slanted structures.
+      const inside =
+        pointInPolygon([hit.x, hit.z], landmark.polygon) ||
+        (raycaster.ray.intersectPlane(groundPlane, scratch) !== null &&
+          pointInPolygon([scratch.x, scratch.z], landmark.polygon));
+      if (!inside) continue;
+      const d = hit.distanceToSquared(raycaster.ray.origin);
+      if (d < distance) {
+        distance = d;
+        nearest = landmark.id;
+      }
+    }
+    return nearest;
+  }
   function cancelTransition() {
     transition = null;
     wheelDirection = 0;
@@ -2279,8 +2367,14 @@ function initializeMapRuntime(
       initial.primary &&
       initial.candidate === pick(event.clientX, event.clientY)
     ) {
-      if (initial.candidate) props().onSelect(initial.candidate);
-      else if (props().selectedId) props().onDeselect?.();
+      if (initial.candidate) {
+        props().onLandmark?.(null);
+        props().onSelect(initial.candidate);
+      } else {
+        const landmark = pickLandmark();
+        props().onLandmark?.(landmark);
+        if (!landmark && props().selectedId) props().onDeselect?.();
+      }
     }
     if (!activePointers.size) {
       clickCancelled = false;

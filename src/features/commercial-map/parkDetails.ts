@@ -422,18 +422,9 @@ export function deriveParkDetails(entities: readonly MapEntity[], pavilionGround
       });
     }
   }
-  const portals = entities.flatMap((e) => e.accesses ?? []).map((p) => p[0]);
+  // Angled parking paint belongs to the avenue's single owner (urbanContext),
+  // on the asphalt. Nothing is painted on the kerbside walk any more.
   const paint: Point[][] = [];
-  for (let x = av.minX + 0.7; x < av.maxX - 1; x += 1.45) {
-    if (portals.some((p) => Math.abs(p - x) < 1.1)) continue;
-    const bay: Point[] = [
-      [x, av.minY + 0.1],
-      [x + 0.045, av.minY + 0.1],
-      [x + 0.52, av.minY + 0.86],
-      [x + 0.475, av.minY + 0.86],
-    ];
-    if (bay.every((p) => pointInPolygon(p, avenue.polygon))) paint.push(bay);
-  }
   const joints: Point[][] = [];
   for (let x = av.minX + 3; x < av.maxX - 1; x += 3.6) {
     const joint = rect(x, av.minY - 1.66, x + 0.014, av.minY - 0.14);
