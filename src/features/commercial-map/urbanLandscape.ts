@@ -570,3 +570,27 @@ export function appendBoundaryTrees(
     persistentTriangles: batches.canopy.position.length / 9 - initialTriangles,
   };
 }
+
+/** Individually placed crowns for a photographed civic garden. Positions are
+ * world drawing coordinates; nothing here is generated or scattered. */
+export function appendCivicPlanting(
+  bucket: UrbanLandscapeBucket,
+  items: readonly { kind: "tree" | "palm" | "shrub"; point: Point; scale: number }[],
+  groundElevation: number,
+) {
+  items.forEach((item, index) => {
+    if (![...item.point, item.scale].every(Number.isFinite) || item.scale <= 0)
+      throw new Error("urban-landscape-invalid-civic-planting");
+    if (item.kind === "tree") tree(bucket, item.point, item.scale, groundElevation, 41 + index);
+    else if (item.kind === "palm") palm(bucket, item.point, item.scale, groundElevation, 5 + index);
+    else
+      lobe(
+        bucket,
+        [item.point[0], groundElevation + 0.3 * item.scale, item.point[1]],
+        [0.42 * item.scale, 0.36 * item.scale, 0.42 * item.scale],
+        index,
+        SHRUBS[index % SHRUBS.length],
+        true,
+      );
+  });
+}

@@ -540,10 +540,14 @@ const supports: MapEntity[] = [
   entity(
     "support:events",
     "support",
-    "Espaço de eventos",
+    "Centro de Eventos",
     rect(1529.9915, 260.7521, 1690.0435, 446.0663),
     "Leste · Rua Brasília",
-    { height: 2.4 },
+    {
+      height: 2.6,
+      notes:
+        "Salão de eventos do parque: telhado de quatro águas com lanternim central e frontão envidraçado na entrada.",
+    },
   ),
   entity(
     "support:mao-na-massa",
@@ -565,7 +569,7 @@ const supports: MapEntity[] = [
     rect(1356.4854, 752.0209, 1411.6757, 878.6145),
     "Leste dos pavilhões · Rua Brasília, junto ao Portão 03",
     {
-      height: 2.8,
+      height: 3,
       notes:
         "Sede administrativa do parque, em dois pavimentos, com mural na empena voltada à Rua Argentina. Na planta de origem aparece com o código impresso B7, que não equivale ao B7 de outros planos.",
     },
