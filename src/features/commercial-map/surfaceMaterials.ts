@@ -36,9 +36,10 @@ export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   masonryBrick: "#a9604c",
   paintedMasonry: "#e6e5db",
   architecturalFrame: "#40504a",
-  // The commercial floor stays lighter than surrounding landscape so thin
-  // parcel borders and status bands keep their contrast in overview.
-  grass: "#83ad70",
+  // One grass for lots, verges and planted ground, matched to the open
+  // terrain around the park so no polygon reads as a rectangular green patch.
+  // Parcel borders and status bands carry the commercial contrast instead.
+  grass: "#97b787",
 };
 
 export interface SurfaceMaterials {

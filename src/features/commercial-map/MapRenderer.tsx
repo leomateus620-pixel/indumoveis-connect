@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { configureMapInput, prepareSecondaryPan } from "./mapInput";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
-import { createSurfaceMaterials } from "./surfaceMaterials";
+import { createSurfaceMaterials, SURFACE_PALETTE } from "./surfaceMaterials";
 import { createSoftwareMaterials } from "./softwareMaterials";
 import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
 import { createPhotoPavilionSetting } from "./photoPavilionSettingGeometry";
@@ -816,7 +816,7 @@ function initializeMapRuntime(
       const start = positions.length / 3;
       positions.push(...data);
       const color = new THREE.Color(
-        kind === "lot" ? "#ffffff" : kind === "landscape" ? PALETTE.landscape : PALETTE.support,
+        kind === "lot" ? "#ffffff" : kind === "landscape" ? SURFACE_PALETTE.grass : PALETTE.support,
       );
       for (let i = 0; i < data.length; i += 3) {
         // Broad deterministic shading gives the planted ground a little depth
