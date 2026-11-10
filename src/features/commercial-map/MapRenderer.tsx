@@ -25,6 +25,7 @@ import {
 import type { PermanentParkLandmark } from "./permanentParkLayout";
 import { deriveUrbanHouses, deriveUrbanVacantLots } from "./urbanLayout";
 import { EXPLORATION_POLYGONS } from "./urbanReference";
+import { pointInPolygon } from "./geometry";
 import { createParkDetails, lotStatusBands } from "./parkDetails";
 import { createCommercialBoundaries } from "./commercialBoundaries";
 import {
@@ -236,6 +237,9 @@ const SMALLEST_LOT_SPAN = smallestSelectableSpan(
   ENTITIES.filter((entity) => entity.kind === "lot").map((entity) => entity.polygon),
 );
 const COMMERCIAL_POLYGONS = ENTITIES.map((entity) => entity.polygon);
+/** Generous illustrative height (about 13 m) for identifying a permanent
+ * structure by a click on its walls or roof; not a surveyed level. */
+const LANDMARK_PICK_HEIGHT = 6;
 const CONTEXT_EXPLORATION = [
   ...EXPLORATION_POLYGONS,
   ...PERMANENT_PARK_EXPLORATION,
@@ -2210,6 +2214,34 @@ function initializeMapRuntime(
         string | undefined) ?? null
     );
   }
+  /** Permanent structures carry no commercial pick. A click identifies them
+   * through their registered volume, nearest first; call after `pick`. */
+  const landmarkBox = new THREE.Box3();
+  function pickLandmark() {
+    if (!permanentPark?.group.visible) return null;
+    let nearest: string | null = null,
+      distance = Infinity;
+    for (const landmark of PERMANENT_PARK_LANDMARKS) {
+      if (landmark.existingOwner) continue;
+      const [x0, z0, x1, z1] = landmark.bounds;
+      landmarkBox.min.set(x0, 0, z0);
+      landmarkBox.max.set(x1, LANDMARK_PICK_HEIGHT, z1);
+      const hit = raycaster.ray.intersectBox(landmarkBox, scratch2);
+      if (!hit) continue;
+      // Bounds are axis-aligned; the footprint decides slanted structures.
+      const inside =
+        pointInPolygon([hit.x, hit.z], landmark.polygon) ||
+        (raycaster.ray.intersectPlane(groundPlane, scratch) !== null &&
+          pointInPolygon([scratch.x, scratch.z], landmark.polygon));
+      if (!inside) continue;
+      const d = hit.distanceToSquared(raycaster.ray.origin);
+      if (d < distance) {
+        distance = d;
+        nearest = landmark.id;
+      }
+    }
+    return nearest;
+  }
   function cancelTransition() {
     transition = null;
     wheelDirection = 0;
@@ -2296,8 +2328,14 @@ function initializeMapRuntime(
       initial.primary &&
       initial.candidate === pick(event.clientX, event.clientY)
     ) {
-      if (initial.candidate) props().onSelect(initial.candidate);
-      else if (props().selectedId) props().onDeselect?.();
+      if (initial.candidate) {
+        props().onLandmark?.(null);
+        props().onSelect(initial.candidate);
+      } else {
+        const landmark = pickLandmark();
+        props().onLandmark?.(landmark);
+        if (!landmark && props().selectedId) props().onDeselect?.();
+      }
     }
     if (!activePointers.size) {
       clickCancelled = false;

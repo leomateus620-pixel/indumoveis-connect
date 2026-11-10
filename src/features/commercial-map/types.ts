@@ -39,6 +39,9 @@ export interface MapRendererProps {
   onSelect(id: string): void;
   /** A click on unselectable ground closes the current inspection session. */
   onDeselect?(): void;
+  /** A click on a permanent, non-commercial structure identifies it in
+   * context. It selects nothing and never opens a commercial inspection. */
+  onLandmark?(id: string | null): void;
   onReady(): void;
   onFailure(reason: string): void;
   statuses: Record<string, string>;
