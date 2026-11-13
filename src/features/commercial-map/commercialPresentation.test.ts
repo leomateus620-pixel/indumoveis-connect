@@ -253,6 +253,7 @@ describe("commercial cadastral presentation", () => {
       reservado: "#e2c69e",
       vendido: "#9b7c91",
       bloqueado: "#b6b2b5",
+      indisponivel: "#b6b2b5",
     });
     expect(Object.values(COMMERCIAL_STATUS_COLORS)).not.toContain(LOT_GRAPHICS.selected);
     expect(Object.values(COMMERCIAL_STATUS_COLORS)).not.toContain(LOT_GRAPHICS.hover);

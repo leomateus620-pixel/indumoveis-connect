@@ -11,7 +11,7 @@ export const commercialSegmentKeys = [
 
 export type CommercialSegmentKey = (typeof commercialSegmentKeys)[number];
 export type CommercialLotStatus =
-  "vendido" | "reservado" | "em_negociacao" | "disponivel" | "bloqueado";
+  "vendido" | "reservado" | "em_negociacao" | "disponivel" | "bloqueado" | "indisponivel";
 
 export type CommercialAggregate = {
   total: number;

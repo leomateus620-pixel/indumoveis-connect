@@ -7,10 +7,16 @@ import "./pavilion13-directory.css";
 type Props = {
   environments: readonly InteriorEnvironment[];
   selectedCode?: string;
+  isSaleSelected?: (environment: InteriorEnvironment) => boolean;
   onSelect: (code: string) => void;
 };
 
-export function Pavilion13LotDirectory({ environments, selectedCode, onSelect }: Props) {
+export function Pavilion13LotDirectory({
+  environments,
+  selectedCode,
+  isSaleSelected,
+  onSelect,
+}: Props) {
   const id = useId();
   const [openSector, setOpenSector] = useState<Pavilion13Sector>();
   const selectedSector = selectedCode ? pavilion13Sector(selectedCode) : undefined;
@@ -55,7 +61,9 @@ export function Pavilion13LotDirectory({ environments, selectedCode, onSelect }:
                       type="button"
                       key={lot.id}
                       aria-label={lot.name}
-                      aria-pressed={lot.code === selectedCode}
+                      aria-pressed={
+                        isSaleSelected ? isSaleSelected(lot) : lot.code === selectedCode
+                      }
                       onClick={() => onSelect(lot.code)}
                     >
                       {lot.code}

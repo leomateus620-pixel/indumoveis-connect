@@ -11,6 +11,7 @@ import {
   useEdition,
   useFloorPlans,
   useInspections,
+  useIsAdmin,
   useInstallments,
   useSpaces,
 } from "@/lib/api";
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/_authenticated/_app/dashboard")({
 function Dashboard() {
   const { data: edition } = useEdition();
   const fin = useCan("financeiro");
+  const isAdmin = useIsAdmin();
   const spaces = useSpaces();
   const deals = useDeals();
   const contracts = useContracts();
@@ -127,19 +129,30 @@ function Dashboard() {
               to="/mapa"
               search={{ status: "disponivel" }}
             />
-            <Stat
-              label={SPACE_STATUS.reservado.label + "s"}
-              value={s.byStatus.reservado ?? 0}
-              to="/mapa"
-              search={{ status: "reservado" }}
-            />
-            <Stat
-              label="Vendidos"
-              value={s.byStatus.vendido ?? 0}
-              hint="contrato com assinatura registrada"
-              to="/mapa"
-              search={{ status: "vendido" }}
-            />
+            {isAdmin ? (
+              <>
+                <Stat
+                  label={SPACE_STATUS.reservado.label + "s"}
+                  value={s.byStatus.reservado ?? 0}
+                  to="/mapa"
+                  search={{ status: "reservado" }}
+                />
+                <Stat
+                  label="Vendidos"
+                  value={s.byStatus.vendido ?? 0}
+                  hint="contrato com assinatura registrada"
+                  to="/mapa"
+                  search={{ status: "vendido" }}
+                />
+              </>
+            ) : (
+              <Stat
+                label="Espaços indisponíveis"
+                value={s.byStatus.indisponivel ?? 0}
+                to="/mapa"
+                search={{ status: "indisponivel" }}
+              />
+            )}
             <Stat
               label="Negociações ativas"
               value={s.active}

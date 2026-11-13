@@ -89,13 +89,21 @@ begin
     then raise exception 'Receipts or open amounts mismatch'; end if;
 
   perform set_config('request.jwt.claim.sub', reader_actor::text, true);
-  rollup := public.get_commercial_overview(ed);
-  details := public.get_commercial_details(ed,'p12');
-  if (rollup->>'financial')::boolean or (rollup->'overall') ? 'grossCents' or
-     details->'totals' <> 'null'::jsonb or exists (
-       select from jsonb_array_elements(details->'lots') lot
-       where lot ? 'tariffCents' or lot ? 'grossCents' or (lot->'deal') ? 'spacePriceCents'
-     ) then raise exception 'Finance data leaked to read-only role'; end if;
+  begin
+    perform public.get_commercial_overview(ed);
+    raise exception 'Commercial dashboard exposed to non-admin';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform public.get_commercial_details(ed,'p12');
+    raise exception 'Commercial details exposed to non-admin';
+  exception when insufficient_privilege then null;
+  end;
+  if exists (
+    select from jsonb_array_elements(public.get_commercial_lots(ed,'p12')) lot
+    where lot ? 'tariffCents' or lot ? 'grossCents' or lot->'deal' <> 'null'::jsonb
+      or lot->>'status' not in ('disponivel','indisponivel')
+  ) then raise exception 'Private fields leaked through map inventory'; end if;
   if has_table_privilege('authenticated','public.commercial_lot_facts_v','select') or
      has_function_privilege('anon','public.get_commercial_details(uuid,text)','execute') then
     raise exception 'Unexpected direct grants';

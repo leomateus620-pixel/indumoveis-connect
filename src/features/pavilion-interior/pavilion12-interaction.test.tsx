@@ -4,6 +4,8 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import { PavilionInterior } from "./PavilionInterior";
 import { PAVILION_12_PLAN } from "./pavilion12";
 import { PAVILION_PRESENTATIONS } from "./presentation";
+import { SaleModeContext } from "@/features/guided-sales/sale-mode-context";
+import type { CommercialLot } from "@/lib/commercial";
 
 function Harness({ initial }: { initial?: string }) {
   const [code, select] = useState(initial);
@@ -57,6 +59,90 @@ afterEach(() => {
 });
 
 describe("Pavilhão 12 lot inspection", () => {
+  it("toggles multiple spaces by UUID with the existing keyboard movement and no inspection change", () => {
+    const select = vi.fn();
+    const lotsByEnvironment = new Map(
+      ["172", "173", "174"].map((code) => {
+        const environment = PAVILION_12_PLAN.environments.find((item) => item.code === code)!;
+        return [
+          environment.id,
+          {
+            id: `space-${code}`,
+            environmentId: environment.id,
+            geometryId: null,
+            code,
+            segmentKey: "p12",
+            areaM2: 4,
+            areaPending: false,
+            pricingState: "priced",
+            cornerState: null,
+            status: code === "174" ? "vendido" : "disponivel",
+            grossCents: 10000,
+          } satisfies CommercialLot,
+        ];
+      }),
+    );
+    function HarnessWithMode() {
+      const [active, setActive] = useState(false);
+      const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(new Set());
+      return (
+        <SaleModeContext.Provider
+          value={{
+            active,
+            selectedIds,
+            canUse: true,
+            resumeSale: () => {},
+            toggleMode: () => setActive(!active),
+            toggleLot: (lot) => {
+              if (lot.status === "disponivel") {
+                setSelectedIds((previous) => {
+                  const next = new Set(previous);
+                  if (next.has(lot.id)) next.delete(lot.id);
+                  else next.add(lot.id);
+                  return next;
+                });
+              }
+              return true;
+            },
+          }}
+        >
+          <PavilionInterior
+            plan={PAVILION_12_PLAN}
+            presentation={PAVILION_PRESENTATIONS[12]}
+            lotsByEnvironment={lotsByEnvironment}
+            onSelect={select}
+            onBack={() => {}}
+          />
+        </SaleModeContext.Provider>
+      );
+    }
+    const { container } = render(<HarnessWithMode />);
+    const plan = within(screen.getByRole("group", { name: "Planta interativa do Pavilhão 12" }));
+    const first = plan.getByRole("button", { name: "Lote 172" });
+    const second = plan.getByRole("button", { name: "Lote 173" });
+    const sold = plan.getByRole("button", { name: "Lote 174" });
+    const drawing = container.querySelector(".arq-plan > g")!;
+    fireEvent.keyDown(first, { key: "Enter" });
+    expect(select).toHaveBeenCalledWith("172");
+    select.mockClear();
+    fireEvent.click(screen.getByRole("button", { name: "Modo Comercialização" }));
+    const before = drawing.getAttribute("transform");
+    first.focus();
+    fireEvent.keyDown(first, { key: "Enter" });
+    fireEvent.keyDown(first, { key: "ArrowRight" });
+    expect(second).toHaveFocus();
+    fireEvent.keyDown(second, { key: " " });
+    expect(first).toHaveAttribute("aria-pressed", "true");
+    expect(second).toHaveAttribute("aria-pressed", "true");
+    expect(container.querySelectorAll("[data-sale-selected]")).toHaveLength(2);
+    fireEvent.keyDown(sold, { key: "Enter" });
+    expect(sold).toHaveAttribute("aria-pressed", "false");
+    expect(sold.parentElement?.querySelector("[data-sold-lot-check]")).not.toBeNull();
+    expect(select).not.toHaveBeenCalled();
+    expect(drawing.getAttribute("transform")).toBe(before);
+    fireEvent.keyDown(first, { key: "Enter" });
+    expect(first).toHaveAttribute("aria-pressed", "false");
+  });
   it("finds an individual lot and zooms to it only on explicit request", () => {
     const { container } = render(<Harness />);
     const drawing = container.querySelector(".arq-plan > g")!;

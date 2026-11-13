@@ -7,6 +7,7 @@ import {
   useCommercialOverview,
   useEditionId,
   useMapDealSpaces,
+  useIsAdmin,
 } from "@/lib/api";
 import { CommercialMapWorkspace } from "@/features/commercial-map/CommercialMapWorkspace";
 import { ENTITIES } from "@/features/commercial-map/data/territory";
@@ -47,24 +48,33 @@ export const Route = createFileRoute("/_authenticated/_app/mapa")({
 
 function MapaPage() {
   const can = useCan("mapa");
-  const commercialCan = useCan("comercial");
-  const canReadCommercial = can.read && commercialCan.read;
+  const isAdmin = useIsAdmin();
+  const canReadCommercial = can.read && isAdmin;
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/mapa" });
   const editionId = useEditionId();
-  const lots = useCommercialLots(undefined, canReadCommercial);
+  const lots = useCommercialLots(undefined, can.read);
   const overview = useCommercialOverview(canReadCommercial);
   const deal = useMapDealSpaces(search.deal, canReadCommercial);
   const resolution = useMemo(
     () =>
       resolvePersistedMapLots(
         editionId,
-        canReadCommercial && !lots.isError ? (lots.data ?? []) : [],
+        can.read && !lots.isError ? (lots.data ?? []) : [],
         lotGeometryIds,
         search,
         canReadCommercial && !deal.isError ? deal.data : null,
       ),
-    [editionId, canReadCommercial, lots.data, lots.isError, deal.data, deal.isError, search],
+    [
+      editionId,
+      can.read,
+      canReadCommercial,
+      lots.data,
+      lots.isError,
+      deal.data,
+      deal.isError,
+      search,
+    ],
   );
   if (!can.read) return <Restricted />;
   if (!editionId) return <p role="status">Carregando mapa…</p>;
@@ -96,9 +106,11 @@ function MapaPage() {
       }}
       statuses={resolution.statuses}
       lotsByGeometry={resolution.lotsByGeometry}
-      renderExternalReview={(lot) => (
-        <ExternalCornerReview key={lot.id} editionId={editionId} spaceId={lot.id} />
-      )}
+      renderExternalReview={
+        isAdmin
+          ? (lot) => <ExternalCornerReview key={lot.id} editionId={editionId} spaceId={lot.id} />
+          : undefined
+      }
       pavilionProgress={canReadCommercial ? overview.data?.segments : undefined}
       onOpenCommercialDashboard={
         canReadCommercial
@@ -111,7 +123,7 @@ function MapaPage() {
       externalSelection={resolution.selectedGeometryId}
       notice={resolution.warning}
       commercialState={
-        !canReadCommercial || lots.isError
+        !can.read || lots.isError
           ? "unavailable"
           : lots.isLoading
             ? "loading"

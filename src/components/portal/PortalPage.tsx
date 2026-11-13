@@ -6,7 +6,8 @@ import { PortalCategoryCard } from "./PortalCategoryCard";
 
 export function PortalPage({ me }: { me: Me }) {
   const perms = me.perms;
-  const categories = useMemo(() => visibleCategories(perms), [perms]);
+  const isAdmin = me.roles.includes("admin");
+  const categories = useMemo(() => visibleCategories(perms, isAdmin), [perms, isAdmin]);
 
   return (
     <div className="portal-wrap portal-body">

@@ -20,6 +20,7 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 vi.mock("@/lib/api", () => ({
   useCan: () => ({ read: true }),
+  useIsAdmin: () => true,
   useEditionId: () => "active-edition",
   useCommercialLots: () => ({ isError: false, isLoading: false, data: [] }),
   useCommercialOverview: () => ({ data: undefined }),

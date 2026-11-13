@@ -1,0 +1,103 @@
+.arq-header {
+  position: relative;
+}
+
+.arq-sales-button {
+  position: absolute;
+  right: 24px;
+  top: 8px;
+  z-index: 1;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid #dacbd4;
+  border-radius: 9px;
+  color: #583b51;
+  background: #fffdfa;
+}
+
+.arq-sales-button:hover,
+.arq-sales-button[aria-pressed="true"] {
+  color: #fffdf9;
+  background: #583b51;
+  border-color: #583b51;
+}
+
+.arq-interior .arq-workspace .arq-environment[data-sale-selected] > .arq-part {
+  fill: #197a74;
+  stroke: #075451;
+  stroke-width: 1.5;
+}
+
+.arq-interior .arq-workspace .arq-environment[data-sale-selected] > .arq-part:focus-visible {
+  stroke: #fffdf9;
+  stroke-width: 1.9;
+  stroke-dasharray: 3 2;
+}
+
+.arq-interior .arq-workspace .arq-environment[data-sale-selected] > .arq-plan-label {
+  fill: #fffdf9;
+  stroke: none;
+  font-weight: 750;
+}
+
+.arq-interior
+  .arq-workspace
+  .arq-environment[data-commercial-status]:not(.is-selected, [data-sale-selected])
+  > .arq-part {
+  fill: color-mix(in srgb, var(--arq-stock-color) 56%, #fcf6eb);
+}
+
+.arq-interior
+  .arq-workspace
+  .arq-environment[data-commercial-status]:not(.is-selected, [data-sale-selected])
+  > .arq-part:not(:focus-visible) {
+  stroke: color-mix(in srgb, var(--arq-stock-color) 62%, #4f4149);
+}
+
+.arq-sidebar .commercial-lot-legend {
+  font-size: 11px;
+  padding: 6px 0 16px;
+}
+
+.arq-sales-notice {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  z-index: 4;
+  max-width: calc(100% - 28px);
+  padding: 6px 10px;
+  border: 1px solid #dacbd4;
+  border-radius: 7px;
+  color: #583b51;
+  background: #fffdfa;
+  font-size: 12px;
+}
+
+@media (min-width: 701px) {
+  .arq-interior .arq-header:has(.arq-sales-button) {
+    padding-right: max(82px, calc(3vw + 58px));
+  }
+
+  .arq-sales-button {
+    top: 50%;
+    right: max(24px, 3vw);
+    transform: translateY(-50%);
+  }
+}
+
+@media (max-width: 700px) {
+  .arq-sales-button {
+    right: 8px;
+    top: 17px;
+  }
+
+  .arq-header:has(.arq-sales-button) .arq-brand-led {
+    padding-right: 36px;
+  }
+
+  .arq-interior.is-sales-active .arq-view-controls {
+    bottom: max(74px, calc(64px + env(safe-area-inset-bottom, 0px)));
+  }
+}

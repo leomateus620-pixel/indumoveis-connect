@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,11 +15,16 @@ import {
   Plus,
   Scan,
   Search,
+  ShoppingCart,
   X,
 } from "lucide-react";
 import { brl, SPACE_STATUS } from "@/lib/format";
 import type { CommercialLot } from "@/lib/commercial";
 import { lotPricingNote } from "@/features/commercial-map/lotPricingPresentation";
+import { CommercialLotLegend, SoldLotCheck } from "@/features/commercial-map/CommercialLotLegend";
+import { polygonBounds } from "@/features/commercial-map/geometry";
+import { COMMERCIAL_STATUS_COLORS } from "@/features/commercial-map/visualTheme";
+import { useCommercialSaleMode } from "@/features/guided-sales/sale-mode-context";
 import { Pavilion1Architecture, Pavilion1NumberPlate } from "./Pavilion1Architecture";
 import { Pavilion12Architecture } from "./Pavilion12Architecture";
 import {
@@ -30,6 +42,8 @@ import {
 } from "./presentation";
 import "./interior.css";
 import "./pavilion1-shell.css";
+import "@/features/commercial-map/commercial-lot-legend.css";
+import "./interior-sales.css";
 import {
   parkPavilionNumber,
   pavilionDestinationHref,
@@ -78,6 +92,9 @@ export function PavilionInterior({
   const searchLots = presentation.searchLots === true;
   const [lotQuery, setLotQuery] = useState("");
   const [searchError, setSearchError] = useState("");
+  const saleMode = useCommercialSaleMode();
+  const salesActive = !!saleMode?.active;
+  const [saleNotice, setSaleNotice] = useState("");
   const [keyboardLot, setKeyboardLot] = useState<string>();
   const [panelOpen, setPanelOpen] = useState(!!selected);
   const [mobile, setMobile] = useState(false);
@@ -258,6 +275,20 @@ export function PavilionInterior({
     };
   }, [zoom]);
   const choose = (code?: string) => {
+    if (salesActive) {
+      const environment = plan.environments.find(
+        (item) => item.code === code && item.kind === "commercial",
+      );
+      if (!environment) return;
+      const lot = lotsByEnvironment?.get(environment.id);
+      if (!lot) {
+        setSaleNotice("Este lote não tem um vínculo comercial confirmado.");
+        return;
+      }
+      setSaleNotice("");
+      saleMode?.toggleLot(lot);
+      return;
+    }
     if (
       lotsMode &&
       code &&
@@ -277,6 +308,12 @@ export function PavilionInterior({
     onSelect(undefined);
     collapse();
   };
+  const saleSelected = (environment: InteriorEnvironment) => {
+    const lot = lotsByEnvironment?.get(environment.id);
+    return !!lot && !!saleMode?.selectedIds.has(lot.id);
+  };
+  const saleStatus = (environment: InteriorEnvironment) =>
+    lotsByEnvironment?.get(environment.id)?.status ?? commercial[environment.code]?.status;
   const locateSelected = () => {
     if (!selected) return;
     if (mobile) {
@@ -321,7 +358,11 @@ export function PavilionInterior({
   const currentStatus = commercialLot?.status ?? commercialInfo?.status;
   const displayArea = commercialLot ? commercialLot.areaM2 : selected?.declaredAreaM2;
   const showDetailArea = selected?.kind === "commercial" || presentation.showAreas;
-  const pricingNote = commercialLot ? lotPricingNote(commercialLot) : undefined;
+  const pricingNote = commercialLot?.areaPending
+    ? "Área em validação"
+    : commercialLot && commercialLot.grossCents !== undefined
+      ? lotPricingNote(commercialLot)
+      : undefined;
   const hasExternal = selected?.parts.some((part) => part.kind === "external");
   const connections =
     presentation.connections?.flatMap((connection) => {
@@ -356,7 +397,8 @@ export function PavilionInterior({
   };
   return (
     <main
-      className={`arq-interior is-pavilion-${presentation.pavilionNumber} ${lotsMode ? "has-lot-layout" : ""} ${panelOpen ? "is-panel-open" : ""}`}
+      data-guided-sales-host=""
+      className={`arq-interior is-pavilion-${presentation.pavilionNumber} ${lotsMode ? "has-lot-layout" : ""} ${panelOpen ? "is-panel-open" : ""} ${salesActive ? "is-sales-active" : ""}`}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           event.stopPropagation();
@@ -409,6 +451,26 @@ export function PavilionInterior({
             <span>Área total:</span>{" "}
             <strong>{formatArea(plan.totalAreaM2, isPavilion12 ? 0 : 2)}</strong>
           </p>
+        )}
+        {saleMode?.canUse && (
+          <button
+            type="button"
+            className="arq-sales-button"
+            data-guided-sales-toggle=""
+            aria-label="Modo Comercialização"
+            title="Modo Comercialização"
+            aria-pressed={salesActive}
+            onClick={() => {
+              if (!salesActive && selected) {
+                onSelect(undefined);
+                if (mobile) setPanelOpen(false);
+              }
+              setSaleNotice("");
+              saleMode.toggleMode();
+            }}
+          >
+            <ShoppingCart size={19} aria-hidden="true" />
+          </button>
         )}
       </header>
       <div className="arq-workspace">
@@ -556,7 +618,7 @@ export function PavilionInterior({
                   return;
                 }
                 setLotQuery(code);
-                if (isPavilion12 && code !== selectedCode) {
+                if (!salesActive && isPavilion12 && code !== selectedCode) {
                   setKeyboardLot(code);
                   focusDirectorySelection.current = true;
                 }
@@ -604,7 +666,8 @@ export function PavilionInterior({
                     key={e.id}
                     onClick={() => choose(e.code)}
                     aria-label={lotsMode ? e.name : `${e.code} · ${e.name}`}
-                    aria-pressed={selected?.id === e.id}
+                    aria-pressed={salesActive ? saleSelected(e) : selected?.id === e.id}
+                    disabled={salesActive && e.kind !== "commercial"}
                     data-p1-linked={
                       isPavilion1 && e.parts.some((part) => part.kind === "external")
                         ? true
@@ -621,6 +684,7 @@ export function PavilionInterior({
                   className="arq-hall-link"
                   onClick={() => choose("salon")}
                   aria-pressed={selected?.code === "salon"}
+                  disabled={salesActive}
                 >
                   Salão de Design <ArrowRight size={14} />
                 </button>
@@ -631,8 +695,9 @@ export function PavilionInterior({
             <Pavilion13LotDirectory
               environments={plan.environments}
               selectedCode={selected?.code}
+              isSaleSelected={salesActive ? saleSelected : undefined}
               onSelect={(code) => {
-                focusDirectorySelection.current = code !== selected?.code;
+                focusDirectorySelection.current = !salesActive && code !== selected?.code;
                 choose(code);
               }}
             />
@@ -670,8 +735,17 @@ export function PavilionInterior({
               </>
             )}
           </div>
+          <CommercialLotLegend
+            statuses={[...(lotsByEnvironment?.values() ?? [])].map((lot) => lot.status)}
+            salesActive={salesActive}
+          />
         </aside>
         <div className="arq-canvas" ref={viewport}>
+          {salesActive && saleNotice && (
+            <p className="arq-sales-notice" role="status">
+              {saleNotice}
+            </p>
+          )}
           {mobile && !panelOpen && (
             <button
               className="arq-panel-toggle"
@@ -838,96 +912,134 @@ export function PavilionInterior({
                   </g>
                 );
               })}
-              {plan.environments.map((environment) => (
-                <g
-                  key={environment.id}
-                  data-environment={environment.code}
-                  data-p13-sector={isPavilion13 ? pavilion13Sector(environment.code) : undefined}
-                  className={`arq-environment is-${environment.kind} ${selected?.id === environment.id ? "is-selected" : ""}`}
-                >
-                  {environment.parts.map((part) => (
-                    <path
-                      key={part.id}
-                      d={part.path}
-                      data-part={part.kind}
-                      className={`arq-part is-${part.kind}`}
-                      role={environment.kind === "circulation" ? undefined : "button"}
-                      tabIndex={
-                        part.kind === "interior" &&
-                        environment.kind !== "circulation" &&
-                        (!isPavilion12 || environment.code === (keyboardLot ?? selectedCode ?? "1"))
-                          ? 0
-                          : -1
-                      }
-                      aria-label={`${!isPavilion12 && environment.code.match(/^\d/) ? environment.code + " · " : ""}${environment.name}${part.kind === "external" ? " · área externa vinculada" : ""}`}
-                      aria-pressed={selected?.id === environment.id}
-                      onFocus={isPavilion12 ? () => setKeyboardLot(environment.code) : undefined}
-                      onClick={(e) => {
-                        if (e.detail === 0) choose(environment.code);
-                      }}
-                      onKeyDown={(e) => {
-                        if (
-                          isPavilion12 &&
-                          ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)
-                        ) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          focusAdjacentLot(environment, e.key);
-                          return;
-                        }
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          choose(environment.code);
-                        }
-                      }}
-                    />
-                  ))}
-                  {isPavilion8 &&
-                    environment.parts.map((part) => (
-                      <Pavilion8LotRelief key={part.id} path={part.path} />
-                    ))}
-                  {isPavilion8 && <Pavilion8NumberPlate center={environment.label} />}
-                  {isPavilion1 && /^\d{2}$/.test(environment.code) && (
-                    <Pavilion1NumberPlate center={environment.label} />
-                  )}
-                  <text
-                    x={environment.label[0]}
-                    y={environment.label[1]}
-                    className={`arq-plan-label ${/^\d/.test(environment.code) ? "" : "is-word"}`}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    aria-hidden="true"
+              {plan.environments.map((environment) => {
+                const status =
+                  environment.kind === "commercial" ? saleStatus(environment) : undefined;
+                const selectedForSale = salesActive && saleSelected(environment);
+                const primary = environment.parts.find((part) => part.kind === "interior");
+                const bounds =
+                  status === "vendido" && primary ? polygonBounds(primary.polygon) : null;
+                const sealSize = bounds
+                  ? Math.min(
+                      (bounds.maxX - bounds.minX) * 0.26,
+                      (bounds.maxY - bounds.minY) * 0.32,
+                      19,
+                    )
+                  : 0;
+                return (
+                  <g
+                    key={environment.id}
+                    data-environment={environment.code}
+                    data-commercial-status={status}
+                    data-sale-selected={selectedForSale || undefined}
+                    style={
+                      status && COMMERCIAL_STATUS_COLORS[status]
+                        ? ({
+                            "--arq-stock-color": COMMERCIAL_STATUS_COLORS[status],
+                          } as CSSProperties)
+                        : undefined
+                    }
+                    data-p13-sector={isPavilion13 ? pavilion13Sector(environment.code) : undefined}
+                    className={`arq-environment is-${environment.kind} ${selected?.id === environment.id ? "is-selected" : ""}`}
                   >
-                    {/^\d/.test(environment.code) ? environment.code : environment.name}
-                  </text>
-                  {presentation.showAreas && /^\d/.test(environment.code) && (
+                    {environment.parts.map((part) => (
+                      <path
+                        key={part.id}
+                        d={part.path}
+                        data-part={part.kind}
+                        className={`arq-part is-${part.kind}`}
+                        role={environment.kind === "circulation" ? undefined : "button"}
+                        tabIndex={
+                          part.kind === "interior" &&
+                          environment.kind !== "circulation" &&
+                          (!isPavilion12 ||
+                            environment.code === (keyboardLot ?? selectedCode ?? "1"))
+                            ? 0
+                            : -1
+                        }
+                        aria-label={`${!isPavilion12 && environment.code.match(/^\d/) ? environment.code + " · " : ""}${environment.name}${part.kind === "external" ? " · área externa vinculada" : ""}`}
+                        aria-pressed={
+                          salesActive ? selectedForSale : selected?.id === environment.id
+                        }
+                        aria-disabled={
+                          salesActive && environment.kind !== "commercial" ? true : undefined
+                        }
+                        aria-description={status ? SPACE_STATUS[status]?.label : undefined}
+                        onFocus={isPavilion12 ? () => setKeyboardLot(environment.code) : undefined}
+                        onClick={(e) => {
+                          if (e.detail === 0) choose(environment.code);
+                        }}
+                        onKeyDown={(e) => {
+                          if (
+                            isPavilion12 &&
+                            ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)
+                          ) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            focusAdjacentLot(environment, e.key);
+                            return;
+                          }
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            choose(environment.code);
+                          }
+                        }}
+                      />
+                    ))}
+                    {isPavilion8 &&
+                      environment.parts.map((part) => (
+                        <Pavilion8LotRelief key={part.id} path={part.path} />
+                      ))}
+                    {isPavilion8 && <Pavilion8NumberPlate center={environment.label} />}
+                    {isPavilion1 && /^\d{2}$/.test(environment.code) && (
+                      <Pavilion1NumberPlate center={environment.label} />
+                    )}
                     <text
                       x={environment.label[0]}
-                      y={environment.label[1] + 17}
-                      className="arq-plan-detail"
+                      y={environment.label[1]}
+                      className={`arq-plan-label ${/^\d/.test(environment.code) ? "" : "is-word"}`}
                       textAnchor="middle"
+                      dominantBaseline="central"
                       aria-hidden="true"
                     >
-                      {environment.functionLabel}
+                      {/^\d/.test(environment.code) ? environment.code : environment.name}
                     </text>
-                  )}
-                  {environment.parts
-                    .filter((p) => p.kind === "external")
-                    .map((part) => (
+                    {bounds && sealSize > 0 && (
+                      <SoldLotCheck
+                        x={bounds.maxX - sealSize * 1.15}
+                        y={bounds.minY + sealSize * 0.15}
+                        size={sealSize}
+                      />
+                    )}
+                    {presentation.showAreas && /^\d/.test(environment.code) && (
                       <text
-                        key={part.id}
                         x={environment.label[0]}
-                        y={plan.bounds.minY + 23}
-                        className="arq-external-label"
+                        y={environment.label[1] + 17}
+                        className="arq-plan-detail"
                         textAnchor="middle"
                         aria-hidden="true"
                       >
-                        {environment.code} · externa
+                        {environment.functionLabel}
                       </text>
-                    ))}
-                </g>
-              ))}
+                    )}
+                    {environment.parts
+                      .filter((p) => p.kind === "external")
+                      .map((part) => (
+                        <text
+                          key={part.id}
+                          x={environment.label[0]}
+                          y={plan.bounds.minY + 23}
+                          className="arq-external-label"
+                          textAnchor="middle"
+                          aria-hidden="true"
+                        >
+                          {environment.code} · externa
+                        </text>
+                      ))}
+                  </g>
+                );
+              })}
               <g className="arq-architecture" aria-hidden="true">
                 {plan.architecture
                   .filter(

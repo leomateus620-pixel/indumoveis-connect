@@ -216,7 +216,7 @@ export function CommercialDashboard({
 }) {
   const me = useMe();
   const edition = useEdition();
-  const allowed = !!(me.data?.perms.mapa?.read && me.data?.perms.comercial?.read);
+  const allowed = me.data?.roles.includes("admin") === true;
   const overview = useCommercialOverview(allowed);
   const details = useCommercialDetails(search.segmento, allowed);
   const snapshot = overview.data;

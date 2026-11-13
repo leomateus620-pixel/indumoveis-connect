@@ -63,12 +63,17 @@ describe("navigation registry", () => {
     expect(v[1].destinations.map((d) => d.to)).toEqual(["/documentos"]);
   });
 
-  it("requires both map and commercial access for the commercial dashboard", () => {
+  it("requires an administrator for the commercial dashboard", () => {
     const paths = (...modules: string[]) =>
       visibleCategories(perms(...modules)).flatMap((group) => group.destinations.map((d) => d.to));
     expect(paths("mapa")).not.toContain("/dashboard-comercial");
     expect(paths("comercial")).not.toContain("/dashboard-comercial");
-    expect(paths("mapa", "comercial")).toContain("/dashboard-comercial");
+    expect(paths("mapa", "comercial")).not.toContain("/dashboard-comercial");
+    expect(
+      visibleCategories(perms("mapa", "comercial"), true).flatMap((g) =>
+        g.destinations.map((d) => d.to),
+      ),
+    ).toContain("/dashboard-comercial");
   });
 
   it("does not require admin to reveal the Administração group", () => {

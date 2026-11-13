@@ -23,6 +23,7 @@ import {
   MoreHorizontal,
   Check,
   BarChart3,
+  ShoppingCart,
 } from "lucide-react";
 import { ENTITIES } from "./data/territory";
 import type { Point } from "./data/territory";
@@ -57,7 +58,10 @@ import {
   type InteriorPavilionNumber,
 } from "@/features/pavilion-interior/presentation";
 import type { ParkPavilionNumber } from "@/features/pavilion-interior/connections";
+import { useCommercialSaleMode } from "@/features/guided-sales/sale-mode-context";
+import { CommercialLotLegend } from "./CommercialLotLegend";
 import "./map.css";
+import "./commercial-lot-legend.css";
 
 type Renderer = ComponentType<MapRendererProps & RefAttributes<MapHandle>>;
 type Selection = {
@@ -200,6 +204,18 @@ export function CommercialMapWorkspace({
   const [query, setQuery] = useState(""),
     [location, setLocation] = useState("");
   const [landmarkNotice, setLandmarkNotice] = useState("");
+  const saleMode = useCommercialSaleMode();
+  const salesActive = !!saleMode?.active;
+  const [saleNotice, setSaleNotice] = useState("");
+  const saleSelectedGeometryIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (salesActive && saleMode?.selectedIds && lotsByGeometry) {
+      for (const [geometryId, lot] of lotsByGeometry) {
+        if (saleMode.selectedIds.has(lot.id)) ids.add(geometryId);
+      }
+    }
+    return ids;
+  }, [salesActive, saleMode?.selectedIds, lotsByGeometry]);
   // Contextual identification of a permanent structure after a click on it.
   // It is transient and never competes with the commercial inspection.
   const [identified, setIdentified] = useState<string | null>(null);
@@ -304,6 +320,24 @@ export function CommercialMapWorkspace({
         );
     returnTo?.focus({ preventScroll: true });
   }, [onCloseExternal]);
+  const selectFromMap = (id: string, keyboard = false) => {
+    const entry = ENTITIES.find((candidate) => candidate.id === id);
+    if (salesActive && entry?.kind === "lot") {
+      const lot = lotsByGeometry?.get(id);
+      if (lot) {
+        setSaleNotice("");
+        saleMode?.toggleLot(lot);
+      } else {
+        setSaleNotice(
+          commercialState === "loading"
+            ? "Aguarde a consulta da disponibilidade."
+            : "Este lote não tem um vínculo comercial confirmado.",
+        );
+      }
+      return;
+    }
+    select(id, keyboard);
+  };
   const dismissMenu = useCallback(() => {
     menuOrigin.current?.focus({ preventScroll: true });
     setMenu(null);
@@ -512,12 +546,13 @@ export function CommercialMapWorkspace({
     quality,
     gesture: "move",
     insets,
-    onSelect: select,
+    onSelect: selectFromMap,
     onDeselect: close,
     onLandmark: setIdentified,
     onReady: () => {},
     onFailure: fail,
     statuses,
+    saleSelectedGeometryIds,
     highlightedIds,
     initialFocus: lastTarget.current,
     initialCamera: savedPark.current?.camera,
@@ -529,6 +564,7 @@ export function CommercialMapWorkspace({
     action: () => void,
     active?: boolean,
     visibleLabel?: string,
+    salesToggle = false,
   ) => (
     <button
       type="button"
@@ -536,6 +572,7 @@ export function CommercialMapWorkspace({
       aria-label={label}
       title={label}
       aria-pressed={active}
+      data-guided-sales-toggle={salesToggle || undefined}
       onClick={action}
     >
       {icon}
@@ -609,6 +646,25 @@ export function CommercialMapWorkspace({
   );
   const headerActions = (
     <div className="im-map-header-actions">
+      {saleMode?.canUse &&
+        tool(
+          "Modo Comercialização",
+          <ShoppingCart aria-hidden="true" />,
+          () => {
+            if (!salesActive && entity?.kind === "lot") {
+              close();
+              workspace.current
+                ?.querySelector<HTMLButtonElement>("[data-guided-sales-toggle]")
+                ?.focus();
+            }
+            if (menu) setMenu(null);
+            setSaleNotice("");
+            saleMode.toggleMode();
+          },
+          salesActive,
+          undefined,
+          true,
+        )}
       {tool(
         "Buscar lote, pavilhão, via ou estrutura",
         <Search />,
@@ -645,7 +701,8 @@ export function CommercialMapWorkspace({
   return (
     <div
       ref={workspace}
-      className={`im-map-workspace ${expanded ? "is-expanded" : ""} ${compactHeader ? "has-compact-header" : ""} ${landscapeLayout ? "is-landscape" : ""}`}
+      data-guided-sales-host=""
+      className={`im-map-workspace ${expanded ? "is-expanded" : ""} ${compactHeader ? "has-compact-header" : ""} ${landscapeLayout ? "is-landscape" : ""} ${salesActive ? "is-sales-active" : ""}`}
       style={
         {
           "--im-open": `${MOTION.panelOpen}ms`,
@@ -762,6 +819,11 @@ export function CommercialMapWorkspace({
             {notice || "Situação comercial não confirmada."}
           </div>
         )}
+        {salesActive && saleNotice && (
+          <div className="im-map-sales-notice" role="status">
+            {saleNotice}
+          </div>
+        )}
         {identifiedName && (
           <div
             className="im-map-identity"
@@ -865,10 +927,15 @@ export function CommercialMapWorkspace({
                               : `landmark:${result.landmark.id}`
                           }
                           aria-pressed={
-                            result.type === "entity" ? selection.id === result.entity.id : undefined
+                            result.type === "entity"
+                              ? salesActive && result.entity.kind === "lot"
+                                ? saleSelectedGeometryIds.has(result.entity.id)
+                                : selection.id === result.entity.id
+                              : undefined
                           }
                           onClick={(e) => {
-                            if (result.type === "entity") select(result.entity.id, e.detail === 0);
+                            if (result.type === "entity")
+                              selectFromMap(result.entity.id, e.detail === 0);
                             else if (handle()?.focusLandmark(result.landmark.id)) {
                               setLandmarkNotice("");
                               dismissMenu();
@@ -921,7 +988,10 @@ export function CommercialMapWorkspace({
                                   : "Disponível no mapa 3D"}
                             </small>
                           </span>
-                          {result.type === "entity" && selection.id === result.entity.id ? (
+                          {result.type === "entity" &&
+                          (salesActive && result.entity.kind === "lot"
+                            ? saleSelectedGeometryIds.has(result.entity.id)
+                            : selection.id === result.entity.id) ? (
                             <Check className="im-map-result-check" aria-hidden="true" />
                           ) : result.type === "entity" && statuses[result.entity.id] ? (
                             <span className="im-map-result-status">
@@ -1006,10 +1076,10 @@ export function CommercialMapWorkspace({
                     Vegetação / área natural
                   </p>
                   <p>Preenchimento físico não indica disponibilidade.</p>
-                  {Object.keys(statuses).length > 0 &&
-                    Object.entries(SPACE_STATUS)
-                      .filter(([key]) => Object.values(statuses).includes(key))
-                      .map(([key, value]) => <p key={key}>{value.label} · vínculo confirmado</p>)}
+                  <CommercialLotLegend
+                    statuses={Object.values(statuses)}
+                    salesActive={salesActive}
+                  />
                 </>
               )}
             </div>
@@ -1081,7 +1151,9 @@ export function CommercialMapWorkspace({
                       : "Situação não confirmada"}
                   </span>
                 )}
-                {externalLot && <LotPricing lot={externalLot} />}
+                {externalLot && externalLot.grossCents !== undefined && (
+                  <LotPricing lot={externalLot} />
+                )}
                 {activeProgress && (
                   <div className="im-map-pavilion-progress">
                     <strong>

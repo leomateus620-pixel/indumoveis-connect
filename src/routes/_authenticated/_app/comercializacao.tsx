@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ResumeGuidedSaleButton } from "@/features/guided-sales/ResumeGuidedSaleButton";
 import { dealGuidance } from "@/lib/journey";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
@@ -43,6 +44,7 @@ import {
 import {
   useDeals,
   useDeal,
+  useGuidedSale,
   useSpaces,
   useCommercialLots,
   useContracts,
@@ -226,6 +228,7 @@ function DealDetail({
   onEdit: (d: any) => void;
 }) {
   const q = useDeal(id);
+  const guided = useGuidedSale(id, !!q.data);
   const { data: d, isLoading } = q;
   const { data: contracts = [] } = useContracts();
   const { data: edition } = useEdition();
@@ -252,7 +255,10 @@ function DealDetail({
   const locked = contract && ["emitido", "assinado"].includes(contract.status);
   const guide = dealGuidance(d.status, contract);
   const actions = DEAL_TRANSITIONS[d.status].filter(
-    (s) => s !== "contratada" && !(locked && ["proposta", "negociacao"].includes(s)),
+    (s) =>
+      (!guided.data || s === "cancelada") &&
+      s !== "contratada" &&
+      !(locked && ["proposta", "negociacao"].includes(s)),
   );
   const expired =
     d.status === "reservada" &&
@@ -329,11 +335,19 @@ function DealDetail({
                       : `Mover para ${DEAL_STATUS[s].label.toLowerCase()}`}
               </Button>
             ))}
-            {!locked && !["contratada", "perdida", "cancelada"].includes(d.status) && (
-              <Button size="sm" variant="outline" onClick={() => onEdit(d)}>
-                Editar
-              </Button>
+            {guided.data && (
+              <ResumeGuidedSaleButton dealId={id}>
+                {guided.data.status === "reservada" ? "Retomar venda" : "Ver comercialização"}
+              </ResumeGuidedSaleButton>
             )}
+            {!guided.isLoading &&
+              !guided.data &&
+              !locked &&
+              !["contratada", "perdida", "cancelada"].includes(d.status) && (
+                <Button size="sm" variant="outline" onClick={() => onEdit(d)}>
+                  Editar
+                </Button>
+              )}
           </div>
         )}
         <Section
@@ -419,8 +433,8 @@ function DealDetail({
             entityType="deal"
             entityId={d.id}
             category="geral"
-            canWrite={canWrite}
-            extraLinks={[{ type: "company", id: d.company_id }]}
+            canWrite={canWrite && !guided.data}
+            extraLinks={guided.data ? [] : [{ type: "company", id: d.company_id }]}
           />
         </Section>
       </div>

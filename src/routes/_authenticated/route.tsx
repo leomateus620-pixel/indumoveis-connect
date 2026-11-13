@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { BootScreen } from "@/components/app/BootScreen";
+import { CommercialSaleModeProvider } from "@/features/guided-sales/CommercialSaleMode";
 
 // Proteção de sessão compartilhada pelo portal (/portal) e pelo layout operacional (_app).
 export const Route = createFileRoute("/_authenticated")({
@@ -25,5 +26,14 @@ export const Route = createFileRoute("/_authenticated")({
     return { user };
   },
   pendingComponent: () => <BootScreen />,
-  component: Outlet,
+  component: AuthenticatedLayout,
 });
+
+function AuthenticatedLayout() {
+  const { user } = Route.useRouteContext();
+  return (
+    <CommercialSaleModeProvider userId={user.id}>
+      <Outlet />
+    </CommercialSaleModeProvider>
+  );
+}

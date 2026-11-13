@@ -5,6 +5,7 @@ const state = vi.hoisted(() => ({
   queries: [] as any[],
   calls: [] as any[],
   permitted: true,
+  isAdmin: false,
   rows: [] as any[],
 }));
 vi.mock("@tanstack/react-query", () => ({
@@ -13,6 +14,8 @@ vi.mock("@tanstack/react-query", () => ({
     return options.queryKey[1] === "me"
       ? {
           data: {
+            id: "actor",
+            roles: state.isAdmin ? ["admin"] : ["comercial"],
             perms: Object.fromEntries(
               ["empresas", "comercial", "contratos", "agenda"].map((module) => [
                 module,
@@ -58,6 +61,7 @@ beforeEach(() => {
   state.calls = [];
   state.rows = [];
   state.permitted = true;
+  state.isAdmin = false;
 });
 const lastQuery = () => state.queries.at(-1);
 
@@ -129,6 +133,19 @@ describe("company edition data boundaries", () => {
       expect(lastQuery().enabled).toBe(false);
     },
   );
+
+  it("separates company and document cache after admin demotion", () => {
+    state.isAdmin = true;
+    useCompanyParticipation("company", "2027", true);
+    const adminDetail = lastQuery().queryKey;
+    useEntityDocuments("company", "company", "2027");
+    const adminDocs = lastQuery().queryKey;
+    state.isAdmin = false;
+    useCompanyParticipation("company", "2027", true);
+    expect(lastQuery().queryKey).not.toEqual(adminDetail);
+    useEntityDocuments("company", "company", "2027");
+    expect(lastQuery().queryKey).not.toEqual(adminDocs);
+  });
 
   it("filters company documents by the requested edition", async () => {
     state.rows = { rows: [] } as any;

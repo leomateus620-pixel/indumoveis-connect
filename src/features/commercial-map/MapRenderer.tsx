@@ -39,7 +39,7 @@ import {
 } from "./commercialPresentation";
 import { createSolarShadows } from "./solarShadows";
 import { isSoftwareRasterizer, ResolutionBudget } from "./performanceBudget";
-import { VISUAL_THEME as PALETTE, COMMERCIAL_STATUS_COLORS } from "./visualTheme";
+import { VISUAL_THEME as PALETTE, COMMERCIAL_STATUS_COLORS, SALES_MAP_COLORS } from "./visualTheme";
 import {
   STREET_LABEL,
   isWalkway,
@@ -362,6 +362,7 @@ const MapRenderer = forwardRef<MapHandle, MapRendererProps>(function MapRenderer
     props.insets.bottom,
     props.statuses,
     props.highlightedIds,
+    props.saleSelectedGeometryIds,
     props.onPavilionProjection,
   ]);
 
@@ -1077,6 +1078,31 @@ function initializeMapRuntime(
   selectionFill.frustumCulled = false;
   commercialGroup.add(selectionFill);
 
+  // The transient selection is a single non-pickable overlay over the original lots.
+  const lotPositions = lotGeometry?.getAttribute("position") as THREE.BufferAttribute | undefined;
+  const saleSelectionGeometry = track(new THREE.BufferGeometry());
+  const saleSelectionPositions = new Float32Array((lotPositions?.count ?? 0) * 3);
+  const saleSelectionAttribute = new THREE.BufferAttribute(saleSelectionPositions, 3);
+  saleSelectionAttribute.setUsage(THREE.DynamicDrawUsage);
+  saleSelectionGeometry.setAttribute("position", saleSelectionAttribute);
+  saleSelectionGeometry.setDrawRange(0, 0);
+  const saleSelectionFill = new THREE.Mesh(
+    saleSelectionGeometry,
+    track(
+      new THREE.MeshBasicMaterial({
+        color: SALES_MAP_COLORS.selected,
+        opacity: 0.7,
+        transparent: true,
+        depthWrite: false,
+      }),
+    ),
+  );
+  saleSelectionFill.raycast = () => {};
+  saleSelectionFill.frustumCulled = false;
+  saleSelectionFill.renderOrder = 2;
+  saleSelectionFill.visible = false;
+  commercialGroup.add(saleSelectionFill);
+
   // One small canvas atlas and one mesh, with CPU collision/priority only when a
   // draw is already needed. No per-label DOM nodes or individual text textures.
   const atlasCanvas = document.createElement("canvas");
@@ -1102,7 +1128,7 @@ function initializeMapRuntime(
         : (PAVILION_LABELS[entity.id] ?? entity.label);
     const row = Math.floor(index / 4),
       col = index % 4;
-    if (row * cellHeight >= 1024) return;
+    if ((row + 1) * cellHeight > 1000) return;
     const lot = entity.kind === "lot";
     const multiline = lot && (entity.numbers?.length ?? 0) > 2;
     const textLines = multiline
@@ -1210,6 +1236,22 @@ function initializeMapRuntime(
               : 4,
     });
   });
+  // Reuse the label atlas for all sold seals. The last strip is reserved above.
+  const sealStart = 1002;
+  atlas.fillStyle = SALES_MAP_COLORS.sold;
+  atlas.strokeStyle = SALES_MAP_COLORS.check;
+  atlas.lineWidth = 1.2;
+  atlas.beginPath();
+  atlas.arc(10, sealStart + 10, 8.2, 0, Math.PI * 2);
+  atlas.fill();
+  atlas.stroke();
+  atlas.lineWidth = 2;
+  atlas.lineCap = "round";
+  atlas.beginPath();
+  atlas.moveTo(6, sealStart + 10);
+  atlas.lineTo(9, sealStart + 13);
+  atlas.lineTo(14, sealStart + 7);
+  atlas.stroke();
   const labelTexture = track(new THREE.CanvasTexture(atlasCanvas));
   labelTexture.colorSpace = THREE.SRGBColorSpace;
   // Atlas padding separates cells by several glyph pixels. Trilinear mipmaps
@@ -1237,6 +1279,41 @@ function initializeMapRuntime(
   labelsMesh.renderOrder = 3;
   labelsMesh.frustumCulled = false;
   commercialGroup.add(labelsMesh);
+  const soldGeometry = track(new THREE.BufferGeometry());
+  const soldPositions = new THREE.BufferAttribute(new Float32Array(lotRanges.size * 18), 3);
+  soldPositions.setUsage(THREE.DynamicDrawUsage);
+  soldGeometry.setAttribute("position", soldPositions);
+  const sealBottom = 1 - (sealStart + 20) / 1024;
+  const sealTop = 1 - sealStart / 1024;
+  const sealRight = 20 / 1024;
+  const soldUVs = new Float32Array(lotRanges.size * 12);
+  for (let i = 0; i < lotRanges.size; i++) {
+    soldUVs.set(
+      [
+        0,
+        sealBottom,
+        sealRight,
+        sealBottom,
+        sealRight,
+        sealTop,
+        0,
+        sealBottom,
+        sealRight,
+        sealTop,
+        0,
+        sealTop,
+      ],
+      i * 12,
+    );
+  }
+  soldGeometry.setAttribute("uv", new THREE.BufferAttribute(soldUVs, 2));
+  soldGeometry.setDrawRange(0, 0);
+  const soldSeals = new THREE.Mesh(soldGeometry, labelsMesh.material);
+  soldSeals.raycast = () => {};
+  soldSeals.frustumCulled = false;
+  soldSeals.renderOrder = 4;
+  soldSeals.visible = false;
+  commercialGroup.add(soldSeals);
   const collisionRects: { x: number; y: number; w: number; h: number }[] = [];
   const bandX = [0, 0, 0, 0],
     bandY = [0, 0, 0, 0];
@@ -1254,6 +1331,7 @@ function initializeMapRuntime(
       );
     }
     let count = 0;
+    let soldCount = 0;
     for (const label of sortedLabels) {
       label.drawn = false;
       const { entity, vertex } = label;
@@ -1480,7 +1558,44 @@ function initializeMapRuntime(
       labelIndices[count++] = vertex;
       labelIndices[count++] = vertex + 3;
       labelIndices[count++] = vertex + 2;
+      if (lot && state.statuses[entity.id] === "vendido") {
+        const sealSize = 11;
+        const sealX = rect.x + rect.w / 2 + sealSize / 2 + 2;
+        const sealRect = { x: sealX, y: rect.y, w: sealSize, h: sealSize };
+        const sealCollides = collisionRects.some(
+          (other) =>
+            other !== rect &&
+            Math.abs(other.x - sealX) < (other.w + sealSize) / 2 + 1 &&
+            Math.abs(other.y - rect.y) < (other.h + sealSize) / 2 + 1,
+        );
+        if (
+          !sealCollides &&
+          sealX + sealSize / 2 < width - state.insets.right &&
+          rect.y + sealSize / 2 < height - state.insets.bottom
+        ) {
+          const dx = (sealX - px) * worldUnitsPerPixel;
+          const dy = (py - rect.y) * worldUnitsPerPixel;
+          const half = (sealSize * worldUnitsPerPixel) / 2;
+          const centerX = anchorX + m[0] * dx + m[4] * dy;
+          const centerY = y + m[1] * dx + m[5] * dy + 0.12;
+          const centerZ = anchorY + m[2] * dx + m[6] * dy;
+          for (const corner of [0, 1, 2, 0, 2, 3]) {
+            const sx = (corner === 0 || corner === 3 ? -1 : 1) * half;
+            const sy = (corner < 2 ? -1 : 1) * half;
+            soldPositions.setXYZ(
+              soldCount++,
+              centerX + m[0] * sx + m[4] * sy,
+              centerY + m[1] * sx + m[5] * sy,
+              centerZ + m[2] * sx + m[6] * sy,
+            );
+          }
+          collisionRects.push(sealRect);
+        }
+      }
     }
+    soldSeals.visible = soldCount > 0;
+    soldGeometry.setDrawRange(0, soldCount);
+    if (soldCount) soldPositions.needsUpdate = true;
     labelsGeometry.setDrawRange(0, count);
     labelsGeometry.index!.needsUpdate = true;
     labelsGeometry.getAttribute("position").needsUpdate = true;
@@ -2725,6 +2840,7 @@ function initializeMapRuntime(
   let selectionAppearanceInspection: string | null | undefined;
   const selectionSurfaces = new Map<string, Float32Array>();
   const previousStatusColors = new Map<string, string>();
+  let previousSaleSelection: ReadonlySet<string> | undefined;
   function update() {
     const state = props();
     configureMapInput(controls);
@@ -2814,6 +2930,21 @@ function initializeMapRuntime(
         changed = true;
       }
       if (changed) colors.needsUpdate = opacities.needsUpdate = true;
+    }
+    if (lotPositions && previousSaleSelection !== state.saleSelectedGeometryIds) {
+      previousSaleSelection = state.saleSelectedGeometryIds;
+      let count = 0;
+      for (const id of state.saleSelectedGeometryIds ?? []) {
+        const range = lotRanges.get(id);
+        if (!range) continue;
+        const [start, vertices] = range;
+        for (let i = start; i < start + vertices; i++) {
+          saleSelectionAttribute.setXYZ(count++, lotPositions.getX(i), 0.12, lotPositions.getZ(i));
+        }
+      }
+      saleSelectionFill.visible = count > 0;
+      saleSelectionGeometry.setDrawRange(0, count);
+      if (count) saleSelectionAttribute.needsUpdate = true;
     }
     if (previousSelection !== state.selectedId) pendingVisibilityCheck = false;
     if (state.insets.right !== previousInsetRight || state.insets.bottom !== previousInsetBottom) {
