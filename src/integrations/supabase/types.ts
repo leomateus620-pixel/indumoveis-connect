@@ -349,8 +349,8 @@ export type Database = {
       }
       companies: {
         Row: {
-          address_complement: string | null;
-          address_number: string | null;
+          address_complement: string | null
+          address_number: string | null
           city: string | null
           created_at: string
           created_by: string | null
@@ -358,22 +358,22 @@ export type Database = {
           id: string
           is_demo: boolean
           legal_name: string
-          neighborhood: string | null;
+          neighborhood: string | null
           notes: string | null
           phone: string | null
-          postal_code: string | null;
+          postal_code: string | null
           segment: string | null
           state: string | null
-          street: string | null;
+          street: string | null
           tax_id: string | null
-          tax_id_type: string | null;
+          tax_id_type: string | null
           trade_name: string
           updated_at: string
           website: string | null
         }
         Insert: {
-          address_complement?: string | null;
-          address_number?: string | null;
+          address_complement?: string | null
+          address_number?: string | null
           city?: string | null
           created_at?: string
           created_by?: string | null
@@ -381,22 +381,22 @@ export type Database = {
           id?: string
           is_demo?: boolean
           legal_name: string
-          neighborhood?: string | null;
+          neighborhood?: string | null
           notes?: string | null
           phone?: string | null
-          postal_code?: string | null;
+          postal_code?: string | null
           segment?: string | null
           state?: string | null
-          street?: string | null;
+          street?: string | null
           tax_id?: string | null
-          tax_id_type?: string | null;
+          tax_id_type?: string | null
           trade_name: string
           updated_at?: string
           website?: string | null
         }
         Update: {
-          address_complement?: string | null;
-          address_number?: string | null;
+          address_complement?: string | null
+          address_number?: string | null
           city?: string | null
           created_at?: string
           created_by?: string | null
@@ -404,15 +404,15 @@ export type Database = {
           id?: string
           is_demo?: boolean
           legal_name?: string
-          neighborhood?: string | null;
+          neighborhood?: string | null
           notes?: string | null
           phone?: string | null
-          postal_code?: string | null;
+          postal_code?: string | null
           segment?: string | null
           state?: string | null
-          street?: string | null;
+          street?: string | null
           tax_id?: string | null
-          tax_id_type?: string | null;
+          tax_id_type?: string | null
           trade_name?: string
           updated_at?: string
           website?: string | null
@@ -421,212 +421,209 @@ export type Database = {
       }
       company_import_batches: {
         Row: {
-          applied_at: string | null;
-          created_at: string;
-          created_by: string | null;
-          edition_id: string | null;
-          file_sha256: string;
-          id: string;
-          payload_fingerprint: string;
-          reconciliation: Json;
-          source_name: string;
-          source_row_count: number;
-          status: string;
-        };
+          applied_at: string | null
+          created_at: string
+          created_by: string | null
+          edition_id: string | null
+          file_sha256: string
+          id: string
+          payload_fingerprint: string
+          reconciliation: Json
+          source_name: string
+          source_row_count: number
+          status: string
+        }
         Insert: {
-          applied_at?: string | null;
-          created_at?: string;
-          created_by?: string | null;
-          edition_id?: string | null;
-          file_sha256: string;
-          id?: string;
-          payload_fingerprint: string;
-          reconciliation?: Json;
-          source_name: string;
-          source_row_count: number;
-          status?: string;
-        };
+          applied_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          edition_id?: string | null
+          file_sha256: string
+          id?: string
+          payload_fingerprint: string
+          reconciliation?: Json
+          source_name: string
+          source_row_count: number
+          status?: string
+        }
         Update: {
-          applied_at?: string | null;
-          created_at?: string;
-          created_by?: string | null;
-          edition_id?: string | null;
-          file_sha256?: string;
-          id?: string;
-          payload_fingerprint?: string;
-          reconciliation?: Json;
-          source_name?: string;
-          source_row_count?: number;
-          status?: string;
-        };
+          applied_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          edition_id?: string | null
+          file_sha256?: string
+          id?: string
+          payload_fingerprint?: string
+          reconciliation?: Json
+          source_name?: string
+          source_row_count?: number
+          status?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "company_import_batches_edition_id_fkey";
-            columns: ["edition_id"];
-            isOneToOne: false;
-            referencedRelation: "editions";
-            referencedColumns: ["id"];
+            foreignKeyName: "company_import_batches_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       company_import_rows: {
         Row: {
-          batch_id: string;
-          company_id: string | null;
-          conflicts: Json;
-          failure: string | null;
-          id: string;
-          issues: Json;
-          participation_id: string | null;
-          prepared_data: Json;
-          source_document_raw: string | null;
-          source_row: number;
-          source_values: Json;
-          status: string;
-        };
+          batch_id: string
+          company_id: string | null
+          conflicts: Json
+          failure: string | null
+          id: string
+          issues: Json
+          participation_id: string | null
+          prepared_data: Json
+          source_document_raw: string | null
+          source_row: number
+          source_values: Json
+          status: string
+        }
         Insert: {
-          batch_id: string;
-          company_id?: string | null;
-          conflicts?: Json;
-          failure?: string | null;
-          id?: string;
-          issues?: Json;
-          participation_id?: string | null;
-          prepared_data: Json;
-          source_document_raw?: string | null;
-          source_row: number;
-          source_values: Json;
-          status?: string;
-        };
+          batch_id: string
+          company_id?: string | null
+          conflicts?: Json
+          failure?: string | null
+          id?: string
+          issues?: Json
+          participation_id?: string | null
+          prepared_data: Json
+          source_document_raw?: string | null
+          source_row: number
+          source_values: Json
+          status?: string
+        }
         Update: {
-          batch_id?: string;
-          company_id?: string | null;
-          conflicts?: Json;
-          failure?: string | null;
-          id?: string;
-          issues?: Json;
-          participation_id?: string | null;
-          prepared_data?: Json;
-          source_document_raw?: string | null;
-          source_row?: number;
-          source_values?: Json;
-          status?: string;
-        };
+          batch_id?: string
+          company_id?: string | null
+          conflicts?: Json
+          failure?: string | null
+          id?: string
+          issues?: Json
+          participation_id?: string | null
+          prepared_data?: Json
+          source_document_raw?: string | null
+          source_row?: number
+          source_values?: Json
+          status?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "company_import_rows_batch_id_fkey";
-            columns: ["batch_id"];
-            isOneToOne: false;
-            referencedRelation: "company_import_batches";
-            referencedColumns: ["id"];
+            foreignKeyName: "company_import_rows_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "company_import_batches"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "company_import_rows_company_id_fkey";
-            columns: ["company_id"];
-            isOneToOne: false;
-            referencedRelation: "companies";
-            referencedColumns: ["id"];
+            foreignKeyName: "company_import_rows_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "company_import_rows_participation_id_fkey";
-            columns: ["participation_id"];
-            isOneToOne: false;
-            referencedRelation: "company_participations";
-            referencedColumns: ["id"];
+            foreignKeyName: "company_import_rows_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_exhibitors_v"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+          {
+            foreignKeyName: "company_import_rows_participation_id_fkey"
+            columns: ["participation_id"]
+            isOneToOne: false
+            referencedRelation: "company_exhibitors_v"
+            referencedColumns: ["participation_id"]
+          },
+          {
+            foreignKeyName: "company_import_rows_participation_id_fkey"
+            columns: ["participation_id"]
+            isOneToOne: false
+            referencedRelation: "company_participations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_participation_occupations: {
         Row: {
-          area_label: string;
-          area_total: number;
-          created_at: string;
-          edition_id: string;
-          id: string;
-          kind: string;
-          module_codes: string[];
-          module_count: number | null;
-          participation_id: string;
-          source_import_row_id: string | null;
-          source_snapshot: Json | null;
-          updated_at: string;
-        };
+          area_label: string
+          area_total: number
+          created_at: string
+          edition_id: string
+          id: string
+          kind: string
+          module_codes: string[]
+          module_count: number | null
+          participation_id: string
+          source_import_row_id: string | null
+          source_snapshot: Json | null
+          updated_at: string
+        }
         Insert: {
-          area_label: string;
-          area_total: number;
-          created_at?: string;
-          edition_id: string;
-          id?: string;
-          kind: string;
-          module_codes?: string[];
-          module_count?: never;
-          participation_id: string;
-          source_import_row_id?: string | null;
-          source_snapshot?: Json | null;
-          updated_at?: string;
-        };
+          area_label: string
+          area_total: number
+          created_at?: string
+          edition_id: string
+          id?: string
+          kind: string
+          module_codes?: string[]
+          module_count?: number | null
+          participation_id: string
+          source_import_row_id?: string | null
+          source_snapshot?: Json | null
+          updated_at?: string
+        }
         Update: {
-          area_label?: string;
-          area_total?: number;
-          created_at?: string;
-          edition_id?: string;
-          id?: string;
-          kind?: string;
-          module_codes?: string[];
-          module_count?: never;
-          participation_id?: string;
-          source_import_row_id?: string | null;
-          source_snapshot?: Json | null;
-          updated_at?: string;
-        };
+          area_label?: string
+          area_total?: number
+          created_at?: string
+          edition_id?: string
+          id?: string
+          kind?: string
+          module_codes?: string[]
+          module_count?: number | null
+          participation_id?: string
+          source_import_row_id?: string | null
+          source_snapshot?: Json | null
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "company_participation_occupations_edition_id_fkey";
-            columns: ["edition_id"];
-            isOneToOne: false;
-            referencedRelation: "editions";
-            referencedColumns: ["id"];
+            foreignKeyName: "company_participation_occupations_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "company_participation_occupations_participation_id_fkey";
-            columns: ["participation_id"];
-            isOneToOne: false;
-            referencedRelation: "company_participations";
-            referencedColumns: ["id"];
+            foreignKeyName: "company_participation_occupations_participation_id_fkey"
+            columns: ["participation_id"]
+            isOneToOne: false
+            referencedRelation: "company_exhibitors_v"
+            referencedColumns: ["participation_id"]
           },
           {
-            foreignKeyName: "company_participation_occupations_source_import_row_id_fkey";
-            columns: ["source_import_row_id"];
-            isOneToOne: true;
-            referencedRelation: "company_import_rows";
-            referencedColumns: ["id"];
+            foreignKeyName: "company_participation_occupations_participation_id_fkey"
+            columns: ["participation_id"]
+            isOneToOne: false
+            referencedRelation: "company_participations"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-      company_save_requests: {
-        Row: {
-          actor: string;
-          created_at: string;
-          fingerprint: string;
-          idempotency_key: string;
-          result: Json;
-        };
-        Insert: {
-          actor: string;
-          created_at?: string;
-          fingerprint: string;
-          idempotency_key: string;
-          result: Json;
-        };
-        Update: {
-          actor?: string;
-          created_at?: string;
-          fingerprint?: string;
-          idempotency_key?: string;
-          result?: Json;
-        };
-        Relationships: [];
-      };
+          {
+            foreignKeyName: "company_participation_occupations_source_import_row_id_fkey"
+            columns: ["source_import_row_id"]
+            isOneToOne: true
+            referencedRelation: "company_import_rows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_participations: {
         Row: {
           company_id: string
@@ -634,11 +631,11 @@ export type Database = {
           edition_id: string
           id: string
           notes: string | null
-          registration_snapshot: Json;
-          snapshot_locked: boolean;
+          registration_snapshot: Json
+          snapshot_locked: boolean
           status: string
-          updated_at: string;
-          version: number;
+          updated_at: string
+          version: number
         }
         Insert: {
           company_id: string
@@ -646,11 +643,11 @@ export type Database = {
           edition_id: string
           id?: string
           notes?: string | null
-          registration_snapshot?: Json;
-          snapshot_locked?: boolean;
+          registration_snapshot?: Json
+          snapshot_locked?: boolean
           status?: string
-          updated_at?: string;
-          version?: number;
+          updated_at?: string
+          version?: number
         }
         Update: {
           company_id?: string
@@ -658,11 +655,11 @@ export type Database = {
           edition_id?: string
           id?: string
           notes?: string | null
-          registration_snapshot?: Json;
-          snapshot_locked?: boolean;
+          registration_snapshot?: Json
+          snapshot_locked?: boolean
           status?: string
-          updated_at?: string;
-          version?: number;
+          updated_at?: string
+          version?: number
         }
         Relationships: [
           {
@@ -673,6 +670,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "company_participations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_exhibitors_v"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "company_participations_edition_id_fkey"
             columns: ["edition_id"]
             isOneToOne: false
@@ -680,6 +684,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      company_save_requests: {
+        Row: {
+          actor: string
+          created_at: string
+          fingerprint: string
+          idempotency_key: string
+          result: Json
+        }
+        Insert: {
+          actor: string
+          created_at?: string
+          fingerprint: string
+          idempotency_key: string
+          result: Json
+        }
+        Update: {
+          actor?: string
+          created_at?: string
+          fingerprint?: string
+          idempotency_key?: string
+          result?: Json
+        }
+        Relationships: []
       }
       contacts: {
         Row: {
@@ -718,6 +746,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_exhibitors_v"
             referencedColumns: ["id"]
           },
         ]
@@ -855,6 +890,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_exhibitors_v"
             referencedColumns: ["id"]
           },
           {
@@ -1009,6 +1051,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "deals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_exhibitors_v"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "deals_edition_id_fkey"
             columns: ["edition_id"]
             isOneToOne: false
@@ -1132,15 +1181,15 @@ export type Database = {
         Row: {
           contract_template: string | null
           created_at: string
-          ends_on: string | null;
+          ends_on: string | null
           id: string
           is_active: boolean
-          is_historical: boolean;
+          is_historical: boolean
           name: string
           opening_time: string | null
           reservation_expiry_action: string | null
           reservation_hold_days: number | null
-          starts_on: string | null;
+          starts_on: string | null
           timezone: string
           venue: string | null
           year: number
@@ -1148,15 +1197,15 @@ export type Database = {
         Insert: {
           contract_template?: string | null
           created_at?: string
-          ends_on?: string | null;
+          ends_on?: string | null
           id?: string
           is_active?: boolean
-          is_historical?: boolean;
+          is_historical?: boolean
           name: string
           opening_time?: string | null
           reservation_expiry_action?: string | null
           reservation_hold_days?: number | null
-          starts_on?: string | null;
+          starts_on?: string | null
           timezone?: string
           venue?: string | null
           year: number
@@ -1164,15 +1213,15 @@ export type Database = {
         Update: {
           contract_template?: string | null
           created_at?: string
-          ends_on?: string | null;
+          ends_on?: string | null
           id?: string
           is_active?: boolean
-          is_historical?: boolean;
+          is_historical?: boolean
           name?: string
           opening_time?: string | null
           reservation_expiry_action?: string | null
           reservation_hold_days?: number | null
-          starts_on?: string | null;
+          starts_on?: string | null
           timezone?: string
           venue?: string | null
           year?: number
@@ -1313,6 +1362,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "inspections_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_exhibitors_v"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "inspections_contract_id_fkey"
             columns: ["contract_id"]
             isOneToOne: false
@@ -1390,185 +1446,253 @@ export type Database = {
           },
         ]
       }
+      pavilion_architecture_elements: {
+        Row: {
+          display_order: number
+          edition_id: string
+          id: string
+          kind: string
+          label: string | null
+          label_at: Json | null
+          path: string
+          revision_id: string
+          stroke_width: number | null
+        }
+        Insert: {
+          display_order?: number
+          edition_id: string
+          id: string
+          kind: string
+          label?: string | null
+          label_at?: Json | null
+          path: string
+          revision_id: string
+          stroke_width?: number | null
+        }
+        Update: {
+          display_order?: number
+          edition_id?: string
+          id?: string
+          kind?: string
+          label?: string | null
+          label_at?: Json | null
+          path?: string
+          revision_id?: string
+          stroke_width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pavilion_architecture_elements_revision_id_edition_id_fkey"
+            columns: ["revision_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "pavilion_plan_revisions"
+            referencedColumns: ["id", "edition_id"]
+          },
+        ]
+      }
+      pavilion_environment_parts: {
+        Row: {
+          edition_id: string
+          environment_id: string
+          id: string
+          kind: string
+          path: string
+          polygon: Json | null
+          revision_id: string
+        }
+        Insert: {
+          edition_id: string
+          environment_id: string
+          id: string
+          kind: string
+          path: string
+          polygon?: Json | null
+          revision_id: string
+        }
+        Update: {
+          edition_id?: string
+          environment_id?: string
+          id?: string
+          kind?: string
+          path?: string
+          polygon?: Json | null
+          revision_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pavilion_environment_parts_revision_id_environment_id_edit_fkey"
+            columns: ["revision_id", "environment_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "pavilion_environment_revisions"
+            referencedColumns: ["revision_id", "environment_id", "edition_id"]
+          },
+        ]
+      }
+      pavilion_environment_revisions: {
+        Row: {
+          declared_area_m2: number | null
+          display_order: number
+          edition_id: string
+          environment_id: string
+          function_label: string | null
+          label: Json
+          name: string
+          revision_id: string
+        }
+        Insert: {
+          declared_area_m2?: number | null
+          display_order: number
+          edition_id: string
+          environment_id: string
+          function_label?: string | null
+          label: Json
+          name: string
+          revision_id: string
+        }
+        Update: {
+          declared_area_m2?: number | null
+          display_order?: number
+          edition_id?: string
+          environment_id?: string
+          function_label?: string | null
+          label?: Json
+          name?: string
+          revision_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pavilion_environment_revisions_edition_id_environment_id_fkey"
+            columns: ["edition_id", "environment_id"]
+            isOneToOne: false
+            referencedRelation: "pavilion_environments"
+            referencedColumns: ["edition_id", "id"]
+          },
+          {
+            foreignKeyName: "pavilion_environment_revisions_revision_id_edition_id_fkey"
+            columns: ["revision_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "pavilion_plan_revisions"
+            referencedColumns: ["id", "edition_id"]
+          },
+        ]
+      }
+      pavilion_environments: {
+        Row: {
+          code: string
+          edition_id: string
+          id: string
+          kind: string
+          pavilion_number: number
+          space_id: string | null
+        }
+        Insert: {
+          code: string
+          edition_id: string
+          id: string
+          kind: string
+          pavilion_number: number
+          space_id?: string | null
+        }
+        Update: {
+          code?: string
+          edition_id?: string
+          id?: string
+          kind?: string
+          pavilion_number?: number
+          space_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pavilion_environments_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pavilion_environments_space_id_edition_id_fkey"
+            columns: ["space_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "space_status_v"
+            referencedColumns: ["id", "edition_id"]
+          },
+          {
+            foreignKeyName: "pavilion_environments_space_id_edition_id_fkey"
+            columns: ["space_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id", "edition_id"]
+          },
+        ]
+      }
       pavilion_plan_revisions: {
         Row: {
-          id: string
+          bounds: Json
+          coordinate_system: Json
+          created_at: string
           edition_id: string
           floor_plan_id: string
+          id: string
+          is_current: boolean
           pavilion_number: number
-          stable_id: string
+          payload_sha256: string
           revision: number
           source_document: Json
           source_name: string
           source_sha256: string
-          payload_sha256: string
-          coordinate_system: Json
-          bounds: Json
+          stable_id: string
           total_area_m2: number | null
-          is_current: boolean
-          created_at: string
         }
         Insert: {
-          id?: string
+          bounds: Json
+          coordinate_system: Json
+          created_at?: string
           edition_id: string
           floor_plan_id: string
+          id?: string
+          is_current?: boolean
           pavilion_number: number
-          stable_id: string
+          payload_sha256: string
           revision: number
           source_document?: Json
           source_name: string
           source_sha256: string
-          payload_sha256: string
-          coordinate_system: Json
-          bounds: Json
+          stable_id: string
           total_area_m2?: number | null
-          is_current?: boolean
-          created_at?: string
         }
         Update: {
-          id?: string
+          bounds?: Json
+          coordinate_system?: Json
+          created_at?: string
           edition_id?: string
           floor_plan_id?: string
+          id?: string
+          is_current?: boolean
           pavilion_number?: number
-          stable_id?: string
+          payload_sha256?: string
           revision?: number
           source_document?: Json
           source_name?: string
           source_sha256?: string
-          payload_sha256?: string
-          coordinate_system?: Json
-          bounds?: Json
+          stable_id?: string
           total_area_m2?: number | null
-          is_current?: boolean
-          created_at?: string
         }
-        Relationships: []
-      }
-      pavilion_environments: {
-        Row: {
-          edition_id: string
-          id: string
-          pavilion_number: number
-          code: string
-          kind: string
-          space_id: string | null
-        }
-        Insert: {
-          edition_id: string
-          id: string
-          pavilion_number: number
-          code: string
-          kind: string
-          space_id?: string | null
-        }
-        Update: {
-          edition_id?: string
-          id?: string
-          pavilion_number?: number
-          code?: string
-          kind?: string
-          space_id?: string | null
-        }
-        Relationships: []
-      }
-      pavilion_environment_revisions: {
-        Row: {
-          edition_id: string
-          revision_id: string
-          environment_id: string
-          name: string
-          declared_area_m2: number | null
-          function_label: string | null
-          label: Json
-          display_order: number
-        }
-        Insert: {
-          edition_id: string
-          revision_id: string
-          environment_id: string
-          name: string
-          declared_area_m2?: number | null
-          function_label?: string | null
-          label: Json
-          display_order: number
-        }
-        Update: {
-          edition_id?: string
-          revision_id?: string
-          environment_id?: string
-          name?: string
-          declared_area_m2?: number | null
-          function_label?: string | null
-          label?: Json
-          display_order?: number
-        }
-        Relationships: []
-      }
-      pavilion_environment_parts: {
-        Row: {
-          id: string
-          edition_id: string
-          revision_id: string
-          environment_id: string
-          kind: string
-          path: string
-          polygon: Json | null
-        }
-        Insert: {
-          id: string
-          edition_id: string
-          revision_id: string
-          environment_id: string
-          kind: string
-          path: string
-          polygon?: Json | null
-        }
-        Update: {
-          id?: string
-          edition_id?: string
-          revision_id?: string
-          environment_id?: string
-          kind?: string
-          path?: string
-          polygon?: Json | null
-        }
-        Relationships: []
-      }
-      pavilion_architecture_elements: {
-        Row: {
-          id: string
-          edition_id: string
-          revision_id: string
-          kind: string
-          display_order: number
-          stroke_width: number | null
-          path: string
-          label: string | null
-          label_at: Json | null
-        }
-        Insert: {
-          id: string
-          edition_id: string
-          revision_id: string
-          kind: string
-          display_order?: number
-          stroke_width?: number | null
-          path: string
-          label?: string | null
-          label_at?: Json | null
-        }
-        Update: {
-          id?: string
-          edition_id?: string
-          revision_id?: string
-          kind?: string
-          display_order?: number
-          stroke_width?: number | null
-          path?: string
-          label?: string | null
-          label_at?: Json | null
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pavilion_plan_revisions_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pavilion_plan_revisions_floor_plan_id_edition_id_fkey"
+            columns: ["floor_plan_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id", "edition_id"]
+          },
+        ]
       }
       payments: {
         Row: {
@@ -1717,6 +1841,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "spaces_floor_plan_edition_fkey"
+            columns: ["floor_plan_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id", "edition_id"]
+          },
+          {
             foreignKeyName: "spaces_floor_plan_id_fkey"
             columns: ["floor_plan_id"]
             isOneToOne: false
@@ -1747,31 +1878,32 @@ export type Database = {
     Views: {
       company_exhibitors_v: {
         Row: {
-          area_labels: string[] | null;
-          city: string | null;
-          edition_id: string | null;
-          id: string | null;
-          legal_name: string | null;
-          module_count: number | null;
-          occupation_count: number | null;
-          participation_id: string | null;
-          snapshot_locked: boolean | null;
-          state: string | null;
-          status: string | null;
-          total_area: number | null;
-          trade_name: string | null;
-          version: number | null;
-        };
+          area_labels: string[] | null
+          city: string | null
+          edition_id: string | null
+          id: string | null
+          legal_name: string | null
+          module_count: number | null
+          occupation_count: number | null
+          participation_id: string | null
+          snapshot_locked: boolean | null
+          state: string | null
+          status: string | null
+          tax_id: string | null
+          total_area: number | null
+          trade_name: string | null
+          version: number | null
+        }
         Relationships: [
           {
-            foreignKeyName: "company_participations_edition_id_fkey";
-            columns: ["edition_id"];
-            isOneToOne: false;
-            referencedRelation: "editions";
-            referencedColumns: ["id"];
+            foreignKeyName: "company_participations_edition_id_fkey"
+            columns: ["edition_id"]
+            isOneToOne: false
+            referencedRelation: "editions"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       space_status_v: {
         Row: {
           active_deal_id: string | null
@@ -1839,6 +1971,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "spaces_floor_plan_edition_fkey"
+            columns: ["floor_plan_id", "edition_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id", "edition_id"]
+          },
+          {
             foreignKeyName: "spaces_floor_plan_id_fkey"
             columns: ["floor_plan_id"]
             isOneToOne: false
@@ -1849,46 +1988,11 @@ export type Database = {
       }
     }
     Functions: {
-      get_pavilion_interior: {
-        Args: { p_edition_id: string; p_pavilion_number?: number; p_revision?: number }
-        Returns: Json
-      }
-      get_pavilion_interior_commercial: {
-        Args: { p_edition_id: string; p_floor_plan_id: string; p_revision: number; p_pavilion_number?: number }
-        Returns: Json
-      }
-      pavilion_valid_point: { Args: { p: Json }; Returns: boolean }
-      pavilion_valid_path: { Args: { p: string }; Returns: boolean }
-      pavilion_valid_polygon: { Args: { p: Json }; Returns: boolean }
-
-      apply_company_import: {
-        Args: { p_batch_id: string; p_edition_year?: number };
-        Returns: Json;
-      };
-      company_document_info: { Args: { p_raw: string }; Returns: Json };
-      company_import_reconciliation: { Args: { p_batch_id: string }; Returns: Json };
-      company_registration_snapshot: { Args: { p_company_id: string }; Returns: Json };
-      get_company_participation: {
-        Args: { p_company_id: string; p_edition_id: string };
-        Returns: Json;
-      };
-      save_company_participation: {
-        Args: {
-          p_company: Json;
-          p_company_id: string | null;
-          p_edition_id: string;
-          p_expected_company_updated_at: string | null;
-          p_expected_participation_version: number | null;
-          p_idempotency_key: string;
-          p_occupations: Json | null;
-        };
-        Returns: Json;
-      };
-      stage_company_import: {
-        Args: { p_file_sha256: string; p_rows: Json; p_source_name: string };
-        Returns: Json;
-      };
       activity_snapshot: { Args: { p_activity_id: string }; Returns: Json }
+      apply_company_import: {
+        Args: { p_batch_id: string; p_edition_year?: number }
+        Returns: Json
+      }
       begin_document_upload: {
         Args: {
           p_category: string
@@ -1919,6 +2023,15 @@ export type Database = {
       can_read_document_object: { Args: { _path: string }; Returns: boolean }
       can_write: { Args: { _module: string }; Returns: boolean }
       cancel_document_upload: { Args: { p_id: string }; Returns: undefined }
+      company_document_info: { Args: { p_raw: string }; Returns: Json }
+      company_import_reconciliation: {
+        Args: { p_batch_id: string }
+        Returns: Json
+      }
+      company_registration_snapshot: {
+        Args: { p_company_id: string }
+        Returns: Json
+      }
       create_contract_from_deal: {
         Args: { p_deal_id: string }
         Returns: string
@@ -1959,6 +2072,27 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_company_participation: {
+        Args: { p_company_id: string; p_edition_id: string }
+        Returns: Json
+      }
+      get_pavilion_interior: {
+        Args: {
+          p_edition_id: string
+          p_pavilion_number?: number
+          p_revision?: number
+        }
+        Returns: Json
+      }
+      get_pavilion_interior_commercial: {
+        Args: {
+          p_edition_id: string
+          p_floor_plan_id: string
+          p_pavilion_number?: number
+          p_revision: number
+        }
+        Returns: Json
+      }
       has_any_role: { Args: never; Returns: boolean }
       has_role: {
         Args: {
@@ -1971,6 +2105,9 @@ export type Database = {
         Args: { p_doc_id: string; p_entity_id: string; p_type: string }
         Returns: undefined
       }
+      pavilion_valid_path: { Args: { p: string }; Returns: boolean }
+      pavilion_valid_point: { Args: { p: Json }; Returns: boolean }
+      pavilion_valid_polygon: { Args: { p: Json }; Returns: boolean }
       provision_initial_admin: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -2035,6 +2172,18 @@ export type Database = {
         }
         Returns: string
       }
+      save_company_participation: {
+        Args: {
+          p_company: Json
+          p_company_id: string
+          p_edition_id: string
+          p_expected_company_updated_at: string
+          p_expected_participation_version: number
+          p_idempotency_key: string
+          p_occupations: Json
+        }
+        Returns: Json
+      }
       save_contract_body: {
         Args: {
           p_body: string
@@ -2091,6 +2240,10 @@ export type Database = {
           p_to: Database["public"]["Enums"]["contract_status"]
         }
         Returns: undefined
+      }
+      stage_company_import: {
+        Args: { p_file_sha256: string; p_rows: Json; p_source_name: string }
+        Returns: Json
       }
       transition_deal: {
         Args: {
