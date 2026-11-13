@@ -6,7 +6,7 @@ import { Map2D } from "./Map2D";
 import { ENTITIES } from "./data/territory";
 import type { MapHandle, MapRendererProps } from "./types";
 import { STREET_LABEL } from "./labelPolicy";
-import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
+import { COMMERCIAL_STATUS_COLORS, SALES_MAP_COLORS, VISUAL_THEME } from "./visualTheme";
 import { LOT_GRAPHICS } from "./commercialPresentation";
 
 const props: MapRendererProps = {
@@ -23,6 +23,25 @@ const props: MapRendererProps = {
   highlightedIds: [],
 };
 describe("engine-independent territorial fallback", () => {
+  it("distinguishes transient selections, confirmed sales and masked occupied lots", () => {
+    const [a, b, c] = ENTITIES.filter((item) => item.kind === "lot");
+    const { container } = render(
+      <Map2D
+        {...props}
+        saleSelectedGeometryIds={new Set([a.id])}
+        statuses={{ [a.id]: "disponivel", [b.id]: "vendido", [c.id]: "indisponivel" }}
+      />,
+    );
+    const fill = (id: string) =>
+      container.querySelector<SVGPolygonElement>(`[data-entity="${id}"] polygon`)?.style.fill;
+    expect(fill(a.id)).toBe(SALES_MAP_COLORS.selected);
+    expect(fill(b.id)).toBe(COMMERCIAL_STATUS_COLORS.vendido);
+    expect(fill(c.id)).toBe(COMMERCIAL_STATUS_COLORS.indisponivel);
+    const checks = container.querySelectorAll("[data-sold-lot-check]");
+    expect(checks).toHaveLength(1);
+    expect(checks[0].parentElement).toHaveAttribute("data-label-entity", b.id);
+    expect(checks[0]).toHaveAttribute("pointer-events", "none");
+  });
   it("renders useful HTML without browser globals or a WebGL context", () => {
     const html = renderToString(<Map2D {...props} />);
     expect(html).toContain("<svg");

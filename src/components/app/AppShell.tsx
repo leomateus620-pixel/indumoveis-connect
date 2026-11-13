@@ -100,7 +100,8 @@ function SidebarBody({
   onSignOut: () => void;
 }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const groups = useMemo(() => visibleCategories(me.perms), [me.perms]);
+  const isAdmin = me.roles.includes("admin");
+  const groups = useMemo(() => visibleCategories(me.perms, isAdmin), [me.perms, isAdmin]);
   const item = (d: NavDestination) => (
     <NavItem
       key={d.to}
@@ -223,7 +224,7 @@ function ModuleGuard({ me }: { me: Me }) {
   // confirmadas descrevem a página que está de fato na tela.
   const path = useMatches({ select: (ms) => ms[ms.length - 1]?.pathname ?? "" });
   const current = matchDestination(path);
-  if (!current || !canOpen(me.perms, current))
+  if (!current || !canOpen(me.perms, current, me.roles.includes("admin")))
     return (
       <Notice title="Acesso não permitido">
         <p className="text-muted-foreground">Seu perfil não permite consultar este módulo.</p>

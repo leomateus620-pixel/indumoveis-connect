@@ -59,7 +59,7 @@ const lot: CommercialLot = {
   grossCents: 108000,
 };
 
-function stub(financial: boolean) {
+function stub(financial: boolean, admin = true) {
   const overview: CommercialOverview = {
     financial,
     activity: true,
@@ -71,6 +71,7 @@ function stub(financial: boolean) {
   };
   api.useMe.mockReturnValue({
     data: {
+      roles: admin ? ["admin"] : ["comercial", "financeiro"],
       perms: { mapa: { read: true }, comercial: { read: true }, financeiro: { read: financial } },
     },
     isSuccess: true,
@@ -89,6 +90,13 @@ function stub(financial: boolean) {
 }
 
 describe("commercial dashboard", () => {
+  it("does not show cached dashboard data to a non-admin with both module grants", () => {
+    stub(true, false);
+    render(<CommercialDashboard search={{}} onSearch={vi.fn()} />);
+    expect(screen.queryByText("50%")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Potencial de tabela" })).toBeNull();
+    expect(api.useCommercialOverview).toHaveBeenLastCalledWith(false);
+  });
   it("shows partial prices and no percentage for a segment without inventory", () => {
     stub(true);
     const onSearch = vi.fn();

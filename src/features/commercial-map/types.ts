@@ -61,6 +61,8 @@ export interface MapRendererProps {
   onFailure(reason: string): void;
   statuses: Record<string, string>;
   highlightedIds: string[];
+  /** Independent from inspection selection and persisted commercial status. */
+  saleSelectedGeometryIds?: ReadonlySet<string>;
   /** Visible roof centres in CSS pixels, relative to the map stage. */
   onPavilionProjection?: ReportPavilionProjections;
   initialFocus?: Point;

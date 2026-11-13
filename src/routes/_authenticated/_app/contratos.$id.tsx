@@ -34,6 +34,7 @@ import {
 import {
   useContract,
   useContractPricingTerms,
+  useGuidedSale,
   useCan,
   useDbMutation,
   api,
@@ -52,6 +53,8 @@ import {
 import { snapshotDiff, snapshotOfDeal, splitInstallments } from "@/lib/journey";
 import type { ContractPricingTerms } from "@/lib/commercial";
 import { ContractPricingCard } from "@/features/commercial-pricing/ContractPricingCard";
+
+import { ResumeGuidedSaleButton } from "@/features/guided-sales/ResumeGuidedSaleButton";
 
 export const Route = createFileRoute("/_authenticated/_app/contratos/$id")({
   head: () => ({
@@ -81,6 +84,7 @@ function ContractPage() {
   const cq = useContract(id);
   const { data: c, isLoading } = cq;
   const pricing = useContractPricingTerms(id, !!c);
+  const guided = useGuidedSale(c?.deal_id, !!c);
   const { data: inst = [] } = useInstallments(fin.read);
   const { data: files = [] } = useEntityDocuments("contract", id);
   const name = useProfileName();
@@ -132,7 +136,7 @@ function ContractPage() {
     c.deals && c.status !== "cancelado"
       ? snapshotDiff(c.deal_snapshot, snapshotOfDeal(c.deals))
       : [];
-  const canGenerate = ["emitido", "assinado"].includes(c.status);
+  const canGenerate = !guided.data && ["emitido", "assinado"].includes(c.status);
   const pricingTerms = pricing.data;
 
   return (
@@ -274,7 +278,11 @@ function ContractPage() {
               contractId={id}
               terms={pricingTerms}
               editable={
-                c.status === "elaboracao" && can.write && fin.read && !!pricingTerms.fee_rules
+                !guided.data &&
+                c.status === "elaboracao" &&
+                can.write &&
+                fin.read &&
+                !!pricingTerms.fee_rules
               }
             />
           )}
@@ -316,19 +324,26 @@ function ContractPage() {
           </Section>
         </div>
         <div className="min-w-0 space-y-5">
-          {can.write && CONTRACT_TRANSITIONS[c.status].length > 0 && (
+          {can.write && (guided.data || CONTRACT_TRANSITIONS[c.status].length > 0) && (
             <Section title="Ações">
               <div className="flex flex-col gap-2">
-                {CONTRACT_TRANSITIONS[c.status].map((s) => (
-                  <Button
-                    key={s}
-                    variant={s === "cancelado" || s === "elaboracao" ? "outline" : "default"}
-                    disabled={dirty || (s === "emitido" && diff.length > 0)}
-                    onClick={() => setTo(s)}
-                  >
-                    {LABEL[s]}
-                  </Button>
-                ))}
+                {guided.data && (
+                  <ResumeGuidedSaleButton dealId={c.deal_id}>
+                    {guided.data.status === "reservada" ? "Retomar venda" : "Ver comercialização"}
+                  </ResumeGuidedSaleButton>
+                )}
+                {CONTRACT_TRANSITIONS[c.status]
+                  .filter((s) => !guided.data || s === "cancelado")
+                  .map((s) => (
+                    <Button
+                      key={s}
+                      variant={s === "cancelado" || s === "elaboracao" ? "outline" : "default"}
+                      disabled={dirty || (s === "emitido" && diff.length > 0)}
+                      onClick={() => setTo(s)}
+                    >
+                      {LABEL[s]}
+                    </Button>
+                  ))}
                 {dirty && (
                   <p className="text-xs text-warning">Salve o texto antes de mudar a situação.</p>
                 )}
@@ -354,8 +369,8 @@ function ContractPage() {
               entityType="contract"
               entityId={id}
               category="contrato"
-              canWrite={can.write}
-              extraLinks={[{ type: "company", id: c.company_id }]}
+              canWrite={can.write && !guided.data}
+              extraLinks={guided.data ? [] : [{ type: "company", id: c.company_id }]}
             />
             {files.length > 0 && c.status !== "assinado" && (
               <p className="mt-2 text-xs text-muted-foreground">

@@ -8,6 +8,7 @@ import {
   usePavilionInteriorPlan,
   usePavilionInteriorCommercial,
   useCommercialLots,
+  useIsAdmin,
 } from "@/lib/api";
 import { PavilionInterior } from "./PavilionInterior";
 import { pavilionDestination, type ParkPavilionSearch } from "./connections";
@@ -25,27 +26,26 @@ export function PavilionInteriorPage({
 }) {
   const presentation = PAVILION_PRESENTATIONS[pavilionNumber];
   const navigate = useNavigate();
-  const can = useCan("mapa"),
-    commercialCan = useCan("comercial");
+  const can = useCan("mapa");
+  const isAdmin = useIsAdmin();
   const me = useMe(),
     edition = useEdition();
   const plan = usePavilionInteriorPlan(can.read, pavilionNumber);
   const commercial = usePavilionInteriorCommercial(
     plan.data?.databasePlanId,
     plan.data?.revision,
-    can.read && commercialCan.read,
+    can.read && isAdmin,
     pavilionNumber,
   );
-  const canReadCommercial = can.read && commercialCan.read;
-  const inventory = useCommercialLots(`p${pavilionNumber}`, canReadCommercial);
+  const inventory = useCommercialLots(`p${pavilionNumber}`, can.read);
   const lotsByEnvironment = useMemo(
     () =>
       new Map(
-        (canReadCommercial ? (inventory.data ?? []) : []).flatMap((lot) =>
+        (can.read && inventory.isSuccess ? (inventory.data ?? []) : []).flatMap((lot) =>
           lot.environmentId ? [[lot.environmentId, lot] as const] : [],
         ),
       ),
-    [canReadCommercial, inventory.data],
+    [can.read, inventory.isSuccess, inventory.data],
   );
   const back = () => {
     const saved = readParkReturn(edition.data?.id, pavilionNumber);
@@ -96,9 +96,9 @@ export function PavilionInteriorPage({
       plan={plan.data}
       presentation={presentation}
       selectedCode={selection}
-      commercial={commercialCan.read && commercial.isSuccess ? commercial.data : undefined}
+      commercial={isAdmin && commercial.isSuccess ? commercial.data : undefined}
       lotsByEnvironment={lotsByEnvironment}
-      commercialError={canReadCommercial && (commercial.isError || inventory.isError)}
+      commercialError={can.read && (inventory.isError || (isAdmin && commercial.isError))}
       onRetryCommercial={() => {
         if (commercial.isError) void commercial.refetch();
         if (inventory.isError) void inventory.refetch();

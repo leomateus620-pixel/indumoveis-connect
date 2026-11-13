@@ -16,6 +16,17 @@ import type {
   ContractPricingTerms,
 } from "./commercial";
 
+import { GuidedSaleAttachmentRetry } from "./guided-sales";
+import type {
+  CompleteGuidedSaleInput,
+  GuidedSaleCompany,
+  GuidedSaleQuote,
+  GuidedSaleQuoteInput,
+  GuidedSaleResult,
+  GuidedSaleView,
+  SaveGuidedSaleInput,
+} from "./guided-sales";
+
 const db = supabase as any;
 
 async function run<T>(p: PromiseLike<{ data: T; error: any }>): Promise<T> {
@@ -90,6 +101,11 @@ export function useMe(userId?: string) {
   });
 }
 
+export function useIsAdmin() {
+  const { data } = useMe();
+  return data?.roles.includes("admin") === true;
+}
+
 export function useCan(module: string) {
   const { data } = useMe();
   return { read: !!data?.perms[module]?.read, write: !!data?.perms[module]?.write };
@@ -132,6 +148,13 @@ export function useEditionId() {
   return useEdition().data?.id;
 }
 
+// Role-sensitive data must not be reused from an administrator's cache after
+// demotion, even if the user keeps permission to open the operational menu.
+function useDataVisibilityKey() {
+  const { data } = useMe();
+  return [data?.id, data?.roles.includes("admin")] as const;
+}
+
 // ---------- Leitura genérica ----------
 function useList<T = any>(
   name: string,
@@ -139,8 +162,9 @@ function useList<T = any>(
   deps: unknown[] = [],
   enabled = true,
 ) {
+  const visibility = useDataVisibilityKey();
   return useQuery<T[]>({
-    queryKey: qk.list(name, ...deps),
+    queryKey: qk.list(name, ...deps, ...visibility),
     queryFn: () => run(fn()) as Promise<T[]>,
     enabled,
   });
@@ -150,8 +174,9 @@ function useOne<T = any>(
   id: string | undefined,
   fn: () => PromiseLike<{ data: any; error: any }>,
 ) {
+  const visibility = useDataVisibilityKey();
   return useQuery<T | null>({
-    queryKey: qk.list(name, id),
+    queryKey: qk.list(name, id, ...visibility),
     queryFn: () => run(fn()) as Promise<T | null>,
     enabled: !!id,
   });
@@ -249,9 +274,10 @@ export type CompanyCandidate = Pick<
   "id" | "trade_name" | "legal_name" | "tax_id" | "city" | "state"
 >;
 export function useCompanyCandidates(enabled = false) {
+  const visibility = useDataVisibilityKey();
   const can = useCan("empresas");
   return useQuery<CompanyCandidate[]>({
-    queryKey: qk.list("company-candidates"),
+    queryKey: qk.list("company-candidates", ...visibility),
     enabled: enabled && can.read,
     staleTime: 60_000,
     queryFn: ({ signal }) =>
@@ -265,9 +291,10 @@ export function useCompanyCandidates(enabled = false) {
   });
 }
 export function useEditionCompanies(editionId?: string, enabled = true) {
+  const visibility = useDataVisibilityKey();
   const can = useCan("empresas");
   return useQuery<CompanyEditionSummary[]>({
-    queryKey: qk.list("company-exhibitors", editionId),
+    queryKey: qk.list("company-exhibitors", editionId, ...visibility),
     enabled: enabled && !!editionId && can.read,
     staleTime: 60_000,
     queryFn: async ({ signal }) => {
@@ -284,9 +311,10 @@ export function useEditionCompanies(editionId?: string, enabled = true) {
   });
 }
 export function useCompanyParticipation(companyId?: string, editionId?: string, enabled = true) {
+  const visibility = useDataVisibilityKey();
   const can = useCan("empresas");
   return useQuery<CompanyParticipationDetail | null>({
-    queryKey: qk.list("company-participation", companyId, editionId),
+    queryKey: qk.list("company-participation", companyId, editionId, ...visibility),
     enabled: enabled && !!companyId && !!editionId && can.read,
     staleTime: 60_000,
     gcTime: 30 * 60_000,
@@ -376,9 +404,18 @@ function useCommercialQueryContext(enabled: boolean) {
   const { data: me } = useMe();
   return {
     editionId,
-    enabled: enabled && !!editionId && map.read && commercial.read,
+    enabled: enabled && !!editionId && map.read && !!me,
+    admin: me?.roles.includes("admin") === true,
     // Identidade e permissões no cache; o RPC decide o que efetivamente retorna.
-    scope: [me?.id, map.read, commercial.read, finance.read, contracts.read, companies.read],
+    scope: [
+      me?.id,
+      me?.roles.includes("admin"),
+      map.read,
+      commercial.read,
+      finance.read,
+      contracts.read,
+      companies.read,
+    ],
   };
 }
 
@@ -386,7 +423,7 @@ export function useCommercialOverview(enabled = true) {
   const ctx = useCommercialQueryContext(enabled);
   return useQuery({
     queryKey: qk.list("commercial-overview", ctx.editionId, ...ctx.scope),
-    enabled: ctx.enabled,
+    enabled: ctx.enabled && ctx.admin,
     retry: 1,
     staleTime: 30_000,
     queryFn: ({ signal }) =>
@@ -419,7 +456,7 @@ export function useCommercialDetails(segment?: CommercialSegmentKey, enabled = t
   const ctx = useCommercialQueryContext(enabled);
   return useQuery({
     queryKey: qk.list("commercial-details", ctx.editionId, segment, ...ctx.scope),
-    enabled: ctx.enabled,
+    enabled: ctx.enabled && ctx.admin,
     retry: 1,
     staleTime: 30_000,
     queryFn: ({ signal }) =>
@@ -432,6 +469,45 @@ export function useCommercialDetails(segment?: CommercialSegmentKey, enabled = t
           .abortSignal(signal),
       ),
   });
+}
+
+export function useGuidedSale(dealId?: string, enabled = true) {
+  const { data: me } = useMe();
+  const admin = me?.roles.includes("admin") === true;
+  return useQuery({
+    queryKey: qk.list("guided-sale", dealId, me?.id, admin),
+    enabled: !!dealId && admin && enabled,
+    retry: false,
+    queryFn: ({ signal }) =>
+      run<GuidedSaleView | null>(
+        db.rpc("get_guided_sale", { p_deal_id: dealId }).abortSignal(signal),
+      ),
+  });
+}
+
+export function useGuidedSaleCompanies(enabled = true) {
+  const { data: me } = useMe();
+  const admin = me?.roles.includes("admin") === true;
+  return useList<GuidedSaleCompany>(
+    "guided-sale-companies",
+    () =>
+      db
+        .from("companies")
+        .select("id,trade_name,legal_name,tax_id")
+        .eq("is_demo", false)
+        .order("trade_name"),
+    [me?.id, admin],
+    enabled && admin,
+  );
+}
+
+function quoteArguments(input: GuidedSaleQuoteInput) {
+  return {
+    p_edition_id: input.editionId,
+    p_space_ids: input.spaceIds,
+    p_agreed_overrides: input.agreedOverrides ?? {},
+    p_payment: input.payment ?? null,
+  };
 }
 
 export function useContractPricingTerms(contractId: string, enabled = true) {
@@ -577,6 +653,7 @@ export function usePavilionInteriorCommercial(
   enabled = true,
   pavilionNumber = 1,
 ) {
+  const visibility = useDataVisibilityKey();
   const editionId = useEditionId();
   const map = useCan("mapa");
   const commercial = useCan("comercial");
@@ -592,6 +669,7 @@ export function usePavilionInteriorCommercial(
       revision,
       permitted,
       companies.read,
+      ...visibility,
     ),
     enabled: enabled && !!editionId && !!planId && !!revision && permitted,
     retry: 1,
@@ -825,17 +903,23 @@ function searchDocs(p: DocSearch) {
     }),
   );
 }
-export const useDocumentSearch = (p: DocSearch, enabled = true) =>
-  useQuery({
-    queryKey: qk.list("documents", p),
+export function useDocumentSearch(p: DocSearch, enabled = true) {
+  const visibility = useDataVisibilityKey();
+  return useQuery({
+    queryKey: qk.list("documents", ...visibility, p),
     queryFn: () => searchDocs(p),
     enabled: enabled && (p.scope !== "edition" || !!p.editionId),
-    placeholderData: (prev) => prev,
+    placeholderData: (prev, query) =>
+      query?.queryKey[2] === visibility[0] && query?.queryKey[3] === visibility[1]
+        ? prev
+        : undefined,
   });
+}
 /** Anexos de um registro: somente a versão vigente de cada documento (mesma regra da central). */
-export const useEntityDocuments = (type: string, id?: string, editionId?: string) =>
-  useQuery({
-    queryKey: qk.list("documents", "entity", type, id, editionId),
+export const useEntityDocuments = (type: string, id?: string, editionId?: string) => {
+  const visibility = useDataVisibilityKey();
+  return useQuery({
+    queryKey: qk.list("documents", "entity", type, id, editionId, ...visibility),
     enabled: !!id,
     queryFn: async () =>
       (
@@ -848,10 +932,12 @@ export const useEntityDocuments = (type: string, id?: string, editionId?: string
         })
       ).rows,
   });
+};
 /** Versão vigente de uma cadeia (para seleção fora da página atual). */
-export const useCurrentDocument = (rootId?: string) =>
-  useQuery({
-    queryKey: qk.list("documents", "current", rootId),
+export const useCurrentDocument = (rootId?: string) => {
+  const visibility = useDataVisibilityKey();
+  return useQuery({
+    queryKey: qk.list("documents", "current", rootId, ...visibility),
     enabled: !!rootId,
     queryFn: async () => {
       const rows = await run<any[]>(
@@ -866,9 +952,11 @@ export const useCurrentDocument = (rootId?: string) =>
       return rows[0] ?? null;
     },
   });
-export const useDocumentLinks = (rootId?: string) =>
-  useQuery({
-    queryKey: qk.list("documents", "links", rootId),
+};
+export const useDocumentLinks = (rootId?: string) => {
+  const visibility = useDataVisibilityKey();
+  return useQuery({
+    queryKey: qk.list("documents", "links", rootId, ...visibility),
     enabled: !!rootId,
     queryFn: async () => {
       const links = await run<any[]>(
@@ -884,9 +972,11 @@ export const useDocumentLinks = (rootId?: string) =>
       return links.map((l, i) => ({ type: l.entity_type, id: l.entity_id, label: labels[i] }));
     },
   });
-export const useDocumentVersions = (rootId?: string) =>
-  useQuery({
-    queryKey: qk.list("documents", "versions", rootId),
+};
+export const useDocumentVersions = (rootId?: string) => {
+  const visibility = useDataVisibilityKey();
+  return useQuery({
+    queryKey: qk.list("documents", "versions", rootId, ...visibility),
     enabled: !!rootId,
     queryFn: () =>
       run<any[]>(
@@ -898,6 +988,7 @@ export const useDocumentVersions = (rootId?: string) =>
           .order("version", { ascending: false }),
       ),
   });
+};
 export const updateDocumentMeta = (v: {
   rootId: string;
   title: string;
@@ -949,6 +1040,34 @@ export function useDbMutation<V, R = unknown>(
 }
 
 export const api = {
+  previewGuidedSale: (input: GuidedSaleQuoteInput) =>
+    run<GuidedSaleQuote>(db.rpc("preview_guided_sale", quoteArguments(input))),
+  saveGuidedSale: (input: SaveGuidedSaleInput) =>
+    run<GuidedSaleResult>(
+      db.rpc("save_guided_sale", {
+        ...quoteArguments(input),
+        p_quote_fingerprint: input.quoteFingerprint,
+        p_company_id: input.companyId ?? null,
+        p_company: input.company ?? null,
+        p_idempotency_key: input.idempotencyKey,
+        p_signature_note: input.signatureNote ?? null,
+        p_attachment_id: input.attachmentId ?? null,
+      }),
+    ),
+  completeGuidedSale: (input: CompleteGuidedSaleInput) =>
+    run<GuidedSaleResult>(
+      db.rpc("complete_guided_sale", {
+        p_deal_id: input.dealId,
+        p_signature_note: input.signatureNote,
+        p_attachment_id: input.attachmentId ?? null,
+        p_payment: input.payment ?? null,
+      }),
+    ),
+  attachGuidedSaleContract: (dealId: string, attachmentId: string) =>
+    run(
+      db.rpc("attach_guided_sale_contract", { p_deal_id: dealId, p_attachment_id: attachmentId }),
+    ),
+
   saveCompanyParticipation: (input: SaveCompanyParticipationInput) =>
     run<{
       id: string;
@@ -1068,6 +1187,69 @@ export async function uploadDocument(args: {
     p_idempotency_key: args.idempotencyKey ?? crypto.randomUUID(),
   });
   return completeUpload(r, args.file, args.onProgress);
+}
+
+export async function uploadGuidedSaleAttachment(args: {
+  editionId: string;
+  file: File;
+  idempotencyKey: string;
+  onProgress?: (p: number) => void;
+}) {
+  const issue = validateDocFile(args.file);
+  if (issue) throw new Error(issue);
+  if (
+    !args.file.name.toLowerCase().endsWith(".pdf") ||
+    (await args.file.slice(0, 5).text()) !== "%PDF-"
+  )
+    throw new Error("Anexe um PDF válido.");
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) throw new Error("Sessão expirada. Entre novamente.");
+  const begin = () =>
+    api.rpc<Reserved>("begin_guided_sale_attachment", {
+      p_edition_id: args.editionId,
+      p_name: args.file.name,
+      p_mime: "application/pdf",
+      p_size: args.file.size,
+      p_idempotency_key: args.idempotencyKey,
+    });
+  const transportFailure = (error: unknown) =>
+    !error ||
+    typeof error !== "object" ||
+    !("code" in error) ||
+    !error.code ||
+    ["PGRST000", "PGRST001", "PGRST002", "PGRST003"].includes(String(error.code));
+  let staged: Reserved;
+  try {
+    staged = await begin();
+  } catch (first) {
+    if (!transportFailure(first)) throw first;
+    try {
+      staged = await begin();
+    } catch (second) {
+      if (transportFailure(second)) throw new GuidedSaleAttachmentRetry();
+      throw second;
+    }
+  }
+  if (staged.status === "ativo") return staged;
+  try {
+    await putObject(staged.storage_path, args.file, token, args.onProgress);
+  } catch (err) {
+    // Remove only this upload attempt; its DB row remains pending until the
+    // signed/unsigned transaction promotes it.
+    try {
+      await cancelGuidedSaleAttachment(staged);
+    } catch {
+      throw new GuidedSaleAttachmentRetry();
+    }
+    throw err;
+  }
+  return staged;
+}
+
+export async function cancelGuidedSaleAttachment(staged: Pick<Reserved, "id" | "storage_path">) {
+  await supabase.storage.from("documents").remove([staged.storage_path]);
+  return api.rpc("cancel_guided_sale_attachment", { p_attachment_id: staged.id });
 }
 
 export async function uploadDocumentVersion(args: {

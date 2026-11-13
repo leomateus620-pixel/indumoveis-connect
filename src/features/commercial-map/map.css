@@ -85,6 +85,19 @@
   padding-left: 8px;
   border-left: 1px solid var(--im-border);
 }
+.im-map-sales-notice {
+  position: absolute;
+  top: 43px;
+  left: 12px;
+  z-index: 3;
+  max-width: calc(100% - 24px);
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--im-border);
+  color: var(--im-plum);
+  background: #fffcf8;
+  font-size: 12px;
+}
 .im-map-control-group {
   padding: 3px;
   border: 1px solid var(--im-border);
@@ -693,6 +706,9 @@
   transition-duration: var(--im-close);
   transition-timing-function: ease-in;
 }
+.im-map-workspace.is-sales-active .im-map-detail {
+  max-height: min(calc(100% - 32px), 48dvh);
+}
 @starting-style {
   .im-map-detail {
     opacity: 0;
@@ -918,6 +934,10 @@
   stroke-width: 1.85;
   vector-effect: non-scaling-stroke;
 }
+.im-map-lot[data-sale-selected] > polygon {
+  stroke: #075451;
+  stroke-width: 2;
+}
 .im-map-pavilion polygon {
   fill: #f1f0e7;
   stroke: #6a505f;
@@ -960,6 +980,10 @@
   fill: #483a43;
   stroke: rgba(236, 231, 205, 0.75);
   stroke-width: calc(var(--im-label-unit, 0.1px) * 1);
+}
+.im-map-lot[data-sale-selected] text {
+  fill: #fffdf9;
+  stroke: #075451;
 }
 .im-map-entity.is-selected polygon {
   stroke: #f1cc70;
@@ -1199,6 +1223,11 @@
   }
   .im-map-detail-summary {
     padding-right: 0;
+  }
+}
+@media (max-width: 700px) {
+  .im-map-workspace.is-sales-active .im-map-detail {
+    bottom: max(66px, calc(58px + env(safe-area-inset-bottom, 0px)));
   }
 }
 @media (prefers-reduced-motion: reduce) {

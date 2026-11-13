@@ -32,4 +32,12 @@ export const COMMERCIAL_STATUS_COLORS: Record<string, string> = {
   reservado: "#e2c69e",
   vendido: "#9b7c91",
   bloqueado: "#b6b2b5",
+  indisponivel: "#b6b2b5",
 };
+
+export const SALES_MAP_COLORS = {
+  selected: "#197a74",
+  selectedEdge: "#075451",
+  sold: "#583b51",
+  check: "#fffdf9",
+} as const;

@@ -25,6 +25,7 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 vi.mock("@/lib/api", () => ({
   useCan: () => ({ read: true }),
+  useIsAdmin: () => false,
   useMe: () => state.me,
   useEdition: () => state.edition,
   usePavilionInteriorPlan: () => state.plan,

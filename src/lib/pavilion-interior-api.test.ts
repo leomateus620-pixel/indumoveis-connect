@@ -18,6 +18,8 @@ vi.mock("@tanstack/react-query", () => ({
     if (name === "me")
       return {
         data: {
+          id: "profile-1",
+          roles: state.commercialRead ? ["admin"] : ["consulta"],
           perms: {
             mapa: { read: state.mapRead },
             comercial: { read: state.commercialRead },

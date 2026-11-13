@@ -56,6 +56,7 @@ export type NavDestination = {
   openLabel: string;
   module: ModuleKey;
   requires?: readonly ModuleKey[];
+  adminOnly?: boolean;
   icon: LucideIcon;
   /** Aquecimento sob demanda (intenção do usuário), nunca automático no portal. */
   prewarm?: () => void;
@@ -151,6 +152,7 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
       },
       {
         to: "/dashboard-comercial",
+        adminOnly: true,
         label: "Dashboard Comercial",
         title: "Dashboard Comercial",
         openLabel: "Abrir dashboard comercial",
@@ -274,8 +276,9 @@ export function matchDestination(pathname: string): NavDestination | undefined {
   return NAV_DESTINATIONS.find((d) => pathname === d.to || pathname.startsWith(d.to + "/"));
 }
 
-export function canOpen(perms: Perms, destination: NavDestination) {
+export function canOpen(perms: Perms, destination: NavDestination, isAdmin = false) {
   return (
+    (!destination.adminOnly || isAdmin) &&
     !!perms?.[destination.module]?.read &&
     (destination.requires?.every((module) => perms?.[module]?.read) ?? true)
   );
@@ -284,9 +287,9 @@ export function canOpen(perms: Perms, destination: NavDestination) {
 export type VisibleCategory = { category: NavCategory; destinations: NavDestination[] };
 
 /** Categorias com ao menos um destino legível; cada destino respeita a própria chave. */
-export function visibleCategories(perms: Perms): VisibleCategory[] {
+export function visibleCategories(perms: Perms, isAdmin = false): VisibleCategory[] {
   return NAV_CATEGORIES.map((category) => ({
     category,
-    destinations: category.destinations.filter((d) => canOpen(perms, d)),
+    destinations: category.destinations.filter((d) => canOpen(perms, d, isAdmin)),
   })).filter((c) => c.destinations.length > 0);
 }

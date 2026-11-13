@@ -47,6 +47,7 @@ export const SPACE_STATUS: Record<string, { label: string; tone: Tone }> = {
   reservado: { label: "Reservado", tone: "warn" },
   vendido: { label: "Vendido", tone: "brand" },
   bloqueado: { label: "Bloqueado", tone: "neutral" },
+  indisponivel: { label: "Indisponível", tone: "neutral" },
 };
 export const CONTRACT_STATUS: Record<string, { label: string; tone: Tone }> = {
   elaboracao: { label: "Em elaboração", tone: "neutral" },

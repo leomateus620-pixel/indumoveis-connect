@@ -20,7 +20,8 @@ import {
   streetLabelCorridor,
   streetLabelPresentation,
 } from "./labelPolicy";
-import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
+import { COMMERCIAL_STATUS_COLORS, SALES_MAP_COLORS, VISUAL_THEME } from "./visualTheme";
+import { SoldLotCheck } from "./CommercialLotLegend";
 import { commercialBoundaries, interiorLotAnchor, LOT_GRAPHICS } from "./commercialPresentation";
 import { getPavilionPresentation } from "./architectureOrientation";
 import { pavilionMarkerScale } from "./pavilionSalesProgress";
@@ -148,6 +149,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
   const animation = useRef<number | null>(null);
   const animationGeneration = useRef(0);
   const labels = useRef<{ node: SVGTextElement; entity: MapEntity }[]>([]);
+  const soldChecks = useRef(new Map<string, SVGSVGElement>());
   const streetState = useRef(new Map<string, { scale: number; visible: boolean }>());
   const current = useRef(props);
   current.current = props;
@@ -261,6 +263,21 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
               bounds.bottom > r.top - 3,
           ));
       node.style.visibility = visible ? "visible" : "hidden";
+      const check = soldChecks.current.get(entity.id);
+      if (check) {
+        const badge = unit * 11;
+        check.setAttribute("width", String(badge));
+        check.setAttribute("height", String(badge));
+        check.setAttribute("x", String(right - unit * 2));
+        check.setAttribute("y", String((top + bottom - badge) / 2));
+        // Avoid covering neighbouring labels when the viewport is too distant.
+        check.style.visibility =
+          visible &&
+          pointInPolygon([right + badge, top], entity.polygon) &&
+          pointInPolygon([right + badge, bottom], entity.polygon)
+            ? "visible"
+            : "hidden";
+      }
       if (visible) accepted.push(bounds);
     }
   };
@@ -426,6 +443,14 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
   }));
   useEffect(() => {
     const priority = { pavilion: 1, road: 2, support: 3, lot: 4, landscape: 5 };
+    soldChecks.current = new Map(
+      Array.from(
+        svg.current?.querySelectorAll<SVGSVGElement>("[data-sold-lot-check]") ?? [],
+      ).flatMap((node) => {
+        const id = node.parentElement?.getAttribute("data-label-entity");
+        return id ? [[id, node] as const] : [];
+      }),
+    );
     labels.current = Array.from(svg.current?.querySelectorAll("text") ?? [])
       .map((node) => ({
         node,
@@ -441,7 +466,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       );
     write();
     // Labels share the existing SVG; selection only changes their priority.
-  }, [props.selectedId, props.inspectedId, props.onPavilionProjection]);
+  }, [props.selectedId, props.inspectedId, props.onPavilionProjection, props.statuses]);
   useEffect(() => {
     write();
     if (props.initialFocus) {
@@ -668,6 +693,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
         <g
           key={entity.id}
           data-entity={entity.id}
+          data-sale-selected={props.saleSelectedGeometryIds?.has(entity.id) || undefined}
           className={`im-map-entity im-map-${entity.kind} ${props.selectedId === entity.id ? "is-selected" : ""} ${props.highlightedIds.includes(entity.id) ? "is-highlighted" : ""}`}
         >
           <polygon
@@ -677,9 +703,11 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
                 entity.kind === "road" &&
                 !["indumoveis:road:benvenuto", "indumoveis:road:imigrantes"].includes(entity.id)
                   ? "transparent"
-                  : (entity.kind === "lot" &&
-                      COMMERCIAL_STATUS_COLORS[props.statuses[entity.id]]) ||
-                    entityColor(entity),
+                  : props.saleSelectedGeometryIds?.has(entity.id)
+                    ? SALES_MAP_COLORS.selected
+                    : (entity.kind === "lot" &&
+                        COMMERCIAL_STATUS_COLORS[props.statuses[entity.id]]) ||
+                      entityColor(entity),
             }}
           />
           {entity.kind === "pavilion" && (
@@ -739,6 +767,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           <g
             key={entity.id}
             data-label-entity={entity.id}
+            data-sale-selected={props.saleSelectedGeometryIds?.has(entity.id) || undefined}
             className={`im-map-entity im-map-${entity.kind} ${props.selectedId === entity.id ? "is-selected" : ""}`}
           >
             <text
@@ -765,6 +794,9 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
             >
               {sceneLabel(entity)}
             </text>
+            {entity.kind === "lot" && props.statuses[entity.id] === "vendido" && (
+              <SoldLotCheck x={entity.anchor[0]} y={entity.anchor[1]} size={0} />
+            )}
           </g>
         ))}
       </g>

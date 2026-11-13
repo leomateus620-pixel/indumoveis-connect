@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   navigate: vi.fn(),
   canMap: true,
   canCommercial: false,
+  isAdmin: false,
   plan: { isError: false, isPending: false, data: undefined as unknown, refetch: vi.fn() },
   usePlan: vi.fn(),
   useCommercial: vi.fn(),
@@ -16,6 +17,7 @@ const state = vi.hoisted(() => ({
 vi.mock("@tanstack/react-router", () => ({ useNavigate: () => state.navigate }));
 vi.mock("@/lib/api", () => ({
   useCan: (module: string) => ({ read: module === "mapa" ? state.canMap : state.canCommercial }),
+  useIsAdmin: () => state.isAdmin,
   useMe: () => ({ isError: false, isPending: false }),
   useEdition: () => ({ isError: false, isPending: false, data: { id: "current-edition" } }),
   usePavilionInteriorPlan: (...args: unknown[]) => {
@@ -59,6 +61,7 @@ beforeEach(() => {
   sessionStorage.clear();
   state.canMap = true;
   state.canCommercial = false;
+  state.isAdmin = false;
   state.plan.isError = false;
   state.plan.isPending = false;
   state.plan.data = {
@@ -85,8 +88,9 @@ describe("P13 authenticated inspection boundary", () => {
     expect(screen.queryByText("Empresa permitida")).not.toBeInTheDocument();
   });
 
-  it("passes the permission-filtered commercial response when the profile can consult Comercial", () => {
+  it("passes the exhibitor response to an administrator", () => {
     state.canCommercial = true;
+    state.isAdmin = true;
     render(<PavilionInteriorPage pavilionNumber={13} selectedCode="35" onSelect={() => {}} />);
     expect(state.useCommercial).toHaveBeenCalledWith(
       "plan-13",
@@ -96,6 +100,18 @@ describe("P13 authenticated inspection boundary", () => {
     );
     const data = JSON.parse(screen.getByTestId("inspection").getAttribute("data-commercial")!);
     expect(data).toEqual({ "35": { status: "reservado", exhibitor: "Empresa permitida" } });
+  });
+
+  it("does not request or render exhibitor details for a non-admin with Comercial access", () => {
+    state.canCommercial = true;
+    render(<PavilionInteriorPage pavilionNumber={13} selectedCode="35" onSelect={() => {}} />);
+    expect(state.useCommercial).toHaveBeenCalledWith(
+      "plan-13",
+      PAVILION_13_PLAN.revision,
+      false,
+      13,
+    );
+    expect(screen.getByTestId("inspection")).toHaveAttribute("data-commercial", "{}");
   });
 
   it("rejects a mismatched P1 payload instead of opening the wrong interior", () => {

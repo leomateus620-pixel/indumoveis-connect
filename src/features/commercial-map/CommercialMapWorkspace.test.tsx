@@ -1,8 +1,11 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { CommercialMapWorkspace } from "./CommercialMapWorkspace";
 import type { MapHandle, MapRendererProps, MapCameraSnapshot } from "./types";
 import { saveParkReturn } from "@/features/pavilion-interior/parkReturn";
+import { SaleModeContext } from "@/features/guided-sales/sale-mode-context";
+import type { CommercialLot } from "@/lib/commercial";
 
 const commands = vi.hoisted(() => ({ rotate: vi.fn(), zoom: vi.fn(), rendererMount: vi.fn() }));
 
@@ -27,6 +30,7 @@ vi.mock("./Map2D", async () => {
           data-selected={props.selectedId ?? ""}
           data-view={props.view}
           data-initial-camera={JSON.stringify(props.initialCamera ?? null)}
+          data-sales={Array.from(props.saleSelectedGeometryIds ?? []).join(",")}
         />
       );
     }),
@@ -57,8 +61,10 @@ vi.mock("./MapRenderer", async () => {
           data-selected={props.selectedId ?? ""}
           data-view={props.view}
           data-initial-camera={JSON.stringify(props.initialCamera ?? null)}
+          data-sales={Array.from(props.saleSelectedGeometryIds ?? []).join(",")}
         >
           <button onClick={() => props.onSelect("indumoveis:external:lot:01")}>Select A</button>
+          <button onClick={() => props.onSelect("indumoveis:external:lot:02")}>Select C</button>
           <button onClick={() => props.onSelect("indumoveis:pavilion:12")}>Select B</button>
           <button onClick={() => props.onDeselect?.()}>Empty ground</button>
           <button onClick={() => props.onManualOrientation?.()}>Manual orbit</button>
@@ -98,6 +104,71 @@ afterEach(() => {
 });
 
 describe("selection presentation session", () => {
+  it("intercepts lot clicks only in the opt-in mode without replacing the pavilion inspection", async () => {
+    const ids = ["indumoveis:external:lot:01", "indumoveis:external:lot:02"];
+    const lots = new Map(
+      ids.map((geometryId, i) => [
+        geometryId,
+        {
+          id: `space-${i}`,
+          geometryId,
+          environmentId: null,
+          segmentKey: "external",
+          code: `0${i + 1}`,
+          areaM2: 203,
+          areaPending: false,
+          status: "disponivel",
+          cornerState: "regular",
+          pricingState: "priced",
+          grossCents: 10000,
+        } satisfies CommercialLot,
+      ]),
+    );
+    function Harness() {
+      const [active, setActive] = useState(false);
+      const [selectedIds, setSelected] = useState<ReadonlySet<string>>(new Set());
+      return (
+        <SaleModeContext.Provider
+          value={{
+            active,
+            canUse: true,
+            selectedIds,
+            resumeSale: () => {},
+            toggleMode: () => setActive(!active),
+            toggleLot: (lot) => {
+              const next = new Set(selectedIds);
+              if (next.has(lot.id)) next.delete(lot.id);
+              else next.add(lot.id);
+              setSelected(next);
+              return true;
+            },
+          }}
+        >
+          <CommercialMapWorkspace lotsByGeometry={lots} />
+        </SaleModeContext.Provider>
+      );
+    }
+    render(<Harness />);
+    fireEvent.click(await screen.findByRole("button", { name: "Select A" }));
+    const renderer = screen.getByTestId("navigation-renderer");
+    expect(renderer).toHaveAttribute("data-selected", ids[0]);
+    expect(renderer).toHaveAttribute("data-sales", "");
+    fireEvent.click(screen.getByRole("button", { name: "Modo Comercialização" }));
+    expect(screen.getByRole("button", { name: "Modo Comercialização" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Select A" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select C" }));
+    expect(renderer).toHaveAttribute("data-selected", "");
+    expect(renderer).toHaveAttribute("data-sales", ids.join(","));
+    fireEvent.click(screen.getByRole("button", { name: "Select B" }));
+    expect(renderer).toHaveAttribute("data-selected", "indumoveis:pavilion:12");
+    expect(renderer).toHaveAttribute("data-sales", ids.join(","));
+    fireEvent.click(screen.getByRole("button", { name: "Select A" }));
+    expect(renderer).toHaveAttribute("data-sales", ids[1]);
+    expect(commands.rendererMount).toHaveBeenCalledOnce();
+  });
   it("exposes keyboard-focusable rotation and zoom controls while help is closed", async () => {
     render(<CommercialMapWorkspace />);
     const right = await screen.findByRole("button", { name: "Girar à direita" });

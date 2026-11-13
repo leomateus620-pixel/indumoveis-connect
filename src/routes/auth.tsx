@@ -89,7 +89,9 @@ function ResolveAccess({ userId }: { userId: string }) {
     sessionStorage.removeItem("auth-redirect");
     // Login normal entra no portal; link direto protegido volta ao destino pedido.
     const target =
-      requested && canOpen(me.perms, requested.destination) ? requested.path : PORTAL_PATH;
+      requested && canOpen(me.perms, requested.destination, me.roles.includes("admin"))
+        ? requested.path
+        : PORTAL_PATH;
     navigate({ href: target, replace: true });
   }, [me, navigate]);
   if (isPending) return <Status title="Carregando seu perfil" />;
