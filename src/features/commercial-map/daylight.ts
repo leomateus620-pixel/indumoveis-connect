@@ -1,24 +1,20 @@
 import * as THREE from "three";
+import panoramaUrl from "./assets/daylight.png?url";
+import daylightPalette from "./daylightPalette.json";
+import { PARK_DAYLIGHT } from "./visualTheme";
 
-/** One world-oriented art direction for visible sky, filtered reflections and
- * local lights. Direction points from the park towards the sun, not camera.
- * These are presentation choices, not a time/location solar simulation. */
+/** One world direction for sky, filtered reflections, direct light and shadows. */
 export const DAYLIGHT = {
-  sunDirection: [-0.5, Math.SQRT1_2, 0.5] as readonly [number, number, number],
-  sunlight: { color: "#fff4e3", intensity: 2.65 },
-  hemisphere: { sky: "#d5e4ef", ground: "#aab69a", intensity: 1.18 },
-  fill: { color: "#dbe8f5", intensity: 0.32 },
-  sky: { zenith: "#6fa9d6", mid: "#9bc6e1", horizon: "#dce9ec" },
-  ground: { nearHorizon: "#b9c4a6", nadir: "#879773" },
-  horizonBandRadians: 0.02,
+  ...daylightPalette,
+  ...PARK_DAYLIGHT,
   panorama: { width: 1024, height: 512 },
   simplePanorama: { width: 64, height: 32 },
   environment: { width: 512, height: 256 },
 } as const;
 
 export type DaylightSky = {
-  texture: THREE.DataTexture;
-  /** RGBA8 source; excludes Three's renderer-owned cubemap and driver overhead. */
+  texture: THREE.Texture;
+  /** Estimated RGBA8 texture storage, excluding driver overhead. */
   textureBytes: number;
   fallback: boolean;
   detail: "simple" | "rich";
@@ -31,103 +27,50 @@ const colors = {
   horizon: new THREE.Color(DAYLIGHT.sky.horizon),
   ground: new THREE.Color(DAYLIGHT.ground.nearHorizon),
   nadir: new THREE.Color(DAYLIGHT.ground.nadir),
-  cloud: new THREE.Color("#f4f6f2"),
   sun: new THREE.Color(DAYLIGHT.sunlight.color),
 };
 const horizonY = Math.sin(DAYLIGHT.horizonBandRadians);
 
-/** Few wide, soft cloud banks. Every centre/basis lives on the world sphere;
- * no UV-noise seam, longitude stretch, pole pinch or camera-relative motion. */
-const cloudBanks = [
-  { azimuth: -1.05, elevation: 0.105, width: 0.22, height: 0.028, opacity: 0.72 },
-  { azimuth: 0.7, elevation: 0.15, width: 0.27, height: 0.043, opacity: 0.75 },
-  { azimuth: 2.6, elevation: 0.12, width: 0.2, height: 0.03, opacity: 0.68 },
-  { azimuth: -2.5, elevation: 0.105, width: 0.3, height: 0.035, opacity: 0.76 },
-].map(({ azimuth, elevation, width, height, opacity }) => {
-  const cosElevation = Math.cos(elevation);
-  const centre = [
-    Math.cos(azimuth) * cosElevation,
-    Math.sin(elevation),
-    Math.sin(azimuth) * cosElevation,
-  ];
-  const horizontal = [-Math.sin(azimuth), 0, Math.cos(azimuth)];
-  const vertical = [
-    -Math.sin(elevation) * Math.cos(azimuth),
-    cosElevation,
-    -Math.sin(elevation) * Math.sin(azimuth),
-  ];
-  return { centre, horizontal, vertical, width, height, opacity };
-});
-
-/** Allocation-free inner sampler; input must be a normalized world direction.
- * Result is linear RGB until the caller explicitly encodes it as sRGB. */
-function sampleDirection(x: number, y: number, z: number, clouds: boolean, target: THREE.Color) {
+/** Both the baked panorama and the immediate fallback use this gradient. The
+ * horizon matches the terrain's atmosphere color before output transforms. */
+function sampleGradient(x: number, y: number, z: number, target: THREE.Color) {
   target.copy(colors.horizon);
-  // A shallow, identical horizon on both sides lets distant terrain disappear
-  // without a horizon seam. Clouds, solar glow and ground colour start outside.
   if (Math.abs(y) <= horizonY) return target;
   if (y < -horizonY) {
-    const below = -y;
-    target.lerp(colors.ground, THREE.MathUtils.smoothstep(below, horizonY, 0.42));
-    target.lerp(colors.nadir, THREE.MathUtils.smoothstep(below, 0.42, 1));
+    target.lerp(colors.ground, THREE.MathUtils.smoothstep(-y, horizonY, 0.42));
+    target.lerp(colors.nadir, THREE.MathUtils.smoothstep(-y, 0.42, 1));
     return target;
   }
-  target.lerp(colors.mid, THREE.MathUtils.smoothstep(y, horizonY, 0.1));
-  target.lerp(colors.zenith, THREE.MathUtils.smoothstep(y, 0.1, 1));
-  const clearHorizon = THREE.MathUtils.smoothstep(y, horizonY, horizonY + 0.025);
-  if (clouds) {
-    let cloud = 0;
-    for (const bank of cloudBanks) {
-      const facing = x * bank.centre[0] + y * bank.centre[1] + z * bank.centre[2];
-      if (facing < 0.9) continue;
-      const h =
-        (x * bank.horizontal[0] + y * bank.horizontal[1] + z * bank.horizontal[2]) / bank.width;
-      const v = (x * bank.vertical[0] + y * bank.vertical[1] + z * bank.vertical[2]) / bank.height;
-      // Offset lobes make a low cloud bank with rounded shoulders rather than
-      // an ellipsoid cutout, hard noise threshold or repeated cloud sprites.
-      const density =
-        Math.exp(-h * h * 2.2 - v * v * 1.6) * 0.68 +
-        Math.exp(-((h - 0.6) ** 2) * 4.1 - (v + 0.22) ** 2 * 2.2) * 0.38 +
-        Math.exp(-((h + 0.63) ** 2) * 4.8 - (v + 0.15) ** 2 * 2.6) * 0.32;
-      cloud = Math.max(cloud, THREE.MathUtils.smoothstep(density, 0.12, 0.93) * bank.opacity);
-    }
-    target.lerp(colors.cloud, cloud * clearHorizon);
-  }
+  const midY = DAYLIGHT.skyMidY;
+  target.lerp(colors.mid, THREE.MathUtils.smoothstep(y, horizonY, midY));
+  target.lerp(colors.zenith, THREE.MathUtils.smoothstep(y, midY, 1));
   const [sx, sy, sz] = DAYLIGHT.sunDirection;
   const sunDot = Math.max(0, x * sx + y * sy + z * sz);
-  // Broad, low-energy warm lobe. No HDR disc, lens flare or additional light.
-  target.lerp(colors.sun, Math.pow(sunDot, 48) * 0.09 * clearHorizon);
-  return target;
+  const { amount, exponent } = DAYLIGHT.solarGlow;
+  const clearHorizon = THREE.MathUtils.smoothstep(y, horizonY, horizonY + 0.025);
+  return target.lerp(colors.sun, sunDot ** exponent * amount * clearHorizon);
 }
 
-/** Public reference sampler for invariant tests and atmosphere diagnostics.
- * Returns sRGB byte channels. Scalar multiples represent the same direction. */
+/** Returns sRGB byte channels for the immediate world-direction gradient. */
 export function sampleDaylightDirection(
   direction: readonly [number, number, number],
-  clouds = true,
 ): [number, number, number] {
   const length = Math.hypot(...direction);
   if (!length || !direction.every(Number.isFinite)) throw new Error("daylight-invalid-direction");
-  const color = sampleDirection(
+  const color = sampleGradient(
     direction[0] / length,
     direction[1] / length,
     direction[2] / length,
-    clouds,
     new THREE.Color(),
   ).convertLinearToSRGB();
   return [Math.round(color.r * 255), Math.round(color.g * 255), Math.round(color.b * 255)];
 }
 
-// CPU data is immutable by contract and shared across renderer reopenings and
-// PMREM preparation. GPU Texture objects always have independent ownership.
-// Four LRU entries bound retained memory even for development preview sizes.
-const panoramaCache = new Map<string, Uint8Array>();
-const MAX_CACHED_PANORAMAS = 4;
+// Only the immediate and fallback reflection gradients are created at runtime.
+// Reopenings share CPU bytes but always own separate GPU texture objects.
+const gradientCache = new Map<string, Uint8Array>();
 
-/** Same direction sampler feeds visible 1024×512 sky and 512×256 reflections.
- * Returned bytes are borrowed read-only; upload or inspect them without edits.
- * DataTexture.flipY=false + Three equirectUv: first row south, last row zenith. */
-export function createDaylightPixels(width: number, height: number, clouds = true): Uint8Array {
+export function createDaylightPixels(width: number, height: number): Uint8Array {
   if (
     !Number.isInteger(width) ||
     !Number.isInteger(height) ||
@@ -137,57 +80,48 @@ export function createDaylightPixels(width: number, height: number, clouds = tru
     height > DAYLIGHT.panorama.height
   )
     throw new Error("daylight-invalid-panorama-size");
-  const key = `${width}x${height}:${clouds ? "rich" : "simple"}`;
-  const cached = panoramaCache.get(key);
-  if (cached) {
-    panoramaCache.delete(key);
-    panoramaCache.set(key, cached);
-    return cached;
-  }
+  const key = `${width}x${height}`;
+  const cached = gradientCache.get(key);
+  if (cached) return cached;
   const pixels = new Uint8Array(width * height * 4);
   const color = new THREE.Color();
-  for (let row = 0; row < height; row++) {
-    // Match v=asin(dir.y)/PI+0.5, including an identical constant pole row.
-    const elevation = (row / (height - 1) - 0.5) * Math.PI;
+  const longitudes = Array.from({ length: width }, (_, column) => {
+    const azimuth = ((column + 0.5) / width - 0.5) * Math.PI * 2;
+    return [Math.cos(azimuth), Math.sin(azimuth)];
+  });
+  for (let row = 0, offset = 0; row < height; row++) {
+    // Match Three's equirectUv at texel centers, with constant pole rows.
+    const elevation =
+      row === 0
+        ? -Math.PI / 2
+        : row === height - 1
+          ? Math.PI / 2
+          : ((row + 0.5) / height - 0.5) * Math.PI;
     const y = Math.sin(elevation),
       radial = Math.cos(elevation);
-    for (let column = 0; column < width; column++) {
-      const azimuth = ((column + 0.5) / width - 0.5) * Math.PI * 2;
-      sampleDirection(
-        Math.cos(azimuth) * radial,
-        y,
-        Math.sin(azimuth) * radial,
-        clouds,
-        color,
-      ).convertLinearToSRGB();
-      pixels.set(
-        [Math.round(color.r * 255), Math.round(color.g * 255), Math.round(color.b * 255), 255],
-        (row * width + column) * 4,
-      );
+    for (const [x, z] of longitudes) {
+      sampleGradient(x * radial, y, z * radial, color).convertLinearToSRGB();
+      pixels[offset++] = Math.round(color.r * 255);
+      pixels[offset++] = Math.round(color.g * 255);
+      pixels[offset++] = Math.round(color.b * 255);
+      pixels[offset++] = 255;
     }
   }
-  panoramaCache.set(key, pixels);
-  if (panoramaCache.size > MAX_CACHED_PANORAMAS)
-    panoramaCache.delete(panoramaCache.keys().next().value!);
+  if (gradientCache.size >= 4) gradientCache.delete(gradientCache.keys().next().value!);
+  gradientCache.set(key, pixels);
   return pixels;
 }
 
-function skyTexture(width: number, height: number, clouds: boolean) {
-  const texture = new THREE.DataTexture(
-    createDaylightPixels(width, height, clouds),
-    width,
-    height,
-    THREE.RGBAFormat,
-    THREE.UnsignedByteType,
-  );
+function configurePanorama<T extends THREE.Texture>(texture: T, name: string): T {
   try {
-    texture.name = `indumoveis-world-daylight-${clouds ? "clouds" : "simple"}`;
+    texture.name = name;
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.mapping = THREE.EquirectangularReflectionMapping;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
     texture.minFilter = texture.magFilter = THREE.LinearFilter;
     texture.generateMipmaps = false;
+    // Offline image and CPU gradient have the same south-first row order.
     texture.flipY = false;
     texture.needsUpdate = true;
     return texture;
@@ -197,28 +131,23 @@ function skyTexture(width: number, height: number, clouds: boolean) {
   }
 }
 
-/** Synchronous 64×32 gradient is available for the first useful frame. Request
- * rich only in the renderer's existing deferred-ready task; no sky RAF needed.
- * Preparation failure keeps the same blue gradient and world orientation. */
-export function createDaylightSky(
-  options: { fail?: boolean; detail?: "simple" | "rich" } = {},
+function gradientTexture(width: number, height: number, name: string) {
+  return configurePanorama(
+    new THREE.DataTexture(createDaylightPixels(width, height), width, height),
+    name,
+  );
+}
+
+function ownSky(
+  texture: THREE.Texture,
+  detail: DaylightSky["detail"],
+  fallback: boolean,
 ): DaylightSky {
-  let detail = options.detail ?? "rich";
-  let fallback = false;
-  let texture: THREE.DataTexture;
-  try {
-    if (options.fail) throw new Error("Laboratory daylight sky failure");
-    const size = detail === "rich" ? DAYLIGHT.panorama : DAYLIGHT.simplePanorama;
-    texture = skyTexture(size.width, size.height, detail === "rich");
-  } catch {
-    detail = "simple";
-    fallback = true;
-    texture = skyTexture(DAYLIGHT.simplePanorama.width, DAYLIGHT.simplePanorama.height, false);
-  }
+  const { width, height } = detail === "rich" ? DAYLIGHT.panorama : DAYLIGHT.simplePanorama;
   let disposed = false;
   return {
     texture,
-    textureBytes: texture.image.width * texture.image.height * 4,
+    textureBytes: width * height * 4,
     fallback,
     detail,
     dispose() {
@@ -227,6 +156,85 @@ export function createDaylightSky(
       texture.dispose();
     },
   };
+}
+
+function createClearSky(fallback: boolean) {
+  const { width, height } = DAYLIGHT.simplePanorama;
+  return ownSky(
+    gradientTexture(width, height, "indumoveis-world-daylight-simple"),
+    "simple",
+    fallback,
+  );
+}
+
+/** Immediate clear gradient. Loading and decoding clouds is deferred. */
+export function createDaylightSky() {
+  return createClearSky(false);
+}
+
+// Decoded image and downsampled reflection source are immutable after creation.
+// Never share the GPU textures across renderers or retain an in-flight request.
+let decodedPanorama: HTMLImageElement | undefined;
+let reflectionPixels: Uint8Array | undefined;
+
+async function loadPanorama(signal?: AbortSignal) {
+  signal?.throwIfAborted();
+  if (decodedPanorama) return decodedPanorama;
+  const response = await fetch(panoramaUrl, { signal });
+  if (!response.ok) throw new Error("daylight-panorama-unavailable");
+  const url = URL.createObjectURL(await response.blob());
+  try {
+    const image = new Image();
+    image.src = url;
+    await image.decode();
+    signal?.throwIfAborted();
+    if (
+      image.naturalWidth !== DAYLIGHT.panorama.width ||
+      image.naturalHeight !== DAYLIGHT.panorama.height
+    )
+      throw new Error("daylight-panorama-size");
+    return (decodedPanorama ??= image);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+export async function prepareDaylightSky(options: { fail?: boolean; signal?: AbortSignal } = {}) {
+  try {
+    if (options.fail) throw new Error("Laboratory daylight sky failure");
+    const image = await loadPanorama(options.signal);
+    return ownSky(
+      configurePanorama(new THREE.Texture(image), "indumoveis-world-daylight-clouds"),
+      "rich",
+      false,
+    );
+  } catch {
+    options.signal?.throwIfAborted();
+    return createClearSky(true);
+  }
+}
+
+/** Downsample the same visible sky once for the PMREM input. A failed rich sky
+ * uses the same clear gradient as the visible fallback, with its own texture. */
+export function createDaylightReflectionSource(sky?: DaylightSky) {
+  const { width, height } = DAYLIGHT.environment;
+  const name = "indumoveis-soft-daylight-source";
+  if (sky?.detail === "rich" && decodedPanorama) {
+    if (!reflectionPixels) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (context) {
+        context.imageSmoothingQuality = "high";
+        context.drawImage(decodedPanorama, 0, 0, width, height);
+        reflectionPixels = new Uint8Array(context.getImageData(0, 0, width, height).data.buffer);
+      }
+    }
+    if (reflectionPixels)
+      return configurePanorama(new THREE.DataTexture(reflectionPixels, width, height), name);
+  }
+  return gradientTexture(width, height, name);
 }
 
 /** Direct panorama background avoids Three's automatic equirectangular→cube
@@ -239,9 +247,14 @@ export function createDaylightBackground(texture: THREE.Texture) {
   let material: THREE.ShaderMaterial | undefined;
   try {
     const panorama = { value: texture as THREE.Texture | null };
+    const previousPanorama = { value: texture as THREE.Texture | null };
+    const panoramaBlend = { value: 1 };
+    const blendDurationMs = 180;
+    let blendStart: number | undefined;
+    let blendAwaitingFrame = false;
     material = new THREE.ShaderMaterial({
       name: "indumoveis-world-daylight-background",
-      uniforms: { panorama },
+      uniforms: { panorama, previousPanorama, panoramaBlend },
       side: THREE.BackSide,
       // Draw after opaque floors: the depth test rejects hidden sky fragments
       // before sampling the panorama, avoiding a second full-screen shading
@@ -260,6 +273,8 @@ export function createDaylightBackground(texture: THREE.Texture) {
       `,
       fragmentShader: `
         uniform sampler2D panorama;
+        uniform sampler2D previousPanorama;
+        uniform float panoramaBlend;
         varying vec3 vWorldDirection;
         void main() {
           vec3 direction = normalize(vWorldDirection);
@@ -267,7 +282,11 @@ export function createDaylightBackground(texture: THREE.Texture) {
             atan(direction.z, direction.x) * 0.15915494309189535 + 0.5,
             asin(clamp(direction.y, -1.0, 1.0)) * 0.3183098861837907 + 0.5
           );
-          gl_FragColor = vec4(texture2D(panorama, uv).rgb, 1.0);
+          vec3 sky = texture2D(panorama, uv).rgb;
+          if (panoramaBlend < 1.0) {
+            sky = mix(texture2D(previousPanorama, uv).rgb, sky, panoramaBlend);
+          }
+          gl_FragColor = vec4(sky, 1.0);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }
@@ -283,14 +302,34 @@ export function createDaylightBackground(texture: THREE.Texture) {
     let disposed = false;
     return {
       mesh,
-      setTexture(next: THREE.Texture) {
-        if (!disposed) panorama.value = next;
+      setTexture(next: THREE.Texture, blend?: { from: THREE.Texture; start: number }) {
+        if (disposed) return;
+        panorama.value = next;
+        previousPanorama.value = blend?.from ?? next;
+        blendStart = blend?.start;
+        blendAwaitingFrame = blend !== undefined;
+        panoramaBlend.value = blend ? 0 : 1;
+      },
+      update(now: number) {
+        if (blendStart === undefined || disposed) return false;
+        // Deferred PMREM preparation can occupy the time between publication
+        // and the next draw. Start the transition on a frame the user sees.
+        if (blendAwaitingFrame) {
+          blendStart = Math.max(blendStart, now);
+          blendAwaitingFrame = false;
+        }
+        panoramaBlend.value = THREE.MathUtils.smoothstep(now - blendStart, 0, blendDurationMs);
+        if (panoramaBlend.value < 1) return true;
+        blendStart = undefined;
+        previousPanorama.value = panorama.value;
+        return false;
       },
       dispose() {
         if (disposed) return;
         disposed = true;
         mesh.removeFromParent();
         panorama.value = null;
+        previousPanorama.value = null;
         geometry.dispose();
         material!.dispose();
       },

@@ -495,7 +495,7 @@ export function buildArchitecture(
     geometries.add(geometry);
     const result = new THREE.Mesh(geometry, surfaces.materials[family]);
     result.receiveShadow = true;
-    result.castShadow = true;
+    result.castShadow = family !== "glass";
     return result;
   }
   for (const entity of entities) {
@@ -1252,6 +1252,9 @@ export function buildArchitecture(
   for (const [family, data] of fineBuckets) {
     const layer = mesh(data, family);
     layer.name = `photo-fine-${family}`;
+    // Relief changes with camera LOD. Only the stable body and canopies cast
+    // into the cached solar map, so first framing cannot imprint small ribs.
+    layer.castShadow = false;
     fineGroup.add(layer);
   }
   group.add(fineGroup);
@@ -1268,6 +1271,7 @@ export function buildArchitecture(
     if (!data.positions.length) continue;
     const layer = mesh(data, family);
     layer.name = name;
+    if (name === "floors-contact") layer.castShadow = false;
     group.add(layer);
   }
   return {

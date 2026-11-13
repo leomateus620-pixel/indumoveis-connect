@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { describe, it, expect, vi } from "vitest";
 import { ENTITIES } from "./data/territory";
-import { architectureVisualHeight } from "./architecture";
+import { getArchitectureDefinition } from "./architecture";
 import { createSolarShadows } from "./solarShadows";
 import { DAYLIGHT } from "./daylight";
 describe("cached directional architectural shadows", () => {
@@ -13,14 +13,29 @@ describe("cached directional architectural shadows", () => {
       expect.arrayContaining(DAYLIGHT.sunDirection.map((v) => expect.closeTo(v, 8))),
     );
     const camera = light.shadow.camera;
-    for (const e of ENTITIES)
+    const casters = ENTITIES.filter(getArchitectureDefinition);
+    for (const e of casters)
       for (const [x, z] of e.polygon)
-        for (const y of [0, architectureVisualHeight(e)]) {
-          const p = new THREE.Vector3(x, y, z).project(camera);
-          expect(Math.abs(p.x)).toBeLessThan(1);
-          expect(Math.abs(p.y)).toBeLessThan(1);
-          expect(Math.abs(p.z)).toBeLessThan(1);
+        for (const y of [-0.18, getArchitectureDefinition(e)!.height]) {
+          const point = new THREE.Vector3(x, y, z);
+          const receiver = point.clone().addScaledVector(direction, (-0.18 - y) / direction.y);
+          for (const p of [point.project(camera), receiver.project(camera)]) {
+            expect(Math.abs(p.x)).toBeLessThan(1);
+            expect(Math.abs(p.y)).toBeLessThan(1);
+            expect(Math.abs(p.z)).toBeLessThan(1);
+          }
         }
+    expect(
+      ENTITIES.some(
+        (entity) =>
+          !getArchitectureDefinition(entity) &&
+          entity.polygon.some(([x, z]) => {
+            const p = new THREE.Vector3(x, 0, z).project(camera);
+            return Math.abs(p.x) > 1 || Math.abs(p.y) > 1;
+          }),
+      ),
+    ).toBe(true);
+    expect(light.shadow.mapSize.toArray()).toEqual([1024, 1024]);
     model.setQuality("balanced");
     expect(light.castShadow).toBe(false);
     model.setQuality("detailed");

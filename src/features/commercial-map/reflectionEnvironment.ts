@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createDaylightPixels, DAYLIGHT } from "./daylight";
+import { createDaylightReflectionSource, DAYLIGHT, type DaylightSky } from "./daylight";
 
 export interface ReflectionEnvironment {
   target: THREE.WebGLRenderTarget;
@@ -39,7 +39,7 @@ function ownFilteredEnvironment(
  * target binding calls instead; no engine-private method or shader is patched. */
 export function createReflectionEnvironment(
   renderer: THREE.WebGLRenderer,
-  options: { fail?: boolean } = {},
+  options: { fail?: boolean; sky?: DaylightSky } = {},
 ): ReflectionEnvironment {
   const previous = {
     target: renderer.getRenderTarget(),
@@ -56,7 +56,7 @@ export function createReflectionEnvironment(
   const markDisposed = (event: { target: unknown }) => {
     disposed.add(event.target as BoundTarget);
   };
-  let source: THREE.DataTexture | null = null;
+  let source: THREE.Texture | null = null;
   let generator: THREE.PMREMGenerator | null = null;
   let output: THREE.WebGLRenderTarget | null = null;
   let failure: unknown;
@@ -75,19 +75,7 @@ export function createReflectionEnvironment(
     return previous.setRenderTarget.call(this, target, face, mip);
   };
   try {
-    source = new THREE.DataTexture(
-      createDaylightPixels(SOURCE_WIDTH, SOURCE_HEIGHT),
-      SOURCE_WIDTH,
-      SOURCE_HEIGHT,
-      THREE.RGBAFormat,
-      THREE.UnsignedByteType,
-    );
-    source.name = "indumoveis-soft-daylight-source";
-    source.colorSpace = THREE.SRGBColorSpace;
-    source.mapping = THREE.EquirectangularReflectionMapping;
-    source.minFilter = source.magFilter = THREE.LinearFilter;
-    source.generateMipmaps = false;
-    source.needsUpdate = true;
+    source = createDaylightReflectionSource(options.sky);
     generator = new THREE.PMREMGenerator(renderer);
     if (options.fail) throw new Error("Laboratory reflection environment failure");
     output = generator.fromEquirectangular(source);

@@ -2,14 +2,16 @@ import * as THREE from "three";
 import { architectureVisualHeight, getArchitectureDefinition } from "./architecture";
 import { DAYLIGHT } from "./daylight";
 import type { MapEntity, Point } from "./data/territory";
+import { polygonBounds, signedPolygonArea } from "./geometry";
 import { pavementUnionCells } from "./pavement";
+import { PARK_SHADOWS } from "./visualTheme";
 
 /** Static schematic ground projections, not a surveyed solar simulation or
  * roof self-shadow. One shared batch costs no shadow map or extra render pass. */
 export const SUN_SHADOW = {
   elevation: 0.085,
-  opacity: 0.12,
-  color: "#2e4050",
+  opacity: PARK_SHADOWS.opacity,
+  color: PARK_SHADOWS.color,
 } as const;
 
 function convexHull(points: Point[]): Point[] {
@@ -54,14 +56,87 @@ export function projectSunShadow(
   ]);
 }
 
-export function createSunShadows(entities: readonly MapEntity[]) {
-  const sources = entities.flatMap((entity) => {
-    const polygon = projectSunShadow(entity);
-    return polygon ? [{ id: entity.id, polygon }] : [];
+/** The sweep consists of the original footprint plus the strips swept by
+ * its outward-facing sides. Keeping those strips separate preserves actual
+ * setbacks and concave yards when the projected polygons are unioned. */
+export function sweepShadowFootprint(
+  polygon: readonly Point[],
+  height: number,
+  direction: readonly [number, number, number],
+): Point[][] {
+  if (
+    !direction.every(Number.isFinite) ||
+    direction[1] <= 0 ||
+    !Number.isFinite(height) ||
+    height < 0
+  )
+    throw new Error("sun-shadow-invalid-projection");
+  const dx = (-direction[0] * height) / direction[1],
+    dz = (-direction[2] * height) / direction[1];
+  const sign = Math.sign(signedPolygonArea(polygon));
+  const strips = polygon.flatMap((a, i) => {
+    const b = polygon[(i + 1) % polygon.length];
+    if (sign * ((b[1] - a[1]) * dx - (b[0] - a[0]) * dz) <= 1e-8) return [];
+    return [[a, b, [b[0] + dx, b[1] + dz] as Point, [a[0] + dx, a[1] + dz] as Point]];
   });
+  return [[...polygon], ...strips];
+}
+
+/** Isolated casters need no shared slab decomposition. AABB components keep
+ * detailed permanent park footprints off the core's initial critical path. */
+export function unionShadowFootprints(sources: readonly Point[][][]): Point[][] {
+  const bounds = sources.map((polygons) => polygonBounds(polygons.flat()));
+  const parent = bounds.map((_, i) => i);
+  const find = (i: number): number => (parent[i] === i ? i : (parent[i] = find(parent[i])));
+  bounds.forEach((a, i) => {
+    for (let j = i + 1; j < bounds.length; j++) {
+      const b = bounds[j];
+      if (a.minX <= b.maxX && b.minX <= a.maxX && a.minY <= b.maxY && b.minY <= a.maxY)
+        parent[find(j)] = find(i);
+    }
+  });
+  const groups = new Map<number, Point[][]>();
+  sources.forEach((polygons, i) => {
+    const key = find(i);
+    const group = groups.get(key) ?? [];
+    group.push(...polygons);
+    groups.set(key, group);
+  });
+  return [...groups.values()].flatMap(pavementUnionCells);
+}
+
+const projectionCache = new WeakMap<
+  readonly MapEntity[],
+  { cells: Point[][]; sourceIds: string[] }
+>();
+
+export function createSunShadows(entities: readonly MapEntity[]) {
   // Nonoverlapping source-derived cells prevent a darker stripe where two
-  // pavilions cast onto the same floor. This runs once, never during gestures.
-  const cells = pavementUnionCells(sources.map(({ polygon }) => polygon));
+  // pavilions cast onto the same floor. Immutable cells can survive reopens.
+  let projection = projectionCache.get(entities);
+  if (!projection) {
+    const sources = entities.flatMap((entity) => {
+      const definition = getArchitectureDefinition(entity);
+      return definition
+        ? [
+            {
+              id: entity.id,
+              polygons: sweepShadowFootprint(
+                entity.polygon,
+                definition.height,
+                DAYLIGHT.sunDirection,
+              ),
+            },
+          ]
+        : [];
+    });
+    projection = {
+      cells: unionShadowFootprints(sources.map(({ polygons }) => polygons)),
+      sourceIds: sources.map(({ id }) => id),
+    };
+    projectionCache.set(entities, projection);
+  }
+  const { cells, sourceIds } = projection;
   const geometry = new THREE.BufferGeometry();
   let material: THREE.MeshBasicMaterial | undefined;
   let mesh: THREE.Mesh | undefined;
@@ -84,10 +159,11 @@ export function createSunShadows(entities: readonly MapEntity[]) {
         [],
       );
       for (const indices of triangles) {
-        const points = indices.map((index) => polygon[index]);
+        const points = indices.map((index) => polygon[index].map(Math.fround));
         const normalY =
           (points[1][1] - points[0][1]) * (points[2][0] - points[0][0]) -
           (points[1][0] - points[0][0]) * (points[2][1] - points[0][1]);
+        if (Math.abs(normalY) <= 1e-10) continue;
         if (normalY < 0) [points[1], points[2]] = [points[2], points[1]];
         for (const [x, z] of points) positions.push(x, SUN_SHADOW.elevation, z);
       }
@@ -119,7 +195,7 @@ export function createSunShadows(entities: readonly MapEntity[]) {
       geometry,
       material,
       cells,
-      sourceIds: sources.map(({ id }) => id),
+      sourceIds,
       dispose,
     };
   } catch (error) {

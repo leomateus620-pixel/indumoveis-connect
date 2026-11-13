@@ -16,6 +16,16 @@ const FAMILY_INDEX: Record<AtlasFamily, number> = {
   paintedMetal: 3,
   grass: 4,
 };
+// Mean linear RGB of the authored inner cells at both source sizes. Center
+// their detail on the authored material colour so loading the full atlas does
+// not darken the palette (the source albedo texels are decoded from sRGB).
+const LINEAR_ALBEDO_MEAN: Record<AtlasFamily, string> = {
+  mineral: "vec3(.895)",
+  concrete: "vec3(.891)",
+  asphalt: "vec3(.882)",
+  paintedMetal: "vec3(.943)",
+  grass: "vec3(.876, .884, .843)",
+};
 
 /** UVs still express world repeats authored by architecture/pavement. Sampling
  * wraps within a padded atlas cell, not across its neighbours. Explicit gradients
@@ -40,47 +50,27 @@ export function bindPbrAtlas(
   material.normalMap = normal;
   material.roughnessMap = material.aoMap = orm;
   material.bumpMap = null;
-  material.aoMapIntensity = family === "paintedMetal" ? 0.25 : 0.55;
+  material.aoMapIntensity = family === "paintedMetal" ? 0.15 : family === "grass" ? 0.22 : 0.38;
   const rect = { value: atlasRect(family) };
   material.onBeforeCompile = (shader) => {
     patchGroundVariation(shader, family);
     shader.uniforms.surfaceAtlasRect = rect;
-    const sample =
-      family === "grass"
-        ? `
-        vec2 a = mat2(.8,.6,-.6,.8) * worldUv * .79;
-        vec2 b = mat2(.384,-.923,.923,.384) * worldUv * 1.173 + vec2(.37,.61);
-        vec4 first = textureGrad(atlasMap, surfaceAtlasRect.xy + fract(a) * surfaceAtlasRect.zw,
-          dFdx(a) * surfaceAtlasRect.zw, dFdy(a) * surfaceAtlasRect.zw);
-        vec4 second = textureGrad(atlasMap, surfaceAtlasRect.xy + fract(b) * surfaceAtlasRect.zw,
-          dFdx(b) * surfaceAtlasRect.zw, dFdy(b) * surfaceAtlasRect.zw);
-        return mix(first, second, .5);
-      `
-        : `
-        return textureGrad(atlasMap,
-          surfaceAtlasRect.xy + fract(worldUv) * surfaceAtlasRect.zw,
-          dFdx(worldUv) * surfaceAtlasRect.zw,
-          dFdy(worldUv) * surfaceAtlasRect.zw);
-      `;
-    // Incommensurate, rotated grass samples remove the short tile grid while
-    // reusing the same atlas/mips and stable explicit texture gradients.
+    // The shared world field carries grass colour at distance. One oblique
+    // tile per channel carries its close detail without a parcel-aligned grid.
     shader.fragmentShader = `uniform vec4 surfaceAtlasRect;
       vec4 surfaceAtlasRead(sampler2D atlasMap, vec2 worldUv) {
-        ${sample}
+        ${family === "grass" ? "worldUv = mat2(.8,.6,-.6,.8) * worldUv * .79;" : ""}
+        return textureGrad(atlasMap,
+          surfaceAtlasRect.xy + fract(worldUv) * surfaceAtlasRect.zw,
+          dFdx(worldUv) * surfaceAtlasRect.zw, dFdy(worldUv) * surfaceAtlasRect.zw);
       }
       ${
         family === "grass"
           ? `
       vec4 surfaceAtlasReadNormal(sampler2D atlasMap, vec2 worldUv) {
-        vec2 a = mat2(.8,.6,-.6,.8) * worldUv * .79;
-        vec2 b = mat2(.384,-.923,.923,.384) * worldUv * 1.173 + vec2(.37,.61);
-        vec3 n1=textureGrad(atlasMap, surfaceAtlasRect.xy+fract(a)*surfaceAtlasRect.zw,
-          dFdx(a)*surfaceAtlasRect.zw,dFdy(a)*surfaceAtlasRect.zw).xyz*2.0-1.0;
-        vec3 n2=textureGrad(atlasMap, surfaceAtlasRect.xy+fract(b)*surfaceAtlasRect.zw,
-          dFdx(b)*surfaceAtlasRect.zw,dFdy(b)*surfaceAtlasRect.zw).xyz*2.0-1.0;
-        n1.xy=mat2(.8,-.6,.6,.8)*n1.xy;
-        n2.xy=mat2(.384,.923,-.923,.384)*n2.xy;
-        return vec4(normalize(mix(n1,n2,.5))*.5+.5,1.0);
+        vec4 sampleNormal = surfaceAtlasRead(atlasMap, worldUv);
+        sampleNormal.xy = mat2(.8,-.6,.6,.8) * (sampleNormal.xy - .5) + .5;
+        return sampleNormal;
       }`
           : ""
       }
@@ -96,20 +86,23 @@ export function bindPbrAtlas(
         `texture2D( ${textureName}, ${uv} )`,
         `${family === "grass" && textureName === "normalMap" ? "surfaceAtlasReadNormal" : "surfaceAtlasRead"}( ${textureName}, ${uv} )`,
       );
-      if (family === "paintedMetal" && chunk === "map_fragment") {
-        // The atlas supplies fine mineral variation, while the authored paint
-        // supplies colour. Remove the old blue tint and strong ribbed albedo;
-        // actual sheet ribs are geometry/filtered normals, never stripes on steel.
+      if (chunk === "map_fragment") {
+        const closeDetail =
+          family === "grass" || family === "asphalt" || family === "concrete"
+            ? "1.0 - smoothstep(.06, .30, max(fwidth(vMapUv.x), fwidth(vMapUv.y)))"
+            : "1.0";
+        const strength = family === "paintedMetal" ? ".28" : family === "grass" ? ".65" : "1.0";
         replacement = replacement.replace(
           "diffuseColor *= sampledDiffuseColor;",
-          "sampledDiffuseColor.rgb=vec3(mix(.93,dot(sampledDiffuseColor.rgb,vec3(.2126,.7152,.0722)),.22)); diffuseColor *= sampledDiffuseColor;",
+          `sampledDiffuseColor.rgb = vec3(1.0) +
+            (sampledDiffuseColor.rgb - ${LINEAR_ALBEDO_MEAN[family]}) * ${strength} * (${closeDetail});
+            diffuseColor *= sampledDiffuseColor;`,
         );
       }
       shader.fragmentShader = shader.fragmentShader.replace(`#include <${chunk}>`, replacement);
     }
   };
-  material.customProgramCacheKey = () =>
-    `indumoveis-pbr-atlas-v4-${["grass", "asphalt", "concrete", "paintedMetal"].includes(family) ? family : "shared"}`;
+  material.customProgramCacheKey = () => `indumoveis-pbr-atlas-v5-${family}`;
   material.needsUpdate = true;
 }
 

@@ -1,0 +1,9 @@
+{
+  "sunDirection": [-0.5, 0.7071067811865476, 0.5],
+  "sunColor": "#fff2df",
+  "sky": { "zenith": "#589bd2", "mid": "#92c1e3", "horizon": "#d8e8ee" },
+  "ground": { "nearHorizon": "#b3c0a3", "nadir": "#82976f" },
+  "horizonBandRadians": 0.02,
+  "skyMidY": 0.16,
+  "solarGlow": { "exponent": 26, "amount": 0.115 }
+}

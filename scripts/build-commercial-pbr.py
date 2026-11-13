@@ -57,11 +57,20 @@ def tile(size, family):
         ao -= joint * .07
         strength = .8
     elif family == "asphalt":
-        grain = np.sin(x * math.pi * 174 + n * 4) * np.cos(y * math.pi * 166 + fine * 3)
-        height += grain * .018
-        albedo = .945 + (n - .5) * .12 + grain * .013
+        # Irregular aggregate at two close scales. A sine grid makes asphalt
+        # look woven and creates a moving checkerboard under perspective.
+        grit = np.random.default_rng(361905).random((size, size)) - .5
+        aggregate = (
+            grit * .45
+            + np.roll(grit, 1, axis=0) * .16
+            + np.roll(grit, -1, axis=0) * .13
+            + np.roll(grit, 1, axis=1) * .15
+            + np.roll(grit, -1, axis=1) * .11
+        )
+        height += aggregate * .011
+        albedo = .945 + (n - .5) * .12 + aggregate * .026
         roughness = .98 + (fine - .5) * .035
-        strength = .65
+        strength = .56
     elif family == "paintedMetal":
         ribs = np.cos(x * math.pi * 16)
         height = ribs * .055 + (fine - .5) * .004

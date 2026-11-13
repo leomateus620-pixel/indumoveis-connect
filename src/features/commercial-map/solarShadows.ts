@@ -1,21 +1,36 @@
 import * as THREE from "three";
 import type { MapEntity } from "./data/territory";
-import { architectureVisualHeight } from "./architecture";
+import { getArchitectureDefinition } from "./architecture";
 import type { SurfaceQuality } from "./surfaceMaterials";
 import { DAYLIGHT } from "./daylight";
+import { PARK_SHADOWS } from "./visualTheme";
+
+const shadowMapSize = 1024;
 
 /** One cached architectural shadow map in Detailed. Balanced/Light keep the
  * cheaper contact projections. Camera navigation never dirties this map. */
 export function createSolarShadows(light: THREE.DirectionalLight, entities: readonly MapEntity[]) {
-  const bounds = new THREE.Box3();
-  for (const e of entities)
-    for (const [x, z] of e.polygon) {
-      bounds.expandByPoint(new THREE.Vector3(x, 0, z));
-      bounds.expandByPoint(new THREE.Vector3(x, architectureVisualHeight(e), z));
+  const direction = new THREE.Vector3(...DAYLIGHT.sunDirection);
+  const sourcePoints: THREE.Vector3[] = [];
+  for (const entity of entities) {
+    const definition = getArchitectureDefinition(entity);
+    if (!definition) continue;
+    // Small overhangs and photographic details can exceed the source eave.
+    // Fit their ground projection as well as the source volume itself.
+    const ground = -0.18;
+    const height = definition.height + 0.7;
+    for (const [x, z] of entity.polygon) {
+      sourcePoints.push(
+        new THREE.Vector3(x, ground, z),
+        new THREE.Vector3(x, height, z),
+        new THREE.Vector3(x, height, z).addScaledVector(direction, (ground - height) / direction.y),
+      );
     }
+  }
+  const bounds = new THREE.Box3().setFromPoints(sourcePoints);
   const center = bounds.getCenter(new THREE.Vector3());
   light.target.position.copy(center);
-  light.position.copy(center).addScaledVector(new THREE.Vector3(...DAYLIGHT.sunDirection), 220);
+  light.position.copy(center).addScaledVector(direction, 220);
   light.target.updateMatrixWorld();
   light.updateMatrixWorld();
   const camera = light.shadow.camera;
@@ -23,22 +38,20 @@ export function createSolarShadows(light: THREE.DirectionalLight, entities: read
   camera.lookAt(center);
   camera.updateMatrixWorld();
   const fit = new THREE.Box3();
-  for (const x of [bounds.min.x, bounds.max.x])
-    for (const y of [bounds.min.y, bounds.max.y])
-      for (const z of [bounds.min.z, bounds.max.z])
-        fit.expandByPoint(new THREE.Vector3(x, y, z).applyMatrix4(camera.matrixWorldInverse));
-  camera.left = fit.min.x - 2;
-  camera.right = fit.max.x + 2;
-  camera.bottom = fit.min.y - 2;
-  camera.top = fit.max.y + 2;
-  camera.near = Math.max(0.1, -fit.max.z - 4);
-  camera.far = -fit.min.z + 4;
+  for (const point of sourcePoints)
+    fit.expandByPoint(point.applyMatrix4(camera.matrixWorldInverse));
+  if (!fit.isEmpty()) {
+    camera.left = fit.min.x - 3;
+    camera.right = fit.max.x + 3;
+    camera.bottom = fit.min.y - 3;
+    camera.top = fit.max.y + 3;
+    camera.near = Math.max(0.1, -fit.max.z - 5);
+    camera.far = -fit.min.z + 5;
+  }
   camera.updateProjectionMatrix();
-  light.shadow.mapSize.set(1024, 1024);
-  light.shadow.bias = -0.00016;
-  light.shadow.normalBias = 0.035;
-  light.shadow.radius = 2;
-  light.shadow.intensity = 0.55;
+  light.shadow.mapSize.set(shadowMapSize, shadowMapSize);
+  const { bias, normalBias, radius, intensity } = PARK_SHADOWS.solar;
+  Object.assign(light.shadow, { bias, normalBias, radius, intensity });
   light.shadow.autoUpdate = false;
   light.castShadow = false;
   let enabled = false,
@@ -49,11 +62,11 @@ export function createSolarShadows(light: THREE.DirectionalLight, entities: read
     },
     // Conservative colour + depth-buffer estimate, not measured driver memory.
     get textureBytes() {
-      return light.shadow.map ? 1024 * 1024 * 8 : 0;
+      return light.shadow.map ? shadowMapSize ** 2 * 8 : 0;
     },
     setQuality(quality: SurfaceQuality) {
       if (disposed) return;
-      const next = quality === "detailed";
+      const next = quality === "detailed" && sourcePoints.length > 0;
       if (next && !enabled) light.shadow.needsUpdate = true;
       enabled = next;
       light.castShadow = enabled;

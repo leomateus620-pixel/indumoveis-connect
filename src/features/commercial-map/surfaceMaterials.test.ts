@@ -243,7 +243,12 @@ describe("renderer-owned semantic surface materials", () => {
         expect(texture.generateMipmaps).toBe(true);
         expect(texture.minFilter).toBe(THREE.LinearMipmapLinearFilter);
         expect(texture.wrapS).toBe(THREE.RepeatWrapping);
-        expect(texture.image.data).toEqual((b.textures[i] as THREE.DataTexture).image.data);
+        // Warm reopens borrow identical immutable CPU pixels while each
+        // renderer owns an independent Texture and disposal lifecycle.
+        expect(Object.is(texture, b.textures[i])).toBe(false);
+        expect(Object.is(texture.image.data, (b.textures[i] as THREE.DataTexture).image.data)).toBe(
+          true,
+        );
       }
       expect(a.textureBytes).toBe(Math.ceil((128 ** 2 * 4 * 4) / 3) * 4);
     } finally {

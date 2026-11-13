@@ -1,12 +1,11 @@
 import * as THREE from "three";
 import { ENTITIES, type Point } from "./data/territory";
 import { DAYLIGHT } from "./daylight";
-import { polygonBounds, signedPolygonArea } from "./geometry";
+import { signedPolygonArea } from "./geometry";
 import { subtractPolygons } from "./parkGeometry";
-import { pavementUnionCells } from "./pavement";
 import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
 import type { SurfaceQuality } from "./surfaceMaterials";
-import { SUN_SHADOW } from "./sunShadows";
+import { SUN_SHADOW, sweepShadowFootprint, unionShadowFootprints } from "./sunShadows";
 
 export type ParkContextShadowSource = {
   id: string;
@@ -43,50 +42,13 @@ const triangulate = (polygon: readonly Point[]): Point[][] =>
     [],
   ).map((indices) => indices.map((index) => polygon[index]));
 
-function convexHull(points: readonly Point[]): Point[] {
-  const sorted = [...points]
-    .sort(([ax, az], [bx, bz]) => ax - bx || az - bz)
-    .filter((p, i, all) => !i || p[0] !== all[i - 1][0] || p[1] !== all[i - 1][1]);
-  const cross = (a: Point, b: Point, c: Point) =>
-    (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
-  const half = (ordered: readonly Point[]) => {
-    const chain: Point[] = [];
-    for (const point of ordered) {
-      while (
-        chain.length > 1 &&
-        cross(chain[chain.length - 2], chain[chain.length - 1], point) <= 1e-10
-      )
-        chain.pop();
-      chain.push(point);
-    }
-    return chain;
-  };
-  return [...half(sorted).slice(0, -1), ...half([...sorted].reverse()).slice(0, -1)];
-}
-
-/** Project each real footprint triangle before union. A convex hull of the
- * entire building would fill a re-entrant yard even with a vertical sun. */
 export function projectParkContextShadow(
   source: ParkContextShadowSource,
   direction: readonly [number, number, number] = DAYLIGHT.sunDirection,
 ): Point[][] {
-  if (
-    !direction.every(Number.isFinite) ||
-    direction[1] <= 0 ||
-    !Number.isFinite(source.height) ||
-    source.height < 0
-  )
-    throw new Error("park-context-shadow-invalid-projection");
-  const dx = (-direction[0] * source.height) / direction[1];
-  const dz = (-direction[2] * source.height) / direction[1];
-  return triangulate(source.polygon).map((triangle) =>
-    convexHull([...triangle, ...triangle.map(([x, z]): Point => [x + dx, z + dz])]),
-  );
+  return sweepShadowFootprint(source.polygon, source.height, direction);
 }
 
-/** Group only potentially intersecting footprints before the exact union.
- * Isolated sectors do not incur a park-wide slab decomposition. Bounds are
- * broad-phase work grouping only, never proof of a shadow intersection. */
 export function deriveParkContextShadowCells(
   sources: readonly ParkContextShadowSource[] = PARK_CONTEXT_SHADOW_SOURCES,
   protectedLots: readonly (readonly Point[])[] = ENTITIES.filter((e) => e.kind === "lot").map(
@@ -94,31 +56,13 @@ export function deriveParkContextShadowCells(
   ),
   direction: readonly [number, number, number] = DAYLIGHT.sunDirection,
 ): Point[][] {
-  const projected = sources.map((source) => {
-    const polygons = projectParkContextShadow(source, direction);
-    return { polygons, bounds: polygonBounds(polygons.flat()) };
-  });
-  const parent = projected.map((_, i) => i);
-  const find = (i: number): number => (parent[i] === i ? i : (parent[i] = find(parent[i])));
-  projected.forEach((item, i) => {
-    for (let j = i + 1; j < projected.length; j++) {
-      const a = item.bounds,
-        b = projected[j].bounds;
-      if (a.minX <= b.maxX && b.minX <= a.maxX && a.minY <= b.maxY && b.minY <= a.maxY)
-        parent[find(j)] = find(i);
-    }
-  });
-  const groups = new Map<number, Point[][]>();
-  projected.forEach((item, i) => {
-    const key = find(i),
-      group = groups.get(key) ?? [];
-    group.push(...item.polygons);
-    groups.set(key, group);
-  });
+  const projected = unionShadowFootprints(
+    sources.map((source) => projectParkContextShadow(source, direction)),
+  );
   const blockers = protectedLots.flatMap(triangulate);
-  return [...groups.values()]
-    .flatMap((polygons) => subtractPolygons(pavementUnionCells(polygons), blockers))
-    .filter((polygon) => Math.abs(signedPolygonArea(polygon)) > 1e-8);
+  return subtractPolygons(projected, blockers).filter(
+    (polygon) => Math.abs(signedPolygonArea(polygon)) > 1e-8,
+  );
 }
 
 // Only immutable drawing cells are shared across reopens. Every GPU buffer and
