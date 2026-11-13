@@ -71,7 +71,7 @@ describe("commercial cadastral presentation", () => {
     const before = JSON.stringify(ENTITIES);
     const lots = ENTITIES.filter((e) => e.kind === "lot");
     const edges = commercialBoundaries(ENTITIES);
-    expect(lots).toHaveLength(57);
+    expect(lots).toHaveLength(68);
     expect(lots.flatMap((lot) => lot.numbers ?? []).sort((a, b) => a - b)).toEqual(
       Array.from({ length: 68 }, (_, i) => i + 1),
     );

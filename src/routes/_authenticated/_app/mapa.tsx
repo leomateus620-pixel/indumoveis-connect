@@ -1,10 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Restricted } from "@/components/app/ui";
-import { useCan, useEditionId, useMapCommercialSpaces, useMapDealSpaces } from "@/lib/api";
+import {
+  useCan,
+  useCommercialLots,
+  useCommercialOverview,
+  useEditionId,
+  useMapDealSpaces,
+} from "@/lib/api";
 import { CommercialMapWorkspace } from "@/features/commercial-map/CommercialMapWorkspace";
 import { ENTITIES } from "@/features/commercial-map/data/territory";
-import { resolveMapCommercialLinks } from "@/features/commercial-map/commercial";
+import { resolvePersistedMapLots } from "@/features/commercial-map/commercial";
+import { ExternalCornerReview } from "@/features/commercial-pricing/ExternalCornerReview";
 import { readParkReturn } from "@/features/pavilion-interior/parkReturn";
 import { interiorPavilionNumber } from "@/features/pavilion-interior/presentation";
 import {
@@ -12,6 +19,10 @@ import {
   pavilionDestination,
   type ParkPavilionSearch,
 } from "@/features/pavilion-interior/connections";
+
+const lotGeometryIds = ENTITIES.filter((entity) => entity.kind === "lot").map(
+  (entity) => entity.id,
+);
 
 export const Route = createFileRoute("/_authenticated/_app/mapa")({
   validateSearch: (
@@ -36,21 +47,24 @@ export const Route = createFileRoute("/_authenticated/_app/mapa")({
 
 function MapaPage() {
   const can = useCan("mapa");
+  const commercialCan = useCan("comercial");
+  const canReadCommercial = can.read && commercialCan.read;
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/mapa" });
   const editionId = useEditionId();
-  const spaces = useMapCommercialSpaces(can.read);
-  const deal = useMapDealSpaces(search.deal, can.read);
+  const lots = useCommercialLots(undefined, canReadCommercial);
+  const overview = useCommercialOverview(canReadCommercial);
+  const deal = useMapDealSpaces(search.deal, canReadCommercial);
   const resolution = useMemo(
     () =>
-      resolveMapCommercialLinks({
+      resolvePersistedMapLots(
         editionId,
-        spaces: spaces.isError ? [] : (spaces.data ?? []),
-        deal: deal.isError ? null : deal.data,
+        canReadCommercial && !lots.isError ? (lots.data ?? []) : [],
+        lotGeometryIds,
         search,
-        geometryIds: ENTITIES.filter((e) => e.kind === "lot").map((e) => e.id),
-      }),
-    [editionId, spaces.data, spaces.isError, deal.data, deal.isError, search],
+        canReadCommercial && !deal.isError ? deal.data : null,
+      ),
+    [editionId, canReadCommercial, lots.data, lots.isError, deal.data, deal.isError, search],
   );
   if (!can.read) return <Restricted />;
   if (!editionId) return <p role="status">Carregando mapa…</p>;
@@ -81,15 +95,27 @@ function MapaPage() {
         await navigate(pavilionDestination(pavilion));
       }}
       statuses={resolution.statuses}
+      lotsByGeometry={resolution.lotsByGeometry}
+      renderExternalReview={(lot) => (
+        <ExternalCornerReview key={lot.id} editionId={editionId} spaceId={lot.id} />
+      )}
+      pavilionProgress={canReadCommercial ? overview.data?.segments : undefined}
+      onOpenCommercialDashboard={
+        canReadCommercial
+          ? (segmento) => {
+              void navigate({ to: "/dashboard-comercial", search: { segmento } });
+            }
+          : undefined
+      }
       highlightedIds={resolution.filteredGeometryIds ?? resolution.highlightedGeometryIds}
       externalSelection={resolution.selectedGeometryId}
       notice={resolution.warning}
       commercialState={
-        spaces.isError
+        !canReadCommercial || lots.isError
           ? "unavailable"
-          : spaces.isLoading
+          : lots.isLoading
             ? "loading"
-            : spaces.data
+            : lots.data
               ? "confirmed"
               : "unavailable"
       }

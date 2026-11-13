@@ -139,6 +139,8 @@ async function newContext({
   apiFailure = false,
   reducedMotion = false,
   fontDelayMs = 0,
+  commercialOverview,
+  commercialLots = [],
 } = {}) {
   const context = await browser.newContext({
     viewport,
@@ -294,6 +296,20 @@ async function newContext({
         return route.fulfill({ status: 200, headers, body: "null" });
       if (url.pathname === "/rest/v1/rpc/search_documents" && request.method() === "POST")
         return route.fulfill({ status: 200, headers, body: "[]" });
+      if (url.pathname === "/rest/v1/rpc/get_commercial_overview" && request.method() === "POST")
+        return route.fulfill({
+          status: 200,
+          headers,
+          body: JSON.stringify(commercialOverview ?? { segments: [] }),
+        });
+      if (url.pathname === "/rest/v1/rpc/get_commercial_lots" && request.method() === "POST")
+        return route.fulfill({
+          status: apiFailure ? 503 : 200,
+          headers,
+          body: JSON.stringify(
+            apiFailure ? { message: "Local laboratory unavailable fixture" } : commercialLots,
+          ),
+        });
       assert.equal(request.method(), "GET", `Blocked backend mutation: ${url.pathname}`);
       const table = url.pathname.split("/").at(-1);
       const payloads = {

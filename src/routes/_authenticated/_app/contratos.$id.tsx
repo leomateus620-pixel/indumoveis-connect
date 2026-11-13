@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   useContract,
+  useContractPricingTerms,
   useCan,
   useDbMutation,
   api,
@@ -49,6 +50,8 @@ import {
   today,
 } from "@/lib/format";
 import { snapshotDiff, snapshotOfDeal, splitInstallments } from "@/lib/journey";
+import type { ContractPricingTerms } from "@/lib/commercial";
+import { ContractPricingCard } from "@/features/commercial-pricing/ContractPricingCard";
 
 export const Route = createFileRoute("/_authenticated/_app/contratos/$id")({
   head: () => ({
@@ -77,6 +80,7 @@ function ContractPage() {
   const fin = useCan("financeiro");
   const cq = useContract(id);
   const { data: c, isLoading } = cq;
+  const pricing = useContractPricingTerms(id, !!c);
   const { data: inst = [] } = useInstallments(fin.read);
   const { data: files = [] } = useEntityDocuments("contract", id);
   const name = useProfileName();
@@ -129,6 +133,7 @@ function ContractPage() {
       ? snapshotDiff(c.deal_snapshot, snapshotOfDeal(c.deals))
       : [];
   const canGenerate = ["emitido", "assinado"].includes(c.status);
+  const pricingTerms = pricing.data;
 
   return (
     <>
@@ -263,6 +268,16 @@ function ContractPage() {
               </p>
             )}
           </Section>
+          {pricingTerms && (
+            <ContractPricingCard
+              key={`${id}:${pricingTerms.recorded_terms?.version ?? 0}`}
+              contractId={id}
+              terms={pricingTerms}
+              editable={
+                c.status === "elaboracao" && can.write && fin.read && !!pricingTerms.fee_rules
+              }
+            />
+          )}
           <Section
             title={`Texto do contrato · versão ${c.current_version}`}
             actions={
@@ -432,7 +447,15 @@ function ContractPage() {
         }
         onConfirm={(note) => tr.mutate({ to: to!, note })}
       />
-      <GenerateDialog open={gen} onOpenChange={setGen} contractId={id} total={c.total_cents} />
+      {gen && (
+        <GenerateDialog
+          open={gen}
+          onOpenChange={setGen}
+          contractId={id}
+          total={c.total_cents}
+          terms={pricingTerms}
+        />
+      )}
     </>
   );
 }
@@ -442,17 +465,36 @@ function GenerateDialog({
   onOpenChange,
   contractId,
   total,
+  terms,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   contractId: string;
   total: number;
+  terms?: ContractPricingTerms | null;
 }) {
+  const minimum = terms
+    ? terms.today > terms.first_due
+      ? terms.today
+      : terms.first_due
+    : undefined;
   const [n, setN] = useState(1);
-  const [first, setFirst] = useState(today());
+  const [first, setFirst] = useState(minimum ?? today());
   const [interval, setInterval] = useState(1);
+  const validDate =
+    !!first && (!minimum || first >= minimum) && (!terms || first <= terms.last_due);
+  const validInterval = Number.isInteger(interval) && interval >= 1 && interval <= 12;
+  const ceiling = terms?.installment_limit ?? 36;
+  const maximum =
+    terms && validDate && validInterval
+      ? splitInstallments(0, ceiling, first, interval).filter(
+          (item) => item.due_date <= terms.last_due,
+        ).length
+      : terms
+        ? 0
+        : ceiling;
   const preview =
-    first && interval >= 1 && interval <= 12 ? splitInstallments(total, n, first, interval) : [];
+    validDate && validInterval && n <= maximum ? splitInstallments(total, n, first, interval) : [];
   const sum = preview.reduce((a, p) => a + p.amount_cents, 0);
   const m = useDbMutation(
     () =>
@@ -480,13 +522,20 @@ function GenerateDialog({
               id="gn"
               type="number"
               min={1}
-              max={36}
+              max={Math.max(1, maximum)}
               value={n}
               onChange={(e) => setN(Number(e.target.value))}
             />
           </FormRow>
           <FormRow label="1º vencimento" htmlFor="gf">
-            <Input id="gf" type="date" value={first} onChange={(e) => setFirst(e.target.value)} />
+            <Input
+              id="gf"
+              type="date"
+              min={minimum}
+              max={terms?.last_due}
+              value={first}
+              onChange={(e) => setFirst(e.target.value)}
+            />
           </FormRow>
           <FormRow label="Intervalo (meses)" htmlFor="gi">
             <Input
@@ -530,7 +579,11 @@ function GenerateDialog({
           </div>
         ) : (
           <p className="text-sm text-destructive">
-            Informe de 1 a 36 parcelas, a data e um intervalo de 1 a 12 meses.
+            {terms
+              ? maximum > 0
+                ? `Com essas datas, selecione até ${maximum} parcela(s).`
+                : `Selecione um vencimento válido até ${fmtDate(terms.last_due)} e um intervalo de 1 a 12 meses.`
+              : "Informe de 1 a 36 parcelas, a data e um intervalo de 1 a 12 meses."}
           </p>
         )}
         <DialogFooter>

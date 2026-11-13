@@ -65,13 +65,17 @@ describe("Indumóveis source geometry", () => {
     ).toBe(true);
   });
 
-  it("covers each external number once and keeps unverifiable subdivisions aggregated", () => {
+  it("renders each commercial external number as a distinct lot", () => {
     const lots = ENTITIES.filter((entity) => entity.kind === "lot");
     const numbers = lots.flatMap((entity) => entity.numbers ?? []).sort((a, b) => a - b);
     // 69 and 70 were never saleable ground: they are the Centro
     // Administrativo garden and the east green sector, kept as context only.
     expect(numbers).toEqual(Array.from({ length: 68 }, (_, i) => i + 1));
-    expect(lots).toHaveLength(57);
+    expect(lots).toHaveLength(68);
+    expect(lots.every((entity) => entity.numbers?.length === 1)).toBe(true);
+    expect(lots.map((entity) => entity.id)).toEqual(
+      numbers.map((number) => `indumoveis:external:lot:${String(number).padStart(2, "0")}`),
+    );
     for (const retired of RETIRED_EXTERNAL_LOTS) {
       expect(ENTITIES.some((entity) => entity.id === retired.formerId)).toBe(false);
       const context = ENTITIES.find((entity) => entity.id === retired.contextId)!;
@@ -79,12 +83,46 @@ describe("Indumóveis source geometry", () => {
       expect(context.numbers).toBeUndefined();
       expect(context.polygon).toEqual(retired.polygon);
     }
-    expect(lots.filter((entity) => (entity.numbers?.length ?? 0) > 1)).toHaveLength(7);
-    const combined = lots.find((entity) => entity.numbers?.includes(35));
-    expect(combined?.numbers).toEqual([35, 36, 49, 50]);
-    expect(combined?.numbers).not.toContain(37);
-    expect(combined?.declaredAreaM2).toBeUndefined();
-    expect(lots.find((entity) => entity.numbers?.includes(10))?.numbers).toEqual([9, 10]);
+    expect(lots.filter((entity) => entity.schematicBoundary)).toHaveLength(18);
+  });
+
+  it("preserves the union of each source envelope while drawing individual lots", () => {
+    const lots = ENTITIES.filter((entity) => entity.kind === "lot");
+    const envelopes = [
+      { numbers: [9, 10], bounds: [1151.1096, 559.9367, 1258.0366, 644.2976], area: 203 },
+      { numbers: [31, 32, 33, 34], bounds: [813.489, 353.4922, 1018.6903, 446.6278], area: 227 },
+      { numbers: [35, 36, 49, 50], bounds: [1018.6903, 260.3559, 1126.1273, 446.6278], area: 227 },
+      { numbers: [37, 38], bounds: [1151.1096, 353.4922, 1258.0366, 446.2806], area: 227 },
+      { numbers: [39, 40], bounds: [1258.0366, 353.4922, 1360.6369, 446.2806], area: 227 },
+      { numbers: [41, 42], bounds: [1360.6369, 353.4922, 1468.9349, 446.2806], area: 227 },
+      { numbers: [43, 44], bounds: [710.5433, 260.3559, 813.489, 353.4922], area: 227 },
+    ];
+    for (const envelope of envelopes) {
+      const [x0, y0, x1, y1] = envelope.bounds;
+      const members = lots.filter((entity) => envelope.numbers.includes(entity.numbers![0]));
+      const memberPoints = members.flatMap((entity) => entity.polygon);
+      expect(members.map((member) => member.declaredAreaM2)).toEqual(
+        envelope.numbers.map(() => envelope.area),
+      );
+      expect(members.every((member) => member.schematicBoundary)).toBe(true);
+      expect(polygonBounds(memberPoints)).toEqual({
+        minX: x0 / 10,
+        minY: y0 / 10,
+        maxX: x1 / 10,
+        maxY: y1 / 10,
+      });
+      const areaInDrawingUnits = members.reduce(
+        (sum, member) => sum + signedPolygonArea(member.polygon),
+        0,
+      );
+      expect(areaInDrawingUnits).toBeCloseTo(((x1 - x0) * (y1 - y0)) / 100, 8);
+    }
+    const [a, b, c, d, e] = [35, 36, 37, 49, 50].map((number) => lots[number - 1].anchor);
+    expect(a[0]).toBeLessThan(b[0]);
+    expect(b[0]).toBeLessThan(c[0]);
+    expect(d[0]).toBeLessThan(e[0]);
+    expect(d[1]).toBeLessThan(a[1]);
+    expect(e[1]).toBeLessThan(b[1]);
   });
 
   it("does not draw overlapping external envelopes", () => {
@@ -125,6 +163,7 @@ describe("Indumóveis source geometry", () => {
     });
     expect(ENTITIES.find((entity) => entity.numbers?.[0] === 14)?.declaredAreaM2).toBe(243);
     expect(ENTITIES.find((entity) => entity.numbers?.[0] === 28)?.declaredAreaM2).toBe(243);
+    expect(ENTITIES.find((entity) => entity.numbers?.[0] === 57)?.declaredAreaM2).toBe(227);
   });
 
   it("leaves numbered terrain distinct from green unnumbered areas and circulation", () => {

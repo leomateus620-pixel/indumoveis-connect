@@ -29,6 +29,7 @@ vi.mock("@/lib/api", () => ({
   useEdition: () => state.edition,
   usePavilionInteriorPlan: () => state.plan,
   usePavilionInteriorCommercial: () => state.commercial,
+  useCommercialLots: () => ({ isError: false, data: [] }),
 }));
 vi.mock("@/components/app/ui", () => ({ Restricted: () => <p>Acesso restrito</p> }));
 vi.mock("./PavilionInterior", () => ({ PavilionInterior: () => <div>Planta</div> }));

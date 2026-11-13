@@ -5,6 +5,7 @@ import { PavilionInterior } from "./PavilionInterior";
 import { PAVILION_13_PLAN } from "./pavilion13";
 import { PAVILION_8_PLAN } from "./pavilion8";
 import { PAVILION_PRESENTATIONS } from "./presentation";
+import type { CommercialLot } from "@/lib/commercial";
 
 type Props = ComponentProps<typeof PavilionInterior>;
 const onSelect = vi.fn();
@@ -24,11 +25,13 @@ function Harness({
   initial,
   plan = PAVILION_13_PLAN,
   commercial,
+  lotsByEnvironment,
   onConnect,
 }: {
   initial?: string;
   plan?: Props["plan"];
   commercial?: Props["commercial"];
+  lotsByEnvironment?: Props["lotsByEnvironment"];
   onConnect?: Props["onConnect"];
 }) {
   const [selected, setSelected] = useState(initial);
@@ -38,6 +41,7 @@ function Harness({
       presentation={PAVILION_PRESENTATIONS[13]}
       selectedCode={selected}
       commercial={commercial}
+      lotsByEnvironment={lotsByEnvironment}
       onConnect={onConnect}
       onBack={() => {}}
       onSelect={(code) => {
@@ -84,11 +88,26 @@ afterEach(() => {
 });
 
 describe("Pavilhão 8 lot inspection", () => {
-  it("shows the pavilion total separately and omits an existing individual lot area", () => {
+  it("shows the confirmed commercial area and table price beside the separate pavilion total", () => {
+    const environment = PAVILION_8_PLAN.environments.find((lot) => lot.code === "07")!;
+    const commercialLot: CommercialLot = {
+      id: "space-07",
+      segmentKey: "p8",
+      code: "07",
+      environmentId: environment.id,
+      geometryId: null,
+      areaM2: 46,
+      areaPending: false,
+      status: "disponivel",
+      pricingState: "priced",
+      cornerState: null,
+      tariffCents: 29000,
+      grossCents: 1334000,
+    };
     const plan = {
       ...PAVILION_8_PLAN,
       environments: PAVILION_8_PLAN.environments.map((lot) =>
-        lot.code === "07" ? { ...lot, declaredAreaM2: 123.45 } : lot,
+        lot.id === environment.id ? { ...lot, declaredAreaM2: 46 } : lot,
       ),
     };
     render(
@@ -96,6 +115,7 @@ describe("Pavilhão 8 lot inspection", () => {
         plan={plan}
         presentation={PAVILION_PRESENTATIONS[8]}
         selectedCode="07"
+        lotsByEnvironment={new Map([[environment.id, commercialLot]])}
         onBack={() => {}}
         onSelect={onSelect}
       />,
@@ -107,7 +127,8 @@ describe("Pavilhão 8 lot inspection", () => {
     expect(within(header).getByText("Pavilhão 8")).toBeInTheDocument();
     const sidebar = screen.getByRole("complementary", { name: "Informações do lote" });
     expect(within(sidebar).getByRole("heading", { name: "Lote 07" })).toBeInTheDocument();
-    expect(sidebar).not.toHaveTextContent(/m²|123,45/);
+    expect(sidebar).toHaveTextContent("46,00 m²");
+    expect(sidebar).toHaveTextContent("R$ 13.340,00");
     expect(within(sidebar).queryByRole("button", { name: "Lote 02" })).not.toBeInTheDocument();
     const drawing = screen.getByRole("group", { name: "Planta interativa do Pavilhão 8" });
     expect(within(drawing).getByRole("link", { name: "Acesso ao Pavilhão 13" })).toHaveAttribute(
@@ -336,27 +357,37 @@ describe("Pavilhão 13 lot inspection", () => {
     expect(input).toHaveAttribute("aria-invalid", "false");
   });
 
-  it("suppresses existing square metres in panel, zoom labels and live announcements", () => {
-    const plan = {
-      ...PAVILION_13_PLAN,
-      environments: PAVILION_13_PLAN.environments.map((e) => ({ ...e, declaredAreaM2: 123.45 })),
-    };
-    const { container } = render(<Harness initial="01" plan={plan} />);
-    for (const code of ["01", "35", "80"]) {
-      fireEvent.click(lotPath(container, code));
-      fireEvent.click(screen.getByRole("button", { name: "Aproximar" }));
-      expect(container.textContent).not.toMatch(
-        /123[,.]45|m²|m2|metragem|Área não|Área confirmada/,
-      );
-      expect(
-        [...container.querySelectorAll("[aria-label], [aria-live]")]
-          .map((el) => `${el.getAttribute("aria-label") ?? ""} ${el.textContent}`)
-          .join(" "),
-      ).not.toMatch(/123[,.]45|m²/);
-      expect(container.querySelector(".arq-area")).not.toBeInTheDocument();
-      expect(container.querySelector(".arq-plan-detail")).not.toBeInTheDocument();
-      expect(container.querySelector('[aria-live="polite"]')).toHaveTextContent(`Lote ${code}`);
-    }
+  it("shows confirmed and pending areas in the selected lot panel and keeps polygons numbered", () => {
+    const records = ["35", "36"].map((code): CommercialLot => {
+      const pending = code === "36";
+      return {
+        id: `space-${code}`,
+        segmentKey: "p13",
+        code,
+        environmentId: PAVILION_13_PLAN.environments.find((lot) => lot.code === code)!.id,
+        geometryId: null,
+        areaM2: pending ? null : 6,
+        areaPending: pending,
+        status: "disponivel",
+        pricingState: pending ? "area_pending" : "priced",
+        cornerState: null,
+      };
+    });
+    const { container } = render(
+      <Harness
+        initial="35"
+        lotsByEnvironment={new Map(records.map((lot) => [lot.environmentId!, lot]))}
+      />,
+    );
+    const panel = screen.getByRole("complementary", { name: "Informações do lote" });
+    expect(within(panel).getByText("6,00 m²")).toBeInTheDocument();
+    expect(within(panel).queryByText("Valor bruto de tabela")).not.toBeInTheDocument();
+    fireEvent.click(lotPath(container, "36"));
+    fireEvent.click(screen.getByRole("button", { name: "Aproximar" }));
+    expect(within(panel).getByText("—")).toBeInTheDocument();
+    expect(within(panel).getByText("Área em validação")).toBeInTheDocument();
+    expect(container.querySelector(".arq-plan-detail")).not.toBeInTheDocument();
+    expect(container.querySelector('[aria-live="polite"]')).toHaveTextContent("Lote 36");
   });
 
   it("does not infer reserved status or occupants from documentary source metadata", () => {

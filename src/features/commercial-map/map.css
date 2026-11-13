@@ -289,6 +289,115 @@
   height: 100%;
   display: block;
 }
+.im-pavilion-marker-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.im-pavilion-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  --im-progress-scale: 1;
+  --im-progress-light-angle: 0deg;
+  pointer-events: none;
+}
+.im-pavilion-marker[hidden] {
+  display: none;
+}
+.im-pavilion-marker-roof {
+  position: absolute;
+  width: 46px;
+  height: 24px;
+  left: -23px;
+  top: -12px;
+  transform: rotate(var(--im-progress-light-angle)) translateX(7px);
+  background: radial-gradient(ellipse, #39283d80, #39283d33 42%, transparent 72%);
+}
+.im-pavilion-marker-roof::after {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: radial-gradient(ellipse, #ffe7ecb5, #efc6df46 44%, transparent 72%);
+}
+.im-pavilion-marker-light {
+  position: absolute;
+  left: -5px;
+  bottom: -1px;
+  width: 10px;
+  height: calc(var(--im-progress-lift) + 6px);
+  background: linear-gradient(180deg, #ead2e375, #f9e4f2 69%, #fce5eb44);
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  opacity: 0.78;
+}
+.im-pavilion-marker[data-projection="plan"] .im-pavilion-marker-roof {
+  transform: none;
+  opacity: 0.45;
+}
+.im-pavilion-marker[data-projection="plan"] .im-pavilion-marker-light {
+  opacity: 0.4;
+}
+.im-pavilion-marker-disc {
+  position: absolute;
+  bottom: var(--im-progress-lift);
+  left: -24px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  transform: scale(var(--im-progress-scale));
+  transform-origin: bottom center;
+  border-radius: 50%;
+  background: linear-gradient(150deg, #604259, #3d293a 74%);
+  color: #fff8fc;
+  box-shadow:
+    inset 0 1px 0 #f5d8ed89,
+    inset 0 -1px 0 #251626d9,
+    0 3px 8px #25182755;
+}
+.im-pavilion-marker.is-neutral .im-pavilion-marker-disc {
+  background: linear-gradient(150deg, #63565e, #463c43 74%);
+  color: #f1e8ee;
+}
+.im-pavilion-marker-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.im-pavilion-marker-track,
+.im-pavilion-marker-value {
+  fill: none;
+  stroke-width: 2.7px;
+}
+.im-pavilion-marker-track {
+  stroke: #9f8199;
+}
+.im-pavilion-marker.is-neutral .im-pavilion-marker-track {
+  stroke: #9b8f98;
+}
+.im-pavilion-marker-value {
+  stroke: #ffe1c7;
+  transform-origin: center;
+  transform: rotate(-90deg);
+}
+.im-pavilion-marker-disc strong {
+  position: relative;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+.im-pavilion-marker-disc strong[data-compact] {
+  font-size: 11px;
+  letter-spacing: -0.035em;
+}
 .im-map-attribution {
   position: absolute;
   bottom: 5px;
@@ -651,6 +760,39 @@
   color: var(--im-muted);
   font-size: 11px;
 }
+.im-map-pavilion-progress {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  color: var(--im-plum);
+}
+.im-map-pavilion-progress strong {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.im-map-lot-price {
+  width: 100%;
+}
+.im-map-lot-price:empty {
+  display: none;
+}
+.im-map-lot-price dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 5px 0 0;
+}
+.im-map-lot-price dl dt {
+  margin: 0;
+  color: var(--im-muted);
+  font-size: 10px;
+}
+.im-map-lot-price dl dd {
+  color: var(--im-ink);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
 .im-map-detail-body {
   font-size: 12px;
   line-height: 1.6;
@@ -724,6 +866,9 @@
 }
 .im-map-workspace .im-map-action-primary:hover {
   background: var(--im-plum-hover);
+}
+.im-map-interior-action {
+  margin: 10px 0 0;
 }
 .im-map-expand {
   display: none;
@@ -909,6 +1054,12 @@
     border-radius: 8px;
     color: var(--im-plum);
   }
+  .im-map-expand span {
+    display: none;
+  }
+  .im-map-detail:has(.im-map-interior-action):not(.is-expanded) .im-map-interior-action {
+    width: calc(100% - 48px);
+  }
   .im-map-expand svg {
     width: 18px;
   }
@@ -920,6 +1071,9 @@
     margin-top: 8px;
     border: 1px solid var(--im-border);
     background: var(--im-surface-warm);
+  }
+  .im-map-detail.is-expanded .im-map-expand span {
+    display: inline;
   }
   .im-map-notice {
     left: 12px;

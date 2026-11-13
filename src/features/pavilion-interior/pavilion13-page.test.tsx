@@ -31,6 +31,7 @@ vi.mock("@/lib/api", () => ({
       refetch: vi.fn(),
     };
   },
+  useCommercialLots: () => ({ isError: false, data: [] }),
 }));
 vi.mock("@/components/app/ui", () => ({ Restricted: () => <p>Acesso restrito</p> }));
 vi.mock("./PavilionInterior", () => ({

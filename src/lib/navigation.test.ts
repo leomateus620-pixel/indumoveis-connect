@@ -11,7 +11,7 @@ const perms = (...modules: string[]) =>
   Object.fromEntries(modules.map((m) => [m, { read: true, write: false }]));
 
 describe("navigation registry", () => {
-  it("groups the ten existing modules in six categories without changing routes", () => {
+  it("groups the operational destinations in six categories", () => {
     expect(NAV_CATEGORIES.map((c) => c.title)).toEqual([
       "Agenda",
       "Mapa Comercial",
@@ -27,6 +27,7 @@ describe("navigation registry", () => {
         "/comercializacao",
         "/contratos",
         "/dashboard",
+        "/dashboard-comercial",
         "/documentos",
         "/empresas",
         "/financeiro",
@@ -60,6 +61,14 @@ describe("navigation registry", () => {
     expect(v.map((c) => c.category.id)).toEqual(["mapa", "administracao"]);
     expect(v[0].destinations.map((d) => d.to)).toEqual(["/comercializacao"]);
     expect(v[1].destinations.map((d) => d.to)).toEqual(["/documentos"]);
+  });
+
+  it("requires both map and commercial access for the commercial dashboard", () => {
+    const paths = (...modules: string[]) =>
+      visibleCategories(perms(...modules)).flatMap((group) => group.destinations.map((d) => d.to));
+    expect(paths("mapa")).not.toContain("/dashboard-comercial");
+    expect(paths("comercial")).not.toContain("/dashboard-comercial");
+    expect(paths("mapa", "comercial")).toContain("/dashboard-comercial");
   });
 
   it("does not require admin to reveal the Administração group", () => {

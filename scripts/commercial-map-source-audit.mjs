@@ -106,7 +106,7 @@ const controls = [
     drawing: [115.87329, 67.88834],
   },
   {
-    entityId: "indumoveis:external:lot:70",
+    entityId: "indumoveis:landscape:east-garden",
     sourcePdf: [1528.9597, 669.8046],
     drawing: [152.89597, 66.98046],
   },
@@ -121,7 +121,8 @@ await fs.writeFile(
 console.log(
   JSON.stringify({
     output,
-    envelopes: ENTITIES.filter((e) => e.kind === "lot").length,
+    externalLots: ENTITIES.filter((e) => e.kind === "lot").length,
+    schematicBoundaries: ENTITIES.filter((e) => e.kind === "lot" && e.schematicBoundary).length,
     controlResidualPdfPoints: controls.map((c) =>
       Math.hypot(c.sourcePdf[0] - c.drawing[0] * 10, c.sourcePdf[1] - c.drawing[1] * 10),
     ),

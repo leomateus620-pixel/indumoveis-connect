@@ -22,16 +22,35 @@ import {
   Map as MapIcon,
   MoreHorizontal,
   Check,
+  BarChart3,
 } from "lucide-react";
 import { ENTITIES } from "./data/territory";
 import type { Point } from "./data/territory";
-import type { MapHandle, MapInsets, MapQuality, MapRendererProps, MapView } from "./types";
+import type {
+  MapHandle,
+  MapInsets,
+  MapQuality,
+  MapRendererProps,
+  MapView,
+  ReportPavilionProjections,
+} from "./types";
 import { Map2D } from "./Map2D";
 import { searchEntities, searchLandmarks } from "./search";
 import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
 import { MOTION } from "./motion";
 import { readQualityPreference, writeQualityPreference } from "./qualityPreference";
-import { area, SPACE_STATUS } from "@/lib/format";
+import { area, brl, SPACE_STATUS } from "@/lib/format";
+import type {
+  CommercialLot,
+  CommercialSegmentAggregate,
+  CommercialSegmentKey,
+} from "@/lib/commercial";
+import { formatCommercialPercent } from "@/lib/commercial";
+import {
+  PavilionSalesProgressMarkers,
+  type PavilionMarkerLayerHandle,
+} from "./PavilionSalesProgressMarkers";
+import { lotPricingNote } from "./lotPricingPresentation";
 import { readParkReturn, saveParkReturn } from "@/features/pavilion-interior/parkReturn";
 import {
   interiorPavilionNumber,
@@ -72,6 +91,10 @@ interface WorkspaceProps {
   parkSearch?: { status?: string; space?: string; deal?: string };
   onOpenInterior?: (pavilionNumber: InteriorPavilionNumber) => void;
   statuses?: Record<string, string>;
+  lotsByGeometry?: ReadonlyMap<string, CommercialLot>;
+  renderExternalReview?: (lot: CommercialLot) => React.ReactNode;
+  pavilionProgress?: readonly CommercialSegmentAggregate[];
+  onOpenCommercialDashboard?: (segment: CommercialSegmentKey) => void;
   highlightedIds?: string[];
   externalSelection?: string;
   notice?: string;
@@ -80,6 +103,28 @@ interface WorkspaceProps {
 }
 const emptyStatuses: Record<string, string> = {};
 const emptyIds: string[] = [];
+const emptyProgress: readonly CommercialSegmentAggregate[] = [];
+
+function LotPricing({ lot }: { lot: CommercialLot }) {
+  const note = lotPricingNote(lot);
+  return (
+    <div className="im-map-lot-price">
+      {lot.tariffCents !== undefined && lot.grossCents !== undefined && (
+        <dl>
+          <div>
+            <dt>Tarifa por m²</dt>
+            <dd>{brl(lot.tariffCents)}</dd>
+          </div>
+          <div>
+            <dt>Valor bruto de tabela</dt>
+            <dd>{brl(lot.grossCents)}</dd>
+          </div>
+        </dl>
+      )}
+      {note && <span>{note}</span>}
+    </div>
+  );
+}
 
 export function CommercialMapWorkspace({
   editionId,
@@ -88,6 +133,10 @@ export function CommercialMapWorkspace({
   parkSearch,
   onOpenInterior,
   statuses = emptyStatuses,
+  lotsByGeometry,
+  renderExternalReview,
+  pavilionProgress = emptyProgress,
+  onOpenCommercialDashboard,
   highlightedIds = emptyIds,
   externalSelection,
   notice,
@@ -111,6 +160,11 @@ export function CommercialMapWorkspace({
     lightMap = useRef<MapHandle>(null),
     origin = useRef<HTMLElement | null>(null),
     closeButton = useRef<HTMLButtonElement>(null);
+  const progressLayer = useRef<PavilionMarkerLayerHandle>(null);
+  const projectPavilions = useCallback<ReportPavilionProjections>(
+    (projections, viewport) => progressLayer.current?.project(projections, viewport),
+    [],
+  );
   const [selection, dispatch] = useReducer(selectionReducer, {
     id: savedPark.current?.selectionId ?? initialPavilionId,
     panelId: savedPark.current?.selectionId ?? initialPavilionId,
@@ -184,6 +238,12 @@ export function CommercialMapWorkspace({
   const entity = ENTITIES.find((e) => e.id === selection.panelId);
   const interiorPavilion =
     entity?.kind === "pavilion" ? interiorPavilionNumber(entity.id.split(":").at(-1)) : undefined;
+  const pavilionNumber =
+    entity?.kind === "pavilion" ? Number(entity.id.split(":").at(-1)) : undefined;
+  const activeProgress = pavilionProgress.find(
+    (segment) => segment.pavilionNumber === pavilionNumber,
+  );
+  const externalLot = entity?.kind === "lot" ? lotsByGeometry?.get(entity.id) : undefined;
   const results = useMemo(
     () => [
       ...searchEntities(ENTITIES, query, location).map((entity) => ({
@@ -486,6 +546,7 @@ export function CommercialMapWorkspace({
     </button>
   );
   const status = entity ? statuses[entity.id] : undefined;
+  const summaryArea = externalLot ? externalLot.areaM2 : entity?.declaredAreaM2;
   const viewControls = compactHeader ? (
     <select
       className="im-map-view-select"
@@ -625,6 +686,7 @@ export function CommercialMapWorkspace({
           <Map2D
             {...common}
             ref={lightMap}
+            onPavilionProjection={pavilionProgress.length ? projectPavilions : undefined}
             onNavigate={() => {
               lightNavigated.current = true;
             }}
@@ -641,6 +703,7 @@ export function CommercialMapWorkspace({
             <Renderer
               {...common}
               ref={map}
+              onPavilionProjection={pavilionProgress.length ? projectPavilions : undefined}
               readInitialTarget={readInitialTarget}
               canPresent={canPresent}
               onReady={() => {
@@ -650,6 +713,12 @@ export function CommercialMapWorkspace({
             />
           </div>
         )}
+        <PavilionSalesProgressMarkers
+          ref={progressLayer}
+          segments={pavilionProgress}
+          selectedPavilion={pavilionNumber}
+          insets={insets}
+        />
         <div
           className={`im-map-caption ${representation === "ready" ? "im-map-live" : ""}`}
           role="status"
@@ -989,15 +1058,17 @@ export function CommercialMapWorkspace({
                 <p className="im-map-location">{entity.location}</p>
               </div>
               <div className="im-map-detail-summary">
-                {entity.declaredAreaM2 != null ? (
+                {summaryArea != null ? (
                   <>
-                    <strong>{area(entity.declaredAreaM2)}</strong>
+                    <strong>{area(summaryArea)}</strong>
                     <span>
                       {entity.kind === "pavilion"
                         ? interiorPavilion === 13
                           ? "Área total declarada na planta"
                           : "Área total declarada do edifício"
-                        : "Área declarada na planta"}
+                        : externalLot
+                          ? "Área comercial confirmada"
+                          : "Área declarada na planta"}
                     </span>
                   </>
                 ) : (
@@ -1005,15 +1076,30 @@ export function CommercialMapWorkspace({
                 )}
                 {entity.kind === "lot" && (
                   <span>
-                    Situação:{" "}
-                    {status ? (SPACE_STATUS[status]?.label ?? "Não confirmada") : "Não confirmada"}
+                    {status
+                      ? (SPACE_STATUS[status]?.label ?? "Situação não confirmada")
+                      : "Situação não confirmada"}
                   </span>
+                )}
+                {externalLot && <LotPricing lot={externalLot} />}
+                {activeProgress && (
+                  <div className="im-map-pavilion-progress">
+                    <strong>
+                      {formatCommercialPercent(
+                        activeProgress.total > 0 ? activeProgress.soldPercent : null,
+                      )}
+                    </strong>
+                    <span>
+                      {activeProgress.total > 0
+                        ? `${activeProgress.sold} de ${activeProgress.total} lotes vendidos`
+                        : "Sem inventário comercial confirmado"}
+                    </span>
+                  </div>
                 )}
               </div>
               {interiorPavilion && onOpenInterior && (
                 <button
-                  className="im-map-action im-map-action-primary"
-                  style={{ margin: "0 20px 12px", width: "calc(100% - 40px)" }}
+                  className="im-map-action im-map-action-primary im-map-interior-action"
                   onClick={() => {
                     if (editionId)
                       saveParkReturn({
@@ -1033,33 +1119,40 @@ export function CommercialMapWorkspace({
               <button
                 className="im-map-expand"
                 aria-expanded={selection.expanded}
+                aria-label={selection.expanded ? "Recolher ficha" : "Mais detalhes"}
                 onClick={() => dispatch({ type: "expand" })}
               >
                 {selection.expanded ? <ChevronDown /> : <ChevronUp />}
-                {selection.expanded ? "Recolher ficha" : "Mais detalhes"}
+                <span>{selection.expanded ? "Recolher ficha" : "Mais detalhes"}</span>
               </button>
               <div className="im-map-detail-body" inert={!selection.expanded && insets.bottom > 0}>
                 <div>
                   <dl>
-                    <dt>Situação comercial</dt>
-                    <dd className={`im-map-commercial-status ${status ? "is-confirmed" : ""}`}>
-                      {status
-                        ? (SPACE_STATUS[status]?.label ?? "Não confirmada")
-                        : "Não confirmada"}
-                    </dd>
+                    {entity.kind === "lot" && (
+                      <>
+                        <dt>Situação comercial</dt>
+                        <dd className={`im-map-commercial-status ${status ? "is-confirmed" : ""}`}>
+                          {status
+                            ? (SPACE_STATUS[status]?.label ?? "Não confirmada")
+                            : "Não confirmada"}
+                        </dd>
+                      </>
+                    )}
                     <dt>Referência</dt>
                     <dd>{entity.source}</dd>
                   </dl>
                   {entity.notes && <p>{entity.notes}</p>}
-                  {entity.kind === "lot" && !entity.notes && (entity.numbers?.length ?? 0) > 1 && (
-                    <p>
-                      Envelope agregado:{" "}
-                      {entity.numbers?.map((n) => String(n).padStart(2, "0")).join(" / ")}.
-                      Subdivisão individual pendente.
-                    </p>
-                  )}
+                  {externalLot && renderExternalReview?.(externalLot)}
                   {entity.kind === "pavilion" && (
                     <>
+                      {activeProgress && onOpenCommercialDashboard && (
+                        <button
+                          className="im-map-action"
+                          onClick={() => onOpenCommercialDashboard(activeProgress.key)}
+                        >
+                          <BarChart3 size={18} /> Ver na dashboard comercial
+                        </button>
+                      )}
                       <button
                         className={`im-map-action ${interiorPavilion ? "" : "im-map-action-primary"}`}
                         onClick={() => {

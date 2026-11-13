@@ -76,7 +76,8 @@ import {
   touchTwistDelta,
   type QualityTier,
 } from "./navigation";
-import type { MapHandle, MapRendererProps, MapView } from "./types";
+import type { MapHandle, MapRendererProps, MapView, PavilionProjection } from "./types";
+import { pavilionMarkerScale } from "./pavilionSalesProgress";
 import { createPavement } from "./pavement";
 import {
   buildArchitecture,
@@ -361,6 +362,7 @@ const MapRenderer = forwardRef<MapHandle, MapRendererProps>(function MapRenderer
     props.insets.bottom,
     props.statuses,
     props.highlightedIds,
+    props.onPavilionProjection,
   ]);
 
   return (
@@ -947,6 +949,87 @@ function initializeMapRuntime(
   commercialGroup.add(architecture.group);
   diag.textureBytes += architecture.textureBytes;
   pickables.push(...architecture.pickables);
+  const progressRoofAnchors = ENTITIES.filter((entity) => entity.kind === "pavilion").map(
+    (entity) => ({
+      id: entity.id,
+      number: Number(entity.id.split(":").at(-1)),
+      position: new THREE.Vector3(
+        entity.anchor[0],
+        architectureVisualHeight(entity) + 0.45,
+        entity.anchor[1],
+      ),
+    }),
+  );
+  const progressRay = new THREE.Raycaster();
+  const progressPoint = new THREE.Vector3();
+  const progressShadowPoint = new THREE.Vector3();
+  const progressDirection = new THREE.Vector3();
+  const progressHits: THREE.Intersection[] = [];
+  const progressCameraMatrix = new THREE.Matrix4();
+  const progressProjectionMatrix = new THREE.Matrix4();
+  let progressCallback: MapRendererProps["onPavilionProjection"];
+  let progressInspectedId: string | null = null;
+  let progressWidth = 0,
+    progressHeight = 0;
+
+  function projectPavilionProgress() {
+    const { onPavilionProjection, inspectedId } = props();
+    if (!onPavilionProjection) {
+      progressCallback = undefined;
+      return;
+    }
+    if (
+      progressCallback === onPavilionProjection &&
+      progressWidth === width &&
+      progressHeight === height &&
+      progressInspectedId === inspectedId &&
+      progressCameraMatrix.equals(camera.matrixWorld) &&
+      progressProjectionMatrix.equals(camera.projectionMatrix)
+    )
+      return;
+    progressCallback = onPavilionProjection;
+    progressWidth = width;
+    progressHeight = height;
+    progressInspectedId = inspectedId;
+    progressCameraMatrix.copy(camera.matrixWorld);
+    progressProjectionMatrix.copy(camera.projectionMatrix);
+    const projections: PavilionProjection[] = [];
+    const maxDistance = width <= 580 ? 180 : 245;
+    for (const roof of progressRoofAnchors) {
+      if (roof.id === inspectedId) continue;
+      const distance = camera.position.distanceTo(roof.position);
+      if (distance > maxDistance) continue;
+      const ndc = progressPoint.copy(roof.position).project(camera);
+      if (Math.abs(ndc.x) > 1 || Math.abs(ndc.y) > 1 || Math.abs(ndc.z) > 1) continue;
+
+      // The map's wall/roof proxies provide depth without a GPU readback. A
+      // closer building, including the near edge of the same roof, can hide it.
+      progressRay.set(
+        camera.position,
+        progressDirection.subVectors(roof.position, camera.position).normalize(),
+      );
+      progressRay.far = distance - 0.15;
+      progressHits.length = 0;
+      progressRay.intersectObjects(architecture.pickables, false, progressHits);
+      if (progressHits.some((hit) => hit.object.userData.entityId !== inspectedId)) continue;
+      const shadow = progressShadowPoint
+        .copy(roof.position)
+        .addScaledVector(sunlight.position, -0.015)
+        .setY(roof.position.y)
+        .project(camera);
+      const lightAngle = Math.atan2((ndc.y - shadow.y) * height, (shadow.x - ndc.x) * width);
+      projections.push({
+        pavilionNumber: roof.number,
+        x: ((ndc.x + 1) * width) / 2,
+        y: ((1 - ndc.y) * height) / 2,
+        distance,
+        scale: pavilionMarkerScale(distance, width),
+        lightAngle: THREE.MathUtils.radToDeg(lightAngle),
+      });
+    }
+    onPavilionProjection(projections, { width, height });
+  }
+
   const sedeEntity = ENTITY_BY_ID.get("indumoveis:support:mao-na-massa")!;
   const sedePick = new THREE.Mesh(
     track(polygonGeometry(sedeEntity.polygon, 3.2)),
@@ -2184,6 +2267,7 @@ function initializeMapRuntime(
       contextTask = window.setTimeout(prepareContext, 160);
       environmentTask = window.setTimeout(prepareEnvironment, 350);
     }
+    if (ready) projectPavilionProgress();
     if (
       (pendingTier || pendingSoftwareMode !== null) &&
       !activePointers.size &&

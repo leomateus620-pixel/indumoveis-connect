@@ -10,7 +10,9 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { SPACE_STATUS } from "@/lib/format";
+import { brl, SPACE_STATUS } from "@/lib/format";
+import type { CommercialLot } from "@/lib/commercial";
+import { lotPricingNote } from "@/features/commercial-map/lotPricingPresentation";
 import { Pavilion1Architecture, Pavilion1NumberPlate } from "./Pavilion1Architecture";
 import { Pavilion12Architecture } from "./Pavilion12Architecture";
 import {
@@ -44,6 +46,7 @@ type Props = {
   presentation?: InteriorPresentation;
   selectedCode?: string;
   commercial?: Record<string, { status: string; exhibitor?: string }>;
+  lotsByEnvironment?: ReadonlyMap<string, CommercialLot>;
   commercialError?: boolean;
   onRetryCommercial?: () => void;
   onSelect: (code?: string) => void;
@@ -59,6 +62,7 @@ export function PavilionInterior({
   presentation = PAVILION_PRESENTATIONS[1],
   selectedCode,
   commercial = {},
+  lotsByEnvironment,
   commercialError,
   onRetryCommercial,
   onSelect,
@@ -311,7 +315,13 @@ export function PavilionInterior({
   const numEnvironments = plan.environments.filter(
     (e) => /^\d{2}$/.test(e.code) && (!lotsMode || e.kind === "commercial"),
   );
+  const commercialLot =
+    selected?.kind === "commercial" ? lotsByEnvironment?.get(selected.id) : undefined;
   const commercialInfo = selected?.kind === "commercial" ? commercial[selected.code] : undefined;
+  const currentStatus = commercialLot?.status ?? commercialInfo?.status;
+  const displayArea = commercialLot ? commercialLot.areaM2 : selected?.declaredAreaM2;
+  const showDetailArea = selected?.kind === "commercial" || presentation.showAreas;
+  const pricingNote = commercialLot ? lotPricingNote(commercialLot) : undefined;
   const hasExternal = selected?.parts.some((part) => part.kind === "external");
   const connections =
     presentation.connections?.flatMap((connection) => {
@@ -440,10 +450,10 @@ export function PavilionInterior({
                   <span>{presentation.title}</span>
                 </p>
               )}
-              {presentation.showAreas && selected.declaredAreaM2 != null && (
+              {showDetailArea && (displayArea != null || selected.kind === "commercial") && (
                 <p className="arq-area">
                   <span>Área</span>
-                  <strong>{formatArea(selected.declaredAreaM2)}</strong>
+                  <strong>{displayArea != null ? formatArea(displayArea) : "—"}</strong>
                 </p>
               )}
               {selected.functionLabel &&
@@ -463,11 +473,24 @@ export function PavilionInterior({
                   <button onClick={onRetryCommercial}>Tentar novamente</button>
                 </div>
               )}
-              {commercialInfo?.status && SPACE_STATUS[commercialInfo.status] && (
+              {(currentStatus || commercialLot) && (
                 <dl className="arq-commercial">
-                  <dt>Situação comercial</dt>
-                  <dd>{SPACE_STATUS[commercialInfo.status].label}</dd>
-                  {commercialInfo.exhibitor && (
+                  {commercialLot?.tariffCents !== undefined &&
+                    commercialLot.grossCents !== undefined && (
+                      <>
+                        <dt>Tarifa por m²</dt>
+                        <dd>{brl(commercialLot.tariffCents)}</dd>
+                        <dt>Valor bruto de tabela</dt>
+                        <dd>{brl(commercialLot.grossCents)}</dd>
+                      </>
+                    )}
+                  {currentStatus && SPACE_STATUS[currentStatus] && (
+                    <>
+                      <dt>Situação comercial</dt>
+                      <dd>{SPACE_STATUS[currentStatus].label}</dd>
+                    </>
+                  )}
+                  {commercialInfo?.exhibitor && (
                     <>
                       <dt>Expositor</dt>
                       <dd>{commercialInfo.exhibitor}</dd>
@@ -475,6 +498,7 @@ export function PavilionInterior({
                   )}
                 </dl>
               )}
+              {pricingNote && <p className="arq-function">{pricingNote}</p>}
               {isPavilion12 ? (
                 <button className="arq-view-plan" onClick={locateSelected}>
                   Localizar na planta <Scan size={16} />
@@ -885,10 +909,7 @@ export function PavilionInterior({
                       textAnchor="middle"
                       aria-hidden="true"
                     >
-                      {environment.functionLabel ??
-                        (environment.declaredAreaM2 != null
-                          ? formatArea(environment.declaredAreaM2)
-                          : "")}
+                      {environment.functionLabel}
                     </text>
                   )}
                   {environment.parts
@@ -997,7 +1018,7 @@ export function PavilionInterior({
           </span>
           <span className="arq-sr-only" aria-live="polite">
             {selected
-              ? `${!lotsMode && /^\d/.test(selected.code) ? selected.code + " " : ""}${selected.name}${presentation.showAreas && selected.declaredAreaM2 != null ? ", " + formatArea(selected.declaredAreaM2) : ""}`
+              ? `${!lotsMode && /^\d/.test(selected.code) ? selected.code + " " : ""}${selected.name}${showDetailArea && displayArea != null ? ", " + formatArea(displayArea) : ""}`
               : lotsMode
                 ? "Nenhum lote selecionado"
                 : "Nenhum ambiente selecionado"}

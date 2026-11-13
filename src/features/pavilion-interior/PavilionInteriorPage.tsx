@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Restricted } from "@/components/app/ui";
 import {
@@ -6,6 +7,7 @@ import {
   useEdition,
   usePavilionInteriorPlan,
   usePavilionInteriorCommercial,
+  useCommercialLots,
 } from "@/lib/api";
 import { PavilionInterior } from "./PavilionInterior";
 import { pavilionDestination, type ParkPavilionSearch } from "./connections";
@@ -33,6 +35,17 @@ export function PavilionInteriorPage({
     plan.data?.revision,
     can.read && commercialCan.read,
     pavilionNumber,
+  );
+  const canReadCommercial = can.read && commercialCan.read;
+  const inventory = useCommercialLots(`p${pavilionNumber}`, canReadCommercial);
+  const lotsByEnvironment = useMemo(
+    () =>
+      new Map(
+        (canReadCommercial ? (inventory.data ?? []) : []).flatMap((lot) =>
+          lot.environmentId ? [[lot.environmentId, lot] as const] : [],
+        ),
+      ),
+    [canReadCommercial, inventory.data],
   );
   const back = () => {
     const saved = readParkReturn(edition.data?.id, pavilionNumber);
@@ -84,8 +97,12 @@ export function PavilionInteriorPage({
       presentation={presentation}
       selectedCode={selection}
       commercial={commercialCan.read && commercial.isSuccess ? commercial.data : undefined}
-      commercialError={commercialCan.read && commercial.isError}
-      onRetryCommercial={() => void commercial.refetch()}
+      lotsByEnvironment={lotsByEnvironment}
+      commercialError={canReadCommercial && (commercial.isError || inventory.isError)}
+      onRetryCommercial={() => {
+        if (commercial.isError) void commercial.refetch();
+        if (inventory.isError) void inventory.refetch();
+      }}
       onBack={back}
       onSelect={onSelect}
       onConnect={(pavilion) => void navigate(pavilionDestination(pavilion))}

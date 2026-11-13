@@ -15,6 +15,7 @@ import { ROLE_LABEL, fmtDate } from "@/lib/format";
 import {
   PORTAL_ENTRY,
   PORTAL_PATH,
+  canOpen,
   matchDestination,
   prewarmMapRenderer,
   visibleCategories,
@@ -42,6 +43,7 @@ function NavItem({
   prewarm,
   active,
   compact,
+  deferMap,
   onNavigate,
 }: {
   to: string;
@@ -50,14 +52,16 @@ function NavItem({
   prewarm?: () => void;
   active: boolean;
   compact: boolean;
+  deferMap?: boolean;
   onNavigate?: () => void;
 }) {
   const link = (
     <Link
       to={to}
+      preload={deferMap ? false : undefined}
       onClick={onNavigate}
       onPointerDown={prewarm}
-      onFocus={prewarm}
+      onFocus={deferMap ? undefined : prewarm}
       aria-current={active ? "page" : undefined}
       className={cn(
         "relative flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-sidebar-ring",
@@ -106,6 +110,7 @@ function SidebarBody({
       prewarm={d.prewarm}
       active={isActive(path, d.to)}
       compact={compact}
+      deferMap={path === "/dashboard-comercial" && d.to === "/mapa"}
       onNavigate={onNavigate}
     />
   );
@@ -218,7 +223,7 @@ function ModuleGuard({ me }: { me: Me }) {
   // confirmadas descrevem a página que está de fato na tela.
   const path = useMatches({ select: (ms) => ms[ms.length - 1]?.pathname ?? "" });
   const current = matchDestination(path);
-  if (!current || !me.perms[current.module]?.read)
+  if (!current || !canOpen(me.perms, current))
     return (
       <Notice title="Acesso não permitido">
         <p className="text-muted-foreground">Seu perfil não permite consultar este módulo.</p>
@@ -235,11 +240,11 @@ function ModuleGuard({ me }: { me: Me }) {
   return <AuthorizedShell me={me} current={current} onSignOut={signOut} />;
 }
 
-function useIdlePrewarm() {
+function useIdlePrewarm(enabled: boolean) {
   useEffect(() => {
     // Só em desktop (ponteiro fino) e quando aparelho e rede permitirem; no celular
     // o mapa 3D carrega apenas ao ser aberto.
-    if (!window.matchMedia?.("(pointer: fine)").matches) return;
+    if (!enabled || !window.matchMedia?.("(pointer: fine)").matches) return;
     const w = window as Window & {
       requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
       cancelIdleCallback?: (id: number) => void;
@@ -250,7 +255,7 @@ function useIdlePrewarm() {
     }
     const id = window.setTimeout(prewarmMapRenderer, 2500);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [enabled]);
 }
 
 function AuthorizedShell(props: { me: Me; current: NavDestination; onSignOut: () => void }) {
@@ -275,7 +280,7 @@ function AuthorizedWorkspace({
   const { data: edition } = useEdition();
   const pending = useRouterState({ select: (s) => s.status === "pending" });
   const closeSheet = useCallback(() => setOpen(false), []);
-  useIdlePrewarm();
+  useIdlePrewarm(current.to !== "/dashboard-comercial" && !!me.perms.mapa?.read);
 
   const toggle = useCallback(() => {
     setCompact((c) => {

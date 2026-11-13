@@ -19,6 +19,7 @@ import { Route as AuthenticatedAppAgendaRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppComercializacaoRouteImport } from './routes/_authenticated/_app/comercializacao'
 import { Route as AuthenticatedAppContratosRouteImport } from './routes/_authenticated/_app/contratos'
 import { Route as AuthenticatedAppDashboardRouteImport } from './routes/_authenticated/_app/dashboard'
+import { Route as AuthenticatedAppDashboardComercialRouteImport } from './routes/_authenticated/_app/dashboard-comercial'
 import { Route as AuthenticatedAppDocumentosRouteImport } from './routes/_authenticated/_app/documentos'
 import { Route as AuthenticatedAppEmpresasRouteImport } from './routes/_authenticated/_app/empresas'
 import { Route as AuthenticatedAppFinanceiroRouteImport } from './routes/_authenticated/_app/financeiro'
@@ -86,6 +87,16 @@ const AuthenticatedAppDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppDashboardComercialRoute =
+  AuthenticatedAppDashboardComercialRouteImport.update({
+    id: '/dashboard-comercial',
+    path: '/dashboard-comercial',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/_app/dashboard-comercial.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const AuthenticatedAppDocumentosRoute =
   AuthenticatedAppDocumentosRouteImport.update({
     id: '/documentos',
@@ -185,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/comercializacao': typeof AuthenticatedAppComercializacaoRoute
   '/contratos': typeof AuthenticatedAppContratosRouteWithChildren
   '/dashboard': typeof AuthenticatedAppDashboardRoute
+  '/dashboard-comercial': typeof AuthenticatedAppDashboardComercialRoute
   '/documentos': typeof AuthenticatedAppDocumentosRoute
   '/empresas': typeof AuthenticatedAppEmpresasRouteWithChildren
   '/financeiro': typeof AuthenticatedAppFinanceiroRoute
@@ -209,6 +221,7 @@ export interface FileRoutesByTo {
   '/agenda': typeof AuthenticatedAppAgendaRoute
   '/comercializacao': typeof AuthenticatedAppComercializacaoRoute
   '/dashboard': typeof AuthenticatedAppDashboardRoute
+  '/dashboard-comercial': typeof AuthenticatedAppDashboardComercialRoute
   '/documentos': typeof AuthenticatedAppDocumentosRoute
   '/financeiro': typeof AuthenticatedAppFinanceiroRoute
   '/mapa': typeof AuthenticatedAppMapaRoute
@@ -235,6 +248,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/comercializacao': typeof AuthenticatedAppComercializacaoRoute
   '/_authenticated/_app/contratos': typeof AuthenticatedAppContratosRouteWithChildren
   '/_authenticated/_app/dashboard': typeof AuthenticatedAppDashboardRoute
+  '/_authenticated/_app/dashboard-comercial': typeof AuthenticatedAppDashboardComercialRoute
   '/_authenticated/_app/documentos': typeof AuthenticatedAppDocumentosRoute
   '/_authenticated/_app/empresas': typeof AuthenticatedAppEmpresasRouteWithChildren
   '/_authenticated/_app/financeiro': typeof AuthenticatedAppFinanceiroRoute
@@ -262,6 +276,7 @@ export interface FileRouteTypes {
     | '/comercializacao'
     | '/contratos'
     | '/dashboard'
+    | '/dashboard-comercial'
     | '/documentos'
     | '/empresas'
     | '/financeiro'
@@ -286,6 +301,7 @@ export interface FileRouteTypes {
     | '/agenda'
     | '/comercializacao'
     | '/dashboard'
+    | '/dashboard-comercial'
     | '/documentos'
     | '/financeiro'
     | '/mapa'
@@ -311,6 +327,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/comercializacao'
     | '/_authenticated/_app/contratos'
     | '/_authenticated/_app/dashboard'
+    | '/_authenticated/_app/dashboard-comercial'
     | '/_authenticated/_app/documentos'
     | '/_authenticated/_app/empresas'
     | '/_authenticated/_app/financeiro'
@@ -404,6 +421,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedAppDashboardRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
+    '/_authenticated/_app/dashboard-comercial': {
+      id: '/_authenticated/_app/dashboard-comercial'
+      path: '/dashboard-comercial'
+      fullPath: '/dashboard-comercial'
+      preLoaderRoute: typeof AuthenticatedAppDashboardComercialRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/_app/documentos': {
@@ -568,6 +592,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppComercializacaoRoute: typeof AuthenticatedAppComercializacaoRoute
   AuthenticatedAppContratosRoute: typeof AuthenticatedAppContratosRouteWithChildren
   AuthenticatedAppDashboardRoute: typeof AuthenticatedAppDashboardRoute
+  AuthenticatedAppDashboardComercialRoute: typeof AuthenticatedAppDashboardComercialRoute
   AuthenticatedAppDocumentosRoute: typeof AuthenticatedAppDocumentosRoute
   AuthenticatedAppEmpresasRoute: typeof AuthenticatedAppEmpresasRouteWithChildren
   AuthenticatedAppFinanceiroRoute: typeof AuthenticatedAppFinanceiroRoute
@@ -581,6 +606,8 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppComercializacaoRoute: AuthenticatedAppComercializacaoRoute,
   AuthenticatedAppContratosRoute: AuthenticatedAppContratosRouteWithChildren,
   AuthenticatedAppDashboardRoute: AuthenticatedAppDashboardRoute,
+  AuthenticatedAppDashboardComercialRoute:
+    AuthenticatedAppDashboardComercialRoute,
   AuthenticatedAppDocumentosRoute: AuthenticatedAppDocumentosRoute,
   AuthenticatedAppEmpresasRoute: AuthenticatedAppEmpresasRouteWithChildren,
   AuthenticatedAppFinanceiroRoute: AuthenticatedAppFinanceiroRoute,
