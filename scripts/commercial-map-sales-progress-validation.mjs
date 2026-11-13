@@ -12,9 +12,9 @@ import {
 const segments = [
   { key: "p1", pavilionNumber: 1, total: 12, sold: 1, soldPercent: 100 / 12 },
   { key: "p3", pavilionNumber: 3, total: 0, sold: 0, soldPercent: null },
-  { key: "p8", pavilionNumber: 8, total: 7, sold: 3, soldPercent: 300 / 7 },
+  { key: "p8", pavilionNumber: 8, total: 7, sold: 0, soldPercent: 0 },
   { key: "p12", pavilionNumber: 12, total: 254, sold: 65, soldPercent: 6500 / 254 },
-  { key: "p13", pavilionNumber: 13, total: 80, sold: 8, soldPercent: 10 },
+  { key: "p13", pavilionNumber: 13, total: 80, sold: 80, soldPercent: 100 },
   { key: "p14", pavilionNumber: 14, total: 0, sold: 0, soldPercent: null },
 ];
 const exteriorFixture = ["09", "10", "35", "36", "37", "38", "43", "44", "49", "50"].map(
@@ -58,7 +58,8 @@ try {
       .locator(`.im-map-stage[data-representation="${representation}"]`)
       .waitFor({ timeout: 25000 });
     const target = page.locator('[data-pavilion-progress="12"]');
-    await target.waitFor({ state: "visible", timeout: 10000 });
+    const disk = target.locator(".im-pavilion-marker-disc");
+    await disk.waitFor({ state: "visible", timeout: 10000 });
     const pct = new Intl.NumberFormat("pt-BR", {
       style: "percent",
       maximumFractionDigits: 1,
@@ -68,7 +69,20 @@ try {
       await page.locator(".im-map-pavilion-progress").textContent(),
       /65 de 254 lotes vendidos/,
     );
-    assert.equal(await page.locator('[data-pavilion-progress="3"] strong').textContent(), "—");
+    const neutral = page.locator('[data-pavilion-progress="3"]');
+    assert.equal(await neutral.locator("strong").textContent(), "—");
+    assert.equal(await neutral.locator(".im-pavilion-marker-value").count(), 0);
+    const empty = page.locator('[data-pavilion-progress="8"]');
+    assert.equal(await empty.locator("strong").textContent(), "0%");
+    assert.equal(await empty.locator(".im-pavilion-marker-value").count(), 0);
+    const full = page.locator('[data-pavilion-progress="13"]');
+    assert.equal(await full.locator("strong").textContent(), "100%");
+    assert.equal(await full.locator(".im-pavilion-marker-value").count(), 1);
+    assert.equal(
+      await full.locator(".im-pavilion-marker-value").getAttribute("stroke-dasharray"),
+      null,
+    );
+    assert.equal(await disk.locator(".im-pavilion-marker-value").count(), 1);
     const diagnostics = await page.evaluate(() => {
       const map = window.__indumoveisMap;
       return (
@@ -81,9 +95,11 @@ try {
       );
     });
     await page.screenshot({ path: path.join(artifactDir, `sales-progress-${settings.name}.png`) });
-    const box = await target.boundingBox();
-    assert(box && box.width >= 58 && box.width <= 80);
-    const doesNotCaptureGestures = await target.evaluate((node) => {
+    const box = await disk.boundingBox();
+    const [minSize, maxSize] = settings.noWebGL ? [40, 45] : [44, 53];
+    assert(box && box.width >= minSize && box.width <= maxSize);
+    assert(Math.abs(box.width - box.height) < 1, "visible marker must be circular");
+    const doesNotCaptureGestures = await disk.evaluate((node) => {
       const box = node.getBoundingClientRect();
       return !node.contains(
         document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2),
@@ -94,6 +110,42 @@ try {
     if (diagnostics && after != null)
       assert(after - diagnostics.frames < 20, "markers must settle");
     const detail = page.getByRole("complementary", { name: "Detalhes da área" });
+    const measureAnchors = () =>
+      target.evaluate((node) => {
+        const wrapper = node.getBoundingClientRect();
+        const disk = node.querySelector(".im-pavilion-marker-disc").getBoundingClientRect();
+        const roof = node.querySelector(".im-pavilion-marker-roof");
+        return {
+          x: wrapper.x,
+          y: wrapper.y,
+          dx: disk.x + disk.width / 2 - wrapper.x,
+          lift: wrapper.y - disk.bottom,
+          lightAngle: node.style.getPropertyValue("--im-progress-light-angle"),
+          roof: getComputedStyle(roof).transform,
+        };
+      });
+    const beforeMotion = await measureAnchors();
+    if (!settings.noWebGL) {
+      const rotate = page.getByRole("button", { name: "Girar à direita" });
+      await rotate.click();
+      await page.waitForFunction(() => window.__indumoveisMap?.cameraState === "idle");
+      await disk.waitFor({ state: "visible" });
+    } else {
+      await page.getByRole("button", { name: "Aproximar" }).click();
+    }
+    const afterMotion = await measureAnchors();
+    for (const position of [beforeMotion, afterMotion]) {
+      assert(Math.abs(position.dx) < 0.5, "disk horizontal center must stay over the roof");
+      assert(Math.abs(position.lift - 8) < 0.5, "disk must hover 8px above the roof");
+    }
+    if (!settings.noWebGL) {
+      assert.notEqual(
+        beforeMotion.lightAngle,
+        afterMotion.lightAngle,
+        "roof light must follow camera projection",
+      );
+      assert.notEqual(beforeMotion.roof, afterMotion.roof);
+    }
     if (settings.noWebGL) {
       const more = detail.getByRole("button", { name: "Mais detalhes", exact: true });
       await more.click();
@@ -154,6 +206,7 @@ try {
       percent: pct,
       size: box,
       diagnostics,
+      anchors: { beforeMotion, afterMotion },
       individualLots: ["36", "37", "43", "44"],
     });
     await context.close();

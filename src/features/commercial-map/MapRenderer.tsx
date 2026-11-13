@@ -962,6 +962,7 @@ function initializeMapRuntime(
   );
   const progressRay = new THREE.Raycaster();
   const progressPoint = new THREE.Vector3();
+  const progressShadowPoint = new THREE.Vector3();
   const progressDirection = new THREE.Vector3();
   const progressHits: THREE.Intersection[] = [];
   const progressCameraMatrix = new THREE.Matrix4();
@@ -1011,12 +1012,19 @@ function initializeMapRuntime(
       progressHits.length = 0;
       progressRay.intersectObjects(architecture.pickables, false, progressHits);
       if (progressHits.some((hit) => hit.object.userData.entityId !== inspectedId)) continue;
+      const shadow = progressShadowPoint
+        .copy(roof.position)
+        .addScaledVector(sunlight.position, -0.015)
+        .setY(roof.position.y)
+        .project(camera);
+      const lightAngle = Math.atan2((ndc.y - shadow.y) * height, (shadow.x - ndc.x) * width);
       projections.push({
         pavilionNumber: roof.number,
         x: ((ndc.x + 1) * width) / 2,
         y: ((1 - ndc.y) * height) / 2,
         distance,
         scale: pavilionMarkerScale(distance, width),
+        lightAngle: THREE.MathUtils.radToDeg(lightAngle),
       });
     }
     onPavilionProjection(projections, { width, height });

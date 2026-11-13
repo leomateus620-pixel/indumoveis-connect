@@ -300,81 +300,103 @@
   position: absolute;
   top: 0;
   left: 0;
-  display: grid;
-  grid-template-columns: 25px 1fr;
-  align-items: center;
-  gap: 4px;
-  width: 72px;
-  height: 38px;
-  padding: 3px 5px;
-  transform-origin: bottom center;
-  border: 1px solid #dfd2db;
-  border-radius: 9px;
-  background: linear-gradient(168deg, #fffdf9 25%, #f1e9ef);
-  color: #482e40;
-  box-shadow:
-    0 2px 0 #513f4d38,
-    0 4px 10px #34233033;
+  --im-progress-scale: 1;
+  --im-progress-light-angle: 0deg;
+  pointer-events: none;
 }
 .im-pavilion-marker[hidden] {
   display: none;
 }
-.im-pavilion-marker::after {
+.im-pavilion-marker-roof {
+  position: absolute;
+  width: 46px;
+  height: 24px;
+  left: -23px;
+  top: -12px;
+  transform: rotate(var(--im-progress-light-angle)) translateX(7px);
+  background: radial-gradient(ellipse, #39283d80, #39283d33 42%, transparent 72%);
+}
+.im-pavilion-marker-roof::after {
   content: "";
   position: absolute;
-  left: calc(50% - 2px);
-  bottom: -10px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #fff9fc;
-  box-shadow: 0 0 0 2px #583b51b5;
+  width: 28px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: radial-gradient(ellipse, #ffe7ecb5, #efc6df46 44%, transparent 72%);
 }
-.im-pavilion-marker.is-neutral {
-  border-color: #ddd7d2;
-  background: #f7f4ee;
-  color: #615b5c;
+.im-pavilion-marker-light {
+  position: absolute;
+  left: -5px;
+  bottom: -1px;
+  width: 10px;
+  height: calc(var(--im-progress-lift) + 6px);
+  background: linear-gradient(180deg, #ead2e375, #f9e4f2 69%, #fce5eb44);
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  opacity: 0.78;
+}
+.im-pavilion-marker[data-projection="plan"] .im-pavilion-marker-roof {
+  transform: none;
+  opacity: 0.45;
+}
+.im-pavilion-marker[data-projection="plan"] .im-pavilion-marker-light {
+  opacity: 0.4;
+}
+.im-pavilion-marker-disc {
+  position: absolute;
+  bottom: var(--im-progress-lift);
+  left: -24px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  transform: scale(var(--im-progress-scale));
+  transform-origin: bottom center;
+  border-radius: 50%;
+  background: linear-gradient(150deg, #604259, #3d293a 74%);
+  color: #fff8fc;
+  box-shadow:
+    inset 0 1px 0 #f5d8ed89,
+    inset 0 -1px 0 #251626d9,
+    0 3px 8px #25182755;
+}
+.im-pavilion-marker.is-neutral .im-pavilion-marker-disc {
+  background: linear-gradient(150deg, #63565e, #463c43 74%);
+  color: #f1e8ee;
 }
 .im-pavilion-marker-ring {
-  width: 25px;
-  height: 25px;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 .im-pavilion-marker-track,
 .im-pavilion-marker-value {
   fill: none;
-  stroke-width: 3.2px;
+  stroke-width: 2.7px;
 }
 .im-pavilion-marker-track {
-  stroke: #d8c9d3;
+  stroke: #9f8199;
+}
+.im-pavilion-marker.is-neutral .im-pavilion-marker-track {
+  stroke: #9b8f98;
 }
 .im-pavilion-marker-value {
-  stroke: #754766;
-  stroke-linecap: round;
+  stroke: #ffe1c7;
   transform-origin: center;
   transform: rotate(-90deg);
 }
-.im-pavilion-marker-center {
-  fill: #8b617e;
-}
-.im-pavilion-marker.is-neutral .im-pavilion-marker-center {
-  fill: #756b71;
-}
-.im-pavilion-marker-text {
-  display: grid;
-  gap: 1px;
-  line-height: 1.08;
-}
-.im-pavilion-marker-text span {
-  color: #6d5b66;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-.im-pavilion-marker-text strong {
-  font-size: 10px;
+.im-pavilion-marker-disc strong {
+  position: relative;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
-  font-weight: 800;
+  font-weight: 750;
+  line-height: 1;
   white-space: nowrap;
+}
+.im-pavilion-marker-disc strong[data-compact] {
+  font-size: 11px;
+  letter-spacing: -0.035em;
 }
 .im-map-attribution {
   position: absolute;

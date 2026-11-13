@@ -18,6 +18,8 @@ export type PavilionProjection = {
   y: number;
   distance: number;
   scale: number;
+  /** Screen direction of the light cast across the 3D roof, in degrees. */
+  lightAngle?: number;
 };
 export type PavilionViewport = { width: number; height: number };
 export type ReportPavilionProjections = (

@@ -1,7 +1,11 @@
 import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef } from "react";
 import { formatCommercialPercent, type CommercialSegmentAggregate } from "@/lib/commercial";
 import type { MapInsets, PavilionProjection, PavilionViewport } from "./types";
-import { PAVILION_MARKER, placePavilionMarkers } from "./pavilionSalesProgress";
+import {
+  PAVILION_MARKER,
+  placePavilionMarkers,
+  stepPavilionMarkerScale,
+} from "./pavilionSalesProgress";
 
 type PavilionProgress = CommercialSegmentAggregate & { pavilionNumber: number };
 
@@ -17,25 +21,12 @@ function pavilionSalesDescription(segment: PavilionProgress) {
 }
 
 type MarkerMotion = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  visible: boolean;
+  value: number;
+  velocity: number;
   transform: string;
+  roofLight: string;
+  scale: string;
 };
-
-const spring = 225;
-const damping = 27;
-const stopThreshold = 0.15;
-
-function stepAxis(position: number, velocity: number, target: number, seconds: number) {
-  const nextVelocity =
-    (velocity + (target - position) * spring * seconds) / (1 + damping * seconds);
-  const offset = position + nextVelocity * seconds - target;
-  const clamped = Math.max(-PAVILION_MARKER.maxShift, Math.min(PAVILION_MARKER.maxShift, offset));
-  return { position: target + clamped, velocity: offset === clamped ? nextVelocity : 0 };
-}
 
 type Props = {
   segments: readonly CommercialSegmentAggregate[];
@@ -87,47 +78,32 @@ export const PavilionSalesProgressMarkers = forwardRef<PavilionMarkerLayerHandle
         frame = null;
         lastTime = 0;
       }
+      function setScale(node: HTMLDivElement, motion: MarkerMotion) {
+        const scale = motion.value.toFixed(4);
+        if (motion.scale === scale) return;
+        motion.scale = scale;
+        node.style.setProperty("--im-progress-scale", scale);
+      }
       function paint(now: number) {
         frame = null;
         if (!onscreen || document.hidden) {
           stop();
           return;
         }
-        const seconds = lastTime ? Math.min((now - lastTime) / 1000, 1 / 30) : 1 / 60;
+        const seconds = lastTime ? Math.min((now - lastTime) / 1000, 1 / 20) : 1 / 60;
         let moving = false;
-        for (const [pavilion, node] of nodes.current) {
-          const target = targets.current.get(pavilion);
+        for (const [pavilion, target] of targets.current) {
+          const node = nodes.current.get(pavilion);
           const motion = motions.current.get(pavilion);
-          if (!target) {
-            if (motion) motion.visible = false;
-            node.hidden = true;
-            continue;
-          }
-          const next = motion ?? { ...target, vx: 0, vy: 0, visible: false, transform: "" };
-          if (media.matches || !next.visible) {
-            Object.assign(next, { x: target.x, y: target.y, vx: 0, vy: 0 });
-          } else {
-            const x = stepAxis(next.x, next.vx, target.x, seconds);
-            const y = stepAxis(next.y, next.vy, target.y, seconds);
-            const active =
-              Math.hypot(x.position - target.x, y.position - target.y) > stopThreshold ||
-              Math.hypot(x.velocity, y.velocity) > 2;
-            moving ||= active;
-            Object.assign(
-              next,
-              active
-                ? { x: x.position, y: y.position, vx: x.velocity, vy: y.velocity }
-                : { x: target.x, y: target.y, vx: 0, vy: 0 },
-            );
-          }
-          next.visible = true;
-          const transform = `translate3d(${next.x.toFixed(1)}px,${next.y.toFixed(1)}px,0) translate(-50%,-100%) scale(${target.scale.toFixed(2)})`;
-          if (next.transform !== transform) {
-            node.style.transform = transform;
-            next.transform = transform;
-          }
-          node.hidden = false;
-          motions.current.set(pavilion, next);
+          if (!node || !motion) continue;
+          Object.assign(
+            motion,
+            media.matches
+              ? { value: target.scale, velocity: 0 }
+              : stepPavilionMarkerScale(motion, target.scale, seconds),
+          );
+          setScale(node, motion);
+          moving ||= motion.value !== target.scale || motion.velocity !== 0;
         }
         if (moving) {
           lastTime = now;
@@ -152,20 +128,50 @@ export const PavilionSalesProgressMarkers = forwardRef<PavilionMarkerLayerHandle
                 selectedPavilion,
               )
             : new Map();
-        // An occluded or offscreen marker cannot continue its previous spring.
+        if (!onscreen || document.hidden) return;
+        let needsScaleFrame = false;
         for (const [pavilion, node] of nodes.current) {
-          if (targets.current.has(pavilion)) continue;
-          const motion = motions.current.get(pavilion);
-          if (motion) motion.visible = false;
-          node.hidden = true;
+          const target = targets.current.get(pavilion);
+          if (!target) {
+            motions.current.delete(pavilion);
+            node.hidden = true;
+            continue;
+          }
+          const motion = motions.current.get(pavilion) ?? {
+            value: target.scale,
+            velocity: 0,
+            transform: "",
+            roofLight: "",
+            scale: "",
+          };
+          // The roof attachment follows the camera projection in the same frame.
+          // Only the small perspective change of the disc uses a spring.
+          const transform = `translate3d(${target.x.toFixed(2)}px,${target.y.toFixed(2)}px,0)`;
+          if (transform !== motion.transform) {
+            motion.transform = transform;
+            node.style.transform = transform;
+          }
+          const roofLight =
+            target.lightAngle == null ? "0deg" : `${target.lightAngle.toFixed(0)}deg`;
+          if (roofLight !== motion.roofLight) {
+            motion.roofLight = roofLight;
+            node.style.setProperty("--im-progress-light-angle", roofLight);
+          }
+          const projectionKind = target.lightAngle == null ? "plan" : "perspective";
+          if (node.dataset.projection !== projectionKind) node.dataset.projection = projectionKind;
+          if (media.matches) Object.assign(motion, { value: target.scale, velocity: 0 });
+          setScale(node, motion);
+          needsScaleFrame ||= motion.value !== target.scale || motion.velocity !== 0;
+          motions.current.set(pavilion, motion);
+          node.hidden = false;
         }
-        if (targets.current.size) schedule();
+        if (needsScaleFrame) schedule();
         else stop();
       };
       const visibilityChanged = () => {
         if (document.hidden || !onscreen) {
           stop();
-          for (const motion of motions.current.values()) motion.visible = false;
+          motions.current.clear();
         } else {
           applyTargets.current();
         }
@@ -179,13 +185,14 @@ export const PavilionSalesProgressMarkers = forwardRef<PavilionMarkerLayerHandle
           : null;
       if (layer.current) observer?.observe(layer.current);
       document.addEventListener("visibilitychange", visibilityChanged);
-      media.addEventListener("change", schedule);
+      media.addEventListener("change", applyTargets.current);
+      const handleMotionPreference = applyTargets.current;
       applyTargets.current();
       return () => {
         stop();
         observer?.disconnect();
         document.removeEventListener("visibilitychange", visibilityChanged);
-        media.removeEventListener("change", schedule);
+        media.removeEventListener("change", handleMotionPreference);
         applyTargets.current = () => {};
       };
     }, []);
@@ -195,7 +202,11 @@ export const PavilionSalesProgressMarkers = forwardRef<PavilionMarkerLayerHandle
       <>
         <div ref={layer} className="im-pavilion-marker-layer" aria-hidden="true">
           {pavilions.map((segment) => {
-            const percent = segment.total > 0 ? segment.soldPercent : null;
+            const percent =
+              segment.total > 0 && segment.soldPercent != null
+                ? Math.max(0, Math.min(100, segment.soldPercent))
+                : null;
+            const label = formatCommercialPercent(percent);
             return (
               <div
                 key={segment.key}
@@ -205,25 +216,26 @@ export const PavilionSalesProgressMarkers = forwardRef<PavilionMarkerLayerHandle
                 }}
                 className={`im-pavilion-marker${percent == null ? " is-neutral" : ""}`}
                 data-pavilion-progress={segment.pavilionNumber}
+                style={{ "--im-progress-lift": `${PAVILION_MARKER.lift}px` } as React.CSSProperties}
                 hidden
               >
-                <svg className="im-pavilion-marker-ring" viewBox="0 0 28 28">
-                  <circle cx="14" cy="14" r="11" className="im-pavilion-marker-track" />
-                  {percent != null && percent > 0 && (
-                    <circle
-                      cx="14"
-                      cy="14"
-                      r="11"
-                      pathLength="100"
-                      strokeDasharray={`${percent} 100`}
-                      className="im-pavilion-marker-value"
-                    />
-                  )}
-                  <circle cx="14" cy="14" r="2.5" className="im-pavilion-marker-center" />
-                </svg>
-                <span className="im-pavilion-marker-text">
-                  <span>P{segment.pavilionNumber}</span>
-                  <strong>{formatCommercialPercent(percent)}</strong>
+                <span className="im-pavilion-marker-roof" />
+                <span className="im-pavilion-marker-light" />
+                <span className="im-pavilion-marker-disc">
+                  <svg className="im-pavilion-marker-ring" viewBox="0 0 48 48">
+                    <circle cx="24" cy="24" r="20.25" className="im-pavilion-marker-track" />
+                    {percent != null && percent > 0 && (
+                      <circle
+                        cx="24"
+                        cy="24"
+                        r="20.25"
+                        pathLength="100"
+                        strokeDasharray={percent < 100 ? `${percent} 100` : undefined}
+                        className="im-pavilion-marker-value"
+                      />
+                    )}
+                  </svg>
+                  <strong data-compact={label.length > 4 || undefined}>{label}</strong>
                 </span>
               </div>
             );
