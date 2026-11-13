@@ -29,6 +29,13 @@
       "when": 1793080800000,
       "tag": "0003_edition_opening_15h",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794543961496,
+      "tag": "0004_restrict_role_permissions_read",
+      "breakpoints": true
     }
   ]
 }
