@@ -10,7 +10,7 @@ import {
   PARK_GATES,
 } from "./permanentParkLayout";
 import type { MapEntity, Point } from "./data/territory";
-import type { MapHandle, MapRendererProps } from "./types";
+import type { MapHandle, MapRendererProps, PavilionProjection } from "./types";
 import { MOTION } from "./motion";
 import { createSelectionNavigationSession, isClick, normalizedWheelDelta } from "./navigation";
 import { pointInPolygon, polygonBounds } from "./geometry";
@@ -23,6 +23,7 @@ import {
 import { COMMERCIAL_STATUS_COLORS, VISUAL_THEME } from "./visualTheme";
 import { commercialBoundaries, interiorLotAnchor, LOT_GRAPHICS } from "./commercialPresentation";
 import { getPavilionPresentation } from "./architectureOrientation";
+import { pavilionMarkerScale } from "./pavilionSalesProgress";
 
 const fullWidth = MAP_BOUNDS.maxX - MAP_BOUNDS.minX;
 const fullHeight = MAP_BOUNDS.maxY - MAP_BOUNDS.minY;
@@ -51,6 +52,7 @@ const roadCorridors = new Map(
   roads.map((entity) => [entity.id, streetLabelCorridor(entity, roads)]),
 );
 const pavilion8Id = "indumoveis:pavilion:8";
+const pavilions = ENTITIES.filter((entity) => entity.kind === "pavilion");
 
 function Pavilion8MapDetail({ entity, roofVisible }: { entity: MapEntity; roofVisible: boolean }) {
   const clip = useId();
@@ -173,6 +175,24 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     if (!rect?.width) return;
     svg.current?.style.setProperty("--im-label-unit", `${b.width / rect.width}px`);
     const pixelsPerUnit = rect.width / b.width;
+    const { onPavilionProjection, inspectedId } = current.current;
+    if (onPavilionProjection) {
+      const projections: PavilionProjection[] = [];
+      if (b.width <= fullWidth * 1.85) {
+        for (const pavilion of pavilions) {
+          if (pavilion.id === inspectedId) continue;
+          const [x, y] = pavilion.anchor;
+          projections.push({
+            pavilionNumber: Number(pavilion.id.split(":").at(-1)),
+            x: (x - b.x) * pixelsPerUnit,
+            y: (y - b.y) * pixelsPerUnit,
+            distance: Math.hypot(x - cx, y - cy),
+            scale: pavilionMarkerScale(b.width, rect.width),
+          });
+        }
+      }
+      onPavilionProjection(projections, { width: rect.width, height: rect.height });
+    }
     // Street text starts at one authored world size, never at a minimum screen
     // size. Only the glyph band is measured; no full-cell/white-plate collision.
     for (const { node, entity } of labels.current) {
@@ -421,7 +441,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       );
     write();
     // Labels share the existing SVG; selection only changes their priority.
-  }, [props.selectedId]);
+  }, [props.selectedId, props.inspectedId, props.onPavilionProjection]);
   useEffect(() => {
     write();
     if (props.initialFocus) {

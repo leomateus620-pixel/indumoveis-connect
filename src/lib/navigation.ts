@@ -9,6 +9,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   Coins,
+  ChartNoAxesCombined,
   FileText,
   Folder,
   Handshake,
@@ -35,6 +36,7 @@ export type ModuleKey =
 
 export type DestinationPath =
   | "/dashboard"
+  | "/dashboard-comercial"
   | "/mapa"
   | "/comercializacao"
   | "/empresas"
@@ -53,6 +55,7 @@ export type NavDestination = {
   title: string;
   openLabel: string;
   module: ModuleKey;
+  requires?: readonly ModuleKey[];
   icon: LucideIcon;
   /** Aquecimento sob demanda (intenção do usuário), nunca automático no portal. */
   prewarm?: () => void;
@@ -145,6 +148,15 @@ export const NAV_CATEGORIES: readonly NavCategory[] = [
         openLabel: "Abrir comercialização",
         module: "comercial",
         icon: Handshake,
+      },
+      {
+        to: "/dashboard-comercial",
+        label: "Dashboard Comercial",
+        title: "Dashboard Comercial",
+        openLabel: "Abrir dashboard comercial",
+        module: "comercial",
+        requires: ["mapa"],
+        icon: ChartNoAxesCombined,
       },
     ],
   },
@@ -263,7 +275,10 @@ export function matchDestination(pathname: string): NavDestination | undefined {
 }
 
 export function canOpen(perms: Perms, destination: NavDestination) {
-  return !!perms?.[destination.module]?.read;
+  return (
+    !!perms?.[destination.module]?.read &&
+    (destination.requires?.every((module) => perms?.[module]?.read) ?? true)
+  );
 }
 
 export type VisibleCategory = { category: NavCategory; destinations: NavDestination[] };

@@ -20,6 +20,8 @@ export type MapEntity = {
   height?: number;
   source: string;
   confidence: string;
+  /** The V1 source shows the outside envelope but not the individual divisa. */
+  schematicBoundary?: boolean;
   notes?: string;
   accesses?: Point[];
 };
@@ -98,27 +100,30 @@ const center = (polygon: Point[]): Point => {
 const main = SOURCES[0].file;
 
 function lot(
-  numbers: number[],
+  number: number,
   bounds: [number, number, number, number],
   location: string,
   area?: number,
+  schematicBoundary = false,
 ): MapEntity {
   const polygon = rect(...bounds);
-  const group = numbers.length > 1;
-  const text = numbers.map((n) => String(n).padStart(2, "0")).join(" / ");
+  const code = String(number).padStart(2, "0");
   return {
-    id: `indumoveis:external:lot:${numbers.map((n) => String(n).padStart(2, "0")).join("-")}`,
+    id: `indumoveis:external:lot:${code}`,
     kind: "lot",
-    label: `${group ? "Lotes" : "Lote"} ${text}`,
+    label: `Lote ${code}`,
     location,
     polygon,
     anchor: center(polygon),
-    numbers,
-    declaredAreaM2: group ? undefined : area,
+    numbers: [number],
+    declaredAreaM2: area,
     source: main,
-    confidence: "limites visíveis na planta geral",
-    notes: group
-      ? `Envelope agregado ${text}. Subdivisão individual pendente de fonte; área total não declarada.`
+    confidence: schematicBoundary
+      ? "limite externo da planta geral; divisa interna esquemática"
+      : "limites visíveis na planta geral",
+    schematicBoundary: schematicBoundary || undefined,
+    notes: schematicBoundary
+      ? "A divisa interna é esquemática. A área comercial segue a metragem documental do módulo da quadra."
       : area === 203
         ? "Área declarada: 203 m². Cotas do módulo: 11,3 × 18 m = 203,4 m²; diferença de arredondamento preservada."
         : area === 227
@@ -129,6 +134,21 @@ function lot(
   };
 }
 
+/** Allocate only drawing coordinates within the printed V1 envelope. Area is
+ * the printed module metadata for this quadra, independent of each polygon. */
+function divideLotEnvelope(
+  numbers: readonly number[],
+  [x0, y0, x1, y1]: [number, number, number, number],
+  location: string,
+  area: number,
+) {
+  const xAt = (index: number) =>
+    index === numbers.length ? x1 : x0 + ((x1 - x0) * index) / numbers.length;
+  return numbers.map((number, index) =>
+    lot(number, [xAt(index), y0, xAt(index + 1), y1], location, area, true),
+  );
+}
+
 const lots: MapEntity[] = [];
 // Lower western block: original dividers, not interpolated subdivisions.
 const lowerWest = [
@@ -137,7 +157,7 @@ const lowerWest = [
 for (let i = 0; i < 8; i++)
   lots.push(
     lot(
-      [i + 1],
+      i + 1,
       [lowerWest[i], 559.9367, lowerWest[i + 1], 644.229],
       "Quadras centrais · Rua Argentina",
       203,
@@ -149,99 +169,88 @@ const upperWest = [
 for (let i = 0; i < 8; i++)
   lots.push(
     lot(
-      [15 + i],
+      15 + i,
       [upperWest[i], 475.9919, upperWest[i + 1], 559.9367],
       "Quadras centrais · Rua Uruguai",
       203,
     ),
   );
-const lowerEast: [number[], number, number][] = [
-  [[9, 10], 1151.1096, 1258.0366],
-  [[11], 1258.0366, 1309.509],
-  [[12], 1309.509, 1360.6369],
-  [[13], 1360.6369, 1411.7645],
-  [[14], 1411.7645, 1473.7663],
+const lowerEastLocation = "Quadras centrais · Rua Argentina / Brasília";
+lots.push(
+  ...divideLotEnvelope([9, 10], [1151.1096, 559.9367, 1258.0366, 644.2976], lowerEastLocation, 203),
+);
+const lowerEast: [number, number, number][] = [
+  [11, 1258.0366, 1309.509],
+  [12, 1309.509, 1360.6369],
+  [13, 1360.6369, 1411.7645],
+  [14, 1411.7645, 1473.7663],
 ];
-for (const [numbers, x0, x1] of lowerEast)
+for (const [number, x0, x1] of lowerEast)
   lots.push(
-    lot(
-      numbers,
-      [x0, 559.9367, x1, 644.2976],
-      "Quadras centrais · Rua Argentina / Brasília",
-      numbers[0] === 14 ? 243 : 203,
-    ),
+    lot(number, [x0, 559.9367, x1, 644.2976], lowerEastLocation, number === 14 ? 243 : 203),
   );
 const upperEast = [1151.1096, 1206.5634, 1258.0366, 1309.509, 1360.6369, 1411.7645, 1473.7663];
 for (let i = 0; i < 6; i++)
   lots.push(
     lot(
-      [23 + i],
+      23 + i,
       [upperEast[i], 475.9919, upperEast[i + 1], 559.9367],
       "Quadras centrais · Rua Uruguai / Brasília",
       i === 5 ? 243 : 203,
     ),
   );
-// Salão do Automóvel: the combined area is exactly 35,36,49,50, never 35–50.
+// The commercial segments follow the rental policy. V1's printed "Salão do
+// Automóvel" spans both rows visually; the policy covers specific numbers.
+const uruguai = "Área externa · Rua Uruguai";
+const brasil = "Salão do Automóvel · Rua Brasil";
+const brasilExterior = "Área externa · Rua Brasil";
 lots.push(
-  lot([29], [710.5433, 353.4922, 762.0159, 446.6278], "Salão do Automóvel · Rua Uruguai", 227),
-  lot([30], [762.0159, 353.4922, 813.489, 446.6278], "Salão do Automóvel · Rua Uruguai", 227),
-  lot(
-    [31, 32, 33, 34],
-    [813.489, 353.4922, 1018.6903, 446.6278],
-    "Salão do Automóvel · Rua Uruguai",
-  ),
-  lot(
-    [35, 36, 49, 50],
-    [1018.6903, 260.3559, 1126.1273, 446.6278],
-    "Salão do Automóvel · Rua Brasil / Uruguai",
-  ),
-  lot([37, 38], [1151.1096, 353.4922, 1258.0366, 446.2806], "Salão do Automóvel · Rua Uruguai"),
-  lot([39, 40], [1258.0366, 353.4922, 1360.6369, 446.2806], "Salão do Automóvel · Rua Uruguai"),
-  lot(
+  lot(29, [710.5433, 353.4922, 762.0159, 446.6278], uruguai, 227),
+  lot(30, [762.0159, 353.4922, 813.489, 446.6278], uruguai, 227),
+  ...divideLotEnvelope([31, 32, 33, 34], [813.489, 353.4922, 1018.6903, 446.6278], uruguai, 227),
+  // Preserve the combined outer envelope. Its row seam follows the adjacent
+  // Brasil/Uruguai alignment; each row is subdivided left to right.
+  ...divideLotEnvelope([35, 36], [1018.6903, 353.4922, 1126.1273, 446.6278], uruguai, 227),
+  ...divideLotEnvelope([49, 50], [1018.6903, 260.3559, 1126.1273, 353.4922], brasil, 227),
+  ...divideLotEnvelope([37, 38], [1151.1096, 353.4922, 1258.0366, 446.2806], uruguai, 227),
+  ...divideLotEnvelope([39, 40], [1258.0366, 353.4922, 1360.6369, 446.2806], uruguai, 227),
+  ...divideLotEnvelope(
     [41, 42],
     [1360.6369, 353.4922, 1468.9349, 446.2806],
-    "Salão do Automóvel · Rua Uruguai / Brasília",
+    "Área externa · Rua Uruguai / Brasília",
+    227,
   ),
-  lot([43, 44], [710.5433, 260.3559, 813.489, 353.4922], "Salão do Automóvel · Rua Brasil"),
+  ...divideLotEnvelope([43, 44], [710.5433, 260.3559, 813.489, 353.4922], brasil, 227),
 );
 const automobileWest = [813.489, 864.9622, 916.4349, 967.5625, 1018.6903];
 for (let i = 0; i < 4; i++)
   lots.push(
-    lot(
-      [45 + i],
-      [automobileWest[i], 260.3559, automobileWest[i + 1], 353.4922],
-      "Salão do Automóvel · Rua Brasil",
-      227,
-    ),
+    lot(45 + i, [automobileWest[i], 260.3559, automobileWest[i + 1], 353.4922], brasil, 227),
   );
 const automobileEast = [1151.1096, 1206.5634, 1258.0366, 1309.509, 1360.6369, 1411.7645, 1468.9349];
 for (let i = 0; i < 6; i++)
   lots.push(
     lot(
-      [51 + i],
+      51 + i,
       [automobileEast[i], 260.3505, automobileEast[i + 1], 353.4922],
-      "Salão do Automóvel · Rua Brasil",
+      brasilExterior,
       227,
     ),
   );
-lots.push(lot([57], [605.6961, 146.9917, 661.087, 229.4372], "Faixa superior · Rua Brasil"));
+lots.push({
+  ...lot(57, [605.6961, 146.9917, 661.087, 229.4372], "Faixa superior · Rua Brasil", 227),
+  notes: "Área de 227 m² confirmada em 13/11/2026. A planta V1 fornece o contorno.",
+});
 const northWest = [
   710.5433, 762.0159, 813.489, 864.9622, 916.4349, 967.5625, 1018.6903, 1071.8809, 1126.1273,
 ];
 for (let i = 0; i < 8; i++)
-  lots.push(
-    lot(
-      [58 + i],
-      [northWest[i], 146.9917, northWest[i + 1], 229.4372],
-      "Faixa superior · Rua Brasil",
-      227,
-    ),
-  );
+  lots.push(lot(58 + i, [northWest[i], 146.9917, northWest[i + 1], 229.4372], brasil, 227));
 const northEast = [1151.1096, 1206.5634, 1258.0366, 1309.1636];
 for (let i = 0; i < 3; i++)
   lots.push(
     lot(
-      [66 + i],
+      66 + i,
       [northEast[i], 146.9917, northEast[i + 1], 229.1555],
       "Faixa superior · Rua Brasil / Brasília",
       227,
@@ -749,7 +758,13 @@ const landscapes: MapEntity[] = [
   ),
 ];
 
-export const ENTITIES: MapEntity[] = [...landscapes, ...roads, ...lots, ...supports, ...pavilions];
+export const ENTITIES: MapEntity[] = [
+  ...landscapes,
+  ...roads,
+  ...lots.sort((a, b) => a.numbers![0] - b.numbers![0]),
+  ...supports,
+  ...pavilions,
+];
 
 /** Sparse source-symbol centres, independent of FenaSoja's complete tree set. */
 export const TREES: Point[] = [

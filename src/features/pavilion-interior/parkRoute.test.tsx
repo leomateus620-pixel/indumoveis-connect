@@ -21,11 +21,12 @@ vi.mock("@tanstack/react-router", () => ({
 vi.mock("@/lib/api", () => ({
   useCan: () => ({ read: true }),
   useEditionId: () => "active-edition",
-  useMapCommercialSpaces: () => ({ isError: false, isLoading: false, data: [] }),
+  useCommercialLots: () => ({ isError: false, isLoading: false, data: [] }),
+  useCommercialOverview: () => ({ data: undefined }),
   useMapDealSpaces: () => ({ isError: false, data: undefined }),
 }));
 vi.mock("@/features/commercial-map/commercial", () => ({
-  resolveMapCommercialLinks: () => ({
+  resolvePersistedMapLots: () => ({
     statuses: {},
     filteredGeometryIds: [],
     highlightedGeometryIds: [],

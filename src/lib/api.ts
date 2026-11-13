@@ -7,6 +7,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { errMsg } from "./format";
 import { mimeFor, validateDocFile } from "./documents";
 import type { PavilionInteriorPlan as PavilionPlan } from "@/features/pavilion-interior/data";
+import type { CommercialCornerReview } from "@/features/commercial-pricing/cornerReview";
+import type {
+  CommercialDetails,
+  CommercialLot,
+  CommercialOverview,
+  CommercialSegmentKey,
+  ContractPricingTerms,
+} from "./commercial";
 
 const db = supabase as any;
 
@@ -358,30 +366,111 @@ export const useSpaces = () => {
   );
 };
 
-// O mapa territorial não precisa de preços, compradores, contratos ou notas.
-// A view continua sendo a única fonte de situação; sem leitura Comercial a
-// security_invoker view não consegue confirmar as negociações protegidas por RLS.
-export type MapCommercialSpace = {
-  id: string;
-  edition_id: string;
-  sector: string | null;
-  commercial_status: string | null;
-};
-export function useMapCommercialSpaces(enabled = true) {
+function useCommercialQueryContext(enabled: boolean) {
   const editionId = useEditionId();
   const map = useCan("mapa");
   const commercial = useCan("comercial");
-  const permitted = map.read && commercial.read;
-  return useQuery<MapCommercialSpace[]>({
-    queryKey: qk.list("spaces", "commercial-map", editionId, permitted),
-    enabled: enabled && !!editionId && permitted,
+  const finance = useCan("financeiro");
+  const contracts = useCan("contratos");
+  const companies = useCan("empresas");
+  const { data: me } = useMe();
+  return {
+    editionId,
+    enabled: enabled && !!editionId && map.read && commercial.read,
+    // Identidade e permissões no cache; o RPC decide o que efetivamente retorna.
+    scope: [me?.id, map.read, commercial.read, finance.read, contracts.read, companies.read],
+  };
+}
+
+export function useCommercialOverview(enabled = true) {
+  const ctx = useCommercialQueryContext(enabled);
+  return useQuery({
+    queryKey: qk.list("commercial-overview", ctx.editionId, ...ctx.scope),
+    enabled: ctx.enabled,
+    retry: 1,
+    staleTime: 30_000,
+    queryFn: ({ signal }) =>
+      run<CommercialOverview>(
+        db.rpc("get_commercial_overview", { p_edition_id: ctx.editionId }).abortSignal(signal),
+      ),
+  });
+}
+
+export function useCommercialLots(segment?: CommercialSegmentKey, enabled = true) {
+  const ctx = useCommercialQueryContext(enabled);
+  return useQuery({
+    queryKey: qk.list("commercial-lots", ctx.editionId, segment, ...ctx.scope),
+    enabled: ctx.enabled,
+    retry: 1,
+    staleTime: 30_000,
+    queryFn: ({ signal }) =>
+      run<CommercialLot[]>(
+        db
+          .rpc("get_commercial_lots", {
+            p_edition_id: ctx.editionId,
+            p_segment: segment ?? null,
+          })
+          .abortSignal(signal),
+      ),
+  });
+}
+
+export function useCommercialDetails(segment?: CommercialSegmentKey, enabled = true) {
+  const ctx = useCommercialQueryContext(enabled);
+  return useQuery({
+    queryKey: qk.list("commercial-details", ctx.editionId, segment, ...ctx.scope),
+    enabled: ctx.enabled,
+    retry: 1,
+    staleTime: 30_000,
+    queryFn: ({ signal }) =>
+      run<CommercialDetails>(
+        db
+          .rpc("get_commercial_details", {
+            p_edition_id: ctx.editionId,
+            p_segment: segment ?? null,
+          })
+          .abortSignal(signal),
+      ),
+  });
+}
+
+export function useContractPricingTerms(contractId: string, enabled = true) {
+  const { data: me } = useMe();
+  const finance = useCan("financeiro");
+  const contracts = useCan("contratos");
+  return useQuery({
+    queryKey: qk.list("contract-pricing-terms", contractId, me?.id, finance.read, contracts.read),
+    enabled: enabled && !!contractId && contracts.read,
     retry: 1,
     queryFn: ({ signal }) =>
-      run<MapCommercialSpace[]>(
+      run<ContractPricingTerms | null>(
+        db.rpc("get_contract_pricing_terms", { p_contract_id: contractId }).abortSignal(signal),
+      ),
+  });
+}
+
+export function useCommercialCornerReview(editionId?: string, spaceId?: string, enabled = true) {
+  const map = useCan("mapa");
+  const commercial = useCan("comercial");
+  const { data: me } = useMe();
+  return useQuery({
+    queryKey: qk.list(
+      "commercial-corner-review",
+      editionId,
+      spaceId,
+      me?.id,
+      map.read,
+      commercial.read,
+    ),
+    enabled: enabled && !!editionId && !!spaceId && map.read && commercial.read,
+    retry: 1,
+    queryFn: ({ signal }) =>
+      run<CommercialCornerReview | null>(
         db
-          .from("space_status_v")
-          .select("id, edition_id, sector, commercial_status")
-          .eq("edition_id", editionId)
+          .rpc("get_commercial_corner_review", {
+            p_edition_id: editionId,
+            p_space_id: spaceId,
+          })
           .abortSignal(signal),
       ),
   });

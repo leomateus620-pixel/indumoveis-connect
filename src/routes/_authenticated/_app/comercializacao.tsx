@@ -44,6 +44,7 @@ import {
   useDeals,
   useDeal,
   useSpaces,
+  useCommercialLots,
   useContracts,
   useCan,
   useDbMutation,
@@ -453,6 +454,11 @@ function DealDialog({
   const edition = useEditionId();
   const { data: me } = useMe();
   const { data: spaces = [] } = useSpaces();
+  const { data: commercialLots } = useCommercialLots(undefined, !!deal);
+  const tableBySpace = useMemo(
+    () => new Map(commercialLots?.map((lot) => [lot.id, lot])),
+    [commercialLots],
+  );
   const [company, setCompany] = useState("");
   const [owner, setOwner] = useState("");
   const [conditions, setConditions] = useState("");
@@ -485,7 +491,7 @@ function DealDialog({
   const m = useDbMutation(
     async () => {
       const ids = Object.keys(sel);
-      const prices = ids.map((i) => toCents(sel[i] || "0"));
+      const prices = ids.map((i) => (sel[i].trim() ? toCents(sel[i]) : Number.NaN));
       if (prices.some((p) => Number.isNaN(p) || p < 0))
         throw new Error("Valor inválido em algum espaço");
       return api.rpc<string>("save_deal", {
@@ -553,6 +559,7 @@ function DealDialog({
               )}
               {options.map((s: any) => {
                 const on = sel[s.id] !== undefined;
+                const table = tableBySpace.get(s.id);
                 return (
                   <div
                     key={s.id}
@@ -564,7 +571,7 @@ function DealDialog({
                       onCheckedChange={(v) =>
                         setSel((p) => {
                           const n = { ...p };
-                          if (v) n[s.id] = centsToInput(s.list_price_cents) || "";
+                          if (v) n[s.id] = "";
                           else delete n[s.id];
                           return n;
                         })
@@ -573,25 +580,42 @@ function DealDialog({
                     <label htmlFor={`sp-${s.id}`} className="min-w-0 break-words text-sm">
                       <strong>{s.code}</strong>{" "}
                       <span className="text-muted-foreground">
-                        {s.sector} · {area(s.area_m2)}
+                        {s.sector} · {area(table?.areaM2 ?? s.area_m2)}
                       </span>
                     </label>
                     {on && (
-                      <Input
-                        aria-label={`Valor ${s.code}`}
-                        className="col-start-2 w-full text-right tnum sm:col-start-auto sm:w-32"
-                        inputMode="decimal"
-                        value={sel[s.id]}
-                        onChange={(e) => setSel({ ...sel, [s.id]: e.target.value })}
-                        placeholder="0,00"
-                      />
+                      <div className="col-start-2 space-y-1 text-right sm:col-start-auto sm:w-36">
+                        <Input
+                          aria-label={`Valor negociado ${s.code}`}
+                          className="w-full text-right tnum"
+                          inputMode="decimal"
+                          required
+                          value={sel[s.id]}
+                          onChange={(e) => setSel({ ...sel, [s.id]: e.target.value })}
+                          placeholder="Valor acordado"
+                        />
+                        {table?.grossCents != null && (
+                          <button
+                            type="button"
+                            className="text-xs font-semibold text-primary underline underline-offset-2"
+                            onClick={() =>
+                              setSel((prev) => ({
+                                ...prev,
+                                [s.id]: centsToInput(table.grossCents),
+                              }))
+                            }
+                          >
+                            Usar tabela: {brl(table.grossCents)}
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
               })}
             </div>
             <p className="mt-1 text-right text-sm">
-              Total: <strong className="tnum">{brl(total)}</strong>
+              Total negociado: <strong className="tnum">{brl(total)}</strong>
             </p>
           </div>
           <FormRow label="Condições comerciais" htmlFor="dcond">

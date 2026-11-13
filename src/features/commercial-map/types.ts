@@ -12,6 +12,19 @@ export interface MapInsets {
   bottom: number;
 }
 
+export type PavilionProjection = {
+  pavilionNumber: number;
+  x: number;
+  y: number;
+  distance: number;
+  scale: number;
+};
+export type PavilionViewport = { width: number; height: number };
+export type ReportPavilionProjections = (
+  projections: readonly PavilionProjection[],
+  viewport: PavilionViewport,
+) => void;
+
 export interface MapHandle {
   focus(id?: string): void;
   /** Returns false when the optional permanent park is not available. */
@@ -46,6 +59,8 @@ export interface MapRendererProps {
   onFailure(reason: string): void;
   statuses: Record<string, string>;
   highlightedIds: string[];
+  /** Visible roof centres in CSS pixels, relative to the map stage. */
+  onPavilionProjection?: ReportPavilionProjections;
   initialFocus?: Point;
   initialCamera?: MapCameraSnapshot;
   /** Read the still-visible fallback's current target during renderer preparation. */

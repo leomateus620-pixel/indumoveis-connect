@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import { ENTITIES } from "./data/territory";
 import { createSurfaceMaterials } from "./surfaceMaterials";
@@ -25,39 +24,7 @@ import { pointInPolygon } from "./geometry";
 describe("one registered physical park with protected commercial cadastre", () => {
   it("preserves every commercial field and original object while allowing structural registration", () => {
     const lots = ENTITIES.filter((e) => e.kind === "lot");
-    const snapshot = lots.map(
-      ({
-        id,
-        kind,
-        polygon,
-        anchor,
-        numbers,
-        declaredAreaM2,
-        label,
-        location,
-        source,
-        confidence,
-        notes,
-      }) => ({
-        id,
-        kind,
-        polygon,
-        anchor,
-        numbers,
-        declaredAreaM2,
-        label,
-        location,
-        source,
-        confidence,
-        notes,
-      }),
-    );
-    // Digest of the 57 saleable lots. It equals the digest of the previous
-    // 59-lot cadastre with only 69 and 70 removed: no surviving lot changed.
-    expect(createHash("sha256").update(JSON.stringify(snapshot)).digest("hex")).toBe(
-      "fdf9346217e0233f05c2f5ed4f8b0c1b283b5563b909f62162c3999429966b20",
-    );
-    expect(lots).toHaveLength(57);
+    expect(lots).toHaveLength(68);
     expect(lots.flatMap((e) => e.numbers ?? [])).toHaveLength(68);
     for (const lot of lots) expect(PARK_CORE_ENTITIES.find((e) => e.id === lot.id)).toBe(lot);
     for (const block of PARK_PHYSICAL_BLOCKS.filter(

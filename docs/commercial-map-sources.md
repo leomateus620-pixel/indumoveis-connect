@@ -2,7 +2,7 @@
 
 Revisão territorial `2026-10-15`. A geometria canônica está em `src/features/commercial-map/data/territory.ts`; 2D e 3D recebem os mesmos IDs, polígonos e âncoras. Não há raster de planta, marca de expositor, dado FenaSoja remoto ou informação comercial embutida.
 
-Na etapa 2, a revisão territorial permanece a mesma. A [arquitetura de apresentação](commercial-map-architecture.md) registra os seis perfis estimados consultados no código FenaSoja, sua adaptação aos footprints Indumóveis e as pendências de elevação real; não é uma nova fonte cadastral. As imagens WhatsApp mostram a maquete anterior, sem certificar fachadas/coberturas reais. A [validação atual](commercial-map-stage2-validation.md) compara a assinatura dos atributos protegidos antes/depois, separando modelos derivados dos dados territoriais.
+O contorno da revisão territorial permanece a referência. A [arquitetura de apresentação](commercial-map-architecture.md) registra os seis perfis estimados consultados no código FenaSoja, sua adaptação aos footprints Indumóveis e as pendências de elevação real. A [validação histórica](commercial-map-stage2-validation.md) compara a assinatura dos atributos protegidos na etapa 2.
 
 ## Conferência dos documentos
 
@@ -45,22 +45,22 @@ O reaproveitamento é de relação permanente verificável e solução de engenh
 
 ## Inventário externo
 
-**59 envelopes selecionáveis** cobrem exatamente os **70 números 01–70**, uma vez cada. Não são 70 polígonos individuais comprovados. Setores são descrições relativas a vias impressas; não novas quadras cadastrais.
+Há **68 polígonos selecionáveis**, um por lote comercial de **01 a 68**. As áreas 69 e 70 são contexto físico. A tabela abaixo preserva os agrupamentos que aparecem impressos na V1 para permitir auditoria do desenho.
 
-| Faixa / localização                                  | Números e envelopes                                             |
-| ---------------------------------------------------- | --------------------------------------------------------------- |
-| Rua Argentina, oeste                                 | 01,02,03,04,05,06,07,08                                         |
-| Rua Argentina, leste                                 | **09 / 10**,11,12,13,14                                         |
-| Rua Uruguai, quadras inferiores                      | 15,16,17,18,19,20,21,22,23,24,25,26,27,28                       |
-| Salão do Automóvel, borda Uruguai                    | 29,30,**31 / 32 / 33 / 34**,**37 / 38**,**39 / 40**,**41 / 42** |
-| Salão do Automóvel, borda Brasil                     | **43 / 44**,45,46,47,48,51,52,53,54,55,56                       |
-| Salão do Automóvel, área atravessando as duas faixas | **35 / 36 / 49 / 50**; não “35–50”                              |
-| Faixa superior, abaixo das áreas verdes sem número   | 57,58,59,60,61,62,63,64,65,66,67,68                             |
-| Leste dos edifícios                                  | 69 acima da B7; 70 a oeste do passeio interno                   |
+| Faixa / localização                                  | Números e envelopes                                               |
+| ---------------------------------------------------- | ----------------------------------------------------------------- |
+| Rua Argentina, oeste                                 | 01,02,03,04,05,06,07,08                                           |
+| Rua Argentina, leste                                 | **09 / 10**,11,12,13,14                                           |
+| Rua Uruguai, quadras inferiores                      | 15,16,17,18,19,20,21,22,23,24,25,26,27,28                         |
+| Salão do Automóvel, borda Uruguai                    | 29,30,**31 / 32 / 33 / 34**,**37 / 38**,**39 / 40**,**41 / 42**   |
+| Salão do Automóvel, borda Brasil                     | **43 / 44**,45,46,47,48,51,52,53,54,55,56                         |
+| Salão do Automóvel, área atravessando as duas faixas | **35 / 36 / 49 / 50**; não “35–50”                                |
+| Faixa superior, abaixo das áreas verdes sem número   | 57,58,59,60,61,62,63,64,65,66,67,68                               |
+| Leste dos edifícios                                  | 69 acima da B7; 70 a oeste do passeio interno (áreas de contexto) |
 
-Os sete grupos em negrito têm subdivisão individual pendente; busca por qualquer membro resolve o mesmo envelope. Não há geometrias duplicadas sobrepostas. Nenhum grupo recebe soma de área oficial inventada.
+Os sete grupos em negrito receberam divisas internas esquemáticas para seleção individual. As faixas têm divisões iguais no eixo x e numeração crescente da esquerda para a direita. No envelope 35/36/49/50, a linha de separação das quadras vizinhas (y = 353,4922 pt no PDF) define a fileira de 35 e 36 junto à Rua Uruguai, e a de 49 e 50 junto à Rua Brasil. Os contornos externos coincidem com os envelopes V1. A implantação A2 continua sendo a referência das vias e dos limites físicos de quadra. As divisas individuais assinaladas como esquemáticas aguardam uma planta com demarcação.
 
-Área declarada nos módulos inferiores: 203 m², com 11,3×18=203,4 m² (diferença +0,4). Nos módulos superiores: 227 m², com 11,3×20,1=227,13 m² (diferença +0,13). Lotes **14 e 28** têm a marcação específica **243 m²**, preservada. 57,69,70 e envelopes agregados não recebem área total sem anotação inequívoca. Os números mantêm IDs geométricos com escopo `indumoveis:external:lot:...`; UUID de espaço e edição comercial são resolvidos separadamente, por associação explícita autorizada.
+A metragem de cada módulo segue a anotação da sua quadra. Nas quadras inferiores são 203 m² (11,3 × 18 m pelas cotas) e nas superiores 227 m² (11,3 × 20,1 m pelas cotas). Os lotes **14 e 28** têm anotação específica de **243 m²**. O lote **57** tem **227 m²**, confirmados em 13/11/2026. A proporção dos polígonos não define essas áreas. Cada `indumoveis:external:lot:NN` se vincula a um UUID de espaço da edição. O segmento Salão do Automóvel segue os números definidos na política (43–50 e 58–65).
 
 ## Edifícios, acessos, apoio e verde
 
@@ -72,6 +72,6 @@ Há Rua Argentina, Uruguai, Brasil, Brasília, La Paz, Alameda Mercosul, Calçad
 
 ## Verificação e limites
 
-`geometry.test.ts`: transformação sem espelho, finitude/degeneração/IDs/âncoras, inventário exato e grupo especial, ausência de sobreposição entre envelopes externos, ordem/separação dos seis pavilhões, diferença de áreas e distinção lote 70/passeio/verde. Resultado local observado: **7/7 passando** em Vitest. Isso valida o modelo vetorial e suas regras; não certifica precisão métrica, GPU, autenticação ou desempenho do renderer.
+`geometry.test.ts` cobre transformação, IDs e âncoras, os 68 lotes, área geométrica e extensão dos antigos envelopes, ausência de sobreposição, ordem dos pavilhões e distinção entre lotes, circulação e vegetação.
 
-Pendências de fonte: subdivisões dos sete grupos; áreas totais de57/69/70; função das áreas sem identificação; acesso exato de14; alturas reais; cotejo cadastral do desenho esquemático e validação de campo. Nenhuma pendência é preenchida com dados comerciais FenaSoja, nomes de empresas ou suposição de disponibilidade.
+Pendências de fonte incluem a demarcação individual nos sete agrupamentos impressos, a relação dos lotes de esquina com o encontro de vias quando ela depende dessas divisas, a função de áreas sem identificação, o acesso exato do P14 e as alturas reais.
