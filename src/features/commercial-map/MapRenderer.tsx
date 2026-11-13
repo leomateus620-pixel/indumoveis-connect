@@ -3,14 +3,23 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { configureMapInput, prepareSecondaryPan } from "./mapInput";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
-import { createSurfaceMaterials, SURFACE_PALETTE } from "./surfaceMaterials";
+import {
+  createInitialGrassMaterial,
+  createSurfaceMaterials,
+  SURFACE_PALETTE,
+} from "./surfaceMaterials";
 import { createSoftwareMaterials } from "./softwareMaterials";
 import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
 import { createPhotoPavilionSetting } from "./photoPavilionSettingGeometry";
 import { getRegisteredParkWoodland, PARK_WOODLAND_MASSES } from "./parkPlanting";
 import { createTerrain, TERRAIN } from "./terrain";
 import { derivePavilionGround } from "./pavilionGround";
-import { DAYLIGHT, createDaylightSky, createDaylightBackground } from "./daylight";
+import {
+  DAYLIGHT,
+  createDaylightSky,
+  createDaylightBackground,
+  prepareDaylightSky,
+} from "./daylight";
 import { createSunShadows } from "./sunShadows";
 import { createLotGrass } from "./lotGrass";
 import type { createUrbanContext } from "./urbanContext";
@@ -39,7 +48,12 @@ import {
 } from "./commercialPresentation";
 import { createSolarShadows } from "./solarShadows";
 import { isSoftwareRasterizer, ResolutionBudget } from "./performanceBudget";
-import { VISUAL_THEME as PALETTE, COMMERCIAL_STATUS_COLORS, SALES_MAP_COLORS } from "./visualTheme";
+import {
+  VISUAL_THEME as PALETTE,
+  COMMERCIAL_STATUS_COLORS,
+  PARK_DAYLIGHT,
+  SALES_MAP_COLORS,
+} from "./visualTheme";
 import {
   STREET_LABEL,
   isWalkway,
@@ -430,7 +444,7 @@ function initializeMapRuntime(
   renderer.setClearColor(PALETTE.background);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
-  renderer.toneMappingExposure = 1;
+  renderer.toneMappingExposure = PARK_DAYLIGHT.exposure;
   renderer.shadowMap.enabled = false;
   renderer.info.autoReset = true;
   const scene = new THREE.Scene();
@@ -438,8 +452,15 @@ function initializeMapRuntime(
   commercialGroup.name = "indumoveis-commercial-fixed";
   scene.add(commercialGroup);
   scene.background = new THREE.Color(PALETTE.background);
-  let sky = createDaylightSky({ detail: "simple" });
-  rollback.push(() => sky.dispose());
+  let sky = createDaylightSky();
+  let fadingSky: typeof sky | null = null;
+  const daylightAbort = new AbortController();
+  function disposeSky() {
+    daylightAbort.abort();
+    fadingSky?.dispose();
+    sky.dispose();
+  }
+  rollback.push(disposeSky);
   const daylightBackground = createDaylightBackground(sky.texture);
   scene.background = new THREE.Color(DAYLIGHT.sky.horizon);
   scene.add(daylightBackground.mesh);
@@ -740,7 +761,7 @@ function initializeMapRuntime(
   renderer.shadowMap.type = THREE.PCFShadowMap;
   solarShadows.setQuality(tier);
   const fill = new THREE.DirectionalLight(DAYLIGHT.fill.color, DAYLIGHT.fill.intensity);
-  fill.position.set(80, 60, -110);
+  fill.position.set(...PARK_DAYLIGHT.fill.position);
   scene.add(fill);
   let envelope = createNavigationEnvelope({
     bounds: MAP_BOUNDS,
@@ -760,13 +781,7 @@ function initializeMapRuntime(
     quality: tier,
     deferMaps: true,
     foundationMaterial: track(
-      new THREE.MeshLambertMaterial({
-        name: "indumoveis-preserved-circulation-initial",
-        // The space between a registered street and a lot or building is a
-        // grass verge in the reference, not a concrete band.
-        color: surfaces.materials.grass.color,
-        vertexColors: true,
-      }),
+      createInitialGrassMaterial("indumoveis-preserved-circulation-initial"),
     ),
     maps: !(diag.enabled && presentationParams.get("mapTerrainMaps") === "off"),
   });
@@ -878,13 +893,7 @@ function initializeMapRuntime(
     geometry.computeVertexNormals();
     const material =
       kind === "lot"
-        ? track(
-            new THREE.MeshLambertMaterial({
-              name: "indumoveis-lot-grass-initial",
-              color: surfaces.materials.grass.color,
-              vertexColors: true,
-            }),
-          )
+        ? track(createInitialGrassMaterial("indumoveis-lot-grass-initial"))
         : track(new THREE.MeshLambertMaterial({ vertexColors: true }));
     const groundMesh = new THREE.Mesh(geometry, material);
     groundMesh.receiveShadow = true;
@@ -914,7 +923,12 @@ function initializeMapRuntime(
     new THREE.Float32BufferAttribute(statusOpacity, 1),
   );
   const statusMaterial = track(
-    new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false }),
+    new THREE.MeshBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      depthWrite: false,
+      toneMapped: false,
+    }),
   );
   statusMaterial.onBeforeCompile = (shader) => {
     shader.vertexShader =
@@ -1071,6 +1085,7 @@ function initializeMapRuntime(
         transparent: true,
         opacity: 0.09,
         depthWrite: false,
+        toneMapped: false,
       }),
     ),
   );
@@ -1094,6 +1109,7 @@ function initializeMapRuntime(
         opacity: 0.7,
         transparent: true,
         depthWrite: false,
+        toneMapped: false,
       }),
     ),
   );
@@ -1273,6 +1289,7 @@ function initializeMapRuntime(
         transparent: true,
         alphaTest: 0.05,
         depthWrite: false,
+        toneMapped: false,
       }),
     ),
   );
@@ -1878,13 +1895,36 @@ function initializeMapRuntime(
       return;
     }
     environmentAttempted = true;
+    const skyBegin = performance.now();
+    // Decode during the atlas load. Each request can fail independently, and
+    // neither needs to finish before the park accepts its first gesture.
+    const pendingSky = prepareDaylightSky({
+      fail: diag.enabled && presentationParams.get("mapSky") === "fail",
+      signal: daylightAbort.signal,
+    })
+      .catch(() => null)
+      .then((result) => {
+        diag.skyPreparationMs = performance.now() - skyBegin;
+        return result;
+      });
+    const waitToPresent = async () => {
+      while (!disposed && !failed && (activePointers.size || transition || document.hidden)) {
+        await new Promise<void>((resolve) => window.setTimeout(resolve, 100));
+      }
+      return !disposed && !failed;
+    };
     const surfaceBytesBefore = surfaces.textureBytes;
     diag.realism.pbr = await surfaces.prepareCompressed(renderer, {
       fail: diag.enabled && presentationParams.get("mapPbr") === "fail",
       resolution: tier === "detailed" ? 1024 : 512,
-      canCommit: () => !activePointers.size && !transition && !document.hidden,
+      canCommit: () => !failed && !activePointers.size && !transition && !document.hidden,
     });
-    if (disposed || failed) return;
+    const richerSky = await pendingSky;
+    if (!(await waitToPresent())) {
+      richerSky?.dispose();
+      return;
+    }
+    softwareMaterials.update();
     diag.textureBytes += surfaces.textureBytes - surfaceBytesBefore;
     diag.realism.ready = false;
     const terrainBegin = performance.now();
@@ -1900,22 +1940,25 @@ function initializeMapRuntime(
       diag.terrain.textureBytes = terrain.textureBytes;
       diag.terrain.mapsReady = terrain.textures.length > 0;
     }
-    const skyBegin = performance.now();
-    try {
-      const richerSky = createDaylightSky({
-        fail: diag.enabled && presentationParams.get("mapSky") === "fail",
-      });
-      daylightBackground.setTexture(richerSky.texture);
+    if (richerSky && !richerSky.fallback) {
+      if (daylightBackground.mesh.visible && !reduceMotion.matches) {
+        fadingSky = sky;
+        diag.textureBytes += sky.textureBytes;
+        daylightBackground.setTexture(richerSky.texture, {
+          from: sky.texture,
+          start: performance.now(),
+        });
+      } else {
+        daylightBackground.setTexture(richerSky.texture);
+        sky.dispose();
+      }
       diag.textureBytes += richerSky.textureBytes - sky.textureBytes;
-      sky.dispose();
       sky = richerSky;
-      if (sky.fallback) diag.optionalFailures.push("sky-preparation");
-    } catch {
-      // Keep the already-rendered simple sky even if both richer allocation
-      // and its optional fallback fail. Selection and local sun remain usable.
+      invalidate();
+    } else {
+      richerSky?.dispose();
       diag.optionalFailures.push("sky-preparation");
     }
-    diag.skyPreparationMs = performance.now() - skyBegin;
     diag.skyReadyAt = performance.now();
     diag.daylight.skyDetail = sky.detail;
     diag.daylight.skyBytes = sky.textureBytes;
@@ -1923,6 +1966,7 @@ function initializeMapRuntime(
     diag.daylight.environmentPreparations++;
     try {
       const environment = createReflectionEnvironment(renderer, {
+        sky,
         fail: diag.enabled && presentationParams.get("mapEnvironment") === "fail",
       });
       environmentResource = environment;
@@ -1948,8 +1992,8 @@ function initializeMapRuntime(
       environmentResource?.dispose();
       environmentResource = null;
       environmentTarget = null;
-      scene.environment = null;
       surfaces.setEnvironment(null);
+      softwareMaterials.update();
       diag.textureBytes -= diag.environmentBytes;
       diag.environmentBytes = 0;
       diag.optionalFailures.push("environment-preparation");
@@ -2255,6 +2299,14 @@ function initializeMapRuntime(
       topGroundDepth <= 0 ||
       (camera.position.y - TERRAIN.baseElevation) / topGroundDepth >= camera.far * 0.98;
     const navigationActive = activePointers.size > 0 || !!transition || now - lastActivity < 240;
+    if (fadingSky) {
+      if (daylightBackground.update(now)) invalidate();
+      else {
+        diag.textureBytes -= fadingSky.textureBytes;
+        fadingSky.dispose();
+        fadingSky = null;
+      }
+    }
     vegetation?.animate(
       now / 1000,
       tier === "detailed" && !reduceMotion.matches && !ambientDisabled,
@@ -2273,7 +2325,6 @@ function initializeMapRuntime(
     lotGrass?.animate(now / 1000, tier === "detailed" && !reduceMotion.matches && !ambientDisabled);
     surfaces.updateDetail(camera.position.distanceTo(controls.target));
     terrain.updateDetail(camera.position.distanceTo(controls.target));
-    softwareMaterials.update();
     camera.near = Math.max(
       0.05,
       Math.min(camera.position.distanceTo(controls.target) / 280, camera.position.y * 0.2),
@@ -3103,8 +3154,7 @@ function initializeMapRuntime(
       terrain.dispose();
       sunShadows.dispose();
       daylightBackground.dispose();
-      sky.dispose();
-      scene.environment = null;
+      disposeSky();
       environmentResource?.dispose();
       surfaces.dispose();
       for (const resource of resources) resource.dispose();

@@ -5,12 +5,13 @@ import {
   createDaylightPixels,
   createDaylightSky,
   DAYLIGHT,
+  prepareDaylightSky,
   sampleDaylightDirection,
 } from "./daylight";
 
 describe("shared world-direction daylight", () => {
   it("keeps the exact horizon on either side, blue zenith and a grounded lower hemisphere", () => {
-    const horizon = [220, 233, 236];
+    const horizon = [216, 232, 238];
     for (const elevation of [-0.019, 0, 0.019])
       for (const azimuth of [-Math.PI, -1, 0, 1, Math.PI])
         expect(
@@ -41,40 +42,12 @@ describe("shared world-direction daylight", () => {
       ).toEqual(pole);
   });
 
-  it("adds a few soft low clouds above the horizon without turning clear sky into a noise field", () => {
-    const azimuth = -1.05,
-      elevation = 0.105;
-    const direction: [number, number, number] = [
-      Math.cos(azimuth) * Math.cos(elevation),
-      Math.sin(elevation),
-      Math.sin(azimuth) * Math.cos(elevation),
-    ];
-    const cloud = sampleDaylightDirection(direction),
-      clear = sampleDaylightDirection(direction, false);
-    expect(cloud[0]).toBeGreaterThan(clear[0] + 10);
-    let cloudSamples = 0;
-    for (let azimuth = -Math.PI; azimuth < Math.PI; azimuth += 0.06)
-      for (let y = 0.07; y < 0.9; y += 0.06) {
-        const radius = Math.sqrt(1 - y * y);
-        const direction: [number, number, number] = [
-          Math.cos(azimuth) * radius,
-          y,
-          Math.sin(azimuth) * radius,
-        ];
-        const cloud = sampleDaylightDirection(direction),
-          clear = sampleDaylightDirection(direction, false);
-        if (cloud.some((channel, index) => channel - clear[index] > 3)) cloudSamples++;
-      }
-    expect(cloudSamples).toBeGreaterThan(5);
-    expect(cloudSamples).toBeLessThan(90);
-  });
-
   it("aligns a low-energy warm solar lobe with the same fixed world light direction", () => {
     const direction = DAYLIGHT.sunDirection;
     expect(Math.hypot(...direction)).toBeCloseTo(1, 8);
     expect(Math.asin(direction[1])).toBeCloseTo(Math.PI / 4, 8);
-    const towards = sampleDaylightDirection(direction, false);
-    const opposite = sampleDaylightDirection([-direction[0], direction[1], -direction[2]], false);
+    const towards = sampleDaylightDirection(direction);
+    const opposite = sampleDaylightDirection([-direction[0], direction[1], -direction[2]]);
     expect(towards[0] - opposite[0]).toBeGreaterThan(towards[2] - opposite[2]);
     expect(towards[0]).toBeGreaterThan(opposite[0] + 5);
     expect(towards.every((channel) => channel <= 255)).toBe(true);
@@ -93,7 +66,7 @@ describe("shared world-direction daylight", () => {
         ).toEqual(Array.from(pixels.slice(row * width * 4, row * width * 4 + 4)));
     const column = 31,
       row = 43;
-    const elevation = (row / (height - 1) - 0.5) * Math.PI;
+    const elevation = ((row + 0.5) / height - 0.5) * Math.PI;
     const azimuth = ((column + 0.5) / width - 0.5) * Math.PI * 2;
     const expected = sampleDaylightDirection([
       Math.cos(azimuth) * Math.cos(elevation),
@@ -105,7 +78,7 @@ describe("shared world-direction daylight", () => {
     ).toEqual(expected);
   });
 
-  it("shares immutable panorama bytes across reopen while each renderer owns and disposes its own texture", () => {
+  it("shares clear gradient bytes across reopen while each renderer owns and disposes its texture", () => {
     const a = createDaylightSky(),
       b = createDaylightSky();
     const aDisposed = vi.fn(),
@@ -113,10 +86,11 @@ describe("shared world-direction daylight", () => {
     a.texture.addEventListener("dispose", aDisposed);
     b.texture.addEventListener("dispose", bDisposed);
     expect(a.texture).not.toBe(b.texture);
-    expect(a.texture.image.data).toBe(b.texture.image.data);
-    expect(a.texture.image.width).toBe(1024);
-    expect(a.texture.image.height).toBe(512);
-    expect(a.textureBytes).toBe(1024 * 512 * 4);
+    expect(a.texture.image).toMatchObject({ width: 64, height: 32 });
+    expect((a.texture as THREE.DataTexture).image.data).toBe(
+      (b.texture as THREE.DataTexture).image.data,
+    );
+    expect(a.textureBytes).toBe(64 * 32 * 4);
     expect(a.texture.colorSpace).toBe(THREE.SRGBColorSpace);
     expect(a.texture.mapping).toBe(THREE.EquirectangularReflectionMapping);
     expect(a.texture.flipY).toBe(false);
@@ -131,40 +105,33 @@ describe("shared world-direction daylight", () => {
     expect(bDisposed).toHaveBeenCalledTimes(1);
   });
 
-  it("provides the same immediate simple blue gradient for deliberate low detail and rich-preparation failure", () => {
-    const simple = createDaylightSky({ detail: "simple" }),
-      failed = createDaylightSky({ fail: true });
+  it("provides the same immediate gradient when rich preparation fails", async () => {
+    const simple = createDaylightSky(),
+      failed = await prepareDaylightSky({ fail: true });
     expect(simple.fallback).toBe(false);
     expect(failed.fallback).toBe(true);
     expect(simple.detail).toBe("simple");
     expect(failed.detail).toBe("simple");
-    expect(simple.texture.image.data).toBe(failed.texture.image.data);
+    expect((simple.texture as THREE.DataTexture).image.data).toBe(
+      (failed.texture as THREE.DataTexture).image.data,
+    );
     expect(simple.textureBytes).toBe(64 * 32 * 4);
-    expect(sampleDaylightDirection([0, 1, 0], false)[2]).toBeGreaterThan(200);
+    expect(sampleDaylightDirection([0, 1, 0])[2]).toBeGreaterThan(200);
     simple.dispose();
     failed.dispose();
   });
 
-  it("disposes a partially allocated rich texture and retains a usable fallback on texture preparation errors", () => {
-    const update = Object.getOwnPropertyDescriptor(THREE.Texture.prototype, "needsUpdate")!.set!;
-    const disposed = vi.spyOn(THREE.Texture.prototype, "dispose");
-    let calls = 0;
-    const textureUpdate = vi
-      .spyOn(THREE.Texture.prototype, "needsUpdate", "set")
-      .mockImplementation(function (this: THREE.Texture, value: boolean) {
-        if (++calls === 1) throw new Error("simulated sky texture preparation failure");
-        update.call(this, value);
-      });
+  it("does not fetch or allocate a texture after cancellation", async () => {
+    const abort = new AbortController();
+    abort.abort();
+    const fetch = vi.spyOn(globalThis, "fetch");
     try {
-      const sky = createDaylightSky();
-      expect(disposed).toHaveBeenCalledTimes(1);
-      expect(sky.fallback).toBe(true);
-      expect(sky.texture.image.width).toBe(64);
-      sky.dispose();
-      expect(disposed).toHaveBeenCalledTimes(2);
+      await expect(prepareDaylightSky({ signal: abort.signal })).rejects.toMatchObject({
+        name: "AbortError",
+      });
+      expect(fetch).not.toHaveBeenCalled();
     } finally {
-      textureUpdate.mockRestore();
-      disposed.mockRestore();
+      fetch.mockRestore();
     }
   });
 
@@ -176,8 +143,8 @@ describe("shared world-direction daylight", () => {
   });
 
   it("switches direct sky textures without recompiling, blocking picking or taking texture ownership", () => {
-    const simple = createDaylightSky({ detail: "simple" }),
-      rich = createDaylightSky();
+    const simple = createDaylightSky(),
+      rich = new THREE.Texture();
     const background = createDaylightBackground(simple.texture);
     const material = background.mesh.material;
     const materialDisposed = vi.fn(),
@@ -186,7 +153,7 @@ describe("shared world-direction daylight", () => {
     material.addEventListener("dispose", materialDisposed);
     background.mesh.geometry.addEventListener("dispose", geometryDisposed);
     simple.texture.addEventListener("dispose", textureDisposed);
-    rich.texture.addEventListener("dispose", textureDisposed);
+    rich.addEventListener("dispose", textureDisposed);
     const version = material.version;
     const initialMatrix = background.mesh.matrix.toArray();
     const scene = new THREE.Scene();
@@ -194,8 +161,16 @@ describe("shared world-direction daylight", () => {
     background.mesh.updateMatrixWorld(true);
     const raycaster = new THREE.Raycaster(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1));
     expect(raycaster.intersectObject(background.mesh)).toHaveLength(0);
-    background.setTexture(rich.texture);
-    expect(material.uniforms.panorama.value).toBe(rich.texture);
+    background.setTexture(rich, { from: simple.texture, start: 100 });
+    expect(material.uniforms.panorama.value).toBe(rich);
+    expect(material.uniforms.previousPanorama.value).toBe(simple.texture);
+    expect(background.update(300)).toBe(true);
+    expect(material.uniforms.panoramaBlend.value).toBe(0);
+    expect(background.update(390)).toBe(true);
+    expect(material.uniforms.panoramaBlend.value).toBeCloseTo(0.5);
+    expect(background.update(480)).toBe(false);
+    expect(material.uniforms.panoramaBlend.value).toBe(1);
+    expect(material.uniforms.previousPanorama.value).toBe(rich);
     expect(material.version).toBe(version);
     expect(background.mesh.matrix.toArray()).toEqual(initialMatrix);
     expect(material.side).toBe(THREE.BackSide);

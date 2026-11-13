@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { VISUAL_THEME } from "./visualTheme";
+import { PARK_SURFACE_COLORS, VISUAL_THEME } from "./visualTheme";
 import { bindPbrAtlas, loadPbrAtlas, type AtlasFamily, type PbrTexture } from "./pbrAtlas";
 import { patchGroundVariation } from "./groundVariation";
 import { applyMasonryFinish } from "./masonryFinish";
@@ -22,25 +22,30 @@ export type SurfaceFamily =
 /** Resolved sRGB colours; this lazy renderer module never consumes CSS/OKLCH. */
 export const SURFACE_PALETTE: Record<SurfaceFamily, string> = {
   paintedWall: VISUAL_THEME.wall,
-  // Pavement/aprons read as grey concrete under the fixed daylight, while
-  // white paint and pale pavilion facades retain their separate identities.
-  concrete: "#a2a6a0",
-  // Aged municipal asphalt is a neutral mid grey in the orthophoto; the
-  // blue-slate 2D road colour reads as wet navy under the fixed daylight.
-  asphalt: "#8e9091",
-  whitePaint: "#f3f1e6",
+  concrete: PARK_SURFACE_COLORS.concrete,
+  asphalt: PARK_SURFACE_COLORS.asphalt,
+  whitePaint: PARK_SURFACE_COLORS.whitePaint,
   paintedSheet: VISUAL_THEME.roof,
   exposedMetal: VISUAL_THEME.metal,
   glass: VISUAL_THEME.glass,
   warmAccent: VISUAL_THEME.warm,
-  masonryBrick: "#a9604c",
-  paintedMasonry: "#e6e5db",
-  architecturalFrame: "#40504a",
-  // One grass for lots, verges and planted ground, matched to the open
-  // terrain around the park so no polygon reads as a rectangular green patch.
-  // Parcel borders and status bands carry the commercial contrast instead.
-  grass: "#97b787",
+  masonryBrick: PARK_SURFACE_COLORS.brick,
+  paintedMasonry: PARK_SURFACE_COLORS.paintedMasonry,
+  architecturalFrame: PARK_SURFACE_COLORS.architecturalFrame,
+  grass: PARK_SURFACE_COLORS.grass,
 };
+
+/** Keep the world colour field on the inexpensive floor during startup. */
+export function createInitialGrassMaterial(name: string) {
+  const material = new THREE.MeshLambertMaterial({
+    name,
+    color: SURFACE_PALETTE.grass,
+    vertexColors: true,
+  });
+  material.onBeforeCompile = (shader) => patchGroundVariation(shader, "grass");
+  material.customProgramCacheKey = () => "indumoveis-procedural-ground-v3-grass";
+  return material;
+}
 
 export interface SurfaceMaterials {
   materials: Record<SurfaceFamily, THREE.MeshStandardMaterial>;
@@ -67,29 +72,36 @@ export interface SurfaceMaterials {
 }
 
 const MAP_SIZE = 128;
+type LocalMap = "mineral-albedo" | "mineral-data" | "sheet-albedo" | "sheet-data";
+const localMapPixels = new Map<LocalMap, Uint8Array>();
 
 /** Fixed seeds and wrapped sampling give the same seamless material on reload. */
 function surfaceMap(kind: "mineral" | "sheet", data: boolean) {
   const size = MAP_SIZE;
-  const pixels = new Uint8Array(size * size * 4);
-  let seed = kind === "sheet" ? 918273 : 725913;
-  for (let y = 0; y < size; y++)
-    for (let x = 0; x < size; x++) {
-      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-      const grain = (seed >>> 24) / 255 - 0.5;
-      // Sheet ribs follow V; a single period repeats without an edge seam.
-      const rib = Math.cos((x / size) * Math.PI * 8);
-      const value = Math.round(
-        data
-          ? kind === "sheet"
-            ? 164 + rib * 18 + grain * 3
-            : 240 + grain * 18
-          : kind === "sheet"
-            ? 246 + rib * 3 + grain * 2
-            : 248 + grain * 10,
-      );
-      pixels.set([value, value, value, 255], (y * size + x) * 4);
-    }
+  const key = `${kind}-${data ? "data" : "albedo"}` as const;
+  let pixels = localMapPixels.get(key);
+  if (!pixels) {
+    pixels = new Uint8Array(size * size * 4);
+    let seed = kind === "sheet" ? 918273 : 725913;
+    for (let y = 0; y < size; y++)
+      for (let x = 0; x < size; x++) {
+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+        const grain = (seed >>> 24) / 255 - 0.5;
+        // Sheet ribs follow V. G carries near-final roughness while R supplies
+        // the independent bump height, both stored as linear data.
+        const rib = Math.cos((x / size) * Math.PI * 8);
+        const red = kind === "sheet" ? 165 + rib * 17 + grain * 2 : 238 + grain * 14;
+        const green = kind === "sheet" ? 226 + rib * 5 + grain * 2 : 245 + grain * 8;
+        const albedo = kind === "sheet" ? 254 + rib * 0.6 : 253 + grain * 3;
+        const offset = (y * size + x) * 4;
+        pixels[offset] = Math.round(data ? red : albedo);
+        pixels[offset + 1] = Math.round(data ? green : albedo);
+        pixels[offset + 2] = Math.round(data ? 255 : albedo);
+        pixels[offset + 3] = 255;
+      }
+    // Keep bounded CPU pixels on reopen. Each renderer owns its Texture objects.
+    localMapPixels.set(key, pixels);
+  }
   const texture = new THREE.DataTexture(pixels, size, size, THREE.RGBAFormat);
   try {
     texture.name = `indumoveis-${kind}-${data ? "surface-data" : "albedo"}`;
@@ -145,24 +157,24 @@ export function createSurfaceMaterials(
     return material;
   };
   const materials = {
-    paintedWall: make("paintedWall", 0.88),
-    concrete: make("concrete", 0.95),
-    asphalt: make("asphalt", 0.98),
+    paintedWall: make("paintedWall", 0.93),
+    concrete: make("concrete", 0.94),
+    asphalt: make("asphalt", 1),
     whitePaint: make("whitePaint", 0.87),
-    paintedSheet: make("paintedSheet", 0.81, 0.035),
-    exposedMetal: make("exposedMetal", 0.42, 0.72),
-    glass: make("glass", 0.25, 0.08),
+    paintedSheet: make("paintedSheet", 0.74),
+    exposedMetal: make("exposedMetal", 0.43, 0.67),
+    glass: make("glass", 0.32, 0.06),
     warmAccent: make("warmAccent", 0.84),
     masonryBrick: make("masonryBrick", 0.94),
     paintedMasonry: make("paintedMasonry", 0.91),
-    architecturalFrame: make("architecturalFrame", 0.7, 0.1),
-    grass: make("grass", 0.98),
+    architecturalFrame: make("architecturalFrame", 0.76, 0.025),
+    grass: make("grass", 1),
   };
-  applyMasonryFinish(materials.masonryBrick, true);
+  applyMasonryFinish(materials.masonryBrick);
   applyMasonryFinish(materials.paintedMasonry, true);
   for (const family of ["grass", "asphalt", "concrete"] as const) {
     materials[family].onBeforeCompile = (shader) => patchGroundVariation(shader, family);
-    materials[family].customProgramCacheKey = () => `indumoveis-procedural-ground-v2-${family}`;
+    materials[family].customProgramCacheKey = () => `indumoveis-procedural-ground-v3-${family}`;
   }
   if (textures.length === 4) {
     const [mineralAlbedo, mineralData, sheetAlbedo, sheetData] = textures;
@@ -222,10 +234,10 @@ export function createSurfaceMaterials(
   // All surfaces remain valid under local directional/hemisphere light if the
   // optional environment is disabled or fails. Glass uses no transmission pass.
   const relief: Partial<Record<SurfaceFamily, number>> = {
-    paintedWall: 0.009,
-    concrete: 0.018,
-    asphalt: 0.013,
-    paintedSheet: 0.008,
+    paintedWall: 0.004,
+    concrete: 0.011,
+    asphalt: 0.008,
+    paintedSheet: 0.004,
     warmAccent: 0.006,
     masonryBrick: 0.012,
     paintedMasonry: 0.008,
@@ -234,20 +246,20 @@ export function createSurfaceMaterials(
   let quality: SurfaceQuality = "balanced";
   let lastDistance = 80;
   const normals: Partial<Record<SurfaceFamily, number>> = {
-    paintedWall: 0.18,
-    concrete: 0.34,
-    asphalt: 0.23,
+    paintedWall: 0.105,
+    concrete: 0.19,
+    asphalt: 0.16,
     whitePaint: 0.08,
     // The atlas normal already encodes corrugations. A large multiplier turns
     // them into dark blue stripes on curved and oblique roofs; retain a subtle
     // filtered relief without a new texture, shader or extra draw.
-    paintedSheet: 0.055,
-    exposedMetal: 0.22,
-    warmAccent: 0.16,
-    masonryBrick: 0.18,
-    paintedMasonry: 0.14,
+    paintedSheet: 0.025,
+    exposedMetal: 0.075,
+    warmAccent: 0.1,
+    masonryBrick: 0.13,
+    paintedMasonry: 0.1,
     architecturalFrame: 0.035,
-    grass: 0.28,
+    grass: 0.135,
   };
   function updateDetail(distance: number) {
     lastDistance = distance;
@@ -264,17 +276,17 @@ export function createSurfaceMaterials(
   function setQuality(tier: SurfaceQuality) {
     quality = tier;
     const reflection: Record<SurfaceFamily, number> = {
-      paintedWall: 0.13,
-      concrete: 0.09,
-      asphalt: 0.06,
-      whitePaint: 0.1,
-      paintedSheet: 0.35,
-      exposedMetal: 0.48,
-      glass: 0.72,
-      warmAccent: 0.14,
-      masonryBrick: 0.08,
-      paintedMasonry: 0.1,
-      architecturalFrame: 0.2,
+      paintedWall: 0.1,
+      concrete: 0.065,
+      asphalt: 0.022,
+      whitePaint: 0.075,
+      paintedSheet: 0.24,
+      exposedMetal: 0.47,
+      glass: 0.53,
+      warmAccent: 0.09,
+      masonryBrick: 0.045,
+      paintedMasonry: 0.065,
+      architecturalFrame: 0.16,
       grass: 0,
     };
     for (const [family, material] of Object.entries(materials))
@@ -356,7 +368,9 @@ export function createSurfaceMaterials(
             asphalt: "asphalt",
             whitePaint: "mineral",
             paintedSheet: "paintedMetal",
-            exposedMetal: "paintedMetal",
+            // Smooth structural steel uses the mineral microstructure and its
+            // own metalness/roughness, not the corrugation of painted roofs.
+            exposedMetal: "mineral",
             warmAccent: "mineral",
             masonryBrick: "mineral",
             paintedMasonry: "mineral",
@@ -368,7 +382,7 @@ export function createSurfaceMaterials(
           for (const [family, cell] of Object.entries(families)) {
             const material = materials[family as SurfaceFamily];
             bindPbrAtlas(material, cell, atlas);
-            if (family === "masonryBrick") applyMasonryFinish(material, true);
+            if (family === "masonryBrick") applyMasonryFinish(material);
             if (family === "paintedMasonry") applyMasonryFinish(material, true);
             const full = fullMaps.get(material)!;
             for (const key of detailMapKeys) full[key] = material[key];

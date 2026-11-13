@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ENTITIES, MAP_BOUNDS, type MapEntity, type Point } from "./data/territory";
 import { pointInPolygon, signedPolygonArea } from "./geometry";
 import { createTerrain, deriveProtectedGround, deriveTerrainTopology, TERRAIN } from "./terrain";
+import { PARK_SURFACE_COLORS } from "./visualTheme";
 
 const extent = { minX: -1000, minY: -1000, maxX: 1200, maxY: 1200 };
 const area = (cells: readonly Point[][]) =>
@@ -119,7 +120,7 @@ describe("continuous source-protected commercial map terrain", () => {
         }
         expect(mesh.userData.entityId).toBeUndefined();
         expect(mesh.castShadow).toBe(false);
-        expect(mesh.receiveShadow).toBe(mesh.name === "preserved-circulation-floor");
+        expect(mesh.receiveShadow).toBe(true);
       }
       const protectedBefore = JSON.stringify(terrain.topology.protectedCells);
       terrain.setExtent({ minX: -2000, minY: -2000, maxX: 2200, maxY: 2200 });
@@ -215,8 +216,8 @@ describe("continuous source-protected commercial map terrain", () => {
     const a = createTerrain(ENTITIES, { extent }),
       b = createTerrain(ENTITIES, { extent });
     try {
-      expect(a.textures.map((texture) => texture.image.width)).toEqual([512, 256]);
-      expect(a.textureBytes).toBeLessThan(1.7 * 1024 * 1024);
+      expect(a.textures.map((texture) => texture.image.width)).toEqual([128, 128]);
+      expect(a.textureBytes).toBeLessThan(180_000);
       for (let i = 0; i < a.textures.length; i++) {
         expect(a.textures[i].image.data).toEqual(b.textures[i].image.data);
         expect(a.textures[i].generateMipmaps).toBe(true);
@@ -255,7 +256,7 @@ describe("continuous source-protected commercial map terrain", () => {
       expect(disposed).toHaveBeenCalledTimes(2);
       expect(terrain.textures).toHaveLength(0);
       expect(terrain.material.map).toBeNull();
-      expect(terrain.material.color.getHexString()).toBe(TERRAIN.palette[0].slice(1));
+      expect(terrain.material.color.getHexString()).toBe(PARK_SURFACE_COLORS.grass.slice(1));
       expect(terrain.group.children).toHaveLength(2);
       terrain.dispose();
     } finally {
@@ -304,15 +305,21 @@ describe("continuous source-protected commercial map terrain", () => {
           range: shader.uniforms.terrainHorizonRange,
           color: shader.uniforms.terrainHorizonColor,
         };
-        terrain.setAtmosphere({ center: [95.5, 55], start: 500, end: 1000 }, "#dce9ec");
+        const bounds = terrain.topology.protectedBounds;
+        const diagonal = Math.hypot(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY);
+        const cappedRange = [
+          diagonal * TERRAIN.hazeStartDiagonals,
+          diagonal * TERRAIN.hazeEndDiagonals,
+        ];
+        terrain.setAtmosphere({ center: [95.5, 55], start: 100, end: 200 }, "#dce9ec");
         expect(uniforms.center.value.toArray()).toEqual([95.5, 55]);
-        expect(uniforms.range.value.toArray()).toEqual([500, 1000]);
+        expect(uniforms.range.value.toArray()).toEqual([100, 200]);
         terrain.setExtent({ minX: -2200, minY: -1800, maxX: 2300, maxY: 2400 });
         terrain.setAtmosphere({ center: [95.5, 55], start: 700, end: 1400 }, "#dce9ec");
         expect(shader.uniforms.terrainHorizonCenter).toBe(uniforms.center);
         expect(shader.uniforms.terrainHorizonRange).toBe(uniforms.range);
         expect(shader.uniforms.terrainHorizonColor).toBe(uniforms.color);
-        expect(uniforms.range.value.toArray()).toEqual([700, 1400]);
+        expect(uniforms.range.value.toArray()).toEqual(cappedRange);
         expect(uniforms.color.value.getHexString()).toBe("dce9ec");
         expect(terrain.material).toBe(material);
         expect(material.version).toBe(version);
@@ -345,18 +352,18 @@ describe("continuous source-protected commercial map terrain", () => {
       expect(terrain.textures).toHaveLength(0);
       expect(terrain.textureBytes).toBe(4);
       expect(placeholder.colorSpace).toBe(THREE.SRGBColorSpace);
-      expect(Array.from(placeholder.image.data!)).toEqual([147, 181, 128, 255]);
+      expect(Array.from(placeholder.image.data!)).toEqual([131, 169, 105, 255]);
       expect(material.color.getHexString()).toBe("ffffff");
       expect(terrain.prepareMaps()).toBe(true);
-      expect(allocations).toEqual([1, 512, 256]);
+      expect(allocations).toEqual([1, 128, 128]);
       expect(terrain.textures).toHaveLength(2);
-      expect(terrain.textureBytes).toBe(1_747_628);
+      expect(terrain.textureBytes).toBe(174_764);
       expect(terrain.material).toBe(material);
       expect(material.map).toBe(terrain.textures[0]);
       expect(material.version).toBe(version);
       expect(placeholderDisposed).toHaveBeenCalledTimes(1);
       expect(terrain.prepareMaps()).toBe(true);
-      expect(allocations).toEqual([1, 512, 256]);
+      expect(allocations).toEqual([1, 128, 128]);
       terrain.dispose();
       expect(placeholderDisposed).toHaveBeenCalledTimes(1);
     } finally {
@@ -435,7 +442,7 @@ describe("continuous source-protected commercial map terrain", () => {
       });
       expect(
         first.textures.reduce((bytes, texture) => bytes + texture.image.data!.byteLength, 0),
-      ).toBe(1_310_720);
+      ).toBe(131_072);
       first.dispose();
       expect(firstDisposed).toHaveBeenCalledTimes(2);
       expect(secondDisposed).not.toHaveBeenCalled();

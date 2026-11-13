@@ -3,8 +3,9 @@ import type { MapEntity, Point } from "./data/territory";
 import { polygonBounds, type Bounds } from "./geometry";
 import { pavementUnionCells } from "./pavement";
 import { SURFACE_PALETTE, type SurfaceQuality } from "./surfaceMaterials";
-import { GROUND_VARIATION_GLSL } from "./groundVariation";
+import { patchGroundCoordinates } from "./groundVariation";
 import { subtractPolygons } from "./parkGeometry";
+import { PARK_SURFACE_COLORS } from "./visualTheme";
 
 /** All distances use drawing units (10 PDF points), not surveyed metres.
  * The former board already sat at -0.15. Keeping its elevation preserves the
@@ -13,16 +14,14 @@ import { subtractPolygons } from "./parkGeometry";
 export const TERRAIN = {
   elevation: -0.15,
   baseElevation: -0.18,
-  albedoSize: 512,
-  detailSize: 256,
-  // The original 192-unit tile covered almost the entire park with one
-  // low-contrast lobe. A smaller world-anchored tile makes the organic field
-  // perceptible in the commercial overview without adding geometry or draws.
-  albedoTile: 112,
-  detailTile: 3.1,
-  roughness: 0.94,
-  bump: 0.009,
-  palette: ["#93b580", "#739d67", "#a3b38a", "#8ea078", "#788e69"],
+  albedoSize: 128,
+  detailSize: 128,
+  detailTile: 2.8,
+  bump: 0.005,
+  // Keep the surroundings readable before the blend starts, then reach
+  // the sky colour before the low, grazing rays reach the clip plane.
+  hazeStartDiagonals: 1.05,
+  hazeEndDiagonals: 2.85,
 } as const;
 
 export type TerrainTopology = {
@@ -162,7 +161,7 @@ function noise(u: number, v: number, period: number, salt: number) {
   return THREE.MathUtils.lerp(lower, upper, fy);
 }
 
-// Exactly two immutable CPU arrays survive warm reopens (1,310,720 bytes).
+// Two compact, immutable CPU arrays survive warm reopens.
 // Texture/GPU ownership is always per renderer; no disposed Texture is shared.
 const terrainPixelCache: Partial<Record<"albedo" | "detail", Uint8Array>> = {};
 
@@ -171,37 +170,30 @@ function terrainPixels(kind: "albedo" | "detail") {
   if (cached) return cached;
   const size = kind === "albedo" ? TERRAIN.albedoSize : TERRAIN.detailSize;
   const pixels = new Uint8Array(size * size * 4);
-  const palette = TERRAIN.palette.map((hex) => new THREE.Color(hex));
-  const sample = new THREE.Color(),
-    soil = new THREE.Color();
+  const grassColor = new THREE.Color(PARK_SURFACE_COLORS.grass);
+  const sample = new THREE.Color();
   for (let y = 0; y < size; y++)
     for (let x = 0; x < size; x++) {
       const u = x / size,
         v = y / size;
+      const fine = hash(x, y, 271) - 0.5;
+      const tufts = noise(u, v, 29, 59) - 0.5;
+      const offset = (y * size + x) * 4;
       if (kind === "albedo") {
-        const broad = noise(u, v, 3, 17),
-          middle = noise(u, v, 11, 43),
-          organic = noise(u, v, 5, 83),
-          small = noise(u, v, 47, 29);
-        const dry = THREE.MathUtils.smoothstep(broad * 0.58 + organic * 0.42, 0.48, 0.82);
-        sample.copy(palette[0]).lerp(palette[1], broad * 0.58 + middle * 0.22);
-        soil.copy(palette[2]).lerp(palette[3], organic * 0.38);
-        sample.lerp(soil, dry * 0.16).lerp(palette[4], small * dry * 0.035);
-        // Colour data is stored in sRGB; all mixing above happens in linear light.
-        sample.convertLinearToSRGB();
-        pixels.set(
-          [Math.round(sample.r * 255), Math.round(sample.g * 255), Math.round(sample.b * 255), 255],
-          (y * size + x) * 4,
-        );
+        // Center close grain on the same grass colour as the startup texture.
+        // The shared non-periodic shader supplies the visible broad variation.
+        sample
+          .copy(grassColor)
+          .multiplyScalar(1 + tufts * 0.08 + fine * 0.03)
+          .convertLinearToSRGB();
+        pixels[offset] = Math.round(sample.r * 255);
+        pixels[offset + 1] = Math.round(sample.g * 255);
+        pixels[offset + 2] = Math.round(sample.b * 255);
       } else {
-        const mineral = noise(u, v, 29, 59),
-          fine = hash(x, y, 271),
-          fibres = noise(u, v, 83, 97);
-        const value = Math.round(
-          228 + (mineral - 0.5) * 12 + (fine - 0.5) * 12 + (fibres - 0.5) * 8,
-        );
-        pixels.set([value, value, value, 255], (y * size + x) * 4);
+        const value = Math.round(128 + tufts * 26 + fine * 13);
+        pixels[offset] = pixels[offset + 1] = pixels[offset + 2] = value;
       }
+      pixels[offset + 3] = 255;
     }
   terrainPixelCache[kind] = pixels;
   return pixels;
@@ -214,7 +206,7 @@ function terrainMap(kind: "albedo" | "detail") {
     texture.name = `indumoveis-terrain-${kind}`;
     texture.colorSpace = kind === "albedo" ? THREE.SRGBColorSpace : THREE.NoColorSpace;
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.setScalar(1 / (kind === "albedo" ? TERRAIN.albedoTile : TERRAIN.detailTile));
+    texture.repeat.setScalar(1 / TERRAIN.detailTile);
     texture.minFilter = THREE.LinearMipmapLinearFilter;
     texture.magFilter = THREE.LinearFilter;
     texture.generateMipmaps = true;
@@ -265,7 +257,7 @@ export function createTerrain(
     const material = own(
       new THREE.MeshLambertMaterial({
         name: "indumoveis-matte-external-soil",
-        color: TERRAIN.palette[0],
+        color: PARK_SURFACE_COLORS.grass,
         envMapIntensity: 0,
         // The finite horizon plane spans thousands of units. Its interpolated
         // depth can win against the circulation floor despite the real .03
@@ -276,12 +268,14 @@ export function createTerrain(
         polygonOffsetUnits: 2,
       }),
     );
+    const protectedDiagonal = Math.hypot(
+      topology.protectedBounds.maxX - topology.protectedBounds.minX,
+      topology.protectedBounds.maxY - topology.protectedBounds.minY,
+    );
     const atmosphere = {
       center: { value: new THREE.Vector2() },
       range: { value: new THREE.Vector2(1e7, 2e7) },
       color: { value: new THREE.Color("#dce9ec") },
-      fine: { value: null as THREE.Texture | null },
-      detail: { value: 0 },
       parkCenter: {
         value: new THREE.Vector2(
           (topology.protectedBounds.minX + topology.protectedBounds.maxX) / 2,
@@ -294,48 +288,49 @@ export function createTerrain(
           (topology.protectedBounds.maxY - topology.protectedBounds.minY) * 1.45,
         ),
       },
-      distantSoil: { value: new THREE.Color("#9dac8c") },
+      distantSoil: { value: new THREE.Color(PARK_SURFACE_COLORS.distantGrass) },
     };
     material.onBeforeCompile = (shader) => {
+      patchGroundCoordinates(shader);
       shader.uniforms.terrainHorizonCenter = atmosphere.center;
       shader.uniforms.terrainHorizonRange = atmosphere.range;
       shader.uniforms.terrainHorizonColor = atmosphere.color;
-      shader.uniforms.terrainFineMap = atmosphere.fine;
-      shader.uniforms.terrainFineAmount = atmosphere.detail;
       shader.uniforms.terrainParkCenter = atmosphere.parkCenter;
       shader.uniforms.terrainParkRadius = atmosphere.parkRadius;
       shader.uniforms.terrainDistantSoil = atmosphere.distantSoil;
-      shader.vertexShader = `varying vec2 terrainWorld;\n${shader.vertexShader}`.replace(
-        "#include <worldpos_vertex>",
-        "#include <worldpos_vertex>\nterrainWorld = (modelMatrix * vec4(transformed, 1.0)).xz;",
-      );
-      shader.fragmentShader =
-        `varying vec2 terrainWorld;\nuniform vec2 terrainHorizonCenter;\nuniform vec2 terrainHorizonRange;\nuniform vec3 terrainHorizonColor;\n${shader.fragmentShader}`.replace(
-          "#include <opaque_fragment>",
-          `float distantAtmosphere = smoothstep(terrainHorizonRange.x, terrainHorizonRange.y, distance(terrainWorld, terrainHorizonCenter));
-         outgoingLight = mix(outgoingLight, terrainHorizonColor, distantAtmosphere);
-         #include <opaque_fragment>`,
-        );
-    };
-    const horizonCompile = material.onBeforeCompile;
-    material.onBeforeCompile = function (shader, renderer) {
-      horizonCompile.call(this, shader, renderer);
-      shader.fragmentShader =
-        `uniform sampler2D terrainFineMap;\nuniform float terrainFineAmount;\nuniform vec2 terrainParkCenter;\nuniform vec2 terrainParkRadius;\nuniform vec3 terrainDistantSoil;\n${GROUND_VARIATION_GLSL}\n${shader.fragmentShader}`.replace(
+      shader.fragmentShader = `uniform vec2 terrainHorizonCenter;
+          uniform vec2 terrainHorizonRange;
+          uniform vec3 terrainHorizonColor;
+          uniform vec2 terrainParkCenter;
+          uniform vec2 terrainParkRadius;
+          uniform vec3 terrainDistantSoil;
+          ${shader.fragmentShader}`
+        .replace(
           "#include <color_fragment>",
           `#include <color_fragment>
-         float parkImportance = 1.0 - smoothstep(0.9, 2.2, length((terrainWorld - terrainParkCenter) / terrainParkRadius));
-         diffuseColor.rgb *= mix(vec3(1.0), parkGrassVariation(terrainWorld), mix(0.15, 0.7, parkImportance));
-         diffuseColor.rgb = mix(terrainDistantSoil, diffuseColor.rgb, mix(0.13, 1.0, parkImportance));
-         if (terrainFineAmount > 0.001) diffuseColor.rgb *= 1.0 + (texture2D(terrainFineMap, terrainWorld / 3.1).r - 0.894) * terrainFineAmount;`,
+            float parkImportance = 1.0 - smoothstep(.78, 2.0,
+              length((parkSurfaceWorld - terrainParkCenter) / terrainParkRadius));
+            if (parkImportance > 0.0) {
+              diffuseColor.rgb = mix(terrainDistantSoil,
+                diffuseColor.rgb * parkGrassVariation(parkSurfaceWorld), parkImportance);
+            } else {
+              diffuseColor.rgb = terrainDistantSoil;
+            }`,
+        )
+        .replace(
+          "#include <opaque_fragment>",
+          `float distantAtmosphere = smoothstep(terrainHorizonRange.x, terrainHorizonRange.y,
+              distance(parkSurfaceWorld, terrainHorizonCenter));
+            outgoingLight = mix(outgoingLight, terrainHorizonColor, distantAtmosphere);
+            #include <opaque_fragment>`,
         );
     };
-    material.customProgramCacheKey = () => "indumoveis-ground-horizon-v3-soft-context";
+    material.customProgramCacheKey = () => "indumoveis-ground-horizon-v4";
     if (options.maps !== false && options.deferMaps) {
       // Compile USE_MAP in the first useful frame without generating the full
       // deterministic field. Keeping a map on both sides avoids a later shader
       // variant merely because the richer albedo became available.
-      const hex = Number.parseInt(TERRAIN.palette[0].slice(1), 16);
+      const hex = Number.parseInt(PARK_SURFACE_COLORS.grass.slice(1), 16);
       placeholder = own(
         new THREE.DataTexture(
           new Uint8Array([(hex >> 16) & 255, (hex >> 8) & 255, hex & 255, 255]),
@@ -348,7 +343,7 @@ export function createTerrain(
       placeholder.colorSpace = THREE.SRGBColorSpace;
       placeholder.minFilter = placeholder.magFilter = THREE.LinearFilter;
       placeholder.wrapS = placeholder.wrapT = THREE.RepeatWrapping;
-      placeholder.repeat.setScalar(1 / TERRAIN.albedoTile);
+      placeholder.repeat.setScalar(1 / TERRAIN.detailTile);
       placeholder.generateMipmaps = false;
       placeholder.needsUpdate = true;
       material.map = placeholder;
@@ -391,18 +386,14 @@ export function createTerrain(
     for (const mesh of [ground, floor]) {
       mesh.raycast = () => {};
       mesh.userData.commercialPickable = false;
-      mesh.castShadow = mesh.receiveShadow = false;
+      mesh.castShadow = false;
+      mesh.receiveShadow = true;
       group.add(mesh);
     }
-    floor.receiveShadow = true;
     let quality = options.quality ?? "balanced";
     let lastDistance = 80;
     function updateDetail(distance: number) {
       lastDistance = distance;
-      // Skip the fine grain sample in overview; no shader rebuild during zoom.
-      atmosphere.detail.value = textures.length
-        ? (1 - THREE.MathUtils.smoothstep(distance, 35, 100)) * 0.45
-        : 0;
       material.bumpScale =
         TERRAIN.bump *
         (1 - THREE.MathUtils.smoothstep(distance, 30, 120)) *
@@ -436,7 +427,6 @@ export function createTerrain(
       prepared.forEach(own);
       textures.push(...prepared);
       material.map = textures[0];
-      atmosphere.fine.value = textures[1];
       material.color.set("#ffffff");
       if (placeholder) {
         owned.delete(placeholder);
@@ -484,7 +474,10 @@ export function createTerrain(
       prepareMaps,
       setAtmosphere(fade: { center: Point; start: number; end: number }, color: string) {
         atmosphere.center.value.set(...fade.center);
-        atmosphere.range.value.set(fade.start, fade.end);
+        atmosphere.range.value.set(
+          Math.min(fade.start, protectedDiagonal * TERRAIN.hazeStartDiagonals),
+          Math.min(fade.end, protectedDiagonal * TERRAIN.hazeEndDiagonals),
+        );
         atmosphere.color.value.set(color);
       },
       dispose,

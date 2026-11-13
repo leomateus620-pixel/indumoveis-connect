@@ -3,6 +3,7 @@ import type { MapEntity, Point } from "./data/territory";
 import { pointInPolygon, polygonBounds, signedPolygonArea } from "./geometry";
 import { distanceToPolygon } from "./planting";
 import type { SurfaceQuality } from "./surfaceMaterials";
+import { PARK_SURFACE_COLORS } from "./visualTheme";
 
 /** Drawing units, not surveyed metres. Roots stay inside the original lots;
  * shared physical blades provide close detail above the authored green floor. */
@@ -66,6 +67,9 @@ export function deriveGrassRoots(
 function tuftGeometry() {
   const positions: number[] = [],
     colors: number[] = [];
+  const rootColor = new THREE.Color(PARK_SURFACE_COLORS.grassBladeRoot);
+  const tipColor = new THREE.Color(PARK_SURFACE_COLORS.grassBladeTip);
+  const color = new THREE.Color();
   for (let blade = 0; blade < 2; blade++) {
     const angle = blade * Math.PI * 0.5 + 0.24,
       bend = blade ? -0.021 : 0.026;
@@ -81,10 +85,7 @@ function tuftGeometry() {
     for (const index of [0, 1, 2, 1, 3, 2, 2, 3, 4]) {
       const vertex = vertices[index];
       positions.push(...vertex.toArray());
-      const color = new THREE.Color("#476537").lerp(
-        new THREE.Color("#a0b86e"),
-        (vertex.y / height) * 0.7,
-      );
+      color.copy(rootColor).lerp(tipColor, (vertex.y / height) * 0.8);
       colors.push(color.r, color.g, color.b);
     }
   }
@@ -180,7 +181,7 @@ export function createLotGrass(
         mesh.setMatrixAt(slot, transform);
         mesh.setColorAt(
           slot,
-          new THREE.Color("#ffffff").lerp(new THREE.Color("#b3b781"), noise(root.seed, 47) * 0.28),
+          new THREE.Color("#ffffff").lerp(new THREE.Color("#cbd5ae"), noise(root.seed, 47) * 0.22),
         );
       });
       mesh.instanceMatrix.needsUpdate = true;
