@@ -3,6 +3,7 @@ import { boundaryDistance } from "./commercialPresentation";
 import { ENTITIES, type Point } from "./data/territory";
 import { deriveParkDetails } from "./parkDetails";
 import { PARK_LOT_TREES, selectParkLotTrees } from "./parkLotPlanting";
+import { getRegisteredParkWoodland } from "./parkPlanting";
 import { derivePavement } from "./pavement";
 import { derivePavilionGround } from "./pavilionGround";
 import {
@@ -10,6 +11,7 @@ import {
   PARK_CONTEXT_WALKS,
   PARK_RENDER_ENTITIES,
 } from "./permanentParkLayout";
+import { auditPlanting } from "./planting";
 
 describe("aerial-reference planting in and around the commercial blocks", () => {
   const topology = derivePavement(PARK_RENDER_ENTITIES);
@@ -50,6 +52,35 @@ describe("aerial-reference planting in and around the commercial blocks", () => 
         ),
         tree.id,
       ).toBe(true);
+    }
+  });
+
+  it("fills the requested side lawns and lot row while keeping a clear passage by Mercosul", () => {
+    const supplements = PARK_LOT_TREES.slice(45);
+    expect(supplements).toHaveLength(18);
+    const byZone = (zone: string) => supplements.filter(({ blockId }) => blockId === zone);
+    expect(byZone("arvoredo")).toHaveLength(5);
+    expect(
+      byZone("J").map(({ ownerEntityId }) => Number(ownerEntityId?.split(":").at(-1))),
+    ).toEqual([43, 44, 45, 47, 49, 50]);
+    expect(byZone("I").map(({ ownerEntityId }) => ownerEntityId)).toEqual([
+      "indumoveis:external:lot:01",
+    ]);
+    expect(["C", "B", "A", "Q", "P"].map((zone) => byZone(zone).length)).toEqual([1, 2, 1, 1, 1]);
+    expect(byZone("arvoredo").every(({ world: [x], crownRadius }) => x + crownRadius < 65)).toBe(
+      true,
+    );
+
+    const olderTrees = [
+      ...auditPlanting(),
+      ...getRegisteredParkWoodland(),
+      ...PARK_LOT_TREES.slice(0, 45),
+    ];
+    for (const tree of supplements) {
+      const closestPrior = Math.min(
+        ...olderTrees.map(({ world: [x, z] }) => Math.hypot(tree.world[0] - x, tree.world[1] - z)),
+      );
+      expect(closestPrior, tree.id).toBeGreaterThan(3);
     }
   });
 

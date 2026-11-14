@@ -33,7 +33,7 @@ O resíduo RMS dos pontos de ajuste foi 0,39 unidade de desenho. Os dois cruzame
 | Entorno (O, U, P, M, C, B, A) | 0               | 12              |
 | Total                         | 23              | 22              |
 
-As 45 árvores passam na revisão do pavimento, passeios, pisos de serviço, acessos e edificações. A menor folga medida a partir da projeção de uma copa é 0,35 unidade de desenho até o pavimento e 0,35 até uma divisa de lote. A renderização usa três geometrias compartilhadas de tronco e copa, com o limite existente de 30 mil triângulos para folhas próximas e os dois mapas de textura compartilhados. No SVG, os símbolos ficam abaixo dos rótulos e deixam a seleção a cargo dos polígonos.
+Na primeira implantação, as 45 árvores passaram na revisão do pavimento, passeios, pisos de serviço, acessos e edificações. A menor folga medida a partir da projeção de uma copa foi 0,35 unidade de desenho até o pavimento e 0,35 até uma divisa de lote. A renderização usa três geometrias compartilhadas de tronco e copa, com o limite existente de 30 mil triângulos para folhas próximas e os dois mapas de textura compartilhados. No SVG, os símbolos ficam abaixo dos rótulos e deixam a seleção a cargo dos polígonos.
 
 ## Comparação antes e depois
 
@@ -49,3 +49,28 @@ Builds de produção comparados no mesmo Chrome 157, com ANGLE Metal em GPU Appl
 | Triângulos, p95 na órbita                    | 257,2–257,3 mil → 303,2 mil | 204,1 mil → 246,7 mil         |
 
 Clique e toque no ponto da árvore do lote 46 abriram a ficha do lote. O mesmo ponto no SVG permitiu a seleção com WebGL desativado. Os oito enquadramentos mantiveram a quantidade de rótulos elegíveis para exibição. Em vistas oblíquas, uma copa ainda pode encobrir parte de um número por perspectiva, como no lote 56 pelo lado leste. As medições em viewport móvel foram feitas no mesmo Mac com toque emulado.
+
+## Complemento nos gramados laterais e na Rua Brasil
+
+A imagem de 19 de março de 2026 no Google Earth mostra grupos de porte desigual dos dois lados da circulação entre o Arvoredo e a Alameda Mercosul. Na Rua Brasil, a fileira comercial dos lotes 43 a 50 tem copas espaçadas, com trechos abertos. Mais a leste, a vegetação contorna os gramados laterais junto ao Centro de Eventos e à Sede. As posições são aproximações em planta, priorizando as partes visivelmente arborizadas de cada faixa. [Vista do Google Earth](https://earth.google.com/web/@-27.8452464,-54.47898396,326.76546911a,663.53410887d,35y,240.04240613h,0t,0r/data=CgRCAggBOgMKATBCAggASg0I____________ARAA)
+
+| Trecho                                                                   | Árvores acrescentadas |
+| ------------------------------------------------------------------------ | --------------------- |
+| Faixa gramada da Calçada do Arvoredo e borda do lote 01                  | 6                     |
+| Fileira dos lotes 43 a 50, ao longo da Rua Brasil                        | 6                     |
+| Gramados laterais a leste, junto a Eventos, La Paz, Sede e Rua Argentina | 4                     |
+| Gramados a oeste, junto à Pecuária e à Rua Bolívia                       | 2                     |
+
+As 18 posições complementam as 45 iniciais, totalizando 63 árvores no catálogo compartilhado entre o 3D e o 2D. No Arvoredo, as novas copas se juntam em pequenos grupos com passagens entre eles. As novas copas têm folga mínima de 0,64 unidade de desenho até os pisos e de 0,46 até as divisas dos lotes em que foram implantadas. O lote 48 permanece como clareira na fileira.
+
+![Arvoredo, Rua Brasil e gramados laterais antes e depois do complemento](validation/commercial-map-park-vegetation/comparativo-arvoredo-laterais.webp)
+
+A comparação com `8d9c937`, usando os mesmos perfis, câmeras e GPU dentro de cada par, confirmou 63 árvores tanto em WebGL quanto no SVG. A ficha do lote 44 abriu ao clicar ou tocar sobre a árvore em 3D e ao clicar no mesmo ponto em 2D. Os números da fileira de 43 a 50 permaneceram legíveis nas vistas testadas.
+
+| Medida na órbita             | Desktop antes → depois | Viewport móvel antes → depois |
+| ---------------------------- | ---------------------- | ----------------------------- |
+| Intervalo entre quadros, p95 | 16,8 → 16,7–16,8 ms    | 16,7 → 16,7–16,8 ms           |
+| Chamadas de desenho, p95     | 138–139 → 141          | 111 → 111                     |
+| Triângulos, p95              | 303,2 mil → 316,7 mil  | 246,7 mil → 263,3 mil         |
+
+Com mais árvores no mesmo enquadramento, algumas copas passaram a usar a geometria simplificada para respeitar o limite de folhagem detalhada. As medições móveis usam emulação no Mac.

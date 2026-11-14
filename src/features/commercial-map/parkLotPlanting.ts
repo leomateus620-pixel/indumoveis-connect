@@ -19,12 +19,14 @@ import type { PavementTopology } from "./pavement";
 import type { PavilionGround } from "./pavilionGround";
 
 type TreeForm = "broadleaf" | "upright" | "spreading";
-type PlantingBlock = "L" | "F" | "J" | "E" | "I" | "D" | "O" | "U" | "P" | "M" | "C" | "B" | "A";
+type PlantingBlock =
+  "L" | "F" | "J" | "E" | "I" | "D" | "O" | "U" | "P" | "Q" | "M" | "C" | "B" | "A";
+type PlantingZone = PlantingBlock | "arvoredo";
 
 export type ParkLotTree = {
   id: string;
   world: Point;
-  blockId: PlantingBlock;
+  blockId: PlantingZone;
   form: TreeForm;
   scale: number;
   /** Maximum horizontal extent from the trunk, including crown motion. */
@@ -49,11 +51,12 @@ type Placement = [
   crownRadius: number,
   lotNumber?: number,
 ];
+type PlantingGroup = { setting: string; trees: Placement[] };
 
 /** Positions and dimensions authored in drawing units from the A2 park and
  * V1 lot geometry. Aerial views check which parts of each block are wooded
  * and which are clear. Each point represents approximate landscape. */
-const placements: Record<PlantingBlock, { setting: string; trees: Placement[] }> = {
+const placements: Partial<Record<PlantingZone, PlantingGroup>> = {
   L: {
     setting: "Maciço no gramado ao sul da Rua Chile e copas esparsas junto à Rua Brasil",
     trees: [
@@ -165,13 +168,68 @@ const placements: Record<PlantingBlock, { setting: string; trees: Placement[] }>
   },
 };
 
+// Keep the original entries first so their instanced rotations and tones stay stable.
+const sidePlanting: Partial<Record<PlantingZone, PlantingGroup>> = {
+  arvoredo: {
+    setting:
+      "Grupos laterais da Calçada do Arvoredo junto aos apoios, com passagem entre as copas e a Mercosul",
+    trees: [
+      ["cafe-side", [63.2, 28.8], "broadleaf", 0.93, 1.36],
+      ["bar-side", [62.95, 33.1], "upright", 0.84, 1.2],
+      ["restaurant-side", [63.55, 40.6], "spreading", 0.91, 1.36],
+      ["south-corner", [63, 46.9], "broadleaf", 0.82, 1.3],
+      ["grove-transition", [57.25, 49.45], "spreading", 0.88, 1.34],
+    ],
+  },
+  J: {
+    setting: "Copas escalonadas na fileira 43–50, junto à Rua Brasil e na borda da Mercosul",
+    trees: [
+      ["arvoredo-grass-43", [72.66, 33.5], "spreading", 0.81, 1.15, 43],
+      ["brasil-grass-44", [78.95, 28], "broadleaf", 0.56, 0.83, 44],
+      ["brasil-grass-45", [83.2, 33.2], "spreading", 0.67, 0.94, 45],
+      ["brasil-grass-47", [94.6, 27.9], "broadleaf", 0.62, 1.03, 47],
+      ["brasil-grass-49", [104, 28.2], "upright", 0.56, 0.78, 49],
+      ["brasil-grass-50", [110.3, 33.2], "spreading", 0.66, 0.94, 50],
+    ],
+  },
+  I: {
+    setting: "Copa na borda gramada do lote 01, na transição da Mercosul com o Arvoredo",
+    trees: [["arvoredo-grass-01", [73.17, 57.78], "broadleaf", 0.73, 0.93, 1]],
+  },
+  C: {
+    setting: "Vegetação na faixa gramada entre o Centro de Eventos e a Rua La Paz",
+    trees: [["events-side-grass", [173.8, 38.3], "upright", 0.76, 1.19]],
+  },
+  B: {
+    setting: "Copas nas laterais gramadas do Palco Lactalis e da Sede, espaçadas ao longo do setor",
+    trees: [
+      ["lactalis-side-grass", [177.55, 53.9], "broadleaf", 1.07, 2.09],
+      ["sede-side-grass", [166.7, 59.8], "spreading", 0.96, 1.88],
+    ],
+  },
+  A: {
+    setting: "Copa na faixa verde além do passeio leste, ao sul da Rua Argentina",
+    trees: [["argentina-east-verge", [178.2, 72], "broadleaf", 1.08, 1.97]],
+  },
+  Q: {
+    setting: "Copa ao sul dos pavilhões da Pecuária, na lateral oeste do parque",
+    trees: [["pecuaria-green-edge", [48.4, -17.9], "spreading", 1.03, 2.05]],
+  },
+  P: {
+    setting: "Copa junto à Rua Bolívia, com abertura de gramado até a Rua Chile",
+    trees: [["bolivia-green-edge", [47.4, -7.2], "broadleaf", 1.04, 1.97]],
+  },
+};
+
 const lots = ENTITIES.filter((entity) => entity.kind === "lot");
 const blockById = new Map(PARK_PHYSICAL_BLOCKS.map((block) => [block.id, block]));
+const arvoredo = ENTITIES.find(({ id }) => id === "indumoveis:road:arvoredo")!;
 
-export const PARK_LOT_TREES: readonly ParkLotTree[] = (
-  Object.keys(placements) as PlantingBlock[]
-).flatMap((blockId) => {
-  const { setting, trees } = placements[blockId];
+export const PARK_LOT_TREES: readonly ParkLotTree[] = [
+  ...Object.entries(placements),
+  ...Object.entries(sidePlanting),
+].flatMap(([zone, { setting, trees }]) => {
+  const blockId = zone as PlantingZone;
   return trees.map(([key, world, form, scale, crownRadius, lotNumber]) => {
     const ownerEntityId = lotNumber
       ? `indumoveis:external:lot:${String(lotNumber).padStart(2, "0")}`
@@ -187,8 +245,11 @@ export const PARK_LOT_TREES: readonly ParkLotTree[] = (
       origin: "park-landscape-reference",
       confidence: "registered-landscape-approximation",
       ownerEntityId,
-      zone: `quadra-${blockId}`,
-      sourceEntityIds: [`block:${blockId}`, ...(ownerEntityId ? [ownerEntityId] : [])],
+      zone: blockId === "arvoredo" ? "calçada-do-arvoredo" : `quadra-${blockId}`,
+      sourceEntityIds: [
+        blockId === "arvoredo" ? arvoredo.id : `block:${blockId}`,
+        ...(ownerEntityId ? [ownerEntityId] : []),
+      ],
       referenceImage: "Vista aérea do Parque de Exposições, Google Earth, conferência visual",
       referencePixel: null,
       localRegistration: "Implantação gráfica A2 e V1 na cena Indumóveis, em unidades de desenho",
@@ -246,22 +307,19 @@ export function selectParkLotTrees(
 
   return PARK_LOT_TREES.filter(({ world, crownRadius, blockId, priority, ownerEntityId }) => {
     const block = blockById.get(blockId);
-    if (!block?.polygons.some((polygon) => boundaryDistance(world, polygon) >= rootSetback))
-      return false;
     const owner = lots.find((lot) => pointInPolygon(world, lot.polygon));
     if (priority === "lot") {
       if (
         !owner ||
         owner.id !== ownerEntityId ||
-        !block.commercialIds.includes(owner.id) ||
+        !block?.commercialIds.includes(owner.id) ||
         boundaryDistance(world, owner.polygon) < crownRadius + rootSetback
       )
         return false;
-    } else if (
-      owner ||
-      !block.referencePieces.some((polygon) => boundaryDistance(world, polygon) >= crownRadius)
-    ) {
-      return false;
+    } else {
+      const envelope = blockId === "arvoredo" ? [arvoredo.polygon] : block?.referencePieces;
+      if (owner || !envelope?.some((polygon) => boundaryDistance(world, polygon) >= crownRadius))
+        return false;
     }
     const [x, z] = world;
     const insideClearance = ({ polygon, bounds }: (typeof pavement)[number], clearance: number) =>
