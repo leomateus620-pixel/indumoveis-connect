@@ -437,9 +437,9 @@ export function createParkDetails(
   entities: readonly MapEntity[],
   surfaces: SurfaceMaterials,
   pavilionGround?: PavilionGround,
+  topology = deriveParkDetails(entities, pavilionGround),
 ) {
-  const topology = deriveParkDetails(entities, pavilionGround),
-    group = new THREE.Group();
+  const group = new THREE.Group();
   group.name = "indumoveis-park-surface-details";
   const owned: (THREE.BufferGeometry | THREE.Material)[] = [];
   const jointMaterial = new THREE.MeshBasicMaterial({ color: "#929b94", depthWrite: false });

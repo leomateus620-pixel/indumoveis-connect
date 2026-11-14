@@ -5,6 +5,11 @@ import { getArchitectureDefinition } from "./architecture";
 import { pointInPolygon } from "./geometry";
 import { createVegetation, VEGETATION, CONTEXT_WOODLAND } from "./vegetation";
 import { auditPlanting, derivePresentationPlanting, distanceToPolygon, PLANTING } from "./planting";
+import { selectParkLotTrees } from "./parkLotPlanting";
+import { PARK_RENDER_ENTITIES } from "./permanentParkLayout";
+import { derivePavement } from "./pavement";
+import { derivePavilionGround } from "./pavilionGround";
+import { deriveParkDetails } from "./parkDetails";
 
 const lifecycle = vi.hoisted(() => ({
   created: [] as { resource: { dispose(): void }; disposals: number }[],
@@ -197,6 +202,72 @@ describe("organic instanced planting", () => {
       );
       model.group.updateMatrixWorld(true);
       expect(raycaster.intersectObject(model.group, true)).toHaveLength(0);
+    } finally {
+      model.dispose();
+    }
+  });
+
+  it("renders registered trees within their audited envelopes at both LODs, preserving height and picking", () => {
+    const pavilionGround = derivePavilionGround(PARK_RENDER_ENTITIES);
+    const parkLotTrees = selectParkLotTrees(
+      derivePavement(PARK_RENDER_ENTITIES),
+      pavilionGround,
+      deriveParkDetails(PARK_RENDER_ENTITIES, pavilionGround).concrete,
+    );
+    const model = createVegetation({ parkLotTrees });
+    try {
+      expect(parkLotTrees.length).toBeGreaterThan(0);
+      expect(model.metadata.parkLotTrees).toBe(parkLotTrees.length);
+      expect(model.metadata.auditedTrees.slice(-parkLotTrees.length)).toEqual(parkLotTrees);
+      const byId = new Map(parkLotTrees.map((tree) => [tree.id, tree]));
+      const families = new Map(parkLotTrees.map((tree) => [tree.id, new Set<string>()]));
+      const matrix = new THREE.Matrix4();
+      const vertex = new THREE.Vector3();
+      const sway = Math.hypot(VEGETATION.sway.x, VEGETATION.sway.z);
+      for (const mesh of meshes(model)) {
+        const [, family, variant] = mesh.name.split("-");
+        if (family === "contact") continue;
+        const positions = mesh.geometry.getAttribute("position");
+        for (const [slot, id] of (mesh.userData.plantingIds as string[]).entries()) {
+          const tree = byId.get(id);
+          if (!tree) continue;
+          expect(VEGETATION.species[Number(variant)]).toBe(tree.form);
+          families.get(id)!.add(family);
+          mesh.getMatrixAt(slot, matrix);
+          const horizontal = Math.hypot(matrix.elements[0], matrix.elements[2]);
+          expect(matrix.elements[5]).toBeCloseTo(tree.scale, 6);
+          let envelope = 0;
+          for (let i = 0; i < positions.count; i++) {
+            vertex.fromBufferAttribute(positions, i).applyMatrix4(matrix);
+            envelope = Math.max(
+              envelope,
+              Math.hypot(vertex.x - tree.world[0], vertex.z - tree.world[1]),
+            );
+          }
+          expect(envelope + (family === "near" ? sway * horizontal : 0)).toBeLessThanOrEqual(
+            tree.crownRadius,
+          );
+        }
+      }
+      for (const drawn of families.values())
+        expect(drawn).toEqual(new Set(["wood", "near", "far"]));
+      const [x, z] = parkLotTrees.find((tree) => tree.ownerEntityId)!.world;
+      const raycaster = new THREE.Raycaster(
+        new THREE.Vector3(x, 10, z),
+        new THREE.Vector3(0, -1, 0),
+      );
+      model.group.updateMatrixWorld(true);
+      expect(raycaster.intersectObject(model.group, true)).toHaveLength(0);
+      expect(model.metadata.textureMaps).toBe(2);
+      model.updateLod(30, [100, 40]);
+      const leafTriangles = meshes(model)
+        .filter((mesh) => mesh.name.startsWith("tree-near") && mesh.visible)
+        .reduce(
+          (sum, mesh) => sum + (mesh.count * mesh.geometry.getAttribute("position").count) / 3,
+          0,
+        );
+      expect(leafTriangles).toBeGreaterThan(0);
+      expect(leafTriangles).toBeLessThanOrEqual(VEGETATION.nearTriangleBudget);
     } finally {
       model.dispose();
     }
