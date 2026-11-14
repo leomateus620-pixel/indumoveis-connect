@@ -8,6 +8,7 @@ import type { MapHandle, MapRendererProps } from "./types";
 import { STREET_LABEL } from "./labelPolicy";
 import { COMMERCIAL_STATUS_COLORS, SALES_MAP_COLORS, VISUAL_THEME } from "./visualTheme";
 import { LOT_GRAPHICS } from "./commercialPresentation";
+import { PARK_LOT_TREES } from "./parkLotPlanting";
 
 const props: MapRendererProps = {
   selectedId: null,
@@ -48,6 +49,22 @@ describe("engine-independent territorial fallback", () => {
     expect(html).not.toContain("<canvas");
     for (const item of ENTITIES.filter((e) => e.kind === "lot" || e.kind === "pavilion"))
       expect(html).toContain(item.id);
+  });
+  it("draws the park trees under commercial labels and leaves hit testing to the lot polygons", () => {
+    const owner = PARK_LOT_TREES.find((tree) => tree.ownerEntityId)!.ownerEntityId!;
+    const { container } = render(<Map2D {...props} statuses={{ [owner]: "vendido" }} />);
+    const trees = container.querySelector(".im-map-lot-trees")!;
+
+    expect(trees.querySelectorAll("ellipse")).toHaveLength(PARK_LOT_TREES.length);
+    expect(trees).toHaveAttribute("pointer-events", "none");
+    expect(trees).toHaveAttribute("aria-hidden", "true");
+    expect(trees.nextElementSibling).toHaveClass("im-map-labels");
+    expect(
+      container.querySelector<SVGPolygonElement>(`[data-entity="${owner}"] polygon`)?.style.fill,
+    ).toBe(COMMERCIAL_STATUS_COLORS.vendido);
+    expect(
+      container.querySelector(`[data-label-entity="${owner}"] [data-sold-lot-check]`),
+    ).not.toBeNull();
   });
   it("gives streets fixed world text with no plaque and keeps selection separate from status", () => {
     const lot = ENTITIES.find((entity) => entity.kind === "lot")!;

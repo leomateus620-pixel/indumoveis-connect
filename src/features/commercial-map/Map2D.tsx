@@ -25,6 +25,7 @@ import { SoldLotCheck } from "./CommercialLotLegend";
 import { commercialBoundaries, interiorLotAnchor, LOT_GRAPHICS } from "./commercialPresentation";
 import { getPavilionPresentation } from "./architectureOrientation";
 import { pavilionMarkerScale } from "./pavilionSalesProgress";
+import { PARK_LOT_TREES } from "./parkLotPlanting";
 
 const fullWidth = MAP_BOUNDS.maxX - MAP_BOUNDS.minX;
 const fullHeight = MAP_BOUNDS.maxY - MAP_BOUNDS.minY;
@@ -762,6 +763,19 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           pointerEvents="none"
         />
       ))}
+      <g className="im-map-lot-trees" pointerEvents="none" aria-hidden="true">
+        {PARK_LOT_TREES.map(({ id, world: [x, z], crownRadius, form }) => (
+          <ellipse
+            key={id}
+            cx={x}
+            cy={z}
+            rx={crownRadius * (form === "upright" ? 0.52 : 0.82)}
+            ry={crownRadius * (form === "spreading" ? 0.59 : 0.76)}
+            fill={VISUAL_THEME.foliage[form === "spreading" ? 0 : form === "upright" ? 2 : 1]}
+            opacity="0.82"
+          />
+        ))}
+      </g>
       <g className="im-map-labels" pointerEvents="none">
         {ENTITIES.map((entity) => (
           <g

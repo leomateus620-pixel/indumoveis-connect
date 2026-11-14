@@ -12,6 +12,7 @@ import { createSoftwareMaterials } from "./softwareMaterials";
 import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
 import { createPhotoPavilionSetting } from "./photoPavilionSettingGeometry";
 import { getRegisteredParkWoodland, PARK_WOODLAND_MASSES } from "./parkPlanting";
+import { selectParkLotTrees } from "./parkLotPlanting";
 import { createTerrain, TERRAIN } from "./terrain";
 import { derivePavilionGround } from "./pavilionGround";
 import {
@@ -35,7 +36,7 @@ import type { PermanentParkLandmark } from "./permanentParkLayout";
 import { deriveUrbanHouses, deriveUrbanVacantLots } from "./urbanLayout";
 import { EXPLORATION_POLYGONS } from "./urbanReference";
 import { pointInPolygon } from "./geometry";
-import { createParkDetails, lotStatusBands } from "./parkDetails";
+import { createParkDetails, deriveParkDetails, lotStatusBands } from "./parkDetails";
 import { createCommercialBoundaries } from "./commercialBoundaries";
 import {
   interiorLotAnchor,
@@ -775,6 +776,9 @@ function initializeMapRuntime(
     fov: camera.fov,
   });
   const pavilionGround = derivePavilionGround(PARK_RENDER_ENTITIES);
+  let parkDetailsTopology: ReturnType<typeof deriveParkDetails> | undefined;
+  const getParkDetailsTopology = () =>
+    (parkDetailsTopology ??= deriveParkDetails(PARK_RENDER_ENTITIES, pavilionGround));
   const terrain = createTerrain(ENTITIES, {
     foundationExclusions: pavilionGround.foundationExclusions,
     extent: envelope.terrainBounds,
@@ -1652,6 +1656,11 @@ function initializeMapRuntime(
         quality: tier,
         additionalPlanting: true,
         photoPavilionTree: true,
+        parkLotTrees: selectParkLotTrees(
+          pavement.topology,
+          pavilionGround,
+          getParkDetailsTopology().concrete,
+        ),
       });
       rollback.push(() => vegetation?.dispose());
       try {
@@ -1696,7 +1705,12 @@ function initializeMapRuntime(
       // not depend on the separately downloaded residential factory.
       try {
         if (!parkDetails && !parkDetailsFailed) {
-          parkDetails = createParkDetails(PARK_RENDER_ENTITIES, surfaces, pavilionGround);
+          parkDetails = createParkDetails(
+            PARK_RENDER_ENTITIES,
+            surfaces,
+            pavilionGround,
+            getParkDetailsTopology(),
+          );
           parkDetails.group.visible = false;
           commercialGroup.add(parkDetails.group);
           rollback.push(() => parkDetails?.dispose());
