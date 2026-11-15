@@ -1,3 +1,55 @@
+# Pavilhão 3 — revisão visual
+
+final result: passed
+
+## Referência e intenção
+
+Redesenho do interior existente, com direção explícita de abandonar a identidade de PDF e oferecer imersão, navegação espacial, painel compacto e lotes individuais. Ajustes incorporados durante a implementação: remover a divisória elevada da ilha central e incluir ícone de conexão direta com o Pavilhão 13.
+
+Fonte visual: `docs/validation/pavilion-3/overview-1440.png`, `lot104-1440.png`, `overview-390.png` e `lot104-390.png`, do commit anterior `560eec6`. A geometria continua sendo a revisão documental já integrada; não se inventaram metragens nem ocupações. Aplicadas as diretrizes de contexto, preservação de conteúdo e composição de Creative Production e Product Design. O quadro interativo de Creative Production não estava disponível; a composição foi executada na interface e na cena, preservando os ativos de marca existentes.
+
+## Comparação normalizada
+
+- Desktop: CSS e imagem 1440 × 1000, DPR 1. Visão geral sem seleção e ficha do lote 104.
+- Celular: CSS e imagem 390 × 844, DPR 1. Mesmos estados e dados demonstrativos.
+- Implementação: `docs/validation/pavilion-3-immersive/after-desktop.jpg`, `lot104-desktop.jpg`, `after-mobile.jpg` e `lot104-mobile.jpg`.
+- Evidência combinada aberta e inspecionada: `comparison-desktop.jpg` (2904 × 1048), `comparison-mobile.jpg` (804 × 892).
+- Comparação focada do painel do lote 104: `comparison-detail.jpg`, com recortes em escala 1:1 do mesmo estado. A diferença de altura e posição é intencional: ficha compacta e painel inferior no celular.
+- Todas as evidências acima ficam em `docs/validation/pavilion-3-immersive/`, exceto as referências anteriores indicadas explicitamente.
+
+## Histórico de correções
+
+1. [P2, layout móvel] A ação da ficha excedia o painel em aproximadamente 7 px, e o ícone P13 sobrepunha parcialmente os controles de zoom. A altura reservada foi ajustada e o ícone recebeu margem lateral. A captura final `lot104-mobile.jpg` mostra a ação entre y=768 e 812, dentro do painel que termina em y=832; o ícone termina em x=315 e o zoom começa em x=330.
+2. [P2, comercialização] O carrinho cobria os controles inferiores no desktop. Os controles agora sobem acima da altura máxima do carrinho, e o ícone P13 conserva 8 px de separação dos controles. Evidência após correção: `individual-sale-desktop.jpg`.
+3. [P2, estados visuais] A seleção comercial usava verde genérico. A cena passou a usar a cor comercial de seleção e números claros nos lotes ativos, preservando os estados da legenda.
+4. [P2, navegação móvel] Voltar de um lote aos setores recolhia o painel. O recolhimento automático ficou restrito à abertura inicial do celular; o retorno aos setores mantém a navegação aberta. Incluído teste de regressão.
+5. Ajustes de direção: a divisória central foi retirada; o ícone P13 acompanha a passagem e permite acesso direto por clique ou teclado. Capturas finais de visão geral, detalhe e percurso mostram a ilha aberta.
+
+## Superfícies de fidelidade
+
+- Tipografia: Figtree na interface, Plus Jakarta Sans no número destacado, números tabulares e rótulos nítidos no atlas da cena. O título, a marca e os dados foram preservados. Sem duplicação de número, pavilhão e descrição na ficha.
+- Espaçamento e layout: cabeçalho de 80 px no desktop e 72 px no celular; painel flutuante de 278 px; ficha inferior móvel com ações de 44 px. Busca, setores e controles permanecem alcançáveis. O painel rola quando necessário.
+- Cores: verde da identidade do pavilhão, superfícies claras e materiais de exposição. Disponibilidade é uma camada explícita; seleção comercial usa o mesmo código de cor do sistema. O estado comercial continua vindo do estoque derivado.
+- Ativos: marca e ícone P13 reutilizados sem redesenho. Volumes derivados dos polígonos exatos de cada lote, sem agrupamento ou alteração de áreas. Alturas são apresentação, não arquitetura medida. Sem imagens de expositores ou mobiliário inventado.
+- Conteúdo: 142 lotes, 5 m² por lote nas fixtures, R$ 265/m² e R$ 1.325 por lote. Os 1.155 m² são a área total do pavilhão. Valores ausentes continuam ausentes e erros comerciais oferecem nova tentativa.
+
+## Interações e resultado
+
+Verificados no navegador integrado: WebGL real, giro, clique direto, busca, foco, percurso, troca de vista, teclado e pan da planta, disponibilidade, seleção comercial 39/104, ícone P13 nos dois tamanhos e retorno. A perda de contexto WebGL foi exercitada e preservou 142 alvos em planta; recarregar recuperou o 3D. Não houve erro de console na sessão final.
+
+649 testes, TypeScript, ESLint dos arquivos alterados e build aprovados. Não restaram achados P0/P1/P2. Revisão realizada com dados locais isolados, sem gravações no banco de produção. A renderização foi verificada no navegador integrado; não foi feita medição de desempenho em aparelhos físicos.
+
+## Checklist concluído
+
+- [x] Cena dedicada e ilha central aberta.
+- [x] Painel enxuto, busca, setores e seleção individual.
+- [x] Conexão P3/P13 acessível por ícone.
+- [x] Controles separados da ficha e do carrinho.
+- [x] Planta alternativa e recuperação sem WebGL.
+- [x] Comparativos de desktop, celular e detalhe inspecionados.
+
+---
+
 # Pavilhão 13 · Galeria do Salão de Imóveis · Design QA, 08/11/2026
 
 final result: passed

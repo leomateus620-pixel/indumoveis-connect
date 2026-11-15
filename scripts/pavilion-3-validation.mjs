@@ -91,6 +91,10 @@ try {
       .getByRole("heading", { name: "Construção e Mobiliário", exact: true })
       .waitFor({ state: "attached" });
     await page.locator('[data-environment="142"]').waitFor();
+    assert.equal(
+      await page.getByRole("button", { name: "Perspectiva", exact: true }).isDisabled(),
+      true,
+    );
     await page.getByRole("button", { name: "Modo Comercialização", exact: true }).click();
     for (const code of ["39", "104"]) {
       const target = page.locator(`[data-environment="${code}"] [data-part="interior"]`);
@@ -127,7 +131,7 @@ try {
     });
     await page.goto(`${baseURL}/mapa/pavilhoes/3/interior?lote=104`);
     await page.getByRole("heading", { name: "Lote 104", exact: true }).waitFor();
-    const panel = page.locator(".arq-sidebar");
+    const panel = page.locator(".p3-panel");
     assert.match(await panel.innerText(), /5,00 m²/);
     assert.match(await panel.innerText(), /265,00/);
     assert.match(await panel.innerText(), /1\.325,00/);
@@ -141,12 +145,12 @@ try {
     await page.getByRole("button", { name: "Localizar lote", exact: true }).click();
     await page.getByRole("heading", { name: "Lote 142", exact: true }).waitFor();
     assert.equal(JSON.parse(new URL(page.url()).searchParams.get("lote")), "142");
-    await page.getByRole("button", { name: "Localizar na planta" }).click();
+    await page.getByRole("button", { name: "Focar lote" }).click();
     await page.screenshot({
       animations: "disabled",
       path: path.join(artifactDir, `located142-${viewport.width}.png`),
     });
-    const drawing = page.locator(".arq-plan > g");
+    const drawing = page.locator(".p3-plan-view > g");
     const before = await drawing.getAttribute("transform");
     await page.getByRole("button", { name: "Aproximar", exact: true }).click();
     assert.notEqual(await drawing.getAttribute("transform"), before);
