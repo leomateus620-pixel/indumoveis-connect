@@ -1,0 +1,259 @@
+{
+  "generatedAt": "2026-11-15T14:26:51.287Z",
+  "baseURL": "http://127.0.0.1:4173",
+  "conditions": {
+    "os": "darwin 25.6.0",
+    "cpu": "Apple M5",
+    "logicalCores": 10,
+    "systemMemoryGiB": 16,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Isolated fixtures for 142 P3 lots; 5 m², R$265/m², R$1325 each. No production session or writes.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [],
+    "optionalContextAssets": [],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "httpCache": "Disabled by Playwright request routing; warm means SPA/module reentry in the same document, not a cached HTTP load",
+    "browser": "157.0.8103.51"
+  },
+  "mode": "realism",
+  "layouts": [],
+  "checks": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "individualTargets": 142,
+      "area": 5,
+      "rate": 265,
+      "gross": 1325,
+      "reload": true,
+      "search142": true,
+      "zoom": true,
+      "passageRoundtrip": true,
+      "parkRoundtrip": true,
+      "independentSale39And104": 2650
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "individualTargets": 142,
+      "area": 5,
+      "rate": 265,
+      "gross": 1325,
+      "reload": true,
+      "search142": true,
+      "zoom": true,
+      "passageRoundtrip": true,
+      "parkRoundtrip": true,
+      "independentSale39And104": 2650
+    }
+  ],
+  "openings": [],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa?pavilhao=%223%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa/pavilhoes/3/interior?lote=%22104%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "url": "http://127.0.0.1:4173/mapa?pavilhao=%223%22",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    }
+  ],
+  "unexpectedRequests": [],
+  "assetResponses": [
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/node_modules/.pnpm/@tanstack+start-client-core@1.170.34/node_modules/@tanstack/start-client-core/dist/esm/client-rpc/frame-decoder.js?v=176e6e31",
+      "status": 200,
+      "contentType": "text/javascript",
+      "contentLength": "20735"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/node_modules/.pnpm/@tanstack+start-client-core@1.170.34/node_modules/@tanstack/start-client-core/dist/esm/client-rpc/frame-decoder.js?v=176e6e31",
+      "status": 200,
+      "contentType": "text/javascript",
+      "contentLength": "20735"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/node_modules/.pnpm/@tanstack+start-client-core@1.170.34/node_modules/@tanstack/start-client-core/dist/esm/client-rpc/frame-decoder.js?v=176e6e31",
+      "status": 200,
+      "contentType": "text/javascript",
+      "contentLength": "20735"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/14effc5f-a456-4cc1-b334-104b0fce0460/mark-light.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/src/features/commercial-map/assets/daylight.png?import&url",
+      "status": 200,
+      "contentType": "text/javascript",
+      "contentLength": "468"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/node_modules/.pnpm/@tanstack+start-client-core@1.170.34/node_modules/@tanstack/start-client-core/dist/esm/client-rpc/frame-decoder.js?v=176e6e31",
+      "status": 200,
+      "contentType": "text/javascript",
+      "contentLength": "20735"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/node_modules/.pnpm/@tanstack+start-client-core@1.170.34/node_modules/@tanstack/start-client-core/dist/esm/client-rpc/frame-decoder.js?v=176e6e31",
+      "status": 200,
+      "contentType": "text/javascript",
+      "contentLength": "20735"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/node_modules/.pnpm/@tanstack+start-client-core@1.170.34/node_modules/@tanstack/start-client-core/dist/esm/client-rpc/frame-decoder.js?v=176e6e31",
+      "status": 200,
+      "contentType": "text/javascript",
+      "contentLength": "20735"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/1710ab86-16eb-419c-9d90-1bf5cd33121d/logo-dark.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/__l5e/assets-v1/14effc5f-a456-4cc1-b334-104b0fce0460/mark-light.png",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "http://127.0.0.1:4173/src/features/commercial-map/assets/daylight.png?import&url",
+      "status": 200,
+      "contentType": "text/javascript",
+      "contentLength": "468"
+    }
+  ]
+}

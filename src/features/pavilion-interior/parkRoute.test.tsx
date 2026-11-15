@@ -2,7 +2,6 @@ import type { ComponentType } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Route } from "@/routes/_authenticated/_app/mapa";
-import { pavilionDestinationHref } from "./connections";
 import { saveParkReturn } from "./parkReturn";
 
 const state = vi.hoisted(() => ({
@@ -41,7 +40,7 @@ vi.mock("@/features/commercial-map/CommercialMapWorkspace", () => ({
     initialPavilionNumber,
     restorePark,
   }: {
-    onOpenInterior: (pavilion: 1 | 8 | 12 | 13) => void;
+    onOpenInterior: (pavilion: 1 | 3 | 8 | 12 | 13) => void;
     initialPavilionNumber?: number;
     restorePark: boolean;
   }) => (
@@ -50,6 +49,7 @@ vi.mock("@/features/commercial-map/CommercialMapWorkspace", () => ({
         {initialPavilionNumber}
       </output>
       <button onClick={() => onOpenInterior(1)}>Abrir Pavilhão 1</button>
+      <button onClick={() => onOpenInterior(3)}>Abrir Pavilhão 3</button>
       <button onClick={() => onOpenInterior(8)}>Abrir Pavilhão 8</button>
       <button onClick={() => onOpenInterior(12)}>Abrir Pavilhão 12</button>
       <button onClick={() => onOpenInterior(13)}>Abrir Pavilhão 13</button>
@@ -65,8 +65,8 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("park destinations of the lateral connections", () => {
-  it.each([3] as const)("accepts a connection URL and focuses Pavilhão %s", (destination) => {
-    const url = new URL(pavilionDestinationHref(destination), "https://indumoveis.example");
+  it.each([3] as const)("accepts an external return URL and focuses Pavilhão %s", (destination) => {
+    const url = new URL(`/mapa?pavilhao=${destination}`, "https://indumoveis.example");
     const rawSearch = Object.fromEntries(url.searchParams);
     const validate = Route.options.validateSearch as (search: Record<string, unknown>) => {
       pavilhao?: string;
@@ -86,12 +86,14 @@ describe("park destinations of the lateral connections", () => {
     render(<MapPage />);
     const target = screen.getByLabelText("Pavilhão enquadrado");
     expect(target).toHaveTextContent(String(destination));
-    expect(target).toHaveAttribute("data-restore-park", "false");
+    expect(target).toHaveAttribute("data-restore-park", "true");
   });
 });
 
 describe("park history before opening another pavilion", () => {
   it.each([
+    { previous: "13", next: 3 },
+    { previous: "3", next: 13 },
     { previous: "13", next: 1 },
     { previous: "1", next: 13 },
     { previous: "13", next: 8 },

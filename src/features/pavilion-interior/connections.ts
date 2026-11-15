@@ -1,7 +1,7 @@
 import type { InteriorPavilionNumber } from "./presentation";
 import type { InteriorPoint } from "./data";
 
-export type ParkPavilionNumber = InteriorPavilionNumber | 3;
+export type ParkPavilionNumber = InteriorPavilionNumber;
 export type ParkPavilionSearch = `${ParkPavilionNumber}`;
 export type InteriorConnection = {
   elementId: string;
@@ -14,6 +14,7 @@ export type InteriorConnection = {
 // focusing the destination in the park to opening its interior without editing the plan.
 const interiorRoutes = {
   1: "/mapa/pavilhoes/1/interior",
+  3: "/mapa/pavilhoes/3/interior",
   8: "/mapa/pavilhoes/8/interior",
   12: "/mapa/pavilhoes/12/interior",
   13: "/mapa/pavilhoes/13/interior",

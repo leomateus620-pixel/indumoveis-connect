@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 62">
+  <rect x="1" y="1" width="50" height="60" rx="5" fill="#faf8ef" stroke="#a9b7a1"/>
+  <path d="M15 12H37M31 6L37 12L31 18" fill="none" stroke="#376450" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <g text-anchor="middle" fill="#294735" font-family="Arial,sans-serif">
+    <text x="26" y="31" font-size="9">Pavilhão</text>
+    <text x="26" y="55" font-size="26" font-weight="bold">13</text>
+  </g>
+</svg>

@@ -21,6 +21,7 @@ const editionId = "22222222-2222-4222-8222-222222222222";
 const plans = {};
 for (const [pavilion, planIdDigit, revisionIdDigit] of [
   [1, "3", "4"],
+  [3, "b", "c"],
   [8, "7", "8"],
   [12, "9", "a"],
   [13, "5", "6"],
