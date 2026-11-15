@@ -28,7 +28,7 @@ export const PAVILION_PRESENTATIONS: Record<InteriorPavilionNumber, InteriorPres
     brandAlt: "ARQ & Design Indumóveis",
     showAreas: true,
     mode: "environments",
-    commercialCount: 14,
+    commercialCount: 15,
     loadingText: "Abrindo a Mostra ARQ & Design…",
     loadErrorText: "Não foi possível carregar a Mostra.",
     wayfinding: [

@@ -14,7 +14,7 @@ describe("pavilion-specific presentation and P13 URL", () => {
       title: "Mostra ARQ & Design",
       showAreas: true,
       mode: "environments",
-      commercialCount: 14,
+      commercialCount: 15,
     });
     expect(PAVILION_PRESENTATIONS[13]).toMatchObject({
       title: "Salão de Imóveis",

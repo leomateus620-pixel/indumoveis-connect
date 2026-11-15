@@ -25,6 +25,7 @@ import { CommercialLotLegend, SoldLotCheck } from "@/features/commercial-map/Com
 import { polygonBounds } from "@/features/commercial-map/geometry";
 import { COMMERCIAL_STATUS_COLORS } from "@/features/commercial-map/visualTheme";
 import { useCommercialSaleMode } from "@/features/guided-sales/sale-mode-context";
+import { commercialPriceLabel, commercialUnitPrice } from "@/lib/commercial";
 import { Pavilion1Architecture, Pavilion1NumberPlate } from "./Pavilion1Architecture";
 import { Pavilion12Architecture } from "./Pavilion12Architecture";
 import {
@@ -540,10 +541,14 @@ export function PavilionInterior({
                   {commercialLot?.tariffCents !== undefined &&
                     commercialLot.grossCents !== undefined && (
                       <>
-                        <dt>Tarifa por m²</dt>
-                        <dd>{brl(commercialLot.tariffCents)}</dd>
-                        <dt>Valor bruto de tabela</dt>
-                        <dd>{brl(commercialLot.grossCents)}</dd>
+                        <dt>{commercialPriceLabel(commercialLot)}</dt>
+                        <dd>{brl(commercialUnitPrice(commercialLot))}</dd>
+                        {commercialLot.pricingBasis !== "fixed" && (
+                          <>
+                            <dt>Valor bruto de tabela</dt>
+                            <dd>{brl(commercialLot.grossCents)}</dd>
+                          </>
+                        )}
                       </>
                     )}
                   {currentStatus && SPACE_STATUS[currentStatus] && (

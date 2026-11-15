@@ -26,7 +26,8 @@ import "./commercial-dashboard.css";
 
 function coverage(known: number, total: number, kind: string) {
   if (!total) return "Sem lotes no recorte";
-  if (!known) return `Sem ${kind} confirmada`;
+  if (!known)
+    return kind === "metragem" ? "Sem metragem confirmada" : "Sem preço de tabela confirmado";
   if (known === total) return `${count(total)} lotes com ${kind}`;
   return `Parcial · ${count(known)} de ${count(total)} lotes com ${kind}`;
 }
@@ -115,12 +116,16 @@ function Overview({
               <Metric
                 label="Potencial bruto conhecido"
                 value={brl(aggregate.grossCents)}
-                note={coverage(aggregate.pricedCount ?? 0, aggregate.total, "tarifa")}
+                note={coverage(aggregate.pricedCount ?? 0, aggregate.total, "preço de tabela")}
               />
               <Metric
                 label="Disponíveis com preço"
                 value={brl(aggregate.availableGrossCents)}
-                note={coverage(aggregate.availablePricedCount ?? 0, aggregate.available, "tarifa")}
+                note={coverage(
+                  aggregate.availablePricedCount ?? 0,
+                  aggregate.available,
+                  "preço de tabela",
+                )}
               />
             </dl>
           </div>

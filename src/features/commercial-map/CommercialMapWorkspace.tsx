@@ -46,7 +46,11 @@ import type {
   CommercialSegmentAggregate,
   CommercialSegmentKey,
 } from "@/lib/commercial";
-import { formatCommercialPercent } from "@/lib/commercial";
+import {
+  commercialPriceLabel,
+  commercialUnitPrice,
+  formatCommercialPercent,
+} from "@/lib/commercial";
 import {
   PavilionSalesProgressMarkers,
   type PavilionMarkerLayerHandle,
@@ -116,13 +120,15 @@ function LotPricing({ lot }: { lot: CommercialLot }) {
       {lot.tariffCents !== undefined && lot.grossCents !== undefined && (
         <dl>
           <div>
-            <dt>Tarifa por m²</dt>
-            <dd>{brl(lot.tariffCents)}</dd>
+            <dt>{commercialPriceLabel(lot)}</dt>
+            <dd>{brl(commercialUnitPrice(lot))}</dd>
           </div>
-          <div>
-            <dt>Valor bruto de tabela</dt>
-            <dd>{brl(lot.grossCents)}</dd>
-          </div>
+          {lot.pricingBasis !== "fixed" && (
+            <div>
+              <dt>Valor bruto de tabela</dt>
+              <dd>{brl(lot.grossCents)}</dd>
+            </div>
+          )}
         </dl>
       )}
       {note && <span>{note}</span>}

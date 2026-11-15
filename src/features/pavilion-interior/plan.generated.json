@@ -1,6 +1,6 @@
 {
   "id": "indumoveis:pavilion:1:mostra-arq-design",
-  "revision": 1,
+  "revision": 2,
   "pavilionNumber": 1,
   "bounds": {
     "minX": 28,
@@ -9,7 +9,7 @@
     "maxY": 532
   },
   "source": {
-    "revisionName": "mostra-arq-design-1-2026-11-08",
+    "revisionName": "mostra-arq-design-2-2026-11-15",
     "document": "Mostra Arq&Design 1 (1).pdf",
     "page": 1,
     "sha256": "088ab9d98e61ed98c98b45834c5813416d9fd09a10af195aeeae29bfc9a4c02a",
@@ -452,7 +452,7 @@
       "id": "indumoveis:pavilion:1:environment:15",
       "code": "15",
       "name": "Banheiros",
-      "kind": "support",
+      "kind": "commercial",
       "declaredAreaM2": 32.33,
       "label": [160, 162],
       "parts": [
@@ -469,7 +469,7 @@
           ]
         }
       ],
-      "functionLabel": "Ambiente de apoio"
+      "functionLabel": "Banheiros"
     },
     {
       "id": "indumoveis:pavilion:1:environment:salon",

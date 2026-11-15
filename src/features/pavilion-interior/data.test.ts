@@ -51,16 +51,16 @@ const declaredAreas = [
 ];
 
 describe("Pavilhão 1 documentary plan", () => {
-  it("preserves all fifteen numbered spaces and exactly fourteen sellable identities", () => {
+  it("preserves all fifteen numbered spaces and exactly fifteen sellable identities", () => {
     const numbered = plan.environments.filter((e) => /^\d{2}$/.test(e.code));
     expect(numbered.map((e) => e.code)).toEqual(
       declaredAreas.map((_, i) => String(i + 1).padStart(2, "0")),
     );
     expect(numbered.map((e) => e.declaredAreaM2)).toEqual(declaredAreas);
     expect(plan.pavilionNumber).toBe(1);
-    expect(plan.environments.filter((e) => e.kind === "commercial")).toHaveLength(14);
+    expect(plan.environments.filter((e) => e.kind === "commercial")).toHaveLength(15);
     expect(plan.environments.find((e) => e.code === "15")).toMatchObject({
-      kind: "support",
+      kind: "commercial",
       name: "Banheiros",
     });
     expect(plan.environments.find((e) => e.code === "salon")).toMatchObject({

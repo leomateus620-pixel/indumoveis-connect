@@ -58,6 +58,9 @@ export type CommercialLot = {
   pricingState: string;
   cornerState: string | null;
   tariffCents?: number | null;
+  /** Optional for previously stored quotes and older API responses. */
+  pricingBasis?: "fixed" | "per_m2";
+  priceSource?: CommercialPriceSource | null;
   grossCents?: number | null;
   policyVersion?: number | null;
   policySource?: string | null;
@@ -68,6 +71,20 @@ export type CommercialLot = {
     spacePriceCents?: number | null;
   } | null;
 };
+
+export type CommercialPriceSource = {
+  name: string;
+  sha256: string;
+  page: number | null;
+};
+
+export function commercialPriceLabel(lot: Pick<CommercialLot, "pricingBasis">) {
+  return lot.pricingBasis === "fixed" ? "Preço por espaço" : "Tarifa por m²";
+}
+
+export function commercialUnitPrice(lot: CommercialLot) {
+  return lot.pricingBasis === "fixed" ? lot.grossCents : lot.tariffCents;
+}
 
 export type CommercialSalesEvent = { date: string; signed: number; cancelled: number };
 export type CommercialFinancialTotals = {

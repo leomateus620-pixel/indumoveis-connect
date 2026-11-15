@@ -55,7 +55,7 @@ begin
 
   if (select array_agg(area_m2 order by lot_code) from public.commercial_inventory_v
       where edition_id = edition and pavilion_number = 1) is distinct from
-    array[111.66,47.50,47.50,74.81,74.81,47.50,47.50,74.81,74.81,47.50,69.17,129.43,69.48,254.81]::numeric[]
+    array[111.66,47.50,47.50,74.81,74.81,47.50,47.50,74.81,74.81,47.50,69.17,129.43,69.48,254.81,32.33]::numeric[]
   or exists (
     select 1 from public.commercial_inventory_v where edition_id = edition
       and (pavilion_number in (3,14) or pavilion_number = 1 and tariff_cents is not null)

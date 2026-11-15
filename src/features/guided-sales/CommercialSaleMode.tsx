@@ -359,7 +359,7 @@ function CartContents({
             <dd>{totals.pricedCount ? brl(totals.tableCents) : "—"}</dd>
           </div>
           {totals.pricedCount < lots.length && (
-            <small>{lots.length - totals.pricedCount} sem tarifa definida</small>
+            <small>{lots.length - totals.pricedCount} sem preço definido</small>
           )}
         </dl>
       )}

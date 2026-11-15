@@ -90,6 +90,53 @@ function stub(financial: boolean, admin = true) {
 }
 
 describe("commercial dashboard", () => {
+  it("shows P1's complete fixed-price potential and documentary lot prices", () => {
+    stub(true);
+    const p1 = {
+      ...populated,
+      total: 15,
+      sold: 0,
+      available: 15,
+      pricedCount: 15,
+      availablePricedCount: 15,
+      grossCents: 13200000,
+      availableGrossCents: 13200000,
+      knownAreaM2: 1203.62,
+      areaKnownCount: 15,
+    };
+    api.useCommercialOverview.mockReturnValue({
+      data: {
+        financial: true,
+        activity: true,
+        overall: p1,
+        segments: [
+          { ...p1, key: "p1", pavilionNumber: 1, label: "Pavilhão 1", description: "ARQ & DESIGN" },
+        ],
+      },
+    });
+    api.useCommercialDetails.mockReturnValue({
+      data: {
+        events: [],
+        totals: null,
+        lots: [
+          {
+            ...lot,
+            segmentKey: "p1",
+            code: "15",
+            areaM2: 32.33,
+            pricingBasis: "fixed",
+            tariffCents: null,
+            grossCents: 450000,
+          },
+        ],
+      },
+    });
+    render(<CommercialDashboard search={{ segmento: "p1" }} onSearch={vi.fn()} />);
+    expect(screen.getAllByText(/132\.000,00/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("15 lotes com preço de tabela").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Preço por espaço").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/4\.500,00/).length).toBeGreaterThan(0);
+  });
   it("does not show cached dashboard data to a non-admin with both module grants", () => {
     stub(true, false);
     render(<CommercialDashboard search={{}} onSearch={vi.fn()} />);
@@ -101,7 +148,7 @@ describe("commercial dashboard", () => {
     stub(true);
     const onSearch = vi.fn();
     const { rerender } = render(<CommercialDashboard search={{}} onSearch={onSearch} />);
-    expect(screen.getByText("Parcial · 1 de 2 lotes com tarifa")).toBeVisible();
+    expect(screen.getByText("Parcial · 1 de 2 lotes com preço de tabela")).toBeVisible();
     expect(screen.getByText("50%", { selector: ".cd-ring-value strong" })).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: /Pavilhão 3.*sem inventário/i }));
     expect(onSearch).toHaveBeenCalledWith({ segmento: "p3", lote: undefined });
@@ -117,7 +164,7 @@ describe("commercial dashboard", () => {
     expect(screen.queryByRole("heading", { name: "Potencial de tabela" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Movimentação comercial" })).toBeNull();
     expect(screen.getByRole("columnheader", { name: "Área confirmada" })).toBeVisible();
-    expect(screen.queryByRole("columnheader", { name: "Tarifa por m²" })).toBeNull();
+    expect(screen.queryByRole("columnheader", { name: "Preço de referência" })).toBeNull();
     expect(screen.queryByText(/1\.080,00/)).toBeNull();
   });
 });

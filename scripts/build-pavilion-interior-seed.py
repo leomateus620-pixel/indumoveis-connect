@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 plan = json.loads((ROOT / 'src/features/pavilion-interior/plan.generated.json').read_text())
-assert plan['revision'] == 1
+assert plan['revision'] == 1, 'Historical revision 1 builder; do not regenerate applied migrations from the current catalogue.'
 assert len([e for e in plan['environments'] if e['kind'] == 'commercial']) == 14
 assert [e['code'] for e in plan['environments'] if any(p['kind']=='external' for p in e['parts'])] == ['04','05','08','09','12']
 base=(ROOT/'supabase/migrations/20261108180000_pavilion_interior_domain.sql').read_text()

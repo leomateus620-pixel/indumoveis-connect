@@ -19,13 +19,22 @@ const rect = (width: number, height: number, left = 0, top = 0): DOMRect => ({
   bottom: top + height,
   toJSON: () => ({}),
 });
-function Harness({ initial, commercial }: { initial?: string; commercial?: Props["commercial"] }) {
+function Harness({
+  initial,
+  commercial,
+  lotsByEnvironment,
+}: {
+  initial?: string;
+  commercial?: Props["commercial"];
+  lotsByEnvironment?: Props["lotsByEnvironment"];
+}) {
   const [selected, setSelected] = useState(initial);
   return (
     <PavilionInterior
       plan={PAVILION_1_PLAN}
       selectedCode={selected}
       commercial={commercial}
+      lotsByEnvironment={lotsByEnvironment}
       onBack={onBack}
       onSelect={(code) => {
         onSelect(code);
@@ -96,6 +105,41 @@ afterEach(() => {
 });
 
 describe("Mostra pavilion interaction", () => {
+  it("shows the bathroom's persisted fixed price without a square-metre tariff", () => {
+    const environmentId = "indumoveis:pavilion:1:environment:15";
+    render(
+      <Harness
+        initial="15"
+        lotsByEnvironment={
+          new Map([
+            [
+              environmentId,
+              {
+                id: "space15",
+                environmentId,
+                geometryId: null,
+                code: "15",
+                segmentKey: "p1",
+                areaM2: 32.33,
+                areaPending: false,
+                status: "disponivel",
+                cornerState: null,
+                pricingState: "priced",
+                pricingBasis: "fixed",
+                tariffCents: null,
+                grossCents: 450000,
+              },
+            ],
+          ])
+        }
+      />,
+    );
+    const panel = within(screen.getByRole("complementary"));
+    expect(panel.getByText("Preço por espaço")).toBeVisible();
+    expect(panel.getByText(/4\.500,00/)).toBeVisible();
+    expect(panel.queryByText("Tarifa por m²")).toBeNull();
+    expect(panel.queryByText("Ambiente de apoio")).toBeNull();
+  });
   it("shows the gallery signature while keeping the full title and return action accessible", () => {
     const { container } = render(<Harness />);
     const header = within(container.querySelector(".arq-header")!);
@@ -112,14 +156,14 @@ describe("Mostra pavilion interaction", () => {
     const { container } = render(<Harness />);
     const panel = screen.getByRole("complementary", { name: "Informações do ambiente" });
     expect(within(panel).getByText("espaços comerciais")).toBeInTheDocument();
-    expect(within(panel).getByText("14", { selector: "strong" })).toBeInTheDocument();
+    expect(within(panel).getByText("15", { selector: "strong" })).toBeInTheDocument();
     const choices = within(panel).getByRole("navigation", { name: "Selecionar ambiente" });
     expect(
       within(choices)
         .getAllByRole("button")
         .filter((button) => /^\d{2}$/.test(button.textContent ?? "")),
     ).toHaveLength(15);
-    expect(container.querySelectorAll(".arq-environment.is-commercial")).toHaveLength(14);
+    expect(container.querySelectorAll(".arq-environment.is-commercial")).toHaveLength(15);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.getAllByRole("complementary")).toHaveLength(1);
   });
@@ -150,7 +194,7 @@ describe("Mostra pavilion interaction", () => {
       <Harness
         commercial={{
           "02": { status: "disponivel", exhibitor: "Expositor real" },
-          "15": { status: "disponivel", exhibitor: "Must not display" },
+          "15": { status: "disponivel", exhibitor: "Expositor Banheiros" },
           salon: { status: "disponivel", exhibitor: "Must not display" },
         }}
       />,
@@ -164,7 +208,8 @@ describe("Mostra pavilion interaction", () => {
     fireEvent.click(path(container, "15"));
     expect(within(panel).getByRole("heading", { level: 2, name: "Banheiros" })).toBeInTheDocument();
     expect(within(panel).getByText("32,33 m²")).toBeInTheDocument();
-    expect(within(panel).queryByText("Situação comercial")).not.toBeInTheDocument();
+    expect(within(panel).getByText("Situação comercial")).toBeInTheDocument();
+    expect(within(panel).getByText("Expositor Banheiros")).toBeInTheDocument();
     expect(screen.queryByText("Must not display")).not.toBeInTheDocument();
     fireEvent.click(within(panel).getByRole("button", { name: "Salão de Design" }));
     expect(

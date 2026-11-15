@@ -1,0 +1,301 @@
+{
+  "projectId": "188cb605-7a42-42a0-9e75-28f5097e9433",
+  "method": "lovable_query_database; migration and history committed atomically; verified through a separate call",
+  "appliedMigration": {
+    "name": "pavilion_1_fixed_prices",
+    "sha256": "33051fc1becbe66820acc768f9c282bcb4d12658f61445998b6571acd0de1cce",
+    "version": "20261115140000"
+  },
+  "financialTablePrivate": true,
+  "p1": [
+    {
+      "areaM2": 111.66,
+      "code": "01",
+      "grossCents": 450000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 47.5,
+      "code": "02",
+      "grossCents": 660000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 47.5,
+      "code": "03",
+      "grossCents": 660000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 74.81,
+      "code": "04",
+      "grossCents": 1020000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 74.81,
+      "code": "05",
+      "grossCents": 1020000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 47.5,
+      "code": "06",
+      "grossCents": 660000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 47.5,
+      "code": "07",
+      "grossCents": 660000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 74.81,
+      "code": "08",
+      "grossCents": 1020000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 74.81,
+      "code": "09",
+      "grossCents": 1020000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 47.5,
+      "code": "10",
+      "grossCents": 660000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 69.17,
+      "code": "11",
+      "grossCents": 960000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 129.43,
+      "code": "12",
+      "grossCents": 1500000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 69.48,
+      "code": "13",
+      "grossCents": 960000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 254.81,
+      "code": "14",
+      "grossCents": 1500000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    },
+    {
+      "areaM2": 32.33,
+      "code": "15",
+      "grossCents": 450000,
+      "priceSource": {
+        "name": "Mostra Arq&Design.pdf",
+        "page": 1,
+        "sha256": "8868c5a7b077a6b88223986dea8faf8b42bcde5df36a1a1ed71408ee42dfbef7"
+      },
+      "pricingBasis": "fixed",
+      "pricingState": "priced",
+      "status": "disponivel",
+      "tariffCents": null
+    }
+  ],
+  "p1CommercialDeals": 0,
+  "revisions": [
+    {
+      "isCurrent": false,
+      "payloadSha256": "90c8e9d2cd6b2b8dd4ae708d97cc49c62eb59dac5378061f7219e262671777c3",
+      "revision": 1
+    },
+    {
+      "isCurrent": true,
+      "payloadSha256": "b013dc6fd0216629e711402f4fda951f92955dcf9c953dec5c8fd8ba0dab18bb",
+      "revision": 2
+    }
+  ],
+  "segments": [
+    {
+      "area_m2": 3632,
+      "gross_cents": null,
+      "pricing_state": "no_tariff",
+      "segment_key": "automobile",
+      "spaces": 16
+    },
+    {
+      "area_m2": 1768,
+      "gross_cents": null,
+      "pricing_state": "corner_pending",
+      "segment_key": "external",
+      "spaces": 8
+    },
+    {
+      "area_m2": 9444,
+      "gross_cents": 17474600,
+      "pricing_state": "priced",
+      "segment_key": "external",
+      "spaces": 44
+    },
+    {
+      "area_m2": 1203.62,
+      "gross_cents": 13200000,
+      "pricing_state": "priced",
+      "segment_key": "p1",
+      "spaces": 15
+    },
+    {
+      "area_m2": 848,
+      "gross_cents": 22896000,
+      "pricing_state": "priced",
+      "segment_key": "p12",
+      "spaces": 254
+    },
+    {
+      "area_m2": null,
+      "gross_cents": null,
+      "pricing_state": "area_pending",
+      "segment_key": "p13",
+      "spaces": 2
+    },
+    {
+      "area_m2": 352,
+      "gross_cents": 15840000,
+      "pricing_state": "priced",
+      "segment_key": "p13",
+      "spaces": 78
+    },
+    {
+      "area_m2": null,
+      "gross_cents": null,
+      "pricing_state": "area_pending",
+      "segment_key": "p8",
+      "spaces": 1
+    },
+    {
+      "area_m2": 394.7,
+      "gross_cents": 11446300,
+      "pricing_state": "priced",
+      "segment_key": "p8",
+      "spaces": 6
+    }
+  ],
+  "verifiedAt": "2026-11-15T13:55:01.807233+00:00"
+}

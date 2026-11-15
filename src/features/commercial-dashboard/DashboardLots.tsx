@@ -17,6 +17,7 @@ import type {
   CommercialSegmentAggregate,
 } from "@/lib/commercial";
 import { count } from "./presentation";
+import { commercialPriceLabel, commercialUnitPrice } from "@/lib/commercial";
 
 const PAGE_SIZE = 25;
 const lotCodes = new Intl.Collator("pt-BR", { numeric: true, sensitivity: "base" });
@@ -119,8 +120,14 @@ function LotSheet({
                 )}
                 {financial && (
                   <>
-                    <Field label="Tarifa por m²">{brl(lot.tariffCents)}</Field>
-                    <Field label="Valor bruto de tabela">
+                    {lot.pricingBasis !== "fixed" && (
+                      <Field label="Tarifa por m²">{brl(lot.tariffCents)}</Field>
+                    )}
+                    <Field
+                      label={
+                        lot.pricingBasis === "fixed" ? "Preço por espaço" : "Valor bruto de tabela"
+                      }
+                    >
                       {brl(lot.grossCents)}
                       {lot.grossCents == null && pendingPrice[lot.pricingState] && (
                         <small className="cd-field-note">{pendingPrice[lot.pricingState]}</small>
@@ -129,9 +136,9 @@ function LotSheet({
                   </>
                 )}
               </dl>
-              {financial && lot.policySource && (
+              {financial && (lot.priceSource?.name || lot.policySource) && (
                 <p className="cd-field-note">
-                  {lot.policySource}
+                  {lot.priceSource?.name ?? lot.policySource}
                   {lot.policyVersion != null && ` · Versão ${lot.policyVersion}`}
                 </p>
               )}
@@ -250,9 +257,12 @@ export function DashboardLots({
     ...(financial
       ? [
           {
-            header: "Tarifa por m²",
+            header: "Preço de referência",
             cell: (lot: CommercialLot) => (
-              <span className="tnum whitespace-nowrap">{brl(lot.tariffCents)}</span>
+              <span className="tnum whitespace-nowrap">
+                {brl(commercialUnitPrice(lot))}
+                <small className="cd-field-note">{commercialPriceLabel(lot)}</small>
+              </span>
             ),
           },
           {

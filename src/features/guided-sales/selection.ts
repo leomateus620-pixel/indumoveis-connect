@@ -30,7 +30,7 @@ export function saleLotProblem(lot: CommercialLot): string | null {
     return `O lote ${lot.code} aguarda a classificação de esquina.`;
   if (
     !(lot.pricingState === "priced" && (lot.grossCents ?? 0) > 0) &&
-    !(lot.pricingState === "no_tariff" && ["p1", "automobile"].includes(lot.segmentKey))
+    !(lot.pricingState === "no_tariff" && lot.segmentKey === "automobile")
   )
     return `O lote ${lot.code} aguarda um valor de tabela.`;
   return null;

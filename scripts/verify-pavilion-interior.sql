@@ -12,7 +12,7 @@ do $$ declare ed uuid; p jsonb; denied boolean:=false; begin
   if jsonb_array_length(p->'environments')<>19 or p->>'editionId'<>ed::text or p->'source'->>'sha256'<>'088ab9d98e61ed98c98b45834c5813416d9fd09a10af195aeeae29bfc9a4c02a' then raise exception 'Map-only read failed'; end if;
   if p::text ~ 'active_deal_id|company_id|list_price_cents|exhibitor|commercial_status' then raise exception 'Commercial leak'; end if;
   insert into pavilion_verification values('map_only_geometry_read_without_commercial_data',true);
-  begin perform public.get_pavilion_interior_commercial(ed,(p->>'databasePlanId')::uuid,1); exception when insufficient_privilege then denied:=true; end;
+  begin perform public.get_pavilion_interior_commercial(ed,(p->>'databasePlanId')::uuid,(p->>'revision')::integer); exception when insufficient_privilege then denied:=true; end;
   if not denied then raise exception 'Commercial RPC must deny map-only user'; end if;
   insert into pavilion_verification values('commercial_rpc_denies_map_only_user',true);
   denied:=false;
@@ -26,10 +26,10 @@ set local request.jwt.claim.sub='00000000-0000-4000-8000-000000000102';
 do $$ declare ed uuid; p jsonb; commercial jsonb; begin
   select id into ed from public.editions where is_active;
   p:=public.get_pavilion_interior(ed,1,null);
-  commercial:=public.get_pavilion_interior_commercial(ed,(p->>'databasePlanId')::uuid,1);
-  if (select count(*) from jsonb_object_keys(commercial))<>14 or commercial ? '15' or commercial ? 'salon' then raise exception 'Commercial stock mismatch'; end if;
+  commercial:=public.get_pavilion_interior_commercial(ed,(p->>'databasePlanId')::uuid,(p->>'revision')::integer);
+  if (select count(*) from jsonb_object_keys(commercial))<>15 or not commercial ? '15' or commercial ? 'salon' then raise exception 'Commercial stock mismatch'; end if;
   if exists(select 1 from jsonb_each(commercial) where value->>'status'<>'disponivel') then raise exception 'Unexpected derived status'; end if;
-  insert into pavilion_verification values('commercial_user_reads_14_view_derived_statuses',true);
+  insert into pavilion_verification values('commercial_user_reads_15_view_derived_statuses',true);
 end $$;
 set local request.jwt.claim.sub='00000000-0000-4000-8000-000000000103';
 do $$ declare denied boolean:=false; begin

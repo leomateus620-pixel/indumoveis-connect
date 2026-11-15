@@ -78,7 +78,7 @@ envs=[
  env('12','Espaço 12','commercial',129.43,[272,188],rect(190.531,127.17,354.451,272.97)),
  env('13','Espaço 13','commercial',69.48,[231,378],rect(190.531,274.53,271.891,485.97)),
  env('14','Café','commercial',254.81,[102,328],[[39.691,124.05],[131.971,124.05],[131.971,275.49],[187.411,275.49],[187.411,409.89],[39.691,409.89]],'Café'),
- env('15','Banheiros','support',32.33,[160,162],rect(133.411,125.61,187.411,273.93),'Ambiente de apoio'),
+ env('15','Banheiros','commercial',32.33,[160,162],rect(133.411,125.61,187.411,273.93),'Banheiros'),
  env('salon','Salão de Design','hall',None,[808,399],[[602.971,307.41],[849.931,307.41]]+curve+[[1013.851,485.97],[602.971,485.97]],'Salão'),
  env('corredor-superior','Corredor de serviço','circulation',None,[767,143],rect(685.291,127.17,848.371,158.61)),
  env('corredor-inferior','Corredor de serviço','circulation',None,[479,471],rect(356.011,454.53,601.411,485.97)),
@@ -86,6 +86,6 @@ envs=[
 ]
 for code,x0,x1 in [('12',197.251,354.331),('09',355.891,436.651),('08',438.211,519.091),('05',520.651,601.411),('04',602.971,683.731)]:
  next(e for e in envs if e['code']==code)['parts'].append(part(code,rect(x0,78.45,x1,124.05),'external'))
-plan={'id':'indumoveis:pavilion:1:mostra-arq-design','revision':1,'pavilionNumber':1,'bounds':{'minX':28,'minY':66,'maxX':1080,'maxY':532},'source':{'revisionName':'mostra-arq-design-1-2026-11-08','document':'Mostra Arq&Design 1 (1).pdf','page':1,'sha256':hashlib.sha256(Path(source).read_bytes()).hexdigest(),'pageWidth':R(p.rect.width),'pageHeight':R(p.rect.height),'coordinateSystem':'PDF points; origin top-left; x right; y down; no metric conversion'},'environments':envs,'architecture':architecture}
+plan={'id':'indumoveis:pavilion:1:mostra-arq-design','revision':2,'pavilionNumber':1,'bounds':{'minX':28,'minY':66,'maxX':1080,'maxY':532},'source':{'revisionName':'mostra-arq-design-2-2026-11-15','document':'Mostra Arq&Design 1 (1).pdf','page':1,'sha256':hashlib.sha256(Path(source).read_bytes()).hexdigest(),'pageWidth':R(p.rect.width),'pageHeight':R(p.rect.height),'coordinateSystem':'PDF points; origin top-left; x right; y down; no metric conversion'},'environments':envs,'architecture':architecture}
 Path('src/features/pavilion-interior/plan.generated.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
 print(stats,'json bytes',Path('src/features/pavilion-interior/plan.generated.json').stat().st_size)

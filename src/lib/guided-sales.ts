@@ -1,4 +1,4 @@
-import type { CommercialSegmentKey } from "./commercial";
+import type { CommercialPriceSource, CommercialSegmentKey } from "./commercial";
 
 export type GuidedSaleOverrides = Record<string, { amountCents: number; reason: string }>;
 export type GuidedSalePayment = {
@@ -44,6 +44,8 @@ export type GuidedSaleQuote = {
     code: string;
     areaM2: number;
     tariffCents: number | null;
+    pricingBasis?: "fixed" | "per_m2";
+    priceSource?: CommercialPriceSource | null;
     grossCents: number | null;
     agreedCents: number | null;
     priceReason: string | null;
