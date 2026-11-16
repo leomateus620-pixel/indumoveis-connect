@@ -1,0 +1,5899 @@
+{
+  "id": "indumoveis:pavilion:3:comercio-construcao",
+  "revision": 1,
+  "pavilionNumber": 3,
+  "totalAreaM2": 1155,
+  "bounds": {
+    "minX": 24,
+    "minY": 78,
+    "maxX": 546,
+    "maxY": 784
+  },
+  "source": {
+    "revisionName": "pavilhao-3-rev06-2026-09-23",
+    "document": "Pav 3 - 06 - 23.09.2026 (1).pdf",
+    "page": 1,
+    "sha256": "b7afd7a651d95b666ed16d004a15a5bf225dd1d1809fb2d436e62e05ac8bcb12",
+    "pageWidth": 556.807,
+    "pageHeight": 814.041,
+    "coordinateSystem": "Native PDF points; shared edges reconciled; x right, y down; no metric conversion"
+  },
+  "environments": [
+    {
+      "id": "indumoveis:pavilion:3:environment:1",
+      "code": "1",
+      "name": "Lote 1",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        720.479
+      ],
+      "parts": [
+        {
+          "id": "1:interior",
+          "kind": "interior",
+          "path": "M64.808 713.299 L136.979 713.299 L136.979 727.658 L64.808 727.658 Z",
+          "polygon": [
+            [
+              64.808,
+              713.299
+            ],
+            [
+              136.979,
+              713.299
+            ],
+            [
+              136.979,
+              727.658
+            ],
+            [
+              64.808,
+              727.658
+            ],
+            [
+              64.808,
+              713.299
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:2",
+      "code": "2",
+      "name": "Lote 2",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        706.12
+      ],
+      "parts": [
+        {
+          "id": "2:interior",
+          "kind": "interior",
+          "path": "M64.808 698.94 L136.979 698.94 L136.979 713.299 L64.808 713.299 Z",
+          "polygon": [
+            [
+              64.808,
+              698.94
+            ],
+            [
+              136.979,
+              698.94
+            ],
+            [
+              136.979,
+              713.299
+            ],
+            [
+              64.808,
+              713.299
+            ],
+            [
+              64.808,
+              698.94
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:3",
+      "code": "3",
+      "name": "Lote 3",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        691.761
+      ],
+      "parts": [
+        {
+          "id": "3:interior",
+          "kind": "interior",
+          "path": "M64.808 684.581 L136.979 684.581 L136.979 698.94 L64.808 698.94 Z",
+          "polygon": [
+            [
+              64.808,
+              684.581
+            ],
+            [
+              136.979,
+              684.581
+            ],
+            [
+              136.979,
+              698.94
+            ],
+            [
+              64.808,
+              698.94
+            ],
+            [
+              64.808,
+              684.581
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:4",
+      "code": "4",
+      "name": "Lote 4",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        677.402
+      ],
+      "parts": [
+        {
+          "id": "4:interior",
+          "kind": "interior",
+          "path": "M64.808 670.222 L136.979 670.222 L136.979 684.581 L64.808 684.581 Z",
+          "polygon": [
+            [
+              64.808,
+              670.222
+            ],
+            [
+              136.979,
+              670.222
+            ],
+            [
+              136.979,
+              684.581
+            ],
+            [
+              64.808,
+              684.581
+            ],
+            [
+              64.808,
+              670.222
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:5",
+      "code": "5",
+      "name": "Lote 5",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        663.015
+      ],
+      "parts": [
+        {
+          "id": "5:interior",
+          "kind": "interior",
+          "path": "M64.808 655.807 L136.979 655.807 L136.979 670.222 L64.808 670.222 Z",
+          "polygon": [
+            [
+              64.808,
+              655.807
+            ],
+            [
+              136.979,
+              655.807
+            ],
+            [
+              136.979,
+              670.222
+            ],
+            [
+              64.808,
+              670.222
+            ],
+            [
+              64.808,
+              655.807
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:6",
+      "code": "6",
+      "name": "Lote 6",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        648.6
+      ],
+      "parts": [
+        {
+          "id": "6:interior",
+          "kind": "interior",
+          "path": "M64.808 641.392 L136.979 641.392 L136.979 655.807 L64.808 655.807 Z",
+          "polygon": [
+            [
+              64.808,
+              641.392
+            ],
+            [
+              136.979,
+              641.392
+            ],
+            [
+              136.979,
+              655.807
+            ],
+            [
+              64.808,
+              655.807
+            ],
+            [
+              64.808,
+              641.392
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:7",
+      "code": "7",
+      "name": "Lote 7",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        634.184
+      ],
+      "parts": [
+        {
+          "id": "7:interior",
+          "kind": "interior",
+          "path": "M64.808 626.977 L136.979 626.977 L136.979 641.392 L64.808 641.392 Z",
+          "polygon": [
+            [
+              64.808,
+              626.977
+            ],
+            [
+              136.979,
+              626.977
+            ],
+            [
+              136.979,
+              641.392
+            ],
+            [
+              64.808,
+              641.392
+            ],
+            [
+              64.808,
+              626.977
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:8",
+      "code": "8",
+      "name": "Lote 8",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        619.769
+      ],
+      "parts": [
+        {
+          "id": "8:interior",
+          "kind": "interior",
+          "path": "M64.808 612.561 L136.979 612.561 L136.979 626.977 L64.808 626.977 Z",
+          "polygon": [
+            [
+              64.808,
+              612.561
+            ],
+            [
+              136.979,
+              612.561
+            ],
+            [
+              136.979,
+              626.977
+            ],
+            [
+              64.808,
+              626.977
+            ],
+            [
+              64.808,
+              612.561
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:9",
+      "code": "9",
+      "name": "Lote 9",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        605.362
+      ],
+      "parts": [
+        {
+          "id": "9:interior",
+          "kind": "interior",
+          "path": "M64.808 598.162 L136.979 598.162 L136.979 612.561 L64.808 612.561 Z",
+          "polygon": [
+            [
+              64.808,
+              598.162
+            ],
+            [
+              136.979,
+              598.162
+            ],
+            [
+              136.979,
+              612.561
+            ],
+            [
+              64.808,
+              612.561
+            ],
+            [
+              64.808,
+              598.162
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:10",
+      "code": "10",
+      "name": "Lote 10",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        590.962
+      ],
+      "parts": [
+        {
+          "id": "10:interior",
+          "kind": "interior",
+          "path": "M64.808 583.763 L136.979 583.763 L136.979 598.162 L64.808 598.162 Z",
+          "polygon": [
+            [
+              64.808,
+              583.763
+            ],
+            [
+              136.979,
+              583.763
+            ],
+            [
+              136.979,
+              598.162
+            ],
+            [
+              64.808,
+              598.162
+            ],
+            [
+              64.808,
+              583.763
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:11",
+      "code": "11",
+      "name": "Lote 11",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        576.563
+      ],
+      "parts": [
+        {
+          "id": "11:interior",
+          "kind": "interior",
+          "path": "M64.808 569.363 L136.979 569.363 L136.979 583.763 L64.808 583.763 Z",
+          "polygon": [
+            [
+              64.808,
+              569.363
+            ],
+            [
+              136.979,
+              569.363
+            ],
+            [
+              136.979,
+              583.763
+            ],
+            [
+              64.808,
+              583.763
+            ],
+            [
+              64.808,
+              569.363
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:12",
+      "code": "12",
+      "name": "Lote 12",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        562.164
+      ],
+      "parts": [
+        {
+          "id": "12:interior",
+          "kind": "interior",
+          "path": "M64.808 554.964 L136.979 554.964 L136.979 569.363 L64.808 569.363 Z",
+          "polygon": [
+            [
+              64.808,
+              554.964
+            ],
+            [
+              136.979,
+              554.964
+            ],
+            [
+              136.979,
+              569.363
+            ],
+            [
+              64.808,
+              569.363
+            ],
+            [
+              64.808,
+              554.964
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:13",
+      "code": "13",
+      "name": "Lote 13",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        547.764
+      ],
+      "parts": [
+        {
+          "id": "13:interior",
+          "kind": "interior",
+          "path": "M64.808 540.565 L136.979 540.565 L136.979 554.964 L64.808 554.964 Z",
+          "polygon": [
+            [
+              64.808,
+              540.565
+            ],
+            [
+              136.979,
+              540.565
+            ],
+            [
+              136.979,
+              554.964
+            ],
+            [
+              64.808,
+              554.964
+            ],
+            [
+              64.808,
+              540.565
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:14",
+      "code": "14",
+      "name": "Lote 14",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        533.365
+      ],
+      "parts": [
+        {
+          "id": "14:interior",
+          "kind": "interior",
+          "path": "M64.808 526.165 L136.979 526.165 L136.979 540.565 L64.808 540.565 Z",
+          "polygon": [
+            [
+              64.808,
+              526.165
+            ],
+            [
+              136.979,
+              526.165
+            ],
+            [
+              136.979,
+              540.565
+            ],
+            [
+              64.808,
+              540.565
+            ],
+            [
+              64.808,
+              526.165
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:15",
+      "code": "15",
+      "name": "Lote 15",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        518.965
+      ],
+      "parts": [
+        {
+          "id": "15:interior",
+          "kind": "interior",
+          "path": "M64.808 511.766 L136.979 511.766 L136.979 526.165 L64.808 526.165 Z",
+          "polygon": [
+            [
+              64.808,
+              511.766
+            ],
+            [
+              136.979,
+              511.766
+            ],
+            [
+              136.979,
+              526.165
+            ],
+            [
+              64.808,
+              526.165
+            ],
+            [
+              64.808,
+              511.766
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:16",
+      "code": "16",
+      "name": "Lote 16",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        504.566
+      ],
+      "parts": [
+        {
+          "id": "16:interior",
+          "kind": "interior",
+          "path": "M64.808 497.366 L136.979 497.366 L136.979 511.766 L64.808 511.766 Z",
+          "polygon": [
+            [
+              64.808,
+              497.366
+            ],
+            [
+              136.979,
+              497.366
+            ],
+            [
+              136.979,
+              511.766
+            ],
+            [
+              64.808,
+              511.766
+            ],
+            [
+              64.808,
+              497.366
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:17",
+      "code": "17",
+      "name": "Lote 17",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        490.167
+      ],
+      "parts": [
+        {
+          "id": "17:interior",
+          "kind": "interior",
+          "path": "M64.808 482.967 L136.979 482.967 L136.979 497.366 L64.808 497.366 Z",
+          "polygon": [
+            [
+              64.808,
+              482.967
+            ],
+            [
+              136.979,
+              482.967
+            ],
+            [
+              136.979,
+              497.366
+            ],
+            [
+              64.808,
+              497.366
+            ],
+            [
+              64.808,
+              482.967
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:18",
+      "code": "18",
+      "name": "Lote 18",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        475.776
+      ],
+      "parts": [
+        {
+          "id": "18:interior",
+          "kind": "interior",
+          "path": "M64.808 468.584 L136.979 468.584 L136.979 482.967 L64.808 482.967 Z",
+          "polygon": [
+            [
+              64.808,
+              468.584
+            ],
+            [
+              136.979,
+              468.584
+            ],
+            [
+              136.979,
+              482.967
+            ],
+            [
+              64.808,
+              482.967
+            ],
+            [
+              64.808,
+              468.584
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:19",
+      "code": "19",
+      "name": "Lote 19",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        461.417
+      ],
+      "parts": [
+        {
+          "id": "19:interior",
+          "kind": "interior",
+          "path": "M64.808 454.25 L136.979 454.25 L136.979 468.584 L64.808 468.584 Z",
+          "polygon": [
+            [
+              64.808,
+              454.25
+            ],
+            [
+              136.979,
+              454.25
+            ],
+            [
+              136.979,
+              468.584
+            ],
+            [
+              64.808,
+              468.584
+            ],
+            [
+              64.808,
+              454.25
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:20",
+      "code": "20",
+      "name": "Lote 20",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        447.026
+      ],
+      "parts": [
+        {
+          "id": "20:interior",
+          "kind": "interior",
+          "path": "M64.808 439.801 L136.979 439.801 L136.979 454.25 L64.808 454.25 Z",
+          "polygon": [
+            [
+              64.808,
+              439.801
+            ],
+            [
+              136.979,
+              439.801
+            ],
+            [
+              136.979,
+              454.25
+            ],
+            [
+              64.808,
+              454.25
+            ],
+            [
+              64.808,
+              439.801
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:21",
+      "code": "21",
+      "name": "Lote 21",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        432.594
+      ],
+      "parts": [
+        {
+          "id": "21:interior",
+          "kind": "interior",
+          "path": "M64.808 425.386 L136.979 425.386 L136.979 439.801 L64.808 439.801 Z",
+          "polygon": [
+            [
+              64.808,
+              425.386
+            ],
+            [
+              136.979,
+              425.386
+            ],
+            [
+              136.979,
+              439.801
+            ],
+            [
+              64.808,
+              439.801
+            ],
+            [
+              64.808,
+              425.386
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:22",
+      "code": "22",
+      "name": "Lote 22",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        418.179
+      ],
+      "parts": [
+        {
+          "id": "22:interior",
+          "kind": "interior",
+          "path": "M64.808 410.972 L136.979 410.972 L136.979 425.386 L64.808 425.386 Z",
+          "polygon": [
+            [
+              64.808,
+              410.972
+            ],
+            [
+              136.979,
+              410.972
+            ],
+            [
+              136.979,
+              425.386
+            ],
+            [
+              64.808,
+              425.386
+            ],
+            [
+              64.808,
+              410.972
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:23",
+      "code": "23",
+      "name": "Lote 23",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        403.837
+      ],
+      "parts": [
+        {
+          "id": "23:interior",
+          "kind": "interior",
+          "path": "M64.808 396.702 L136.979 396.702 L136.979 410.972 L64.808 410.972 Z",
+          "polygon": [
+            [
+              64.808,
+              396.702
+            ],
+            [
+              136.979,
+              396.702
+            ],
+            [
+              136.979,
+              410.972
+            ],
+            [
+              64.808,
+              410.972
+            ],
+            [
+              64.808,
+              396.702
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:24",
+      "code": "24",
+      "name": "Lote 24",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        389.535
+      ],
+      "parts": [
+        {
+          "id": "24:interior",
+          "kind": "interior",
+          "path": "M64.808 382.367 L136.979 382.367 L136.979 396.702 L64.808 396.702 Z",
+          "polygon": [
+            [
+              64.808,
+              382.367
+            ],
+            [
+              136.979,
+              382.367
+            ],
+            [
+              136.979,
+              396.702
+            ],
+            [
+              64.808,
+              396.702
+            ],
+            [
+              64.808,
+              382.367
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:25",
+      "code": "25",
+      "name": "Lote 25",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        375.109
+      ],
+      "parts": [
+        {
+          "id": "25:interior",
+          "kind": "interior",
+          "path": "M64.808 367.851 L136.979 367.851 L136.979 382.367 L64.808 382.367 Z",
+          "polygon": [
+            [
+              64.808,
+              367.851
+            ],
+            [
+              136.979,
+              367.851
+            ],
+            [
+              136.979,
+              382.367
+            ],
+            [
+              64.808,
+              382.367
+            ],
+            [
+              64.808,
+              367.851
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:26",
+      "code": "26",
+      "name": "Lote 26",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        360.626
+      ],
+      "parts": [
+        {
+          "id": "26:interior",
+          "kind": "interior",
+          "path": "M64.808 353.401 L136.979 353.401 L136.979 367.851 L64.808 367.851 Z",
+          "polygon": [
+            [
+              64.808,
+              353.401
+            ],
+            [
+              136.979,
+              353.401
+            ],
+            [
+              136.979,
+              367.851
+            ],
+            [
+              64.808,
+              367.851
+            ],
+            [
+              64.808,
+              353.401
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:27",
+      "code": "27",
+      "name": "Lote 27",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        346.193
+      ],
+      "parts": [
+        {
+          "id": "27:interior",
+          "kind": "interior",
+          "path": "M64.808 338.985 L136.979 338.985 L136.979 353.401 L64.808 353.401 Z",
+          "polygon": [
+            [
+              64.808,
+              338.985
+            ],
+            [
+              136.979,
+              338.985
+            ],
+            [
+              136.979,
+              353.401
+            ],
+            [
+              64.808,
+              353.401
+            ],
+            [
+              64.808,
+              338.985
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:28",
+      "code": "28",
+      "name": "Lote 28",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        331.778
+      ],
+      "parts": [
+        {
+          "id": "28:interior",
+          "kind": "interior",
+          "path": "M64.808 324.57 L136.979 324.57 L136.979 338.985 L64.808 338.985 Z",
+          "polygon": [
+            [
+              64.808,
+              324.57
+            ],
+            [
+              136.979,
+              324.57
+            ],
+            [
+              136.979,
+              338.985
+            ],
+            [
+              64.808,
+              338.985
+            ],
+            [
+              64.808,
+              324.57
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:29",
+      "code": "29",
+      "name": "Lote 29",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        317.435
+      ],
+      "parts": [
+        {
+          "id": "29:interior",
+          "kind": "interior",
+          "path": "M64.808 310.3 L136.979 310.3 L136.979 324.57 L64.808 324.57 Z",
+          "polygon": [
+            [
+              64.808,
+              310.3
+            ],
+            [
+              136.979,
+              310.3
+            ],
+            [
+              136.979,
+              324.57
+            ],
+            [
+              64.808,
+              324.57
+            ],
+            [
+              64.808,
+              310.3
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:30",
+      "code": "30",
+      "name": "Lote 30",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        303.111
+      ],
+      "parts": [
+        {
+          "id": "30:interior",
+          "kind": "interior",
+          "path": "M64.808 295.922 L136.979 295.922 L136.979 310.3 L64.808 310.3 Z",
+          "polygon": [
+            [
+              64.808,
+              295.922
+            ],
+            [
+              136.979,
+              295.922
+            ],
+            [
+              136.979,
+              310.3
+            ],
+            [
+              64.808,
+              310.3
+            ],
+            [
+              64.808,
+              295.922
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:31",
+      "code": "31",
+      "name": "Lote 31",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        288.675
+      ],
+      "parts": [
+        {
+          "id": "31:interior",
+          "kind": "interior",
+          "path": "M64.808 281.428 L136.979 281.428 L136.979 295.922 L64.808 295.922 Z",
+          "polygon": [
+            [
+              64.808,
+              281.428
+            ],
+            [
+              136.979,
+              281.428
+            ],
+            [
+              136.979,
+              295.922
+            ],
+            [
+              64.808,
+              295.922
+            ],
+            [
+              64.808,
+              281.428
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:32",
+      "code": "32",
+      "name": "Lote 32",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        274.106
+      ],
+      "parts": [
+        {
+          "id": "32:interior",
+          "kind": "interior",
+          "path": "M64.808 266.783 L136.979 266.783 L136.979 281.428 L64.808 281.428 Z",
+          "polygon": [
+            [
+              64.808,
+              266.783
+            ],
+            [
+              136.979,
+              266.783
+            ],
+            [
+              136.979,
+              281.428
+            ],
+            [
+              64.808,
+              281.428
+            ],
+            [
+              64.808,
+              266.783
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:33",
+      "code": "33",
+      "name": "Lote 33",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        259.518
+      ],
+      "parts": [
+        {
+          "id": "33:interior",
+          "kind": "interior",
+          "path": "M64.808 252.252 L136.979 252.252 L136.979 266.783 L64.808 266.783 Z",
+          "polygon": [
+            [
+              64.808,
+              252.252
+            ],
+            [
+              136.979,
+              252.252
+            ],
+            [
+              136.979,
+              266.783
+            ],
+            [
+              64.808,
+              266.783
+            ],
+            [
+              64.808,
+              252.252
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:34",
+      "code": "34",
+      "name": "Lote 34",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        245.085
+      ],
+      "parts": [
+        {
+          "id": "34:interior",
+          "kind": "interior",
+          "path": "M64.808 237.918 L136.979 237.918 L136.979 252.252 L64.808 252.252 Z",
+          "polygon": [
+            [
+              64.808,
+              237.918
+            ],
+            [
+              136.979,
+              237.918
+            ],
+            [
+              136.979,
+              252.252
+            ],
+            [
+              64.808,
+              252.252
+            ],
+            [
+              64.808,
+              237.918
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:35",
+      "code": "35",
+      "name": "Lote 35",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        230.694
+      ],
+      "parts": [
+        {
+          "id": "35:interior",
+          "kind": "interior",
+          "path": "M64.808 223.47 L136.979 223.47 L136.979 237.918 L64.808 237.918 Z",
+          "polygon": [
+            [
+              64.808,
+              223.47
+            ],
+            [
+              136.979,
+              223.47
+            ],
+            [
+              136.979,
+              237.918
+            ],
+            [
+              64.808,
+              237.918
+            ],
+            [
+              64.808,
+              223.47
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:36",
+      "code": "36",
+      "name": "Lote 36",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        216.222
+      ],
+      "parts": [
+        {
+          "id": "36:interior",
+          "kind": "interior",
+          "path": "M64.808 208.973 L136.979 208.973 L136.979 223.47 L64.808 223.47 Z",
+          "polygon": [
+            [
+              64.808,
+              208.973
+            ],
+            [
+              136.979,
+              208.973
+            ],
+            [
+              136.979,
+              223.47
+            ],
+            [
+              64.808,
+              223.47
+            ],
+            [
+              64.808,
+              208.973
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:37",
+      "code": "37",
+      "name": "Lote 37",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        201.782
+      ],
+      "parts": [
+        {
+          "id": "37:interior",
+          "kind": "interior",
+          "path": "M64.808 194.59 L136.979 194.59 L136.979 208.973 L64.808 208.973 Z",
+          "polygon": [
+            [
+              64.808,
+              194.59
+            ],
+            [
+              136.979,
+              194.59
+            ],
+            [
+              136.979,
+              208.973
+            ],
+            [
+              64.808,
+              208.973
+            ],
+            [
+              64.808,
+              194.59
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:38",
+      "code": "38",
+      "name": "Lote 38",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral oeste",
+      "label": [
+        100.893,
+        187.456
+      ],
+      "parts": [
+        {
+          "id": "38:interior",
+          "kind": "interior",
+          "path": "M64.808 180.322 L136.979 180.322 L136.979 194.59 L64.808 194.59 Z",
+          "polygon": [
+            [
+              64.808,
+              180.322
+            ],
+            [
+              136.979,
+              180.322
+            ],
+            [
+              136.979,
+              194.59
+            ],
+            [
+              64.808,
+              194.59
+            ],
+            [
+              64.808,
+              180.322
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:39",
+      "code": "39",
+      "name": "Lote 39",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        195.665
+      ],
+      "parts": [
+        {
+          "id": "39:interior",
+          "kind": "interior",
+          "path": "M218.009 188.487 L290.181 188.487 L290.181 202.842 L218.009 202.842 Z",
+          "polygon": [
+            [
+              218.009,
+              188.487
+            ],
+            [
+              290.181,
+              188.487
+            ],
+            [
+              290.181,
+              202.842
+            ],
+            [
+              218.009,
+              202.842
+            ],
+            [
+              218.009,
+              188.487
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:40",
+      "code": "40",
+      "name": "Lote 40",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        210.019
+      ],
+      "parts": [
+        {
+          "id": "40:interior",
+          "kind": "interior",
+          "path": "M218.009 202.842 L290.181 202.842 L290.181 217.197 L218.009 217.197 Z",
+          "polygon": [
+            [
+              218.009,
+              202.842
+            ],
+            [
+              290.181,
+              202.842
+            ],
+            [
+              290.181,
+              217.197
+            ],
+            [
+              218.009,
+              217.197
+            ],
+            [
+              218.009,
+              202.842
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:41",
+      "code": "41",
+      "name": "Lote 41",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        224.374
+      ],
+      "parts": [
+        {
+          "id": "41:interior",
+          "kind": "interior",
+          "path": "M218.009 217.197 L290.181 217.197 L290.181 231.551 L218.009 231.551 Z",
+          "polygon": [
+            [
+              218.009,
+              217.197
+            ],
+            [
+              290.181,
+              217.197
+            ],
+            [
+              290.181,
+              231.551
+            ],
+            [
+              218.009,
+              231.551
+            ],
+            [
+              218.009,
+              217.197
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:42",
+      "code": "42",
+      "name": "Lote 42",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        238.753
+      ],
+      "parts": [
+        {
+          "id": "42:interior",
+          "kind": "interior",
+          "path": "M218.009 231.551 L290.181 231.551 L290.181 245.955 L218.009 245.955 Z",
+          "polygon": [
+            [
+              218.009,
+              231.551
+            ],
+            [
+              290.181,
+              231.551
+            ],
+            [
+              290.181,
+              245.955
+            ],
+            [
+              218.009,
+              245.955
+            ],
+            [
+              218.009,
+              231.551
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:43",
+      "code": "43",
+      "name": "Lote 43",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        253.157
+      ],
+      "parts": [
+        {
+          "id": "43:interior",
+          "kind": "interior",
+          "path": "M218.009 245.955 L290.181 245.955 L290.181 260.359 L218.009 260.359 Z",
+          "polygon": [
+            [
+              218.009,
+              245.955
+            ],
+            [
+              290.181,
+              245.955
+            ],
+            [
+              290.181,
+              260.359
+            ],
+            [
+              218.009,
+              260.359
+            ],
+            [
+              218.009,
+              245.955
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:44",
+      "code": "44",
+      "name": "Lote 44",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        267.561
+      ],
+      "parts": [
+        {
+          "id": "44:interior",
+          "kind": "interior",
+          "path": "M218.009 260.359 L290.181 260.359 L290.181 274.764 L218.009 274.764 Z",
+          "polygon": [
+            [
+              218.009,
+              260.359
+            ],
+            [
+              290.181,
+              260.359
+            ],
+            [
+              290.181,
+              274.764
+            ],
+            [
+              218.009,
+              274.764
+            ],
+            [
+              218.009,
+              260.359
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:45",
+      "code": "45",
+      "name": "Lote 45",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        281.966
+      ],
+      "parts": [
+        {
+          "id": "45:interior",
+          "kind": "interior",
+          "path": "M218.009 274.764 L290.181 274.764 L290.181 289.168 L218.009 289.168 Z",
+          "polygon": [
+            [
+              218.009,
+              274.764
+            ],
+            [
+              290.181,
+              274.764
+            ],
+            [
+              290.181,
+              289.168
+            ],
+            [
+              218.009,
+              289.168
+            ],
+            [
+              218.009,
+              274.764
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:46",
+      "code": "46",
+      "name": "Lote 46",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        296.37
+      ],
+      "parts": [
+        {
+          "id": "46:interior",
+          "kind": "interior",
+          "path": "M218.009 289.168 L290.181 289.168 L290.181 303.572 L218.009 303.572 Z",
+          "polygon": [
+            [
+              218.009,
+              289.168
+            ],
+            [
+              290.181,
+              289.168
+            ],
+            [
+              290.181,
+              303.572
+            ],
+            [
+              218.009,
+              303.572
+            ],
+            [
+              218.009,
+              289.168
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:47",
+      "code": "47",
+      "name": "Lote 47",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        310.774
+      ],
+      "parts": [
+        {
+          "id": "47:interior",
+          "kind": "interior",
+          "path": "M218.009 303.572 L290.181 303.572 L290.181 317.976 L218.009 317.976 Z",
+          "polygon": [
+            [
+              218.009,
+              303.572
+            ],
+            [
+              290.181,
+              303.572
+            ],
+            [
+              290.181,
+              317.976
+            ],
+            [
+              218.009,
+              317.976
+            ],
+            [
+              218.009,
+              303.572
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:48",
+      "code": "48",
+      "name": "Lote 48",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        325.178
+      ],
+      "parts": [
+        {
+          "id": "48:interior",
+          "kind": "interior",
+          "path": "M218.009 317.976 L290.181 317.976 L290.181 332.38 L218.009 332.38 Z",
+          "polygon": [
+            [
+              218.009,
+              317.976
+            ],
+            [
+              290.181,
+              317.976
+            ],
+            [
+              290.181,
+              332.38
+            ],
+            [
+              218.009,
+              332.38
+            ],
+            [
+              218.009,
+              317.976
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:49",
+      "code": "49",
+      "name": "Lote 49",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        339.582
+      ],
+      "parts": [
+        {
+          "id": "49:interior",
+          "kind": "interior",
+          "path": "M218.009 332.38 L290.181 332.38 L290.181 346.784 L218.009 346.784 Z",
+          "polygon": [
+            [
+              218.009,
+              332.38
+            ],
+            [
+              290.181,
+              332.38
+            ],
+            [
+              290.181,
+              346.784
+            ],
+            [
+              218.009,
+              346.784
+            ],
+            [
+              218.009,
+              332.38
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:50",
+      "code": "50",
+      "name": "Lote 50",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        353.986
+      ],
+      "parts": [
+        {
+          "id": "50:interior",
+          "kind": "interior",
+          "path": "M218.009 346.784 L290.181 346.784 L290.181 361.188 L218.009 361.188 Z",
+          "polygon": [
+            [
+              218.009,
+              346.784
+            ],
+            [
+              290.181,
+              346.784
+            ],
+            [
+              290.181,
+              361.188
+            ],
+            [
+              218.009,
+              361.188
+            ],
+            [
+              218.009,
+              346.784
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:51",
+      "code": "51",
+      "name": "Lote 51",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        368.39
+      ],
+      "parts": [
+        {
+          "id": "51:interior",
+          "kind": "interior",
+          "path": "M218.009 361.188 L290.181 361.188 L290.181 375.592 L218.009 375.592 Z",
+          "polygon": [
+            [
+              218.009,
+              361.188
+            ],
+            [
+              290.181,
+              361.188
+            ],
+            [
+              290.181,
+              375.592
+            ],
+            [
+              218.009,
+              375.592
+            ],
+            [
+              218.009,
+              361.188
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:52",
+      "code": "52",
+      "name": "Lote 52",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        382.794
+      ],
+      "parts": [
+        {
+          "id": "52:interior",
+          "kind": "interior",
+          "path": "M218.009 375.592 L290.181 375.592 L290.181 389.996 L218.009 389.996 Z",
+          "polygon": [
+            [
+              218.009,
+              375.592
+            ],
+            [
+              290.181,
+              375.592
+            ],
+            [
+              290.181,
+              389.996
+            ],
+            [
+              218.009,
+              389.996
+            ],
+            [
+              218.009,
+              375.592
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:53",
+      "code": "53",
+      "name": "Lote 53",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        397.198
+      ],
+      "parts": [
+        {
+          "id": "53:interior",
+          "kind": "interior",
+          "path": "M218.009 389.996 L290.181 389.996 L290.181 404.4 L218.009 404.4 Z",
+          "polygon": [
+            [
+              218.009,
+              389.996
+            ],
+            [
+              290.181,
+              389.996
+            ],
+            [
+              290.181,
+              404.4
+            ],
+            [
+              218.009,
+              404.4
+            ],
+            [
+              218.009,
+              389.996
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:54",
+      "code": "54",
+      "name": "Lote 54",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        411.602
+      ],
+      "parts": [
+        {
+          "id": "54:interior",
+          "kind": "interior",
+          "path": "M218.009 404.4 L290.181 404.4 L290.181 418.804 L218.009 418.804 Z",
+          "polygon": [
+            [
+              218.009,
+              404.4
+            ],
+            [
+              290.181,
+              404.4
+            ],
+            [
+              290.181,
+              418.804
+            ],
+            [
+              218.009,
+              418.804
+            ],
+            [
+              218.009,
+              404.4
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:55",
+      "code": "55",
+      "name": "Lote 55",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        426.006
+      ],
+      "parts": [
+        {
+          "id": "55:interior",
+          "kind": "interior",
+          "path": "M218.009 418.804 L290.181 418.804 L290.181 433.209 L218.009 433.209 Z",
+          "polygon": [
+            [
+              218.009,
+              418.804
+            ],
+            [
+              290.181,
+              418.804
+            ],
+            [
+              290.181,
+              433.209
+            ],
+            [
+              218.009,
+              433.209
+            ],
+            [
+              218.009,
+              418.804
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:56",
+      "code": "56",
+      "name": "Lote 56",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        440.411
+      ],
+      "parts": [
+        {
+          "id": "56:interior",
+          "kind": "interior",
+          "path": "M218.009 433.209 L290.181 433.209 L290.181 447.613 L218.009 447.613 Z",
+          "polygon": [
+            [
+              218.009,
+              433.209
+            ],
+            [
+              290.181,
+              433.209
+            ],
+            [
+              290.181,
+              447.613
+            ],
+            [
+              218.009,
+              447.613
+            ],
+            [
+              218.009,
+              433.209
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:57",
+      "code": "57",
+      "name": "Lote 57",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        454.815
+      ],
+      "parts": [
+        {
+          "id": "57:interior",
+          "kind": "interior",
+          "path": "M218.009 447.613 L290.181 447.613 L290.181 462.017 L218.009 462.017 Z",
+          "polygon": [
+            [
+              218.009,
+              447.613
+            ],
+            [
+              290.181,
+              447.613
+            ],
+            [
+              290.181,
+              462.017
+            ],
+            [
+              218.009,
+              462.017
+            ],
+            [
+              218.009,
+              447.613
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:58",
+      "code": "58",
+      "name": "Lote 58",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        469.219
+      ],
+      "parts": [
+        {
+          "id": "58:interior",
+          "kind": "interior",
+          "path": "M218.009 462.017 L290.181 462.017 L290.181 476.421 L218.009 476.421 Z",
+          "polygon": [
+            [
+              218.009,
+              462.017
+            ],
+            [
+              290.181,
+              462.017
+            ],
+            [
+              290.181,
+              476.421
+            ],
+            [
+              218.009,
+              476.421
+            ],
+            [
+              218.009,
+              462.017
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:59",
+      "code": "59",
+      "name": "Lote 59",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        483.623
+      ],
+      "parts": [
+        {
+          "id": "59:interior",
+          "kind": "interior",
+          "path": "M218.009 476.421 L290.181 476.421 L290.181 490.825 L218.009 490.825 Z",
+          "polygon": [
+            [
+              218.009,
+              476.421
+            ],
+            [
+              290.181,
+              476.421
+            ],
+            [
+              290.181,
+              490.825
+            ],
+            [
+              218.009,
+              490.825
+            ],
+            [
+              218.009,
+              476.421
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:60",
+      "code": "60",
+      "name": "Lote 60",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        498.027
+      ],
+      "parts": [
+        {
+          "id": "60:interior",
+          "kind": "interior",
+          "path": "M218.009 490.825 L290.181 490.825 L290.181 505.229 L218.009 505.229 Z",
+          "polygon": [
+            [
+              218.009,
+              490.825
+            ],
+            [
+              290.181,
+              490.825
+            ],
+            [
+              290.181,
+              505.229
+            ],
+            [
+              218.009,
+              505.229
+            ],
+            [
+              218.009,
+              490.825
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:61",
+      "code": "61",
+      "name": "Lote 61",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        512.431
+      ],
+      "parts": [
+        {
+          "id": "61:interior",
+          "kind": "interior",
+          "path": "M218.009 505.229 L290.181 505.229 L290.181 519.633 L218.009 519.633 Z",
+          "polygon": [
+            [
+              218.009,
+              505.229
+            ],
+            [
+              290.181,
+              505.229
+            ],
+            [
+              290.181,
+              519.633
+            ],
+            [
+              218.009,
+              519.633
+            ],
+            [
+              218.009,
+              505.229
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:62",
+      "code": "62",
+      "name": "Lote 62",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        526.792
+      ],
+      "parts": [
+        {
+          "id": "62:interior",
+          "kind": "interior",
+          "path": "M218.009 519.633 L290.181 519.633 L290.181 533.951 L218.009 533.951 Z",
+          "polygon": [
+            [
+              218.009,
+              519.633
+            ],
+            [
+              290.181,
+              519.633
+            ],
+            [
+              290.181,
+              533.951
+            ],
+            [
+              218.009,
+              533.951
+            ],
+            [
+              218.009,
+              519.633
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:63",
+      "code": "63",
+      "name": "Lote 63",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        541.11
+      ],
+      "parts": [
+        {
+          "id": "63:interior",
+          "kind": "interior",
+          "path": "M218.009 533.951 L290.181 533.951 L290.181 548.269 L218.009 548.269 Z",
+          "polygon": [
+            [
+              218.009,
+              533.951
+            ],
+            [
+              290.181,
+              533.951
+            ],
+            [
+              290.181,
+              548.269
+            ],
+            [
+              218.009,
+              548.269
+            ],
+            [
+              218.009,
+              533.951
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:64",
+      "code": "64",
+      "name": "Lote 64",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        555.428
+      ],
+      "parts": [
+        {
+          "id": "64:interior",
+          "kind": "interior",
+          "path": "M218.009 548.269 L290.181 548.269 L290.181 562.587 L218.009 562.587 Z",
+          "polygon": [
+            [
+              218.009,
+              548.269
+            ],
+            [
+              290.181,
+              548.269
+            ],
+            [
+              290.181,
+              562.587
+            ],
+            [
+              218.009,
+              562.587
+            ],
+            [
+              218.009,
+              548.269
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:65",
+      "code": "65",
+      "name": "Lote 65",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        569.746
+      ],
+      "parts": [
+        {
+          "id": "65:interior",
+          "kind": "interior",
+          "path": "M218.009 562.587 L290.181 562.587 L290.181 576.905 L218.009 576.905 Z",
+          "polygon": [
+            [
+              218.009,
+              562.587
+            ],
+            [
+              290.181,
+              562.587
+            ],
+            [
+              290.181,
+              576.905
+            ],
+            [
+              218.009,
+              576.905
+            ],
+            [
+              218.009,
+              562.587
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:66",
+      "code": "66",
+      "name": "Lote 66",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        584.064
+      ],
+      "parts": [
+        {
+          "id": "66:interior",
+          "kind": "interior",
+          "path": "M218.009 576.905 L290.181 576.905 L290.181 591.223 L218.009 591.223 Z",
+          "polygon": [
+            [
+              218.009,
+              576.905
+            ],
+            [
+              290.181,
+              576.905
+            ],
+            [
+              290.181,
+              591.223
+            ],
+            [
+              218.009,
+              591.223
+            ],
+            [
+              218.009,
+              576.905
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:67",
+      "code": "67",
+      "name": "Lote 67",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        598.427
+      ],
+      "parts": [
+        {
+          "id": "67:interior",
+          "kind": "interior",
+          "path": "M218.009 591.223 L290.181 591.223 L290.181 605.631 L218.009 605.631 Z",
+          "polygon": [
+            [
+              218.009,
+              591.223
+            ],
+            [
+              290.181,
+              591.223
+            ],
+            [
+              290.181,
+              605.631
+            ],
+            [
+              218.009,
+              605.631
+            ],
+            [
+              218.009,
+              591.223
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:68",
+      "code": "68",
+      "name": "Lote 68",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        612.836
+      ],
+      "parts": [
+        {
+          "id": "68:interior",
+          "kind": "interior",
+          "path": "M218.009 605.631 L290.181 605.631 L290.181 620.04 L218.009 620.04 Z",
+          "polygon": [
+            [
+              218.009,
+              605.631
+            ],
+            [
+              290.181,
+              605.631
+            ],
+            [
+              290.181,
+              620.04
+            ],
+            [
+              218.009,
+              620.04
+            ],
+            [
+              218.009,
+              605.631
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:69",
+      "code": "69",
+      "name": "Lote 69",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        627.245
+      ],
+      "parts": [
+        {
+          "id": "69:interior",
+          "kind": "interior",
+          "path": "M218.009 620.04 L290.181 620.04 L290.181 634.449 L218.009 634.449 Z",
+          "polygon": [
+            [
+              218.009,
+              620.04
+            ],
+            [
+              290.181,
+              620.04
+            ],
+            [
+              290.181,
+              634.449
+            ],
+            [
+              218.009,
+              634.449
+            ],
+            [
+              218.009,
+              620.04
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:70",
+      "code": "70",
+      "name": "Lote 70",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        641.653
+      ],
+      "parts": [
+        {
+          "id": "70:interior",
+          "kind": "interior",
+          "path": "M218.009 634.449 L290.181 634.449 L290.181 648.858 L218.009 648.858 Z",
+          "polygon": [
+            [
+              218.009,
+              634.449
+            ],
+            [
+              290.181,
+              634.449
+            ],
+            [
+              290.181,
+              648.858
+            ],
+            [
+              218.009,
+              648.858
+            ],
+            [
+              218.009,
+              634.449
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:71",
+      "code": "71",
+      "name": "Lote 71",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · oeste",
+      "label": [
+        254.095,
+        656.062
+      ],
+      "parts": [
+        {
+          "id": "71:interior",
+          "kind": "interior",
+          "path": "M218.009 648.858 L290.181 648.858 L290.181 663.266 L218.009 663.266 Z",
+          "polygon": [
+            [
+              218.009,
+              648.858
+            ],
+            [
+              290.181,
+              648.858
+            ],
+            [
+              290.181,
+              663.266
+            ],
+            [
+              218.009,
+              663.266
+            ],
+            [
+              218.009,
+              648.858
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:72",
+      "code": "72",
+      "name": "Lote 72",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        656.062
+      ],
+      "parts": [
+        {
+          "id": "72:interior",
+          "kind": "interior",
+          "path": "M290.181 648.858 L362.352 648.858 L362.352 663.266 L290.181 663.266 Z",
+          "polygon": [
+            [
+              290.181,
+              648.858
+            ],
+            [
+              362.352,
+              648.858
+            ],
+            [
+              362.352,
+              663.266
+            ],
+            [
+              290.181,
+              663.266
+            ],
+            [
+              290.181,
+              648.858
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:73",
+      "code": "73",
+      "name": "Lote 73",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        641.653
+      ],
+      "parts": [
+        {
+          "id": "73:interior",
+          "kind": "interior",
+          "path": "M290.181 634.449 L362.352 634.449 L362.352 648.858 L290.181 648.858 Z",
+          "polygon": [
+            [
+              290.181,
+              634.449
+            ],
+            [
+              362.352,
+              634.449
+            ],
+            [
+              362.352,
+              648.858
+            ],
+            [
+              290.181,
+              648.858
+            ],
+            [
+              290.181,
+              634.449
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:74",
+      "code": "74",
+      "name": "Lote 74",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        627.245
+      ],
+      "parts": [
+        {
+          "id": "74:interior",
+          "kind": "interior",
+          "path": "M290.181 620.04 L362.352 620.04 L362.352 634.449 L290.181 634.449 Z",
+          "polygon": [
+            [
+              290.181,
+              620.04
+            ],
+            [
+              362.352,
+              620.04
+            ],
+            [
+              362.352,
+              634.449
+            ],
+            [
+              290.181,
+              634.449
+            ],
+            [
+              290.181,
+              620.04
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:75",
+      "code": "75",
+      "name": "Lote 75",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        612.836
+      ],
+      "parts": [
+        {
+          "id": "75:interior",
+          "kind": "interior",
+          "path": "M290.181 605.631 L362.352 605.631 L362.352 620.04 L290.181 620.04 Z",
+          "polygon": [
+            [
+              290.181,
+              605.631
+            ],
+            [
+              362.352,
+              605.631
+            ],
+            [
+              362.352,
+              620.04
+            ],
+            [
+              290.181,
+              620.04
+            ],
+            [
+              290.181,
+              605.631
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:76",
+      "code": "76",
+      "name": "Lote 76",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        598.427
+      ],
+      "parts": [
+        {
+          "id": "76:interior",
+          "kind": "interior",
+          "path": "M290.181 591.223 L362.352 591.223 L362.352 605.631 L290.181 605.631 Z",
+          "polygon": [
+            [
+              290.181,
+              591.223
+            ],
+            [
+              362.352,
+              591.223
+            ],
+            [
+              362.352,
+              605.631
+            ],
+            [
+              290.181,
+              605.631
+            ],
+            [
+              290.181,
+              591.223
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:77",
+      "code": "77",
+      "name": "Lote 77",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        584.064
+      ],
+      "parts": [
+        {
+          "id": "77:interior",
+          "kind": "interior",
+          "path": "M290.181 576.905 L362.352 576.905 L362.352 591.223 L290.181 591.223 Z",
+          "polygon": [
+            [
+              290.181,
+              576.905
+            ],
+            [
+              362.352,
+              576.905
+            ],
+            [
+              362.352,
+              591.223
+            ],
+            [
+              290.181,
+              591.223
+            ],
+            [
+              290.181,
+              576.905
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:78",
+      "code": "78",
+      "name": "Lote 78",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        569.746
+      ],
+      "parts": [
+        {
+          "id": "78:interior",
+          "kind": "interior",
+          "path": "M290.181 562.587 L362.352 562.587 L362.352 576.905 L290.181 576.905 Z",
+          "polygon": [
+            [
+              290.181,
+              562.587
+            ],
+            [
+              362.352,
+              562.587
+            ],
+            [
+              362.352,
+              576.905
+            ],
+            [
+              290.181,
+              576.905
+            ],
+            [
+              290.181,
+              562.587
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:79",
+      "code": "79",
+      "name": "Lote 79",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        555.428
+      ],
+      "parts": [
+        {
+          "id": "79:interior",
+          "kind": "interior",
+          "path": "M290.181 548.269 L362.352 548.269 L362.352 562.587 L290.181 562.587 Z",
+          "polygon": [
+            [
+              290.181,
+              548.269
+            ],
+            [
+              362.352,
+              548.269
+            ],
+            [
+              362.352,
+              562.587
+            ],
+            [
+              290.181,
+              562.587
+            ],
+            [
+              290.181,
+              548.269
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:80",
+      "code": "80",
+      "name": "Lote 80",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        541.11
+      ],
+      "parts": [
+        {
+          "id": "80:interior",
+          "kind": "interior",
+          "path": "M290.181 533.951 L362.352 533.951 L362.352 548.269 L290.181 548.269 Z",
+          "polygon": [
+            [
+              290.181,
+              533.951
+            ],
+            [
+              362.352,
+              533.951
+            ],
+            [
+              362.352,
+              548.269
+            ],
+            [
+              290.181,
+              548.269
+            ],
+            [
+              290.181,
+              533.951
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:81",
+      "code": "81",
+      "name": "Lote 81",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        526.792
+      ],
+      "parts": [
+        {
+          "id": "81:interior",
+          "kind": "interior",
+          "path": "M290.181 519.633 L362.352 519.633 L362.352 533.951 L290.181 533.951 Z",
+          "polygon": [
+            [
+              290.181,
+              519.633
+            ],
+            [
+              362.352,
+              519.633
+            ],
+            [
+              362.352,
+              533.951
+            ],
+            [
+              290.181,
+              533.951
+            ],
+            [
+              290.181,
+              519.633
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:82",
+      "code": "82",
+      "name": "Lote 82",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        512.431
+      ],
+      "parts": [
+        {
+          "id": "82:interior",
+          "kind": "interior",
+          "path": "M290.181 505.229 L362.352 505.229 L362.352 519.633 L290.181 519.633 Z",
+          "polygon": [
+            [
+              290.181,
+              505.229
+            ],
+            [
+              362.352,
+              505.229
+            ],
+            [
+              362.352,
+              519.633
+            ],
+            [
+              290.181,
+              519.633
+            ],
+            [
+              290.181,
+              505.229
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:83",
+      "code": "83",
+      "name": "Lote 83",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        498.027
+      ],
+      "parts": [
+        {
+          "id": "83:interior",
+          "kind": "interior",
+          "path": "M290.181 490.825 L362.352 490.825 L362.352 505.229 L290.181 505.229 Z",
+          "polygon": [
+            [
+              290.181,
+              490.825
+            ],
+            [
+              362.352,
+              490.825
+            ],
+            [
+              362.352,
+              505.229
+            ],
+            [
+              290.181,
+              505.229
+            ],
+            [
+              290.181,
+              490.825
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:84",
+      "code": "84",
+      "name": "Lote 84",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        483.623
+      ],
+      "parts": [
+        {
+          "id": "84:interior",
+          "kind": "interior",
+          "path": "M290.181 476.421 L362.352 476.421 L362.352 490.825 L290.181 490.825 Z",
+          "polygon": [
+            [
+              290.181,
+              476.421
+            ],
+            [
+              362.352,
+              476.421
+            ],
+            [
+              362.352,
+              490.825
+            ],
+            [
+              290.181,
+              490.825
+            ],
+            [
+              290.181,
+              476.421
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:85",
+      "code": "85",
+      "name": "Lote 85",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        469.219
+      ],
+      "parts": [
+        {
+          "id": "85:interior",
+          "kind": "interior",
+          "path": "M290.181 462.017 L362.352 462.017 L362.352 476.421 L290.181 476.421 Z",
+          "polygon": [
+            [
+              290.181,
+              462.017
+            ],
+            [
+              362.352,
+              462.017
+            ],
+            [
+              362.352,
+              476.421
+            ],
+            [
+              290.181,
+              476.421
+            ],
+            [
+              290.181,
+              462.017
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:86",
+      "code": "86",
+      "name": "Lote 86",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        454.815
+      ],
+      "parts": [
+        {
+          "id": "86:interior",
+          "kind": "interior",
+          "path": "M290.181 447.613 L362.352 447.613 L362.352 462.017 L290.181 462.017 Z",
+          "polygon": [
+            [
+              290.181,
+              447.613
+            ],
+            [
+              362.352,
+              447.613
+            ],
+            [
+              362.352,
+              462.017
+            ],
+            [
+              290.181,
+              462.017
+            ],
+            [
+              290.181,
+              447.613
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:87",
+      "code": "87",
+      "name": "Lote 87",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        440.411
+      ],
+      "parts": [
+        {
+          "id": "87:interior",
+          "kind": "interior",
+          "path": "M290.181 433.209 L362.352 433.209 L362.352 447.613 L290.181 447.613 Z",
+          "polygon": [
+            [
+              290.181,
+              433.209
+            ],
+            [
+              362.352,
+              433.209
+            ],
+            [
+              362.352,
+              447.613
+            ],
+            [
+              290.181,
+              447.613
+            ],
+            [
+              290.181,
+              433.209
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:88",
+      "code": "88",
+      "name": "Lote 88",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        426.006
+      ],
+      "parts": [
+        {
+          "id": "88:interior",
+          "kind": "interior",
+          "path": "M290.181 418.804 L362.352 418.804 L362.352 433.209 L290.181 433.209 Z",
+          "polygon": [
+            [
+              290.181,
+              418.804
+            ],
+            [
+              362.352,
+              418.804
+            ],
+            [
+              362.352,
+              433.209
+            ],
+            [
+              290.181,
+              433.209
+            ],
+            [
+              290.181,
+              418.804
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:89",
+      "code": "89",
+      "name": "Lote 89",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        411.602
+      ],
+      "parts": [
+        {
+          "id": "89:interior",
+          "kind": "interior",
+          "path": "M290.181 404.4 L362.352 404.4 L362.352 418.804 L290.181 418.804 Z",
+          "polygon": [
+            [
+              290.181,
+              404.4
+            ],
+            [
+              362.352,
+              404.4
+            ],
+            [
+              362.352,
+              418.804
+            ],
+            [
+              290.181,
+              418.804
+            ],
+            [
+              290.181,
+              404.4
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:90",
+      "code": "90",
+      "name": "Lote 90",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        397.198
+      ],
+      "parts": [
+        {
+          "id": "90:interior",
+          "kind": "interior",
+          "path": "M290.181 389.996 L362.352 389.996 L362.352 404.4 L290.181 404.4 Z",
+          "polygon": [
+            [
+              290.181,
+              389.996
+            ],
+            [
+              362.352,
+              389.996
+            ],
+            [
+              362.352,
+              404.4
+            ],
+            [
+              290.181,
+              404.4
+            ],
+            [
+              290.181,
+              389.996
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:91",
+      "code": "91",
+      "name": "Lote 91",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        382.794
+      ],
+      "parts": [
+        {
+          "id": "91:interior",
+          "kind": "interior",
+          "path": "M290.181 375.592 L362.352 375.592 L362.352 389.996 L290.181 389.996 Z",
+          "polygon": [
+            [
+              290.181,
+              375.592
+            ],
+            [
+              362.352,
+              375.592
+            ],
+            [
+              362.352,
+              389.996
+            ],
+            [
+              290.181,
+              389.996
+            ],
+            [
+              290.181,
+              375.592
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:92",
+      "code": "92",
+      "name": "Lote 92",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        368.39
+      ],
+      "parts": [
+        {
+          "id": "92:interior",
+          "kind": "interior",
+          "path": "M290.181 361.188 L362.352 361.188 L362.352 375.592 L290.181 375.592 Z",
+          "polygon": [
+            [
+              290.181,
+              361.188
+            ],
+            [
+              362.352,
+              361.188
+            ],
+            [
+              362.352,
+              375.592
+            ],
+            [
+              290.181,
+              375.592
+            ],
+            [
+              290.181,
+              361.188
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:93",
+      "code": "93",
+      "name": "Lote 93",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        353.986
+      ],
+      "parts": [
+        {
+          "id": "93:interior",
+          "kind": "interior",
+          "path": "M290.181 346.784 L362.352 346.784 L362.352 361.188 L290.181 361.188 Z",
+          "polygon": [
+            [
+              290.181,
+              346.784
+            ],
+            [
+              362.352,
+              346.784
+            ],
+            [
+              362.352,
+              361.188
+            ],
+            [
+              290.181,
+              361.188
+            ],
+            [
+              290.181,
+              346.784
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:94",
+      "code": "94",
+      "name": "Lote 94",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        339.582
+      ],
+      "parts": [
+        {
+          "id": "94:interior",
+          "kind": "interior",
+          "path": "M290.181 332.38 L362.352 332.38 L362.352 346.784 L290.181 346.784 Z",
+          "polygon": [
+            [
+              290.181,
+              332.38
+            ],
+            [
+              362.352,
+              332.38
+            ],
+            [
+              362.352,
+              346.784
+            ],
+            [
+              290.181,
+              346.784
+            ],
+            [
+              290.181,
+              332.38
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:95",
+      "code": "95",
+      "name": "Lote 95",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        325.178
+      ],
+      "parts": [
+        {
+          "id": "95:interior",
+          "kind": "interior",
+          "path": "M290.181 317.976 L362.352 317.976 L362.352 332.38 L290.181 332.38 Z",
+          "polygon": [
+            [
+              290.181,
+              317.976
+            ],
+            [
+              362.352,
+              317.976
+            ],
+            [
+              362.352,
+              332.38
+            ],
+            [
+              290.181,
+              332.38
+            ],
+            [
+              290.181,
+              317.976
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:96",
+      "code": "96",
+      "name": "Lote 96",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        310.774
+      ],
+      "parts": [
+        {
+          "id": "96:interior",
+          "kind": "interior",
+          "path": "M290.181 303.572 L362.352 303.572 L362.352 317.976 L290.181 317.976 Z",
+          "polygon": [
+            [
+              290.181,
+              303.572
+            ],
+            [
+              362.352,
+              303.572
+            ],
+            [
+              362.352,
+              317.976
+            ],
+            [
+              290.181,
+              317.976
+            ],
+            [
+              290.181,
+              303.572
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:97",
+      "code": "97",
+      "name": "Lote 97",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        296.37
+      ],
+      "parts": [
+        {
+          "id": "97:interior",
+          "kind": "interior",
+          "path": "M290.181 289.168 L362.352 289.168 L362.352 303.572 L290.181 303.572 Z",
+          "polygon": [
+            [
+              290.181,
+              289.168
+            ],
+            [
+              362.352,
+              289.168
+            ],
+            [
+              362.352,
+              303.572
+            ],
+            [
+              290.181,
+              303.572
+            ],
+            [
+              290.181,
+              289.168
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:98",
+      "code": "98",
+      "name": "Lote 98",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        281.966
+      ],
+      "parts": [
+        {
+          "id": "98:interior",
+          "kind": "interior",
+          "path": "M290.181 274.764 L362.352 274.764 L362.352 289.168 L290.181 289.168 Z",
+          "polygon": [
+            [
+              290.181,
+              274.764
+            ],
+            [
+              362.352,
+              274.764
+            ],
+            [
+              362.352,
+              289.168
+            ],
+            [
+              290.181,
+              289.168
+            ],
+            [
+              290.181,
+              274.764
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:99",
+      "code": "99",
+      "name": "Lote 99",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        267.561
+      ],
+      "parts": [
+        {
+          "id": "99:interior",
+          "kind": "interior",
+          "path": "M290.181 260.359 L362.352 260.359 L362.352 274.764 L290.181 274.764 Z",
+          "polygon": [
+            [
+              290.181,
+              260.359
+            ],
+            [
+              362.352,
+              260.359
+            ],
+            [
+              362.352,
+              274.764
+            ],
+            [
+              290.181,
+              274.764
+            ],
+            [
+              290.181,
+              260.359
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:100",
+      "code": "100",
+      "name": "Lote 100",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        253.157
+      ],
+      "parts": [
+        {
+          "id": "100:interior",
+          "kind": "interior",
+          "path": "M290.181 245.955 L362.352 245.955 L362.352 260.359 L290.181 260.359 Z",
+          "polygon": [
+            [
+              290.181,
+              245.955
+            ],
+            [
+              362.352,
+              245.955
+            ],
+            [
+              362.352,
+              260.359
+            ],
+            [
+              290.181,
+              260.359
+            ],
+            [
+              290.181,
+              245.955
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:101",
+      "code": "101",
+      "name": "Lote 101",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        238.753
+      ],
+      "parts": [
+        {
+          "id": "101:interior",
+          "kind": "interior",
+          "path": "M290.181 231.551 L362.352 231.551 L362.352 245.955 L290.181 245.955 Z",
+          "polygon": [
+            [
+              290.181,
+              231.551
+            ],
+            [
+              362.352,
+              231.551
+            ],
+            [
+              362.352,
+              245.955
+            ],
+            [
+              290.181,
+              245.955
+            ],
+            [
+              290.181,
+              231.551
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:102",
+      "code": "102",
+      "name": "Lote 102",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        224.374
+      ],
+      "parts": [
+        {
+          "id": "102:interior",
+          "kind": "interior",
+          "path": "M290.181 217.197 L362.352 217.197 L362.352 231.551 L290.181 231.551 Z",
+          "polygon": [
+            [
+              290.181,
+              217.197
+            ],
+            [
+              362.352,
+              217.197
+            ],
+            [
+              362.352,
+              231.551
+            ],
+            [
+              290.181,
+              231.551
+            ],
+            [
+              290.181,
+              217.197
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:103",
+      "code": "103",
+      "name": "Lote 103",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        210.019
+      ],
+      "parts": [
+        {
+          "id": "103:interior",
+          "kind": "interior",
+          "path": "M290.181 202.842 L362.352 202.842 L362.352 217.197 L290.181 217.197 Z",
+          "polygon": [
+            [
+              290.181,
+              202.842
+            ],
+            [
+              362.352,
+              202.842
+            ],
+            [
+              362.352,
+              217.197
+            ],
+            [
+              290.181,
+              217.197
+            ],
+            [
+              290.181,
+              202.842
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:104",
+      "code": "104",
+      "name": "Lote 104",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Ilha central · leste",
+      "label": [
+        326.266,
+        195.665
+      ],
+      "parts": [
+        {
+          "id": "104:interior",
+          "kind": "interior",
+          "path": "M290.181 188.487 L362.352 188.487 L362.352 202.842 L290.181 202.842 Z",
+          "polygon": [
+            [
+              290.181,
+              188.487
+            ],
+            [
+              362.352,
+              188.487
+            ],
+            [
+              362.352,
+              202.842
+            ],
+            [
+              290.181,
+              202.842
+            ],
+            [
+              290.181,
+              188.487
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:105",
+      "code": "105",
+      "name": "Lote 105",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        124.124
+      ],
+      "parts": [
+        {
+          "id": "105:interior",
+          "kind": "interior",
+          "path": "M443.922 116.932 L517.468 116.932 L517.468 131.316 L443.922 131.316 Z",
+          "polygon": [
+            [
+              443.922,
+              116.932
+            ],
+            [
+              517.468,
+              116.932
+            ],
+            [
+              517.468,
+              131.316
+            ],
+            [
+              443.922,
+              131.316
+            ],
+            [
+              443.922,
+              116.932
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:106",
+      "code": "106",
+      "name": "Lote 106",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        138.541
+      ],
+      "parts": [
+        {
+          "id": "106:interior",
+          "kind": "interior",
+          "path": "M443.922 131.316 L517.468 131.316 L517.468 145.765 L443.922 145.765 Z",
+          "polygon": [
+            [
+              443.922,
+              131.316
+            ],
+            [
+              517.468,
+              131.316
+            ],
+            [
+              517.468,
+              145.765
+            ],
+            [
+              443.922,
+              145.765
+            ],
+            [
+              443.922,
+              131.316
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:107",
+      "code": "107",
+      "name": "Lote 107",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        152.932
+      ],
+      "parts": [
+        {
+          "id": "107:interior",
+          "kind": "interior",
+          "path": "M443.922 145.765 L517.468 145.765 L517.468 160.099 L443.922 160.099 Z",
+          "polygon": [
+            [
+              443.922,
+              145.765
+            ],
+            [
+              517.468,
+              145.765
+            ],
+            [
+              517.468,
+              160.099
+            ],
+            [
+              443.922,
+              160.099
+            ],
+            [
+              443.922,
+              145.765
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:108",
+      "code": "108",
+      "name": "Lote 108",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        167.29
+      ],
+      "parts": [
+        {
+          "id": "108:interior",
+          "kind": "interior",
+          "path": "M443.922 160.099 L517.468 160.099 L517.468 174.482 L443.922 174.482 Z",
+          "polygon": [
+            [
+              443.922,
+              160.099
+            ],
+            [
+              517.468,
+              160.099
+            ],
+            [
+              517.468,
+              174.482
+            ],
+            [
+              443.922,
+              174.482
+            ],
+            [
+              443.922,
+              160.099
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:109",
+      "code": "109",
+      "name": "Lote 109",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        181.73
+      ],
+      "parts": [
+        {
+          "id": "109:interior",
+          "kind": "interior",
+          "path": "M443.922 174.482 L517.468 174.482 L517.468 188.978 L443.922 188.978 Z",
+          "polygon": [
+            [
+              443.922,
+              174.482
+            ],
+            [
+              517.468,
+              174.482
+            ],
+            [
+              517.468,
+              188.978
+            ],
+            [
+              443.922,
+              188.978
+            ],
+            [
+              443.922,
+              174.482
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:110",
+      "code": "110",
+      "name": "Lote 110",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        196.202
+      ],
+      "parts": [
+        {
+          "id": "110:interior",
+          "kind": "interior",
+          "path": "M443.922 188.978 L517.468 188.978 L517.468 203.426 L443.922 203.426 Z",
+          "polygon": [
+            [
+              443.922,
+              188.978
+            ],
+            [
+              517.468,
+              188.978
+            ],
+            [
+              517.468,
+              203.426
+            ],
+            [
+              443.922,
+              203.426
+            ],
+            [
+              443.922,
+              188.978
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:111",
+      "code": "111",
+      "name": "Lote 111",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        210.593
+      ],
+      "parts": [
+        {
+          "id": "111:interior",
+          "kind": "interior",
+          "path": "M443.922 203.426 L517.468 203.426 L517.468 217.76 L443.922 217.76 Z",
+          "polygon": [
+            [
+              443.922,
+              203.426
+            ],
+            [
+              517.468,
+              203.426
+            ],
+            [
+              517.468,
+              217.76
+            ],
+            [
+              443.922,
+              217.76
+            ],
+            [
+              443.922,
+              203.426
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:112",
+      "code": "112",
+      "name": "Lote 112",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        224.896
+      ],
+      "parts": [
+        {
+          "id": "112:interior",
+          "kind": "interior",
+          "path": "M443.922 217.76 L517.468 217.76 L517.468 232.031 L443.922 232.031 Z",
+          "polygon": [
+            [
+              443.922,
+              217.76
+            ],
+            [
+              517.468,
+              217.76
+            ],
+            [
+              517.468,
+              232.031
+            ],
+            [
+              443.922,
+              232.031
+            ],
+            [
+              443.922,
+              217.76
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:113",
+      "code": "113",
+      "name": "Lote 113",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        239.223
+      ],
+      "parts": [
+        {
+          "id": "113:interior",
+          "kind": "interior",
+          "path": "M443.922 232.031 L517.468 232.031 L517.468 246.414 L443.922 246.414 Z",
+          "polygon": [
+            [
+              443.922,
+              232.031
+            ],
+            [
+              517.468,
+              232.031
+            ],
+            [
+              517.468,
+              246.414
+            ],
+            [
+              443.922,
+              246.414
+            ],
+            [
+              443.922,
+              232.031
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:114",
+      "code": "114",
+      "name": "Lote 114",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        253.622
+      ],
+      "parts": [
+        {
+          "id": "114:interior",
+          "kind": "interior",
+          "path": "M443.922 246.414 L517.468 246.414 L517.468 260.829 L443.922 260.829 Z",
+          "polygon": [
+            [
+              443.922,
+              246.414
+            ],
+            [
+              517.468,
+              246.414
+            ],
+            [
+              517.468,
+              260.829
+            ],
+            [
+              443.922,
+              260.829
+            ],
+            [
+              443.922,
+              246.414
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:115",
+      "code": "115",
+      "name": "Lote 115",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        268.036
+      ],
+      "parts": [
+        {
+          "id": "115:interior",
+          "kind": "interior",
+          "path": "M443.922 260.829 L517.468 260.829 L517.468 275.244 L443.922 275.244 Z",
+          "polygon": [
+            [
+              443.922,
+              260.829
+            ],
+            [
+              517.468,
+              260.829
+            ],
+            [
+              517.468,
+              275.244
+            ],
+            [
+              443.922,
+              275.244
+            ],
+            [
+              443.922,
+              260.829
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:116",
+      "code": "116",
+      "name": "Lote 116",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        282.468
+      ],
+      "parts": [
+        {
+          "id": "116:interior",
+          "kind": "interior",
+          "path": "M443.922 275.244 L517.468 275.244 L517.468 289.692 L443.922 289.692 Z",
+          "polygon": [
+            [
+              443.922,
+              275.244
+            ],
+            [
+              517.468,
+              275.244
+            ],
+            [
+              517.468,
+              289.692
+            ],
+            [
+              443.922,
+              289.692
+            ],
+            [
+              443.922,
+              275.244
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:117",
+      "code": "117",
+      "name": "Lote 117",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        296.859
+      ],
+      "parts": [
+        {
+          "id": "117:interior",
+          "kind": "interior",
+          "path": "M443.922 289.692 L517.468 289.692 L517.468 304.026 L443.922 304.026 Z",
+          "polygon": [
+            [
+              443.922,
+              289.692
+            ],
+            [
+              517.468,
+              289.692
+            ],
+            [
+              517.468,
+              304.026
+            ],
+            [
+              443.922,
+              304.026
+            ],
+            [
+              443.922,
+              289.692
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:118",
+      "code": "118",
+      "name": "Lote 118",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        311.218
+      ],
+      "parts": [
+        {
+          "id": "118:interior",
+          "kind": "interior",
+          "path": "M443.922 304.026 L517.468 304.026 L517.468 318.409 L443.922 318.409 Z",
+          "polygon": [
+            [
+              443.922,
+              304.026
+            ],
+            [
+              517.468,
+              304.026
+            ],
+            [
+              517.468,
+              318.409
+            ],
+            [
+              443.922,
+              318.409
+            ],
+            [
+              443.922,
+              304.026
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:119",
+      "code": "119",
+      "name": "Lote 119",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        325.657
+      ],
+      "parts": [
+        {
+          "id": "119:interior",
+          "kind": "interior",
+          "path": "M443.922 318.409 L517.468 318.409 L517.468 332.905 L443.922 332.905 Z",
+          "polygon": [
+            [
+              443.922,
+              318.409
+            ],
+            [
+              517.468,
+              318.409
+            ],
+            [
+              517.468,
+              332.905
+            ],
+            [
+              443.922,
+              332.905
+            ],
+            [
+              443.922,
+              318.409
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:120",
+      "code": "120",
+      "name": "Lote 120",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        340.097
+      ],
+      "parts": [
+        {
+          "id": "120:interior",
+          "kind": "interior",
+          "path": "M443.922 332.905 L517.468 332.905 L517.468 347.289 L443.922 347.289 Z",
+          "polygon": [
+            [
+              443.922,
+              332.905
+            ],
+            [
+              517.468,
+              332.905
+            ],
+            [
+              517.468,
+              347.289
+            ],
+            [
+              443.922,
+              347.289
+            ],
+            [
+              443.922,
+              332.905
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:121",
+      "code": "121",
+      "name": "Lote 121",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        354.468
+      ],
+      "parts": [
+        {
+          "id": "121:interior",
+          "kind": "interior",
+          "path": "M443.922 347.289 L517.468 347.289 L517.468 361.648 L443.922 361.648 Z",
+          "polygon": [
+            [
+              443.922,
+              347.289
+            ],
+            [
+              517.468,
+              347.289
+            ],
+            [
+              517.468,
+              361.648
+            ],
+            [
+              443.922,
+              361.648
+            ],
+            [
+              443.922,
+              347.289
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:122",
+      "code": "122",
+      "name": "Lote 122",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        368.827
+      ],
+      "parts": [
+        {
+          "id": "122:interior",
+          "kind": "interior",
+          "path": "M443.922 361.648 L517.468 361.648 L517.468 376.007 L443.922 376.007 Z",
+          "polygon": [
+            [
+              443.922,
+              361.648
+            ],
+            [
+              517.468,
+              361.648
+            ],
+            [
+              517.468,
+              376.007
+            ],
+            [
+              443.922,
+              376.007
+            ],
+            [
+              443.922,
+              361.648
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:123",
+      "code": "123",
+      "name": "Lote 123",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        383.186
+      ],
+      "parts": [
+        {
+          "id": "123:interior",
+          "kind": "interior",
+          "path": "M443.922 376.007 L517.468 376.007 L517.468 390.365 L443.922 390.365 Z",
+          "polygon": [
+            [
+              443.922,
+              376.007
+            ],
+            [
+              517.468,
+              376.007
+            ],
+            [
+              517.468,
+              390.365
+            ],
+            [
+              443.922,
+              390.365
+            ],
+            [
+              443.922,
+              376.007
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:124",
+      "code": "124",
+      "name": "Lote 124",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · fundos",
+      "label": [
+        480.695,
+        397.545
+      ],
+      "parts": [
+        {
+          "id": "124:interior",
+          "kind": "interior",
+          "path": "M443.922 390.365 L517.468 390.365 L517.468 404.724 L443.922 404.724 Z",
+          "polygon": [
+            [
+              443.922,
+              390.365
+            ],
+            [
+              517.468,
+              390.365
+            ],
+            [
+              517.468,
+              404.724
+            ],
+            [
+              443.922,
+              404.724
+            ],
+            [
+              443.922,
+              390.365
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:125",
+      "code": "125",
+      "name": "Lote 125",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        498.273
+      ],
+      "parts": [
+        {
+          "id": "125:interior",
+          "kind": "interior",
+          "path": "M443.922 491.055 L517.468 491.055 L517.468 505.49 L443.922 505.49 Z",
+          "polygon": [
+            [
+              443.922,
+              491.055
+            ],
+            [
+              517.468,
+              491.055
+            ],
+            [
+              517.468,
+              505.49
+            ],
+            [
+              443.922,
+              505.49
+            ],
+            [
+              443.922,
+              491.055
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:126",
+      "code": "126",
+      "name": "Lote 126",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        512.707
+      ],
+      "parts": [
+        {
+          "id": "126:interior",
+          "kind": "interior",
+          "path": "M443.922 505.49 L517.468 505.49 L517.468 519.925 L443.922 519.925 Z",
+          "polygon": [
+            [
+              443.922,
+              505.49
+            ],
+            [
+              517.468,
+              505.49
+            ],
+            [
+              517.468,
+              519.925
+            ],
+            [
+              443.922,
+              519.925
+            ],
+            [
+              443.922,
+              505.49
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:127",
+      "code": "127",
+      "name": "Lote 127",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        527.142
+      ],
+      "parts": [
+        {
+          "id": "127:interior",
+          "kind": "interior",
+          "path": "M443.922 519.925 L517.468 519.925 L517.468 534.36 L443.922 534.36 Z",
+          "polygon": [
+            [
+              443.922,
+              519.925
+            ],
+            [
+              517.468,
+              519.925
+            ],
+            [
+              517.468,
+              534.36
+            ],
+            [
+              443.922,
+              534.36
+            ],
+            [
+              443.922,
+              519.925
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:128",
+      "code": "128",
+      "name": "Lote 128",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        541.577
+      ],
+      "parts": [
+        {
+          "id": "128:interior",
+          "kind": "interior",
+          "path": "M443.922 534.36 L517.468 534.36 L517.468 548.794 L443.922 548.794 Z",
+          "polygon": [
+            [
+              443.922,
+              534.36
+            ],
+            [
+              517.468,
+              534.36
+            ],
+            [
+              517.468,
+              548.794
+            ],
+            [
+              443.922,
+              548.794
+            ],
+            [
+              443.922,
+              534.36
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:129",
+      "code": "129",
+      "name": "Lote 129",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        556.012
+      ],
+      "parts": [
+        {
+          "id": "129:interior",
+          "kind": "interior",
+          "path": "M443.922 548.794 L517.468 548.794 L517.468 563.229 L443.922 563.229 Z",
+          "polygon": [
+            [
+              443.922,
+              548.794
+            ],
+            [
+              517.468,
+              548.794
+            ],
+            [
+              517.468,
+              563.229
+            ],
+            [
+              443.922,
+              563.229
+            ],
+            [
+              443.922,
+              548.794
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:130",
+      "code": "130",
+      "name": "Lote 130",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        570.447
+      ],
+      "parts": [
+        {
+          "id": "130:interior",
+          "kind": "interior",
+          "path": "M443.922 563.229 L517.468 563.229 L517.468 577.664 L443.922 577.664 Z",
+          "polygon": [
+            [
+              443.922,
+              563.229
+            ],
+            [
+              517.468,
+              563.229
+            ],
+            [
+              517.468,
+              577.664
+            ],
+            [
+              443.922,
+              577.664
+            ],
+            [
+              443.922,
+              563.229
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:131",
+      "code": "131",
+      "name": "Lote 131",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        584.849
+      ],
+      "parts": [
+        {
+          "id": "131:interior",
+          "kind": "interior",
+          "path": "M443.922 577.664 L517.468 577.664 L517.468 592.035 L443.922 592.035 Z",
+          "polygon": [
+            [
+              443.922,
+              577.664
+            ],
+            [
+              517.468,
+              577.664
+            ],
+            [
+              517.468,
+              592.035
+            ],
+            [
+              443.922,
+              592.035
+            ],
+            [
+              443.922,
+              577.664
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:132",
+      "code": "132",
+      "name": "Lote 132",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        599.22
+      ],
+      "parts": [
+        {
+          "id": "132:interior",
+          "kind": "interior",
+          "path": "M443.922 592.035 L517.468 592.035 L517.468 606.405 L443.922 606.405 Z",
+          "polygon": [
+            [
+              443.922,
+              592.035
+            ],
+            [
+              517.468,
+              592.035
+            ],
+            [
+              517.468,
+              606.405
+            ],
+            [
+              443.922,
+              606.405
+            ],
+            [
+              443.922,
+              592.035
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:133",
+      "code": "133",
+      "name": "Lote 133",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        613.59
+      ],
+      "parts": [
+        {
+          "id": "133:interior",
+          "kind": "interior",
+          "path": "M443.922 606.405 L517.468 606.405 L517.468 620.775 L443.922 620.775 Z",
+          "polygon": [
+            [
+              443.922,
+              606.405
+            ],
+            [
+              517.468,
+              606.405
+            ],
+            [
+              517.468,
+              620.775
+            ],
+            [
+              443.922,
+              620.775
+            ],
+            [
+              443.922,
+              606.405
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:134",
+      "code": "134",
+      "name": "Lote 134",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        627.961
+      ],
+      "parts": [
+        {
+          "id": "134:interior",
+          "kind": "interior",
+          "path": "M443.922 620.775 L517.468 620.775 L517.468 635.146 L443.922 635.146 Z",
+          "polygon": [
+            [
+              443.922,
+              620.775
+            ],
+            [
+              517.468,
+              620.775
+            ],
+            [
+              517.468,
+              635.146
+            ],
+            [
+              443.922,
+              635.146
+            ],
+            [
+              443.922,
+              620.775
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:135",
+      "code": "135",
+      "name": "Lote 135",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        642.331
+      ],
+      "parts": [
+        {
+          "id": "135:interior",
+          "kind": "interior",
+          "path": "M443.922 635.146 L517.468 635.146 L517.468 649.516 L443.922 649.516 Z",
+          "polygon": [
+            [
+              443.922,
+              635.146
+            ],
+            [
+              517.468,
+              635.146
+            ],
+            [
+              517.468,
+              649.516
+            ],
+            [
+              443.922,
+              649.516
+            ],
+            [
+              443.922,
+              635.146
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:136",
+      "code": "136",
+      "name": "Lote 136",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        656.702
+      ],
+      "parts": [
+        {
+          "id": "136:interior",
+          "kind": "interior",
+          "path": "M443.922 649.516 L517.468 649.516 L517.468 663.887 L443.922 663.887 Z",
+          "polygon": [
+            [
+              443.922,
+              649.516
+            ],
+            [
+              517.468,
+              649.516
+            ],
+            [
+              517.468,
+              663.887
+            ],
+            [
+              443.922,
+              663.887
+            ],
+            [
+              443.922,
+              649.516
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:137",
+      "code": "137",
+      "name": "Lote 137",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        671.135
+      ],
+      "parts": [
+        {
+          "id": "137:interior",
+          "kind": "interior",
+          "path": "M443.922 663.887 L517.468 663.887 L517.468 678.383 L443.922 678.383 Z",
+          "polygon": [
+            [
+              443.922,
+              663.887
+            ],
+            [
+              517.468,
+              663.887
+            ],
+            [
+              517.468,
+              678.383
+            ],
+            [
+              443.922,
+              678.383
+            ],
+            [
+              443.922,
+              663.887
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:138",
+      "code": "138",
+      "name": "Lote 138",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        685.631
+      ],
+      "parts": [
+        {
+          "id": "138:interior",
+          "kind": "interior",
+          "path": "M443.922 678.383 L517.468 678.383 L517.468 692.879 L443.922 692.879 Z",
+          "polygon": [
+            [
+              443.922,
+              678.383
+            ],
+            [
+              517.468,
+              678.383
+            ],
+            [
+              517.468,
+              692.879
+            ],
+            [
+              443.922,
+              692.879
+            ],
+            [
+              443.922,
+              678.383
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:139",
+      "code": "139",
+      "name": "Lote 139",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        700.103
+      ],
+      "parts": [
+        {
+          "id": "139:interior",
+          "kind": "interior",
+          "path": "M443.922 692.879 L517.468 692.879 L517.468 707.327 L443.922 707.327 Z",
+          "polygon": [
+            [
+              443.922,
+              692.879
+            ],
+            [
+              517.468,
+              692.879
+            ],
+            [
+              517.468,
+              707.327
+            ],
+            [
+              443.922,
+              707.327
+            ],
+            [
+              443.922,
+              692.879
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:140",
+      "code": "140",
+      "name": "Lote 140",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        714.495
+      ],
+      "parts": [
+        {
+          "id": "140:interior",
+          "kind": "interior",
+          "path": "M443.922 707.327 L517.468 707.327 L517.468 721.662 L443.922 721.662 Z",
+          "polygon": [
+            [
+              443.922,
+              707.327
+            ],
+            [
+              517.468,
+              707.327
+            ],
+            [
+              517.468,
+              721.662
+            ],
+            [
+              443.922,
+              721.662
+            ],
+            [
+              443.922,
+              707.327
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:141",
+      "code": "141",
+      "name": "Lote 141",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        728.927
+      ],
+      "parts": [
+        {
+          "id": "141:interior",
+          "kind": "interior",
+          "path": "M443.922 721.662 L517.468 721.662 L517.468 736.193 L443.922 736.193 Z",
+          "polygon": [
+            [
+              443.922,
+              721.662
+            ],
+            [
+              517.468,
+              721.662
+            ],
+            [
+              517.468,
+              736.193
+            ],
+            [
+              443.922,
+              736.193
+            ],
+            [
+              443.922,
+              721.662
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indumoveis:pavilion:3:environment:142",
+      "code": "142",
+      "name": "Lote 142",
+      "kind": "commercial",
+      "declaredAreaM2": 5,
+      "functionLabel": "Lateral leste · entrada",
+      "label": [
+        480.695,
+        743.515
+      ],
+      "parts": [
+        {
+          "id": "142:interior",
+          "kind": "interior",
+          "path": "M443.922 736.193 L517.468 736.193 L517.468 750.838 L443.922 750.838 Z",
+          "polygon": [
+            [
+              443.922,
+              736.193
+            ],
+            [
+              517.468,
+              736.193
+            ],
+            [
+              517.468,
+              750.838
+            ],
+            [
+              443.922,
+              750.838
+            ],
+            [
+              443.922,
+              736.193
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "architecture": [
+    {
+      "id": "p3:floor-outline",
+      "kind": "guide",
+      "path": "M39 114.5H517.5V752H406.5V742H351.5V752H63V158H39Z"
+    },
+    {
+      "id": "p3:perimeter",
+      "kind": "wall",
+      "path": "M189.5 114.5H39V158H63V752H170 M242 752H271 M343 752H351.5V742H406.5V752H517.5V491 M517.5 404.7V114.5H386.4 M344 114.5H310 M280 114.5H232",
+      "strokeWidth": 2.6
+    },
+    {
+      "id": "p3:support",
+      "kind": "guide",
+      "path": "M39 114.5H131.25V157.3H39Z"
+    },
+    {
+      "id": "p3:rear-doors",
+      "kind": "door",
+      "path": "M189.5 114.5V91.3L210.7 113.5L232 91.3V114.5 M344 114.5V91.3L365.2 113.5L386.4 91.3V114.5",
+      "strokeWidth": 0.7
+    },
+    {
+      "id": "p3:main-entrance",
+      "kind": "access",
+      "path": "M206 772V753 M307 772V753",
+      "label": "Entrada do pavilhão",
+      "labelAt": [
+        256,
+        772
+      ]
+    },
+    {
+      "id": "p3:rear-exit",
+      "kind": "access",
+      "path": "M295 113V94",
+      "label": "Fundos do pavilhão",
+      "labelAt": [
+        295,
+        94
+      ]
+    },
+    {
+      "id": "p3:right-passage",
+      "kind": "guide",
+      "path": "M444 448H534",
+      "label": "Acesso ao Pavilhão 13",
+      "labelAt": [
+        487,
+        448
+      ]
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "projectId": "188cb605-7a42-42a0-9e75-28f5097e9433",
+  "migration": "20261115150000_pavilion_3_interior",
+  "date": "2026-11-15",
+  "transport": "Lovable.query_database",
+  "chatMessagesSent": 0,
+  "applied": {
+    "rows": [
+      {
+        "area_m2": "710.00",
+        "individual_cents": 132500,
+        "lots": 142,
+        "rate_cents": 26500,
+        "total_cents": "18815000"
+      }
+    ]
+  },
+  "before": {
+    "rows": [
+      {
+        "id": "8e298737-16ed-41d2-9468-466fa225affd",
+        "inventory_hash": "b21754ea0783fb03e614dcd9fa6ce28b",
+        "lots": 19,
+        "pavilion_number": 1,
+        "payload_sha256": "b013dc6fd0216629e711402f4fda951f92955dcf9c953dec5c8fd8ba0dab18bb",
+        "revision": 2
+      },
+      {
+        "id": "9a607757-f1b2-4205-b744-5478cf1b358a",
+        "inventory_hash": "749a6ff85db9482ae279b28a5269655b",
+        "lots": 7,
+        "pavilion_number": 8,
+        "payload_sha256": "111947fbe152918807c4913da45128701a6e65d331fed215b289243e0baec79a",
+        "revision": 2
+      },
+      {
+        "id": "1192bcf2-65fe-4f37-bfca-7a1effd7cce0",
+        "inventory_hash": "b5f01f22979008153a14ad5c18d46a27",
+        "lots": 254,
+        "pavilion_number": 12,
+        "payload_sha256": "fc53803e91886245fddef1072fa5b65cb75726e7527c68a98aa483ddf37002c6",
+        "revision": 2
+      },
+      {
+        "id": "06e7badf-44f3-44d6-8d93-408657d7be31",
+        "inventory_hash": "2b0cea5bbee9e513cc73359977c89d59",
+        "lots": 80,
+        "pavilion_number": 13,
+        "payload_sha256": "c44e7d564ca6612564ce1bf292f4ad3c2adefd7e5f64891b1ae468c72a21916c",
+        "revision": 3
+      }
+    ]
+  },
+  "after": {
+    "rows": [
+      {
+        "id": "8e298737-16ed-41d2-9468-466fa225affd",
+        "inventory_hash": "b21754ea0783fb03e614dcd9fa6ce28b",
+        "lots": 19,
+        "pavilion_number": 1,
+        "payload_sha256": "b013dc6fd0216629e711402f4fda951f92955dcf9c953dec5c8fd8ba0dab18bb",
+        "revision": 2
+      },
+      {
+        "id": "d30b1591-f4fe-4ac9-baef-86fd971118a0",
+        "inventory_hash": "dcabfc322dfc293f23b3668a01d240b8",
+        "lots": 142,
+        "pavilion_number": 3,
+        "payload_sha256": "088851aeaaaefc13d985fd2d2589e4897b4f6adf9c89f067e7205e3f1b5b4a9a",
+        "revision": 1
+      },
+      {
+        "id": "9a607757-f1b2-4205-b744-5478cf1b358a",
+        "inventory_hash": "749a6ff85db9482ae279b28a5269655b",
+        "lots": 7,
+        "pavilion_number": 8,
+        "payload_sha256": "111947fbe152918807c4913da45128701a6e65d331fed215b289243e0baec79a",
+        "revision": 2
+      },
+      {
+        "id": "1192bcf2-65fe-4f37-bfca-7a1effd7cce0",
+        "inventory_hash": "b5f01f22979008153a14ad5c18d46a27",
+        "lots": 254,
+        "pavilion_number": 12,
+        "payload_sha256": "fc53803e91886245fddef1072fa5b65cb75726e7527c68a98aa483ddf37002c6",
+        "revision": 2
+      },
+      {
+        "id": "06e7badf-44f3-44d6-8d93-408657d7be31",
+        "inventory_hash": "2b0cea5bbee9e513cc73359977c89d59",
+        "lots": 80,
+        "pavilion_number": 13,
+        "payload_sha256": "c44e7d564ca6612564ce1bf292f4ad3c2adefd7e5f64891b1ae468c72a21916c",
+        "revision": 3
+      }
+    ]
+  },
+  "existingPavilionsUnchanged": true,
+  "transactionalValidation": "passed before application and on idempotent replay; both validation runs rolled back"
+}

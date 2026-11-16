@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 104" role="img" aria-label="Construção e Mobiliário · Indumóveis">
+  <g fill="none" stroke="#376450" stroke-width="2.2">
+    <path d="M5 80V22L28 8L51 22V80 M16 72V30L28 23L40 30V72 M5 49H51"/>
+    <path d="M10 86H46" stroke="#b38c57" stroke-width="4"/>
+  </g>
+  <g fill="#294735" font-family="Figtree,Arial,sans-serif">
+    <text x="70" y="36" font-size="29" font-weight="600">Construção e</text>
+    <text x="70" y="70" font-size="32" font-weight="700">Mobiliário</text>
+    <text x="72" y="92" font-size="10" letter-spacing="3" fill="#78816d">INDUMÓVEIS · PAVILHÃO 3</text>
+  </g>
+</svg>

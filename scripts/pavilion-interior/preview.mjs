@@ -21,6 +21,7 @@ const editionId = "22222222-2222-4222-8222-222222222222";
 const plans = {};
 for (const [pavilion, planIdDigit, revisionIdDigit] of [
   [1, "3", "4"],
+  [3, "b", "c"],
   [8, "7", "8"],
   [12, "9", "a"],
   [13, "5", "6"],
@@ -36,6 +37,22 @@ for (const [pavilion, planIdDigit, revisionIdDigit] of [
   plans[pavilion] = plan;
 }
 const exp = Math.floor(Date.now() / 1000) + 86400;
+const p3Lots = plans[3].environments.map((environment, index) => ({
+  id: `55555555-5555-4555-8555-${String(index + 1).padStart(12, "0")}`,
+  code: environment.code,
+  segmentKey: "p3",
+  environmentId: environment.id,
+  geometryId: null,
+  areaM2: 5,
+  areaPending: false,
+  status: "disponivel",
+  pricingState: "priced",
+  pricingBasis: "per_m2",
+  tariffCents: 26500,
+  grossCents: 132500,
+  cornerState: null,
+  policyVersion: 1,
+}));
 const encode = (v) => Buffer.from(JSON.stringify(v)).toString("base64url");
 const session = {
   access_token: `${encode({ alg: "HS256", typ: "JWT" })}.${encode({ sub: user.id, exp, role: "authenticated" })}.local`,
@@ -107,6 +124,9 @@ http
         value = plan ? { id: plan.revisionId, revision: plan.revision } : null;
       else if (name === "get_pavilion_interior") value = plan ?? null;
       else if (name === "get_pavilion_interior_commercial") value = {};
+      else if (name === "get_commercial_lots") value = args.p_segment === "p3" ? p3Lots : [];
+      else if (name === "get_commercial_overview") value = { segments: [] };
+      else if (name === "search_documents") value = [];
       else if (req.method === "GET" && name in payloads) value = payloads[name];
       else {
         res.writeHead(403, { "content-type": "application/json" });

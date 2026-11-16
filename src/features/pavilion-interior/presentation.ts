@@ -2,7 +2,7 @@ import type { InteriorConnection } from "./connections";
 import { PAVILION_8_LOT_CODES } from "./pavilion8-codes";
 import type { InteriorWayfinding } from "./wayfinding";
 
-export type InteriorPavilionNumber = 1 | 8 | 12 | 13;
+export type InteriorPavilionNumber = 1 | 3 | 8 | 12 | 13;
 const PAVILION_12_LOT_COUNT = 254;
 export type InteriorPresentation = {
   pavilionNumber: InteriorPavilionNumber;
@@ -36,6 +36,39 @@ export const PAVILION_PRESENTATIONS: Record<InteriorPavilionNumber, InteriorPres
       { elementId: "exit", kind: "exit", centers: [[114, 519]] },
       { elementId: "north-service-access", kind: "service", centers: [[733, 108]] },
       { elementId: "south-service-access", kind: "service", centers: [[569, 519]] },
+    ],
+  },
+  3: {
+    pavilionNumber: 3,
+    title: "Construção e Mobiliário",
+    brandPath: "/brand/pavilhao-3/construcao-mobiliario.svg",
+    brandAlt: "Construção e Mobiliário · Indumóveis",
+    showAreas: true,
+    mode: "lots",
+    searchLots: true,
+    commercialCount: 142,
+    loadingText: "Abrindo o Pavilhão 3…",
+    loadErrorText: "Não foi possível carregar o Pavilhão 3.",
+    connectionBadge: { width: 52, height: 62, radius: 7 },
+    connections: [
+      {
+        elementId: "p3:right-passage",
+        destination: 13,
+        icon: "/brand/pavilhao-3/acesso-pavilhao-13.svg",
+        center: [487, 448],
+      },
+    ],
+    wayfinding: [
+      {
+        elementId: "p3:main-entrance",
+        kind: "entrance",
+        centers: [
+          [206, 765],
+          [307, 765],
+        ],
+        hideSourcePath: true,
+      },
+      { elementId: "p3:rear-exit", kind: "exit", centers: [[295, 101]], hideSourcePath: true },
     ],
   },
   8: {
@@ -157,6 +190,7 @@ export const PAVILION_PRESENTATIONS: Record<InteriorPavilionNumber, InteriorPres
 };
 export function interiorPavilionNumber(value: unknown): InteriorPavilionNumber | undefined {
   if (value === 1 || value === "1") return 1;
+  if (value === 3 || value === "3") return 3;
   if (value === 8 || value === "8") return 8;
   if (value === 12 || value === "12") return 12;
   if (value === 13 || value === "13") return 13;

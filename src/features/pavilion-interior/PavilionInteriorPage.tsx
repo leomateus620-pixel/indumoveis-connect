@@ -11,6 +11,7 @@ import {
   useIsAdmin,
 } from "@/lib/api";
 import { PavilionInterior } from "./PavilionInterior";
+import { Pavilion3Experience } from "./Pavilion3Experience";
 import { pavilionDestination, type ParkPavilionSearch } from "./connections";
 import { readParkReturn } from "./parkReturn";
 import { PAVILION_PRESENTATIONS, type InteriorPavilionNumber } from "./presentation";
@@ -90,8 +91,9 @@ export function PavilionInteriorPage({
   )
     ? selectedCode
     : undefined;
+  const Interior = pavilionNumber === 3 ? Pavilion3Experience : PavilionInterior;
   return (
-    <PavilionInterior
+    <Interior
       key={`${plan.data.editionId}:${pavilionNumber}:${plan.data.revision}`}
       plan={plan.data}
       presentation={presentation}
