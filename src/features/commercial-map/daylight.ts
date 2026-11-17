@@ -2,6 +2,7 @@ import * as THREE from "three";
 import panoramaUrl from "./assets/daylight.png?url";
 import daylightPalette from "./daylightPalette.json";
 import { PARK_DAYLIGHT } from "./visualTheme";
+import { NATURAL_LIGHT_KEY } from "./mapLighting";
 
 /** One world direction for sky, filtered reflections, direct light and shadows. */
 export const DAYLIGHT = {
@@ -80,7 +81,7 @@ export function createDaylightPixels(width: number, height: number): Uint8Array 
     height > DAYLIGHT.panorama.height
   )
     throw new Error("daylight-invalid-panorama-size");
-  const key = `${width}x${height}`;
+  const key = `${NATURAL_LIGHT_KEY}:${width}x${height}`;
   const cached = gradientCache.get(key);
   if (cached) return cached;
   const pixels = new Uint8Array(width * height * 4);
@@ -242,7 +243,10 @@ export function createDaylightReflectionSource(sky?: DaylightSky) {
  * view translation and pins depth to the far clip, so it needs no camera-follow
  * transform, scale, far-plane change or per-frame update. Never add it to the
  * protected commercial group or use it to calculate commercial bounds. */
-export function createDaylightBackground(texture: THREE.Texture) {
+export function createDaylightBackground(
+  texture: THREE.Texture,
+  skyRadiance = new THREE.Color(1, 1, 1),
+) {
   const geometry = new THREE.BoxGeometry(1, 1, 1);
   let material: THREE.ShaderMaterial | undefined;
   try {
@@ -254,7 +258,7 @@ export function createDaylightBackground(texture: THREE.Texture) {
     let blendAwaitingFrame = false;
     material = new THREE.ShaderMaterial({
       name: "indumoveis-world-daylight-background",
-      uniforms: { panorama, previousPanorama, panoramaBlend },
+      uniforms: { panorama, previousPanorama, panoramaBlend, skyRadiance: { value: skyRadiance } },
       side: THREE.BackSide,
       // Draw after opaque floors: the depth test rejects hidden sky fragments
       // before sampling the panorama, avoiding a second full-screen shading
@@ -275,6 +279,7 @@ export function createDaylightBackground(texture: THREE.Texture) {
         uniform sampler2D panorama;
         uniform sampler2D previousPanorama;
         uniform float panoramaBlend;
+        uniform vec3 skyRadiance;
         varying vec3 vWorldDirection;
         void main() {
           vec3 direction = normalize(vWorldDirection);
@@ -286,7 +291,7 @@ export function createDaylightBackground(texture: THREE.Texture) {
           if (panoramaBlend < 1.0) {
             sky = mix(texture2D(previousPanorama, uv).rgb, sky, panoramaBlend);
           }
-          gl_FragColor = vec4(sky, 1.0);
+          gl_FragColor = vec4(sky * skyRadiance, 1.0);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }

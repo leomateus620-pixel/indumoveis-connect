@@ -30,6 +30,7 @@ import type { Point } from "./data/territory";
 import type {
   MapHandle,
   MapInsets,
+  MapLightingMode,
   MapQuality,
   MapRendererProps,
   MapView,
@@ -40,6 +41,7 @@ import { searchEntities, searchLandmarks } from "./search";
 import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
 import { MOTION } from "./motion";
 import { readQualityPreference, writeQualityPreference } from "./qualityPreference";
+import { readLightingPreference, writeLightingPreference } from "./lightingPreference";
 import { area, brl, SPACE_STATUS } from "@/lib/format";
 import type {
   CommercialLot,
@@ -190,7 +192,11 @@ export function CommercialMapWorkspace({
   const presentation = useRef({ view, orientationFree });
   presentation.current = { view, orientationFree };
   const [quality, setQuality] = useState<MapQuality>("auto");
-  useEffect(() => setQuality(readQualityPreference()), []);
+  const [lighting, setLighting] = useState<MapLightingMode>("natural");
+  useEffect(() => {
+    setQuality(readQualityPreference());
+    setLighting(readLightingPreference());
+  }, []);
   const [menu, setMenu] = useState<"search" | "settings" | "help" | "legend" | "more" | null>(null);
   const menuOrigin = useRef<HTMLButtonElement | null>(null);
   const [menuRight, setMenuRight] = useState(12);
@@ -550,6 +556,7 @@ export function CommercialMapWorkspace({
     view,
     viewRevision,
     quality,
+    lighting,
     gesture: "move",
     insets,
     onSelect: selectFromMap,
@@ -1030,6 +1037,23 @@ export function CommercialMapWorkspace({
                       <option value="detailed">Detalhado</option>
                     </select>
                   </label>
+                  {representation !== "2d" && (
+                    <label>
+                      Iluminação
+                      <select
+                        aria-label="Iluminação"
+                        value={lighting}
+                        onChange={(e) => {
+                          const next = e.target.value as MapLightingMode;
+                          setLighting(next);
+                          writeLightingPreference(next);
+                        }}
+                      >
+                        <option value="natural">Natural</option>
+                        <option value="warm">Quente</option>
+                      </select>
+                    </label>
+                  )}
                   <button className="im-map-action" onClick={() => handle()?.restoreCommercial()}>
                     <Scan /> Enquadrar área Indumóveis
                   </button>

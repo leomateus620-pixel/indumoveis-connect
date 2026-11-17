@@ -236,17 +236,39 @@ export function createPhotoBuilder(entity: MapEntity, h: number, rise: number) {
         const tint = ["#667773", "#73837b", "#7c8b82", "#61716f"][
           (column * 3 + row + Math.floor(x0 * 7)) % 4
         ];
-        box(
+        // Both faces read during closed-roof navigation and inspection.
+        // Glazing edges are seated in the existing frame and never exposed.
+        const front = z + 0.094,
+          back = z + 0.117;
+        quad(
           "glass",
-          (left + right) / 2,
-          (bottom + top) / 2,
-          z + 0.105,
-          right - left,
-          top - bottom,
-          0.025,
+          [left, bottom, front],
+          [left, top, front],
+          [right, top, front],
+          [right, bottom, front],
+          tint,
+        );
+        quad(
+          "glass",
+          [left, bottom, back],
+          [right, bottom, back],
+          [right, top, back],
+          [left, top, back],
           tint,
         );
       }
+    // The projected bottom extrusion forms a drip edge and casts a thin
+    // shadow across the painted or brick sill in both lighting modes.
+    box(
+      "architecturalFrame",
+      (x0 + x1) / 2,
+      y0 - 0.024,
+      z + 0.025,
+      x1 - x0 + 0.07,
+      0.046,
+      0.17,
+      "#7c807a",
+    );
     for (let i = 0; i <= mullions; i++)
       box(
         "architecturalFrame",

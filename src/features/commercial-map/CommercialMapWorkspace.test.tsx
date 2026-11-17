@@ -58,6 +58,8 @@ vi.mock("./MapRenderer", async () => {
       return (
         <div
           data-testid="navigation-renderer"
+          data-lighting={props.lighting}
+          data-quality={props.quality}
           data-selected={props.selectedId ?? ""}
           data-view={props.view}
           data-initial-camera={JSON.stringify(props.initialCamera ?? null)}
@@ -104,6 +106,31 @@ afterEach(() => {
 });
 
 describe("selection presentation session", () => {
+  it("changes lighting in place, preserves the inspected lot, and restores preferences on return", async () => {
+    const first = render(<CommercialMapWorkspace />);
+    fireEvent.click(await screen.findByRole("button", { name: "Select A" }));
+    fireEvent.click(screen.getByRole("button", { name: "Opções de visualização" }));
+    const lighting = screen.getByRole("combobox", { name: "Iluminação" });
+    lighting.focus();
+    expect(lighting).toHaveFocus();
+    fireEvent.change(lighting, { target: { value: "warm" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Qualidade gráfica" }), {
+      target: { value: "light" },
+    });
+    const map = screen.getByTestId("navigation-renderer");
+    expect(map).toHaveAttribute("data-selected", "indumoveis:external:lot:01");
+    expect(map).toHaveAttribute("data-lighting", "warm");
+    expect(map).toHaveAttribute("data-quality", "light");
+    expect(commands.rendererMount).toHaveBeenCalledOnce();
+    first.unmount();
+    render(<CommercialMapWorkspace />);
+    expect(await screen.findByTestId("navigation-renderer")).toHaveAttribute(
+      "data-lighting",
+      "warm",
+    );
+    localStorage.removeItem("indumoveis:map-lighting");
+    localStorage.removeItem("indumoveis:map-quality");
+  });
   it("intercepts lot clicks only in the opt-in mode without replacing the pavilion inspection", async () => {
     const ids = ["indumoveis:external:lot:01", "indumoveis:external:lot:02"];
     const lots = new Map(
@@ -250,7 +277,7 @@ describe("return from Pavilhão 1 interior", () => {
     fireEvent.click(screen.getByRole("button", { name: "Opções de visualização" }));
     fireEvent.click(screen.getByRole("button", { name: "Tentar visualização 3D" }));
     await screen.findByTestId("navigation-renderer");
-    expect(commands.rendererMount).toHaveBeenCalledOnce();
+    await waitFor(() => expect(commands.rendererMount).toHaveBeenCalledOnce());
   });
 
   it("keeps Pavilhão 1 selected over a stale external URL selection, then accepts a new selection", async () => {

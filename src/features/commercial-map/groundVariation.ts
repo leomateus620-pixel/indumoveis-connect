@@ -20,14 +20,22 @@ export const GROUND_VARIATION_GLSL = `
     return mix(mix(parkGroundHash(i),parkGroundHash(i+vec2(1.,0.)),f.x),
       mix(parkGroundHash(i+vec2(0.,1.)),parkGroundHash(i+vec2(1.,1.)),f.x),f.y);
   }
-  vec3 parkGrassVariation(vec2 p) {
+  vec3 parkGrassVariation(vec2 p, float meadow) {
     float broad = parkGroundNoise(p / 37.0 + vec2(13.2, -7.4));
     float middle = parkGroundNoise(p / 7.7 + vec2(broad * 1.6, 5.3));
     float exposed = broad * .76 + middle * .24;
     vec3 living = mix(${grassMultiplier(PARK_SURFACE_COLORS.grassCool)},
       ${grassMultiplier(PARK_SURFACE_COLORS.grassOpen)}, smoothstep(.16, .79, exposed));
-    return mix(living, ${grassMultiplier(PARK_SURFACE_COLORS.grassDry)},
-      smoothstep(.56, .88, broad + (middle - .5) * .21) * .48) * (.97 + middle * .06);
+    vec3 lawn = mix(living, ${grassMultiplier(PARK_SURFACE_COLORS.grassDry)},
+      smoothstep(.56, .88, broad + (middle - .5) * .21) * .48);
+    // Wider olive and straw patches in open fields; a cool, shaded interior
+    // between them. Reuse the two existing noise samples for every profile.
+    vec3 meadowColor = mix(vec3(.74, .82, .74), vec3(1.21, 1.01, .80),
+      smoothstep(.23, .72, broad * .67 + middle * .33));
+    return lawn * mix(vec3(1.0), meadowColor, meadow) * (.97 + middle * .06);
+  }
+  vec3 parkGrassVariation(vec2 p) {
+    return parkGrassVariation(p, 0.0);
   }
 `;
 
@@ -50,7 +58,8 @@ export function patchGroundVariation(shader: ShaderSource, family: string) {
     family === "grass"
       ? "diffuseColor.rgb *= parkGrassVariation(parkSurfaceWorld);"
       : family === "asphalt"
-        ? "diffuseColor.rgb *= .89 + .22 * parkGroundNoise(parkSurfaceWorld / 9.6);"
+        ? `float asphaltAge = parkGroundNoise(parkSurfaceWorld / 12.4);
+           diffuseColor.rgb *= mix(vec3(.88, .90, .92), vec3(1.07, 1.045, 1.01), asphaltAge);`
         : `float mineralWear = parkGroundNoise(parkSurfaceWorld / 6.3);
            diffuseColor.rgb *= mix(vec3(.94, .95, .96), vec3(1.055, 1.05, 1.035), mineralWear);`;
   shader.fragmentShader = shader.fragmentShader.replace(

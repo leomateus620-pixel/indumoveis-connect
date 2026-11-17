@@ -69,7 +69,7 @@ export const PARK_VEGETATION = {
 export const PARK_SHADOWS = {
   color: "#374753",
   opacity: 0.16,
-  solar: { bias: -0.00011, normalBias: 0.025, radius: 1.5, intensity: 0.72 },
+  solar: { bias: -0.00011, normalBias: 0.025, radius: 0.85, intensity: 0.72 },
 } as const;
 
 /** Commercial colours only apply to a confirmed persisted association. */

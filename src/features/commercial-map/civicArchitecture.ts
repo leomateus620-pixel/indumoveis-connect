@@ -809,6 +809,9 @@ export function buildEventCentreRoof<B>(kit: CivicKit<B>) {
     const top = (p: CivicVertex): CivicVertex => [p[0], lanternY, p[2]];
     quad(b.roofGlass, lantern[i], lantern[j], top(lantern[j]), top(lantern[i]), "#ffffff", outward);
     quad(b.picking, lantern[i], lantern[j], top(lantern[j]), top(lantern[i]), "#ffffff");
+    const midX = (lantern[i][0] + lantern[j][0]) / 2,
+      midZ = (lantern[i][2] + lantern[j][2]) / 2;
+    box(b.roof, midX - 0.045, baseY, midZ - 0.045, midX + 0.045, lanternY, midZ + 0.045, "#817f73");
     const grow = (p: CivicVertex): CivicVertex => [
       cx + (p[0] - cx) * 1.16,
       lanternY,
@@ -879,30 +882,61 @@ export function buildEventCentreRoof<B>(kit: CivicKit<B>) {
       top = E + (gableRidge - E) * (1 - Math.abs(t)) - 0.12;
     box(b.frames, 0, E, z - 0.045, inset, top, z + 0.045, frame);
   }
-  // Entrance under the gable: a glazed portal set just ahead of the wall
-  // panels, without leaving the registered footprint.
-  const doorHalf = half * 0.48,
-    doorTop = E * 0.66;
-  for (const z of [cz - doorHalf, cz - doorHalf / 3, cz + doorHalf / 3, cz + doorHalf])
-    box(b.frames, 0, 0, z - 0.06, 0.02, doorTop, z + 0.06, frame);
-  box(
-    b.frames,
-    0,
-    doorTop,
-    cz - doorHalf - 0.06,
-    0.02,
-    doorTop + 0.14,
-    cz + doorHalf + 0.06,
-    frame,
-  );
+  // A colonnade stands at the eave and a single curtain wall closes the
+  // facade behind it. Door recess, side lights, plinth and soffit meet in
+  // section, so the entrance remains legible from the oblique street view.
+  const reveal = Math.min(W * 0.1, 1.45),
+    rail = 0.072;
+  const head = E * 0.8,
+    transom = E * 0.62,
+    base = 0.13;
+  const pier = tint("paintedWall", "#d8d4c6"),
+    stone = tint("concrete", "#a19b8d");
+  const leftEdge = D * 0.065,
+    rightEdge = D - leftEdge,
+    doorHalf = half * 0.46;
+  box(b.floor, 0, 0.015, 0, reveal + 0.16, base, D, stone);
+  box(b.walls, 0.1, base, 0.08, reveal + 0.18, E - 0.15, leftEdge, pier);
+  box(b.walls, 0.1, base, rightEdge, reveal + 0.18, E - 0.15, D - 0.08, pier);
+  box(b.walls, reveal, head, leftEdge, reveal + 0.17, E - 0.15, rightEdge, pier);
+  box(b.structure, 0.12, E - 0.18, leftEdge, reveal + 0.17, E - 0.035, rightEdge, "#e6e4db");
   quad(
-    b.glass,
-    [0.012, 0.05, cz - doorHalf],
-    [0.012, 0.05, cz + doorHalf],
-    [0.012, doorTop, cz + doorHalf],
-    [0.012, doorTop, cz - doorHalf],
-    "#ffffff",
-    west,
+    b.walls,
+    [0.12, E - 0.18, leftEdge],
+    [0.12, E - 0.18, rightEdge],
+    [reveal + 0.17, E - 0.18, rightEdge],
+    [reveal + 0.17, E - 0.18, leftEdge],
+    "#d8d3be",
+    [0, -1, 0],
   );
+  const glazing = (z0: number, z1: number, sill: number, bays: number) => {
+    quad(
+      b.glass,
+      [reveal, sill, z0],
+      [reveal, sill, z1],
+      [reveal, head, z1],
+      [reveal, head, z0],
+      "#ffffff",
+      west,
+    );
+    for (let index = 0; index <= bays; index++) {
+      const z = z0 + ((z1 - z0) * index) / bays;
+      box(b.frames, reveal - 0.1, sill, z - rail / 2, reveal + 0.03, head, z + rail / 2, frame);
+    }
+    for (const y of [sill, transom, head])
+      box(b.frames, reveal - 0.11, y - 0.035, z0, reveal + 0.03, y + 0.035, z1, frame);
+  };
+  for (const [z0, z1] of [
+    [leftEdge, cz - doorHalf],
+    [cz + doorHalf, rightEdge],
+  ]) {
+    box(b.walls, reveal - 0.035, base, z0, reveal + 0.17, E * 0.25, z1, pier);
+    glazing(z0, z1, E * 0.25, 3);
+  }
+  glazing(cz - doorHalf, cz + doorHalf, base, 2);
+  for (const z of [leftEdge + 0.18, cz - half, cz + half, rightEdge - 0.18]) {
+    box(b.structure, 0.15, base, z - 0.12, 0.43, E - 0.18, z + 0.12, "#dfddd1");
+    box(b.structure, 0.1, base, z - 0.17, 0.48, base + 0.23, z + 0.17, stone);
+  }
   return { apex };
 }

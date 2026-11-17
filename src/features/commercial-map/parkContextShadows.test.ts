@@ -5,9 +5,12 @@ import { pointInPolygon, signedPolygonArea } from "./geometry";
 import { DAYLIGHT } from "./daylight";
 import { projectSunShadow, SUN_SHADOW } from "./sunShadows";
 import { polygonsOverlap, subtractPolygons } from "./parkGeometry";
-import { PARK_CORE_ENTITIES } from "./permanentParkLayout";
+import { registeredHallFrame } from "./parkHallArchitecture";
+import { viaExpressaRoof } from "./parkSupportArchitecture";
+import { PARK_CORE_ENTITIES, PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
 import {
   createParkContextShadows,
+  PARK_CONTEXT_SHADOW_SOURCES,
   deriveParkContextShadowCells,
   projectParkContextShadow,
 } from "./parkContextShadows";
@@ -20,6 +23,21 @@ const rect = (x0: number, z0: number, x1: number, z1: number): Point[] => [
 ];
 
 describe("shared permanent-park contact projection", () => {
+  it("leaves the Via Expressa forecourt sunlit in the lightweight roof projection", () => {
+    const hall = PERMANENT_PARK_LANDMARKS.find((item) => item.id === "via-expressa")!;
+    const frame = registeredHallFrame(hall.polygon);
+    const roof = viaExpressaRoof(frame.width, frame.depth);
+    const source = PARK_CONTEXT_SHADOW_SOURCES.find((item) => item.id === hall.id)!;
+    expect(source.height).toBe(roof.peak);
+    const area = Math.abs(signedPolygonArea(source.polygon));
+    expect(area).toBeCloseTo((roof.far - roof.near) * (roof.right - roof.left), 7);
+    const [x, , z] = frame.world([frame.width * 0.5, 0, frame.depth * 0.84]);
+    expect(pointInPolygon([x, z], hall.polygon)).toBe(true);
+    expect(
+      projectParkContextShadow(source, [0, 1, 0]).some((part) => pointInPolygon([x, z], part)),
+    ).toBe(false);
+  });
+
   it("keeps a concave yard open rather than shadowing its convex hull", () => {
     const source = {
       id: "concave",
@@ -75,7 +93,10 @@ describe("shared permanent-park contact projection", () => {
         expect(positions.getY(i)).toBeCloseTo(SUN_SHADOW.elevation);
         expect(normals.getY(i)).toBeCloseTo(1);
       }
-      for (const quality of ["light", "balanced", "detailed"] as const) shadow.setQuality(quality);
+      for (const quality of ["detailed", "balanced", "detailed", "light"] as const) {
+        shadow.setQuality(quality);
+        expect(shadow.mesh.visible).toBe(quality !== "detailed");
+      }
       expect(Array.from(positions.array)).toEqual(original);
       expect(shadow.mesh.visible).toBe(true);
       shadow.group.updateMatrixWorld(true);

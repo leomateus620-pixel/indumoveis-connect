@@ -16,7 +16,7 @@ export const VEGETATION = {
   leafAtlasSize: 128,
   nearDistances: { light: 55, balanced: 95, detailed: 130 },
   nearTriangleBudget: 30_000,
-  leavesPerTree: 450,
+  leavesPerTree: 7 * 8 * 5,
   sway: { x: 0.035, z: 0.022 },
   species: ["broadleaf", "upright", "spreading"],
 } as const;
@@ -99,23 +99,17 @@ const random = (i: number, seed: number) => {
 type Batch = { position: number[]; normal: number[]; uv: number[]; color: number[] };
 const batch = (): Batch => ({ position: [], normal: [], uv: [], color: [] });
 
-function append(
-  target: Batch,
-  geometry: THREE.BufferGeometry,
-  color: THREE.Color | ((point: THREE.Vector3) => THREE.Color),
-) {
+function append(target: Batch, geometry: THREE.BufferGeometry, color: THREE.Color) {
   const source = geometry.index ? geometry.toNonIndexed() : geometry;
   try {
     const p = source.getAttribute("position"),
       n = source.getAttribute("normal"),
       uv = source.getAttribute("uv");
-    const point = new THREE.Vector3();
     for (let i = 0; i < p.count; i++) {
       target.position.push(p.getX(i), p.getY(i), p.getZ(i));
       target.normal.push(n.getX(i), n.getY(i), n.getZ(i));
       target.uv.push(uv?.getX(i) ?? 0, uv?.getY(i) ?? 0);
-      const tint = typeof color === "function" ? color(point.fromBufferAttribute(p, i)) : color;
-      target.color.push(tint.r, tint.g, tint.b);
+      target.color.push(color.r, color.g, color.b);
     }
   } finally {
     if (source !== geometry) source.dispose();
@@ -128,25 +122,45 @@ function finish(data: Batch) {
   geometry.computeBoundingSphere();
   return geometry;
 }
-function leafAtlas() {
-  const size = VEGETATION.leafAtlasSize,
-    pixels = new Uint8Array(size * size * 4);
+let leafAtlasPixels: Uint8Array<ArrayBuffer> | undefined;
+function createLeafAtlasPixels(size: number) {
+  const pixels = new Uint8Array(size * size * 4);
   for (let y = 0; y < size; y++)
     for (let x = 0; x < size; x++) {
       const u = ((x + 0.5) / size) * 2 - 1,
         v = ((y + 0.5) / size) * 2 - 1;
-      const edge =
-        Math.abs(u) / Math.max(0.001, Math.sqrt(Math.max(0, 1 - v * v)) * (0.72 + 0.15 * v));
-      // Grayscale reflectance leaves the species hue in the vertex palette.
-      const vein =
-        Math.exp(-Math.abs(u) * 40) * 8 + Math.max(0, Math.cos(v * 32 + Math.abs(u) * 16)) ** 8 * 3;
-      const value = Math.round(237 + vein + Math.sin(x * 1.8 + y * 2.3) * 2);
+      // Three staggered pairs and a terminal leaf share a twig. Keep the
+      // inter-leaf gaps in alpha and pigment in linear-lit vertex colours.
+      const midrib = 0.1 * Math.sin((v + 0.6) * 2.3);
+      const lateral = Math.abs(u - midrib);
+      let shape = Math.abs(v) < 0.92 ? (0.033 - lateral) * 25 : -1;
+      let veinDistance = 1;
+      for (let pair = 0; pair < 3; pair++) {
+        const along = lateral / (0.92 - pair * 0.12);
+        if (along > 1) continue;
+        const axis = -0.78 + pair * 0.43 + along * 0.36 + (u > midrib ? 0.065 : 0);
+        veinDistance = Math.min(veinDistance, Math.abs(v - axis));
+        const halfWidth = Math.sin(Math.PI * along) ** 0.75 * 0.245;
+        shape = Math.max(shape, (halfWidth - Math.abs(v - axis)) * 8);
+      }
+      const terminal = 1 - ((u - midrib) / 0.23) ** 2 - ((v - 0.68) / 0.32) ** 2;
+      shape = Math.max(shape, terminal);
+      const vein = Math.exp(-veinDistance * 44);
+      const value = Math.round(
+        220 + lateral * 16 + vein * 15 + Math.sin(v * 65 - lateral * 43) * 3,
+      );
       pixels.set(
-        [value, value, value, Math.round(THREE.MathUtils.smoothstep(1 - edge, 0, 0.06) * 255)],
+        [value, value + 3, value - 4, Math.round(THREE.MathUtils.smoothstep(shape, 0, 0.11) * 255)],
         (y * size + x) * 4,
       );
     }
-  const texture = new THREE.DataTexture(pixels, size, size, THREE.RGBAFormat);
+  return pixels;
+}
+
+function leafAtlas() {
+  const size = VEGETATION.leafAtlasSize;
+  leafAtlasPixels ??= createLeafAtlasPixels(size);
+  const texture = new THREE.DataTexture(leafAtlasPixels, size, size, THREE.RGBAFormat);
   try {
     texture.name = "indumoveis-shared-leaf-atlas";
     texture.colorSpace = THREE.SRGBColorSpace;
@@ -238,7 +252,7 @@ export function createVegetation(
         map: texture,
         color: "#ffffff",
         vertexColors: true,
-        alphaTest: 0.45,
+        alphaTest: 0.32,
         side: THREE.DoubleSide,
       }),
     );
@@ -262,10 +276,7 @@ export function createVegetation(
         "#include <normal_fragment_begin>\nnormal *= faceDirection;",
       );
     };
-    leavesMaterial.customProgramCacheKey = () => "indumoveis-organic-leaves-v5";
-    const farMaterial = own(
-      new THREE.MeshLambertMaterial({ color: "#ffffff", vertexColors: true }),
-    );
+    leavesMaterial.customProgramCacheKey = () => "indumoveis-organic-leaves-v6";
     const woodMaterial = own(
       new THREE.MeshStandardMaterial({
         color: PARK_VEGETATION.bark,
@@ -333,9 +344,17 @@ export function createVegetation(
           ? tint.copy(interior).lerp(canopy, lightness / 0.52)
           : tint.copy(canopy).lerp(tips, (lightness - 0.52) / 0.48);
       };
-      const segment = (a: THREE.Vector3, b: THREE.Vector3, lower: number, upper: number) => {
+      const segment = (
+        a: THREE.Vector3,
+        b: THREE.Vector3,
+        lower: number,
+        upper: number,
+        sides = 6,
+      ) => {
         const direction = b.clone().sub(a),
-          geometry = own(new THREE.CylinderGeometry(upper, lower, direction.length(), 7));
+          geometry = own(
+            new THREE.CylinderGeometry(upper, lower, direction.length(), sides, 1, true),
+          );
         geometry.applyQuaternion(
           new THREE.Quaternion().setFromUnitVectors(up, direction.normalize()),
         );
@@ -348,88 +367,98 @@ export function createVegetation(
       ends.forEach((end, i) => {
         const root = joints[branchRoots[i]],
           elbow = root.clone().lerp(end, 0.55);
-        elbow.y -= 0.1;
+        // Curved scaffold limbs lean sideways as well as upwards.
+        const crook = (random(i, 14 + variant) - 0.5) * 0.46;
+        elbow.x += crook * end.z;
+        elbow.z -= crook * end.x;
+        elbow.y -= 0.16;
+
         const [base, middle, tip] = branchRadii;
         const fork = variant === 2 && i === 0;
         segment(root, elbow, fork ? taper[1] : base, fork ? taper[2] : middle);
         segment(elbow, end, fork ? taper[2] : middle, tip);
-        const lobe = own(new THREE.IcosahedronGeometry(0.82, 1)),
-          p = lobe.getAttribute("position");
-        for (let j = 0; j < p.count; j++) {
-          const x = p.getX(j),
-            y = p.getY(j),
-            z = p.getZ(j),
-            rough = 1 + Math.sin(x * 7 + y * 4 + z * 6 + i) * 0.12;
-          p.setXYZ(j, x * rough, y * rough, z * rough);
-        }
-        lobe.scale(width * 0.85, lobeHeight, width * 0.82);
-        lobe.translate(...end.toArray());
-        // IcosahedronGeometry is non-indexed: recomputing its normals would
-        // shade each triangle as a separate facet. Ellipsoidal radial normals
-        // keep volume and branch-lobe variation with a softer distant crown.
-        const normals = lobe.getAttribute("normal"),
-          normal = new THREE.Vector3();
-        for (let j = 0; j < p.count; j++) {
-          normal
-            .set(
-              (p.getX(j) - end.x) / (width * 0.85) ** 2,
-              (p.getY(j) - end.y) / lobeHeight ** 2,
-              (p.getZ(j) - end.z) / (width * 0.82) ** 2,
-            )
-            .normalize();
-          normals.setXYZ(j, normal.x, normal.y, normal.z);
-        }
-        const variation = (random(i, 26) - 0.5) * 0.14;
-        append(far, lobe, (point) => crownColor(point, i, variation));
-        release(lobe);
       });
-      // Small leaves form dense branch-end sprays, each in one cheap quad.
-      // There are no per-leaf objects, blend layers or additional draw calls.
-      const leafHeight = lobeHeight * 1.18;
-      for (let i = 0; i < VEGETATION.leavesPerTree; i++) {
-        const lobe = i % ends.length,
-          centre = ends[lobe],
-          a = random(i, 31 + variant) * Math.PI * 2,
-          v = random(i, 62) * 2 - 1;
-        const r = Math.cbrt(random(i, 87)) * 0.78,
-          radial = Math.sqrt(1 - v * v);
-        const p = centre
-          .clone()
-          .add(
-            new THREE.Vector3(
-              Math.cos(a) * radial * r * width,
-              v * r * leafHeight,
-              Math.sin(a) * radial * r * width,
-            ),
+      // Both LODs grow from the same eight asymmetric shoots per branch.
+      // From afar, two larger sprays per shoot retain holes and outline at
+      // 224 triangles/tree. The close model resolves five smaller sprays.
+      const forward = new THREE.Vector3(),
+        side = new THREE.Vector3();
+      const centre = new THREE.Vector3(),
+        normal = new THREE.Vector3();
+      const bladeNormal = new THREE.Vector3();
+      const quadCorners = [
+        [-1, -1],
+        [1, -1],
+        [1, 1],
+        [-1, -1],
+        [1, 1],
+        [-1, 1],
+      ];
+      function spray(target: Batch, halfWidth: number, halfLength: number, color: THREE.Color) {
+        for (const [u, v] of quadCorners) {
+          target.position.push(
+            centre.x + side.x * halfWidth * u + forward.x * halfLength * v,
+            centre.y + side.y * halfWidth * u + forward.y * halfLength * v,
+            centre.z + side.z * halfWidth * u + forward.z * halfLength * v,
           );
-        const leaf = own(
-          new THREE.PlaneGeometry(0.21 + random(i, 18) * 0.11, 0.3 + random(i, 40) * 0.12),
-        );
-        // Deterministic card tilt preserves the leaf silhouette. Shading uses
-        // the envelope normal of the same lobe that represents this LOD afar.
-        leaf.rotateX(Math.PI / 2 + (random(i, 23) - 0.5) * 1.8);
-        leaf.rotateY(a);
-        leaf.rotateZ((random(i, 29) - 0.5) * 1.2);
-        leaf.translate(...p.toArray());
-        const normal = new THREE.Vector3(
-          (p.x - centre.x) / width ** 2,
-          (p.y - centre.y) / leafHeight ** 2,
-          (p.z - centre.z) / width ** 2,
-        )
-          .normalize()
-          .addScaledVector(up, 0.18)
-          .normalize();
-        const normals = leaf.getAttribute("normal");
-        for (let j = 0; j < normals.count; j++) normals.setXYZ(j, normal.x, normal.y, normal.z);
-        append(near, leaf, crownColor(p, lobe, (random(i, 70) - 0.5) * 0.19 + 0.035));
-        release(leaf);
+          target.uv.push((u + 1) / 2, (v + 1) / 2);
+          bladeNormal
+            .copy(normal)
+            .addScaledVector(side, u * 0.23)
+            .addScaledVector(forward, v * 0.17)
+            .normalize();
+          target.normal.push(bladeNormal.x, bladeNormal.y, bladeNormal.z);
+          const brightness = 1 + v * 0.065;
+          target.color.push(color.r * brightness, color.g * brightness, color.b * brightness);
+        }
       }
+      ends.forEach((end, lobe) => {
+        for (let shoot = 0; shoot < 8; shoot++) {
+          const index = lobe * 8 + shoot;
+          const angle = shoot * 2.39996 + lobe * 1.71 + random(index, 13) * 0.6;
+          const lift = ((shoot + 0.5) / 8) * 2 - 1;
+          const spread = Math.sqrt(1 - lift * lift) * (0.49 + 0.23 * random(index, 28));
+          const offset = new THREE.Vector3(
+            width * Math.cos(angle) * spread,
+            lobeHeight * lift * 0.79,
+            width * Math.sin(angle) * spread,
+          );
+          if (shoot % 3 === 0)
+            segment(end, end.clone().addScaledVector(offset, 0.86), 0.026, 0.008, 4);
+          normal
+            .copy(offset)
+            .normalize()
+            .addScaledVector(lobeAxes[lobe], 0.5)
+            .addScaledVector(up, 0.27)
+            .normalize();
+          const azimuth = Math.atan2(normal.z, normal.x);
+          for (let j = 0; j < 5; j++) {
+            const i = index * 5 + j;
+            const bearing = azimuth + (j - 2) * 0.92 + (random(i, 23) - 0.5) * 0.5;
+            forward
+              .set(Math.cos(bearing), (random(i, 48) - 0.43) * 1.8, Math.sin(bearing))
+              .normalize();
+            side
+              .crossVectors(forward, up)
+              .normalize()
+              .applyAxisAngle(forward, (random(i, 72) - 0.5) * 1.7);
+            centre
+              .copy(end)
+              .add(offset)
+              .addScaledVector(forward, 0.16 + 0.13 * random(i, 57));
+            const size = 0.28 + random(i, 18) * 0.095;
+            const color = crownColor(centre, lobe, (random(i, 70) - 0.5) * 0.21);
+            spray(near, size * 0.88, size, color);
+            if (j === 1 || j === 3) spray(far, size * 1.24, size * 1.32, color);
+          }
+        }
+      });
       const model = { wood: own(finish(wood)), near: own(finish(near)), far: own(finish(far)) };
       let modelHeight = 0;
       let modelRadius = 0;
       for (const kind of ["wood", "near", "far"] as const) {
         const positions = model[kind].getAttribute("position");
-        const sway = kind === "near" ? swayRadius : 0;
+        const sway = kind === "wood" ? 0 : swayRadius;
         for (let i = 0; i < positions.count; i++) {
           modelHeight = Math.max(modelHeight, positions.getY(i));
           modelRadius = Math.max(
@@ -487,13 +516,16 @@ export function createVegetation(
           const mesh = own(
             new THREE.InstancedMesh(
               model[kind],
-              kind === "wood" ? woodMaterial : kind === "near" ? leavesMaterial : farMaterial,
+              kind === "wood" ? woodMaterial : leavesMaterial,
               members.length,
             ),
           );
           mesh.name = `tree-${kind}-${variant}`;
           mesh.userData.planting = true;
           mesh.userData.plantingIds = members.map(({ index }) => plantingAudit[index].id);
+          // The park canopy bakes once with the architecture. The distant
+          // contextual woodland keeps its own inexpensive ground projections.
+          mesh.castShadow = !approximateContext;
           mesh.raycast = () => {};
           members.forEach(({ point, index }, slot) => {
             const { horizontal, vertical, elevation } = instances[index];
@@ -505,9 +537,11 @@ export function createVegetation(
               instanceScale.set(horizontal, vertical, horizontal),
             );
             mesh.setMatrixAt(slot, matrix);
+            const lightness = 0.93 + random(index, 47) * 0.13;
+            const leafWarmth = kind === "wood" ? 0 : (random(index, 34) - 0.5) * 0.11;
             mesh.setColorAt(
               slot,
-              tint.setScalar(THREE.MathUtils.lerp(0.9, 1.05, random(index, 47))),
+              tint.setRGB(lightness + leafWarmth, lightness, lightness - leafWarmth),
             );
           });
           mesh.instanceMatrix.needsUpdate = true;
@@ -551,7 +585,7 @@ export function createVegetation(
       new THREE.InstancedMesh(contactGeometry, contactMaterial, points.length * 2),
     );
     contacts.name = "tree-contact";
-    contacts.userData.plantingIds = plantingAudit.flatMap((record) => [record.id, record.id]);
+    contacts.userData.plantingIds = [...plantingAudit, ...plantingAudit].map((record) => record.id);
     contacts.raycast = () => {};
     const [sunX, sunY, sunZ] = DAYLIGHT.sunDirection;
     const shadowRotation = new THREE.Quaternion().setFromAxisAngle(up, Math.atan2(sunZ, -sunX));
@@ -574,13 +608,13 @@ export function createVegetation(
         shadowRotation,
         sizeOnGround.set((width * 2.35 + 1.5) * horizontal, 1, width * 2.45 * horizontal),
       );
-      contacts.setMatrixAt(i * 2, matrix);
+      contacts.setMatrixAt(i + points.length, matrix);
       matrix.compose(
         centre.set(point[0], contactY, point[1]),
         groundRotation,
         sizeOnGround.set(0.95 * horizontal, 1, 0.95 * horizontal),
       );
-      contacts.setMatrixAt(i * 2 + 1, matrix);
+      contacts.setMatrixAt(i, matrix);
     });
     contacts.instanceMatrix.needsUpdate = true;
     contacts.computeBoundingSphere();
@@ -612,6 +646,13 @@ export function createVegetation(
         pair.far.visible = !pair.near.visible;
       }
     };
+    // Keep trunk contact in Detailed; use the second half for directional
+    // crown projections when the cached shadow map is disabled.
+    const syncContacts = () => {
+      contacts.count =
+        !approximateContext && quality === "detailed" ? points.length : points.length * 2;
+    };
+    syncContacts();
     updateLod(lastDistance);
     return {
       group,
@@ -641,6 +682,7 @@ export function createVegetation(
       },
       setQuality(tier: SurfaceQuality) {
         quality = tier;
+        syncContacts();
         updateLod(lastDistance, lastTarget);
       },
       updateLod,

@@ -361,21 +361,24 @@ const METRES_PER_RADIAN = 6378137;
 const referenceScale = 0.195;
 const anchor = OSM_NODES[ANCHOR_ID];
 const longitudeScale = Math.cos(anchor[1] * RADIANS);
-function localMetres(id: string): Point {
-  const node = OSM_NODES[id];
-  if (!node) throw new Error(`Missing selected OSM node ${id}`);
+function localMetres(node: readonly number[]): Point {
   return [
     (node[0] - anchor[0]) * RADIANS * METRES_PER_RADIAN * longitudeScale,
     (node[1] - anchor[1]) * RADIANS * METRES_PER_RADIAN,
   ];
 }
-const cam = localMetres(CAMPEIRA_BENVENUTO_ID);
+const cam = localMetres(OSM_NODES[CAMPEIRA_BENVENUTO_ID]);
 const measuredAnchorDistance = Math.hypot(...cam);
 const unitsPerMetre = (referenceScale * 760) / measuredAnchorDistance;
 const u: Point = [-cam[0] / measuredAnchorDistance, -cam[1] / measuredAnchorDistance];
 const v: Point = [u[1], -u[0]];
 export function projectReferenceNode(id: string): Point {
-  const [east, north] = localMetres(id);
+  const node = OSM_NODES[id];
+  if (!node) throw new Error(`Missing selected OSM node ${id}`);
+  return projectReferenceCoordinate(node);
+}
+export function projectReferenceCoordinate(coordinate: readonly number[]): Point {
+  const [east, north] = localMetres(coordinate);
   return [
     ANCHOR_WORLD[0] + (east * u[0] + north * u[1]) * unitsPerMetre,
     ANCHOR_WORLD[1] + (east * v[0] + north * v[1]) * unitsPerMetre,
@@ -604,25 +607,33 @@ export const REFERENCE_ROADS: ReferenceRoad[] = [
     ...fromNodes(
       "benvenuto-approach",
       "Avenida Benvenuto de Conti",
-      ["953262435", "1553497179"],
-      ["2132115382", "8787950866", "6770753557", "14102589768", "7776485898"],
+      ["953262435"],
+      ["2132115382", "8787950866"],
       9.9,
-      ["benvenuto", "campeira", "roundabout"],
+      ["benvenuto", "campeira", "benvenuto-entry", "benvenuto-exit"],
     ),
     path: [
       [26.36, (URBAN_REFERENCE.avenueNorth + URBAN_REFERENCE.avenueSouth) / 2],
-      ...["2132115382", "8787950866", "6770753557", "14102589768", "7776485898"].map(
-        projectReferenceNode,
-      ),
+      ...["2132115382", "8787950866"].map(projectReferenceNode),
     ],
   },
+  // Each one-way arm meets a distinct mapped OSM node on the ring.
+  // Road widths in drawing units are presentation estimates.
+  ...[
+    ["benvenuto-entry", "1553497180", "Acesso da Benvenuto", "benvenuto-approach"],
+    ["benvenuto-exit", "1553497179", "Avenida Benvenuto de Conti", "benvenuto-approach"],
+    ["tuparendi-entry-northeast", "891242798", "Acesso da Tuparendi", "tuparendi"],
+    ["tuparendi-entry-southwest", "891242797", "Acesso da Tuparendi", "tuparendi-southwest"],
+  ].map(([id, way, name, approach]) =>
+    fromNodes(id, name, [way], REFERENCE_WAYS[way].nodes, 3.15, [approach, "roundabout"]),
+  ),
   fromNodes(
     "tuparendi",
     "Avenida Tuparendi",
     ["833033190", "203230187"],
     ["7776485913", ...REFERENCE_WAYS["203230187"].nodes],
     6.4,
-    ["roundabout", "campeira"],
+    ["roundabout", "campeira", "tuparendi-entry-northeast"],
   ),
   fromNodes(
     "tuparendi-southwest",
@@ -630,7 +641,7 @@ export const REFERENCE_ROADS: ReferenceRoad[] = [
     ["833033191", "447054088"],
     ["7776485910", ...[...REFERENCE_WAYS["447054088"].nodes].reverse()],
     6.4,
-    ["roundabout", "secondary-roundabout"],
+    ["roundabout", "secondary-roundabout", "tuparendi-entry-southwest"],
   ),
   fromNodes(
     "secondary-tuparendi-east",

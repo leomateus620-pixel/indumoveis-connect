@@ -1,0 +1,857 @@
+{
+  "base": "f667717",
+  "conditions": {
+    "os": "darwin 25.6.0",
+    "cpu": "Apple M5",
+    "logicalCores": 10,
+    "systemMemoryGiB": 16,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [
+      "/assets/MapRenderer-xtar_fNG.js"
+    ],
+    "optionalContextAssets": [
+      "/assets/urbanContext-FQMc7byt.js"
+    ],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "httpCache": "Disabled by Playwright request routing; warm means SPA/module reentry in the same document, not a cached HTTP load",
+    "browser": "157.0.8103.79"
+  },
+  "method": "Three independent contexts per condition. 6.5 s orbit per context, same viewport, manual profile, DPR=1. Record active frame intervals with requestAnimationFrame; no GPU memory query.",
+  "desktop-before": [
+    {
+      "run": 0,
+      "tier": "detailed",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "buffer": [
+        1294,
+        655
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 660.5,
+      "first3D_ms": 898.7,
+      "complete_ms": 2069.8,
+      "openingLongTasks_ms": [
+        149,
+        168,
+        65,
+        350
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.8,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 0.6,
+        "p95": 2.7,
+        "max": 3.4
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 152,
+        "p95": 170,
+        "max": 171
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 258238,
+        "p95": 342738,
+        "max": 356354
+      },
+      "overviewTextures": 14,
+      "overviewEstimatedTextureBytes": 20316273,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        1,
+        1
+      ]
+    },
+    {
+      "run": 1,
+      "tier": "detailed",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "buffer": [
+        1294,
+        655
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 619.2,
+      "first3D_ms": 836.4,
+      "complete_ms": 2040.7,
+      "openingLongTasks_ms": [
+        121,
+        169,
+        66,
+        349
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.8,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 2.5,
+        "p95": 3.2,
+        "max": 4.9
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 152,
+        "p95": 170,
+        "max": 171
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 258238,
+        "p95": 342906,
+        "max": 356505
+      },
+      "overviewTextures": 14,
+      "overviewEstimatedTextureBytes": 20316273,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        1,
+        1
+      ]
+    },
+    {
+      "run": 2,
+      "tier": "detailed",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "buffer": [
+        1294,
+        655
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 595.6,
+      "first3D_ms": 816.9,
+      "complete_ms": 2055.3,
+      "openingLongTasks_ms": [
+        121,
+        189,
+        57,
+        399
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.7,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 0.7,
+        "p95": 0.8,
+        "max": 1.7
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 152,
+        "p95": 170,
+        "max": 171
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 259495,
+        "p95": 342356,
+        "max": 363989
+      },
+      "overviewTextures": 14,
+      "overviewEstimatedTextureBytes": 20316273,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        1,
+        1
+      ]
+    }
+  ],
+  "desktop-after": [
+    {
+      "run": 0,
+      "tier": "detailed",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "buffer": [
+        1294,
+        655
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 631.6,
+      "first3D_ms": 852.4,
+      "complete_ms": 2086,
+      "openingLongTasks_ms": [
+        129,
+        165,
+        69,
+        359
+      ],
+      "frameInterval_ms": {
+        "n": 389,
+        "p50": 16.7,
+        "p95": 16.7,
+        "max": 33.3
+      },
+      "cpuSubmission_ms": {
+        "n": 390,
+        "p50": 2.4,
+        "p95": 3,
+        "max": 3.5
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 390,
+        "p50": 152,
+        "p95": 169,
+        "max": 170
+      },
+      "triangles": {
+        "n": 390,
+        "p50": 218091,
+        "p95": 270634,
+        "max": 287591
+      },
+      "overviewTextures": 16,
+      "overviewEstimatedTextureBytes": 20316273,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        3,
+        3
+      ]
+    },
+    {
+      "run": 1,
+      "tier": "detailed",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "buffer": [
+        1294,
+        655
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 628.5,
+      "first3D_ms": 849.3,
+      "complete_ms": 2049.5,
+      "openingLongTasks_ms": [
+        121,
+        163,
+        63,
+        360
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.8,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 2.4,
+        "p95": 3.3,
+        "max": 3.9
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 152,
+        "p95": 169,
+        "max": 170
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 218091,
+        "p95": 270532,
+        "max": 282471
+      },
+      "overviewTextures": 16,
+      "overviewEstimatedTextureBytes": 20316273,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        3,
+        3
+      ]
+    },
+    {
+      "run": 2,
+      "tier": "detailed",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "buffer": [
+        1294,
+        655
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 632.2,
+      "first3D_ms": 852,
+      "complete_ms": 2102,
+      "openingLongTasks_ms": [
+        118,
+        168,
+        67,
+        365
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.7,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 2.3,
+        "p95": 3.1,
+        "max": 3.5
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 152,
+        "p95": 169,
+        "max": 170
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 218091,
+        "p95": 270388,
+        "max": 282342
+      },
+      "overviewTextures": 16,
+      "overviewEstimatedTextureBytes": 20316273,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        3,
+        3
+      ]
+    }
+  ],
+  "mobile-before": [
+    {
+      "run": 0,
+      "tier": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "buffer": [
+        390,
+        689
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 633.7,
+      "first3D_ms": 1164.7,
+      "complete_ms": 2553.6,
+      "openingLongTasks_ms": [
+        149,
+        118,
+        208,
+        349,
+        60,
+        435
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.7,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 1.5,
+        "p95": 2.3,
+        "max": 2.6
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 92,
+        "p95": 126,
+        "max": 130
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 145528,
+        "p95": 266223,
+        "max": 279155
+      },
+      "overviewTextures": 11,
+      "overviewEstimatedTextureBytes": 10354801,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        0,
+        0
+      ]
+    },
+    {
+      "run": 1,
+      "tier": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "buffer": [
+        390,
+        689
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 615.4,
+      "first3D_ms": 832.9,
+      "complete_ms": 2020.3,
+      "openingLongTasks_ms": [
+        121,
+        172,
+        69,
+        350
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.7,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 2,
+        "p95": 2.7,
+        "max": 3.1
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 93,
+        "p95": 126,
+        "max": 130
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 145528,
+        "p95": 266949,
+        "max": 279155
+      },
+      "overviewTextures": 11,
+      "overviewEstimatedTextureBytes": 10354801,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        0,
+        0
+      ]
+    },
+    {
+      "run": 2,
+      "tier": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "buffer": [
+        390,
+        689
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 612.5,
+      "first3D_ms": 832.6,
+      "complete_ms": 2020.4,
+      "openingLongTasks_ms": [
+        123,
+        178,
+        67,
+        350
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.7,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 1.7,
+        "p95": 2.5,
+        "max": 2.8
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 93,
+        "p95": 126,
+        "max": 130
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 145528,
+        "p95": 265827,
+        "max": 279155
+      },
+      "overviewTextures": 11,
+      "overviewEstimatedTextureBytes": 10354801,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        0,
+        0
+      ]
+    }
+  ],
+  "mobile-after": [
+    {
+      "run": 0,
+      "tier": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "buffer": [
+        390,
+        689
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 628.8,
+      "first3D_ms": 852.8,
+      "complete_ms": 2101.4,
+      "openingLongTasks_ms": [
+        127,
+        169,
+        67,
+        364
+      ],
+      "frameInterval_ms": {
+        "n": 389,
+        "p50": 16.7,
+        "p95": 16.7,
+        "max": 33.3
+      },
+      "cpuSubmission_ms": {
+        "n": 390,
+        "p50": 1.9,
+        "p95": 2.6,
+        "max": 3.3
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 390,
+        "p50": 94,
+        "p95": 129,
+        "max": 133
+      },
+      "triangles": {
+        "n": 390,
+        "p50": 125245,
+        "p95": 183608,
+        "max": 198754
+      },
+      "overviewTextures": 13,
+      "overviewEstimatedTextureBytes": 10354801,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        0,
+        0
+      ]
+    },
+    {
+      "run": 1,
+      "tier": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "buffer": [
+        390,
+        689
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 614.1,
+      "first3D_ms": 830.8,
+      "complete_ms": 2048.2,
+      "openingLongTasks_ms": [
+        121,
+        167,
+        69,
+        360
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.8,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 1.8,
+        "p95": 2.6,
+        "max": 3.5
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 94,
+        "p95": 129,
+        "max": 133
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 125354,
+        "p95": 183622,
+        "max": 198754
+      },
+      "overviewTextures": 13,
+      "overviewEstimatedTextureBytes": 10354801,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        0,
+        0
+      ]
+    },
+    {
+      "run": 2,
+      "tier": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "buffer": [
+        390,
+        689
+      ],
+      "webgl": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "interactive2D_ms": 586.2,
+      "first3D_ms": 815.9,
+      "complete_ms": 2033,
+      "openingLongTasks_ms": [
+        128,
+        168,
+        61,
+        365
+      ],
+      "frameInterval_ms": {
+        "n": 390,
+        "p50": 16.7,
+        "p95": 16.7,
+        "max": 16.8
+      },
+      "cpuSubmission_ms": {
+        "n": 391,
+        "p50": 1.6,
+        "p95": 2.4,
+        "max": 3.1
+      },
+      "intervalsOver50ms": 0,
+      "calls": {
+        "n": 391,
+        "p50": 94,
+        "p95": 129,
+        "max": 133
+      },
+      "triangles": {
+        "n": 391,
+        "p50": 125356,
+        "p95": 183608,
+        "max": 198754
+      },
+      "overviewTextures": 13,
+      "overviewEstimatedTextureBytes": 10354801,
+      "minimumDpr": 1,
+      "minimumScale": 1,
+      "shadowUpdates": [
+        0,
+        0
+      ]
+    }
+  ],
+  "longNavigation": {
+    "duration": 65000,
+    "frameIntervalMs": {
+      "n": 2000,
+      "p50": 16.7,
+      "p95": 16.7,
+      "max": 16.8
+    },
+    "framesOver50Ms": 0,
+    "cpuSubmissionMs": {
+      "n": 2000,
+      "p50": 1.7,
+      "p95": 2.7,
+      "max": 3.1
+    },
+    "drawCalls": {
+      "n": 3902,
+      "p50": 151,
+      "p95": 171,
+      "max": 172
+    },
+    "triangles": {
+      "n": 3902,
+      "p50": 191737,
+      "p95": 247564,
+      "max": 254177
+    },
+    "minimumScale": 1,
+    "minimumDpr": 1
+  },
+  "reentries": [
+    {
+      "elapsedMs": 1056.6,
+      "closed": {
+        "created": 1,
+        "active": 0
+      },
+      "opened": {
+        "created": 2,
+        "active": 1
+      },
+      "resources": {
+        "instance": "a97bec29-16f5-4084-903e-5f352e4201d1",
+        "pbr": {
+          "loaded": true,
+          "textureBytes": 524400,
+          "source": "basis",
+          "compressed": true
+        },
+        "planting": true,
+        "woodland": true,
+        "sky": 2097152,
+        "shadow": 0,
+        "terrain": 174764,
+        "environment": 1572864
+      },
+      "textures": 13,
+      "textureBytesEstimate": 10354801,
+      "optionalFailures": [],
+      "tier": "balanced",
+      "daylight": {
+        "mode": "warm",
+        "profileKey": "warm@1",
+        "mix": 1,
+        "sunDirection": [
+          -0.5,
+          0.707,
+          0.5
+        ],
+        "skyDetail": "rich",
+        "skyBytes": 2097152,
+        "environmentPreparations": 1,
+        "shadowDraws": 1
+      }
+    },
+    {
+      "elapsedMs": 1016.2,
+      "closed": {
+        "created": 2,
+        "active": 0
+      },
+      "opened": {
+        "created": 3,
+        "active": 1
+      },
+      "resources": {
+        "instance": "82ad8f79-4ca3-472d-81bf-8d394c32515a",
+        "pbr": {
+          "loaded": true,
+          "textureBytes": 524400,
+          "source": "basis",
+          "compressed": true
+        },
+        "planting": true,
+        "woodland": true,
+        "sky": 2097152,
+        "shadow": 0,
+        "terrain": 174764,
+        "environment": 1572864
+      },
+      "textures": 13,
+      "textureBytesEstimate": 10354801,
+      "optionalFailures": [],
+      "tier": "balanced",
+      "daylight": {
+        "mode": "warm",
+        "profileKey": "warm@1",
+        "mix": 1,
+        "sunDirection": [
+          -0.5,
+          0.707,
+          0.5
+        ],
+        "skyDetail": "rich",
+        "skyBytes": 2097152,
+        "environmentPreparations": 1,
+        "shadowDraws": 1
+      }
+    },
+    {
+      "elapsedMs": 1031.2,
+      "closed": {
+        "created": 3,
+        "active": 0
+      },
+      "opened": {
+        "created": 4,
+        "active": 1
+      },
+      "resources": {
+        "instance": "e605a433-58ef-4f0c-a243-2af83af2045c",
+        "pbr": {
+          "loaded": true,
+          "textureBytes": 524400,
+          "source": "basis",
+          "compressed": true
+        },
+        "planting": true,
+        "woodland": true,
+        "sky": 2097152,
+        "shadow": 0,
+        "terrain": 174764,
+        "environment": 1572864
+      },
+      "textures": 13,
+      "textureBytesEstimate": 10354801,
+      "optionalFailures": [],
+      "tier": "balanced",
+      "daylight": {
+        "mode": "warm",
+        "profileKey": "warm@1",
+        "mix": 1,
+        "sunDirection": [
+          -0.5,
+          0.707,
+          0.5
+        ],
+        "skyDetail": "rich",
+        "skyBytes": 2097152,
+        "environmentPreparations": 1,
+        "shadowDraws": 1
+      }
+    }
+  ],
+  "measurementLimit": "2000 latest active intervals retained in the diagnostic buffer for the 65 s orbit. Device-specific WebGL texture count and estimated resident bytes are different measures."
+}

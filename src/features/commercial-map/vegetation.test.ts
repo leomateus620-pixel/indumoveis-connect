@@ -182,6 +182,27 @@ describe("organic instanced planting", () => {
       expect(material.map!.generateMipmaps).toBe(true);
       expect(material.alphaTest).toBeGreaterThan(0);
       expect(material.transparent).toBe(false);
+      // The far mesh shares the cutout twig atlas and branch layout. The
+      // envelope stays within the same visual size across the LOD boundary.
+      for (const tree of near) {
+        const sibling = meshes(model).find(
+          (mesh) => mesh.name === tree.name.replace("-near-", "-far-"),
+        )!;
+        expect(sibling.material).toBe(tree.material);
+        tree.geometry.computeBoundingBox();
+        sibling.geometry.computeBoundingBox();
+        const close = tree.geometry.boundingBox!.getSize(new THREE.Vector3());
+        const distant = sibling.geometry.boundingBox!.getSize(new THREE.Vector3());
+        for (const ratio of distant.divide(close).toArray()) {
+          expect(ratio).toBeGreaterThan(0.85);
+          expect(ratio).toBeLessThan(1.15);
+        }
+      }
+      const contact = meshes(model).find((mesh) => mesh.name === "tree-contact")!;
+      model.setQuality("detailed");
+      expect(contact.count).toBe(model.metadata.totalTrees);
+      model.setQuality("light");
+      expect(contact.count).toBe(model.metadata.totalTrees * 2);
       expect(near.every((mesh) => mesh.frustumCulled && mesh.boundingSphere !== null)).toBe(true);
       for (const mesh of near) {
         mesh.geometry.computeBoundingBox();

@@ -63,7 +63,12 @@ describe("surface-supported physical park connectivity", () => {
 
   it("reports uncovered gate and equipment anchors instead of accepting proximity", () => {
     const report = auditParkConnectivity();
-    expect(report.anchors.some((anchor) => anchor.kind === "gate")).toBe(true);
+    expect(report.anchors.find((anchor) => anchor.id === "A2")?.vehicleConnected).toBe(false);
+    expect(report.externalPassages.map((p) => [p.id, p.supported])).toEqual([
+      ["A3-1", true],
+      ["A3-2", true],
+      ["A5", true],
+    ]);
     expect(report.anchors.some((anchor) => anchor.kind === "block")).toBe(true);
     expect(report.anchors.filter((anchor) => anchor.kind === "block")).toHaveLength(
       PARK_PHYSICAL_BLOCKS.reduce((count, block) => count + block.referencePieces.length, 0),

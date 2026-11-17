@@ -47,7 +47,7 @@ function triangle(
   a: Vertex,
   b: Vertex,
   c: Vertex,
-  hex: string,
+  color: string | ((p: Vertex) => Vertex),
   outward?: Vertex,
 ) {
   const n = cross(sub(b, a), sub(c, a));
@@ -62,7 +62,7 @@ function triangle(
           : 2;
   for (const p of [a, b, c]) {
     bucket.position.push(...p);
-    bucket.color.push(...rgb(hex));
+    bucket.color.push(...(typeof color === "string" ? rgb(color) : color(p)));
     bucket.uv.push(axis === 0 ? p[2] : p[0], axis === 1 ? p[2] : p[1]);
   }
 }
@@ -202,26 +202,65 @@ function tree(
     center[1] + z * scale * shape[2],
   ];
   const root: Vertex = [0, -0.02, 0],
-    elbow: Vertex = [0.04, 1.15, 0.02],
-    fork: Vertex = [-0.06, 1.95, 0.03];
-  branch(bucket, at(root), at(elbow), 0.12 * scale, 0.085 * scale);
-  branch(bucket, at(elbow), at(fork), 0.085 * scale, 0.05 * scale);
-  const crowns: { point: Vertex; size: Vertex }[] = [
-    { point: [-0.38, 2.2, 0.08], size: [0.94, 0.88, 0.88] },
-    { point: [0.39, 2.52, 0.15], size: [0.82, 0.88, 0.8] },
-    { point: [0.08, 1.83, -0.42], size: [0.8, 0.82, 0.78] },
-  ];
-  crowns.forEach(({ point, size }, i) => {
-    branch(bucket, at(elbow), at(point), 0.052 * scale, 0.017 * scale);
-    lobe(
-      bucket,
-      at(point),
-      size.map((n, axis) => n * scale * shape[axis]) as Vertex,
-      seed + i,
-      LEAVES[(seed + i) % LEAVES.length],
-      true,
-    );
-  });
+    elbow: Vertex = [0.05, 0.95, 0.015],
+    fork: Vertex = [-0.08, 2.07, 0.05];
+  branch(bucket, at(root), at(elbow), 0.112 * scale, 0.083 * scale);
+  branch(bucket, at(elbow), at(fork), 0.083 * scale, 0.04 * scale);
+
+  const [centerWorldX, centerWorldZ] = center;
+  const deep = rgb(["#425738", "#3f583b", "#4a5938"][seed % 3]);
+  const tips = rgb(["#86a966", "#7c9f60", "#95ad69"][seed % 3]);
+  // Eight branches over staggered levels. Five folded leaf sprays per branch
+  // supply small gaps through the crown. Two trunk segments plus the limbs
+  // use 80 triangles; the five-sided sprays use the remaining 200.
+  for (let arm = 0; arm < 8; arm++) {
+    const level = arm / 7;
+    const yaw = (seed + arm) * 2.39996 + 0.28 * Math.sin(seed * 0.81 + arm * 1.4);
+    const reach = 0.78 - 0.48 * level * level + 0.08 * Math.sin(yaw * 4);
+    const height = 1.76 + level * 1.09 + 0.12 * Math.sin(seed * 0.63 + arm * 2.3);
+    const start: Vertex = elbow.map((v, i) => v + (fork[i] - v) * level) as Vertex;
+    const end: Vertex = [Math.cos(yaw) * reach, height, Math.sin(yaw) * reach];
+    branch(bucket, at(start), at(end), (0.052 - 0.019 * level) * scale, 0.017 * scale);
+
+    for (let spray = 0; spray < 5; spray++) {
+      const t = 0.62 + 0.095 * spray;
+      const center = start.map((v, i) => v + (end[i] - v) * t) as Vertex;
+      const angle = yaw + (spray - 2) * 1.17 + 0.21 * Math.sin(arm + seed + spray * 1.4);
+      const dx = Math.cos(angle),
+        dz = Math.sin(angle);
+      const length = 0.69 + 0.095 * Math.sin(seed * 0.78 + arm + spray * 1.39);
+      const spread = 0.28 + 0.052 * Math.sin(arm * 1.77 + spray);
+      const lift = 0.24 + 0.19 * Math.sin(seed * 0.37 + arm * 1.16 + spray * 2.1);
+      const point = (along: number, across: number, y: number): Vertex =>
+        at([
+          center[0] + dx * along - dz * across,
+          center[1] + y,
+          center[2] + dz * along + dx * across,
+        ]);
+      // Each folded spray bends upward at its midrib then drops its tips.
+      // Unequal outer shoulders break the silhouette even in a grazing view.
+      const rim = [
+        point(-0.13, 0, -0.08),
+        point(length * 0.22, spread * 0.91, lift - 0.13),
+        point(length * 0.83, spread * 0.54, lift - 0.23),
+        point(length, 0, lift - 0.29),
+        point(length * 0.47, -spread, lift - 0.08),
+      ];
+      const ridge = point(length * 0.41, 0.018, lift + 0.2);
+      const colorAt = (p: Vertex): Vertex => {
+        const y = (p[1] - groundY) / scale;
+        const radial = Math.hypot(p[0] - centerWorldX, p[2] - centerWorldZ) / scale;
+        const light = Math.min(0.96, Math.max(0.08, (y - 1.28) * 0.35 + radial * 0.15));
+        return [
+          deep[0] + (tips[0] - deep[0]) * light,
+          deep[1] + (tips[1] - deep[1]) * light,
+          deep[2] + (tips[2] - deep[2]) * light,
+        ];
+      };
+      for (let edge = 0; edge < rim.length; edge++)
+        triangle(bucket, rim[edge], rim[(edge + 1) % rim.length], ridge, colorAt, [0, 1, 0]);
+    }
+  }
 }
 
 /** Curved grounded trunk, articulated midribs and five pairs of inexpensive

@@ -1,6 +1,6 @@
 import { ShapeUtils, Vector2 } from "three";
 import type { Point } from "./data/territory";
-import { signedPolygonArea } from "./geometry";
+import { pointInPolygon, signedPolygonArea } from "./geometry";
 
 export type ArchitecturalVertex = [number, number, number];
 /** Vertical extrusion of the actual concave footprint. Y is interpolated,
@@ -9,12 +9,58 @@ export function footprintClipper(footprint: readonly Point[]) {
   const pieces = ShapeUtils.triangulateShape(
     footprint.map((p) => new Vector2(...p)),
     [],
-  ).map((indices) => indices.map((i) => footprint[i]));
+  ).map((indices) => {
+    const points = indices.map((i) => footprint[i]);
+    const sign = Math.sign(signedPolygonArea(points));
+    return {
+      points,
+      sign,
+      minX: Math.min(...points.map((p) => p[0])),
+      maxX: Math.max(...points.map((p) => p[0])),
+      minZ: Math.min(...points.map((p) => p[1])),
+      maxZ: Math.max(...points.map((p) => p[1])),
+    };
+  });
+  // Most small frame members lie entirely inside the outline. A triangle
+  // whose plan bounds miss every boundary has the same membership throughout.
+  // Keep its original three vertices instead of cutting it at internal ears.
+  const boundary = footprint.map((p, i) => {
+    const q = footprint[(i + 1) % footprint.length];
+    return {
+      minX: Math.min(p[0], q[0]),
+      maxX: Math.max(p[0], q[0]),
+      minZ: Math.min(p[1], q[1]),
+      maxZ: Math.max(p[1], q[1]),
+    };
+  });
   return (triangle: readonly ArchitecturalVertex[]): ArchitecturalVertex[][] => {
     const result: ArchitecturalVertex[][] = [],
       seen = new Set<string>();
-    for (const piece of pieces) {
-      const sign = Math.sign(signedPolygonArea(piece));
+    const [u, v, w] = triangle;
+    const minX = Math.min(u[0], v[0], w[0]),
+      maxX = Math.max(u[0], v[0], w[0]);
+    const minZ = Math.min(u[2], v[2], w[2]),
+      maxZ = Math.max(u[2], v[2], w[2]);
+    const overlaps = (b: (typeof boundary)[number]) =>
+      minX <= b.maxX + 1e-8 &&
+      maxX >= b.minX - 1e-8 &&
+      minZ <= b.maxZ + 1e-8 &&
+      maxZ >= b.minZ - 1e-8;
+    if (!boundary.some(overlaps)) {
+      if (!pointInPolygon([u[0], u[2]], footprint)) return [];
+      const abX = v[0] - u[0],
+        abY = v[1] - u[1],
+        abZ = v[2] - u[2];
+      const acX = w[0] - u[0],
+        acY = w[1] - u[1],
+        acZ = w[2] - u[2];
+      if (Math.hypot(abY * acZ - abZ * acY, abZ * acX - abX * acZ, abX * acY - abY * acX) < 1e-9)
+        return [];
+      return [[u, v, w]];
+    }
+    for (const bounds of pieces) {
+      const { points: piece, sign } = bounds;
+      if (!overlaps(bounds)) continue;
       let polygon = [...triangle];
       for (let i = 0; i < piece.length && polygon.length; i++) {
         const a = piece[i],

@@ -1,0 +1,422 @@
+{
+  "parque": {
+    "requested": {
+      "position": [
+        70,
+        178,
+        265
+      ],
+      "target": [
+        83,
+        24
+      ]
+    },
+    "position": [
+      70,
+      178,
+      265.0000000000002
+    ],
+    "target": [
+      83,
+      24
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "eventos": {
+    "requested": {
+      "position": [
+        126,
+        11,
+        48
+      ],
+      "target": [
+        162,
+        36
+      ]
+    },
+    "position": [
+      126,
+      11,
+      48
+    ],
+    "target": [
+      162,
+      36
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "sede": {
+    "requested": {
+      "position": [
+        143,
+        8,
+        69
+      ],
+      "target": [
+        157,
+        60.5
+      ]
+    },
+    "position": [
+      143,
+      7.999999999999999,
+      69
+    ],
+    "target": [
+      157,
+      60.5
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "arena": {
+    "requested": {
+      "position": [
+        187,
+        21,
+        32
+      ],
+      "target": [
+        228,
+        4
+      ]
+    },
+    "position": [
+      187,
+      21.000000000000004,
+      32
+    ],
+    "target": [
+      228,
+      4
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "arenaFrente": {
+    "requested": {
+      "position": [
+        196,
+        5.8,
+        9
+      ],
+      "target": [
+        228,
+        5
+      ]
+    },
+    "position": [
+      192.9005163639103,
+      6.74769109875039,
+      9.387435454511216
+    ],
+    "target": [
+      228,
+      5
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "pecuaria": {
+    "requested": {
+      "position": [
+        45,
+        7.5,
+        -8
+      ],
+      "target": [
+        73,
+        -30
+      ]
+    },
+    "position": [
+      45,
+      7.5,
+      -7.9999999999999964
+    ],
+    "target": [
+      73,
+      -30
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "pavilhoes": {
+    "requested": {
+      "position": [
+        98,
+        31,
+        145
+      ],
+      "target": [
+        104,
+        78
+      ]
+    },
+    "position": [
+      98,
+      30.999999999999993,
+      145.00000000000003
+    ],
+    "target": [
+      104,
+      78.00000000000001
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "fachada": {
+    "requested": {
+      "position": [
+        95,
+        8.5,
+        54
+      ],
+      "target": [
+        107,
+        74
+      ]
+    },
+    "position": [
+      95,
+      8.500000000000002,
+      54.000000000000014
+    ],
+    "target": [
+      107,
+      74.00000000000001
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "arvores": {
+    "requested": {
+      "position": [
+        84,
+        7.2,
+        40
+      ],
+      "target": [
+        79,
+        30
+      ]
+    },
+    "position": [
+      85.64139737558067,
+      9.563612220836141,
+      43.282794751161305
+    ],
+    "target": [
+      79.00000000000001,
+      30.000000000000004
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "copa": {
+    "requested": {
+      "position": [
+        68,
+        4.3,
+        63.5
+      ],
+      "target": [
+        60.9,
+        59.2
+      ]
+    },
+    "position": [
+      72.93644226218429,
+      7.289676299632735,
+      66.48967629963273
+    ],
+    "target": [
+      60.9,
+      59.2
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "rotula": {
+    "requested": {
+      "position": [
+        -23,
+        37,
+        139
+      ],
+      "target": [
+        -48,
+        97
+      ]
+    },
+    "position": [
+      -23.000000000000007,
+      37,
+      139
+    ],
+    "target": [
+      -48,
+      97
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "portao": {
+    "requested": {
+      "position": [
+        136,
+        7,
+        100
+      ],
+      "target": [
+        147,
+        94
+      ]
+    },
+    "position": [
+      121.90784305498312,
+      15.967736237738016,
+      107.68663106091829
+    ],
+    "target": [
+      147,
+      94
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "acessoLeste": {
+    "requested": {
+      "position": [
+        242,
+        52,
+        113
+      ],
+      "target": [
+        287,
+        57
+      ]
+    },
+    "position": [
+      242,
+      52,
+      113
+    ],
+    "target": [
+      287,
+      57
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "horizonte": {
+    "requested": {
+      "position": [
+        67,
+        18,
+        191
+      ],
+      "target": [
+        68,
+        99
+      ]
+    },
+    "position": [
+      67,
+      17.99999999999999,
+      191
+    ],
+    "target": [
+      68,
+      99.00000000000001
+    ],
+    "dpr": 1,
+    "buffer": [
+      1294,
+      655
+    ],
+    "tier": "detailed"
+  },
+  "mobile": {
+    "requested": {
+      "position": [
+        98,
+        31,
+        145
+      ],
+      "target": [
+        104,
+        78
+      ]
+    },
+    "position": [
+      98,
+      30.999999999999993,
+      145.00000000000003
+    ],
+    "target": [
+      104,
+      78.00000000000001
+    ],
+    "dpr": 1,
+    "buffer": [
+      390,
+      689
+    ],
+    "tier": "light"
+  }
+}

@@ -55,6 +55,21 @@ def noise(u, v, frequency, field):
     )
 
 
+def veil(sky, directions):
+    """A thin high layer with long wind-aligned streaks and breaks of clear sky."""
+    x, y, z = np.moveaxis(directions, -1, 0)
+    # Unit sphere coordinates keep the field continuous across the longitude seam.
+    wind = x * .84 + z * .54
+    cross = z * .84 - x * .54 + y * .32
+    field = np.random.default_rng(31825).random((96, 96))
+    bank = noise(wind, cross + y * .9, 2.6, field)
+    strand = noise(wind * 1.6, y * 12 + cross * .9 + bank * .65, 3.5, field)
+    alpha = .12 * smooth(bank, .43, .81) * smooth(strand, .33, .81)
+    # Leave the skyline and polar texels on the same calibrated base gradient.
+    alpha *= smooth(y, .09, .25) * (1 - smooth(y, .7, .96))
+    return mix(sky, linear("#e5edf0"), alpha)
+
+
 # Degrees of azimuth, elevation and angular half-size. The low layer is
 # composed for the navigable sky band, with broken blue between cloud groups.
 # Smaller distant formations are flatter, while the closer shapes have height.
@@ -126,7 +141,7 @@ def main():
     elevation[0], elevation[-1] = -math.pi / 2, math.pi / 2
     az, el = np.meshgrid(azimuth, elevation)
     directions = np.stack([np.cos(az) * np.cos(el), np.sin(el), np.sin(az) * np.cos(el)], axis=-1)
-    sky = sky_gradient(directions)
+    sky = veil(sky_gradient(directions), directions)
     for index, cloud in sorted(enumerate(CLOUDS), key=lambda entry: entry[1][1], reverse=True):
         paint_cloud(sky, directions, cloud, 24179 + index * 1709)
     srgb = np.where(sky < .0031308, sky * 12.92, 1.055 * sky ** (1 / 2.4) - .055)

@@ -4,6 +4,9 @@ import { ENTITIES } from "./data/territory";
 import { DISTRICT_REFERENCE } from "./urbanDistrictReference";
 import { pointInPolygon } from "./geometry";
 import { URBAN_REFERENCE, ACTIVE_REFERENCE_ROADS } from "./urbanReference";
+import { derivePavement, PAVEMENT } from "./pavement";
+import { PARK_RENDER_ENTITIES } from "./permanentParkLayout";
+import { EAST_APPROACH, deriveUrbanPavement } from "./urbanPavement";
 import { deriveRoadRibbon } from "./roadGeometry";
 import { createSurfaceMaterials } from "./surfaceMaterials";
 import { deriveUrbanContact } from "./urbanContact";
@@ -179,7 +182,11 @@ describe("approximate residential context outside the source park", () => {
               Number.isFinite,
             ),
           ).toBe(true);
-          expect(p.getZ(i)).toBeGreaterThanOrEqual(URBAN_CONTEXT.minimumZ);
+          const minimum =
+            object.name === "urban-road"
+              ? Math.min(...EAST_APPROACH.highway.map((point) => point[1])) - 1.85
+              : URBAN_CONTEXT.minimumZ;
+          expect(p.getZ(i)).toBeGreaterThanOrEqual(minimum);
         }
         expect(object.userData.entityId).toBeUndefined();
         expect(object.userData.commercialPickable).toBe(false);
@@ -469,6 +476,31 @@ describe("approximate residential context outside the source park", () => {
       context.dispose();
     }
   });
+  it("honours A2 floor ownership and matches asphalt texture coordinates across the main entrance", () => {
+    const park = derivePavement(PARK_RENDER_ENTITIES);
+    const external = deriveUrbanPavement(park);
+    const witness: [number, number] = [146.95, 95.5];
+    expect(park.asphaltCells.some((polygon) => pointInPolygon(witness, polygon))).toBe(true);
+    expect(external.asphalt.some((polygon) => pointInPolygon(witness, polygon))).toBe(false);
+    const context = createUrbanContext({ parkPavement: park });
+    try {
+      const road = (context.group.getObjectByName("urban-road") as THREE.Mesh).geometry;
+      const positions = road.getAttribute("position");
+      const uv = road.getAttribute("uv");
+      for (let i = 0; i < positions.count; i++) {
+        expect(uv.getX(i)).toBeCloseTo(positions.getX(i) / PAVEMENT.grainTile, 4);
+        expect(uv.getY(i)).toBeCloseTo(positions.getZ(i) / PAVEMENT.grainTile, 4);
+      }
+      // Each triangle belongs to a single linear section of the approach.
+      for (let i = 0; i < elementCount(road); i += 3) {
+        const zs = [0, 1, 2].map((j) => positions.getZ(vertexIndex(road, i + j)));
+        for (const seam of [URBAN_REFERENCE.avenueSouth, URBAN_REFERENCE.avenueSouth + 5])
+          expect(Math.min(...zs) < seam - 1e-5 && Math.max(...zs) > seam + 1e-5).toBe(false);
+      }
+    } finally {
+      context.dispose();
+    }
+  });
   it("uses mapped street connections, two continuous circles and separated contextual parcels without replacing the source", () => {
     const before = JSON.stringify(ENTITIES),
       context = createUrbanContext();
@@ -498,7 +530,23 @@ describe("approximate residential context outside the source park", () => {
         expect(asphaltAt([x, URBAN_REFERENCE.avenueSection.asphaltNorth - 0.3])).toBe(false);
         expect(asphaltAt([x, URBAN_REFERENCE.avenueSection.asphaltSouth + 0.3])).toBe(false);
       }
+      const pavement = deriveUrbanPavement();
+      const on = (point: [number, number], cells: [number, number][][]) =>
+        cells.some((polygon) => pointInPolygon(point, polygon));
+      // Divergent one-way branches leave an unpaved splitter. A continuous
+      // public ribbon extended to both nodes used to cover this entire area.
+      expect(on([-35, 95.7], pavement.asphalt)).toBe(false);
+      expect(on([-35, 95.7], pavement.sidewalks)).toBe(false);
+      for (const point of EAST_APPROACH.highway.slice(1, -1)) expect(asphaltAt(point)).toBe(true);
       const graph = deriveUrbanRoads();
+      for (const r of graph.filter((road) => road.terminal || road.id === "campeira")) {
+        const [a, b] = r.path;
+        const south = URBAN_REFERENCE.avenueSouth + 0.5;
+        const t = (south - a[1]) / (b[1] - a[1]);
+        const mouth: [number, number] = [a[0] + t * (b[0] - a[0]), south];
+        expect(on(mouth, pavement.asphalt)).toBe(true);
+        expect(on(mouth, pavement.sidewalks)).toBe(false);
+      }
       expect(graph.find((r) => r.id === "campeira")!.connects).toContain("tuparendi");
       for (const id of ["musicanto", "fenasoja", "10-de-agosto"]) {
         const r = graph.find((r) => r.id === id)!;
