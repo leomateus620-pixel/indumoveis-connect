@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 
 import numpy as np
-from facades import ATLAS, SAMPLES, TILE
 from footprints import load_footprints
+from frontage import generate as generate_frontage
 from PIL import Image
 from rasterio.features import rasterize
 from rasterio.transform import from_origin
@@ -99,77 +99,15 @@ def photo_grid(cache):
     mid, _ = fuse_pan(load_source(cache, "pan-mid")[0], true_colour, 8192, stops)
     far = expose(true_colour)
     for name, rgb in [("near", near), ("mid", mid), ("far", far)]:
-        save_webp(Image.fromarray(rgb), name, 512, 2048)
+        # At this distance the measured panorama carries the skyline. Keep the
+        # full Sentinel grid for the offline projection and a smaller ground fallback.
+        save_webp(Image.fromarray(rgb), name, 512, 1024 if name == "far" else 2048)
     return near, mid, far
 
 
-def facade_sampler(footprints, estimate):
-    # Each taller measured footprint gets a local frame parallel to its longest
-    # surveyed image edge. A window row is sampled at a physical height above
-    # its ground and keeps its phase when adjacent azimuth rays hit the wall.
-    frames = np.zeros((len(footprints) + 1, 6), dtype="float32")
-    for idx in np.flatnonzero(estimate > 12):
-        ring = np.asarray(footprints[idx - 1]["geometry"]["coordinates"][0])
-        edges = np.diff(ring, axis=0)
-        side = edges[np.argmax(np.sum(edges * edges, axis=1))]
-        u = side / max(np.linalg.norm(side), 1e-6)
-        v = np.array([-u[1], u[0]])
-        local = ring @ np.stack([u, v], axis=1)
-        centre = (local.max(axis=0) + local.min(axis=0)) / 2
-        frames[idx] = [
-            *(centre[0] * u + centre[1] * v),
-            *u,
-            *np.maximum(np.ptp(local, axis=0), 1),
-        ]
-    # Pre-filter the photographic material to angular pixel size in three
-    # distance bands. Wrapped filtering and 2x supersampling avoid moiré.
-    atlas = np.asarray(Image.open(ATLAS).convert("RGB"), dtype="float32")
-    materials = [0, 1, 3]
-    tw, th = TILE
-    texture = []
-    for distance in [1800, 2650, 3700]:
-        tiles = []
-        for material in materials:
-            _, span, storeys, _ = SAMPLES[material]
-            image = atlas[material * th : (material + 1) * th]
-            sigma_x = 0.27 * distance * np.deg2rad(360 / BAND_WIDTH) * tw / span
-            sigma_y = (
-                0.27 * distance * np.deg2rad((HIGH - LOW) / BAND_HEIGHT) * th / storeys
-            )
-            tiles.append(gaussian_filter(image, (sigma_y, sigma_x, 0), mode="wrap"))
-        texture.append(tiles)
-    texture = np.asarray(texture)
-    spans = np.array([SAMPLES[m][1:3] for m in materials])
-
-    def sample(roof_ids, direction, distance, physical_height):
-        e, n = np.sin(direction) * distance, np.cos(direction) * distance
-        cx, cy, ux, uy, extent_x, extent_y = frames[roof_ids].T
-        local_x, local_y = (e - cx) * ux + (n - cy) * uy, -(e - cx) * uy + (n - cy) * ux
-        along = np.where(
-            abs(local_x) / extent_x < abs(local_y) / extent_y, local_x, local_y
-        )
-        mat = roof_ids % len(materials)
-        tx = (
-            np.floor(tw * (along / spans[mat, 0] + (roof_ids % 11) / 11)).astype(int)
-        ) % tw
-        ty = (np.floor(-th * physical_height / spans[mat, 1]).astype(int)) % th
-        mip = (distance > 2200).astype(int) + (distance > 3150).astype(int)
-        return texture[mip, mat, ty, tx]
-
-    return sample
-
-
-def ray_data(cache, near, far, mid=None):
-    surface = load_source(cache, "relief")[0]
-    cover = load_source(cache, "landCover")[0]
+def footprint_heights(cache, footprints):
+    """One robust height per measured footprint, shared by mesh and panorama."""
     heights, confidences = load_source(cache, "building")
-    # Surface includes canopy/roofs. Infer only a local underlying ground for
-    # building pixels, then take the maximum; adding heights to DSM doubles roofs.
-    floor = gaussian_filter(minimum_filter(surface, size=3), sigma=1)
-    # Aggregate relative heights over *observed* Microsoft roof outlines. The
-    # same roof receives one robust height instead of isolated predicted pixels
-    # turning into needles. Unmeasured roofs retain the existing DSM silhouette.
-    footprints = load_footprints(cache)
     labels = rasterize(
         ((f["geometry"], i + 1) for i, f in enumerate(footprints)),
         out_shape=heights.shape,
@@ -186,8 +124,32 @@ def ray_data(cache, near, far, mid=None):
     estimate = np.zeros(len(footprints) + 1, dtype="float32")
     enough = count >= 2
     estimate[roof_ids[enough]] = h[sort[begin + (count * 0.65).astype(int)]][enough]
+    return labels, estimate
+
+
+def ray_data(cache, near, far, mid=None):
+    surface = load_source(cache, "relief")[0]
+    cover = load_source(cache, "landCover")[0]
+    # Surface includes canopy/roofs. Infer only a local underlying ground for
+    # building pixels, then take the maximum; adding heights to DSM doubles roofs.
+    floor = gaussian_filter(minimum_filter(surface, size=3), sigma=1)
+    # Aggregate relative heights over *observed* Microsoft roof outlines. The
+    # same roof receives one robust height instead of isolated predicted pixels
+    # turning into needles. Unmeasured roofs retain the existing DSM silhouette.
+    footprints = load_footprints(cache)
+    labels, estimate = footprint_heights(cache, footprints)
     mass = estimate[labels]
-    sample_wall = facade_sampler(footprints, estimate) if near is not None else None
+    center_radii = np.array(
+        [
+            0,
+            *(
+                np.linalg.norm(np.mean(f["geometry"]["coordinates"][0][:-1], axis=0))
+                for f in footprints
+            ),
+        ]
+    )
+    in_mesh = (estimate > 12) & (estimate < 120) & (center_radii <= 4000)
+    background_mass = np.where(in_mesh, 0, estimate)[labels]
     # Smoothed footprint edge normals determine which vertical faces receive
     # the shared easterly key light. The sign of rows is opposite true north.
     dy, dx = np.gradient(gaussian_filter(mass, sigma=0.85))
@@ -210,13 +172,13 @@ def ray_data(cache, near, far, mid=None):
         e, n = np.sin(radians)[:, None] * ranges, np.cos(radians)[:, None] * ranges
         dsm = grid_samples(surface, e, n, 50000)
         tree_or_land = grid_samples(cover, e, n, 50000, 0)
-        building = grid_samples(mass, e, n, 8192, 0)
+        building = grid_samples(background_mass if colour else mass, e, n, 8192, 0)
         building[(abs(e) >= 4096) | (abs(n) >= 4096)] = 0
-        # Runtime uses georeferenced image cards for near buildings. Only
-        # suppress that extra height on the production band; retain it in the
-        # analytics so those compare the complete measured line of sight.
+        # Sightline analytics include all measured roofs in front of the observer.
         if colour:
-            building *= np.clip((ranges - 1400) / 100, 0, 1)
+            # The nearby settlement and the taller city buildings have closed world-space
+            # meshes. Repeating a facade in the panorama would leave a second silhouette.
+            building *= np.clip((ranges - 1450) / 100, 0, 1)
         roofs = grid_samples(floor, e, n, 50000) + building
         z = np.where(building > 0, np.maximum(dsm, roofs), dsm)
         if not colour:
@@ -238,8 +200,6 @@ def ray_data(cache, near, far, mid=None):
             building,
             np.stack(rgb, axis=-1),
             side,
-            grid_samples(labels, e, n, 8192, 0),
-            sample_wall,
         )
 
     offsets = (np.arange(512, dtype="float32") + 0.5) * 16 - 4096
@@ -271,9 +231,7 @@ def panorama(rays, ranges, ground):
         "uint8"
     )
     for start in range(0, size, 64):
-        z, building, rgb, side, roof_ids, sample_wall = rays(
-            directions[start : start + 64]
-        )
+        z, building, rgb, side = rays(directions[start : start + 64])
         for index, agl in enumerate([16, 72]):
             angles = skyline_angle(z, ranges, ground + agl)
             envelope = np.maximum.accumulate(angles, axis=1)
@@ -299,20 +257,6 @@ def panorama(rays, ranges, ground):
                 )
                 wall_tone = 0.72 + 0.24 * side[j, k] + 0.06 * height_fraction
                 wall_rgb = (sample * 0.58 + [71, 72, 70]) * wall_tone[:, None]
-                tall = (building[j, k] > 12) & (wall_weight > 0.05)
-                if np.any(tall):
-                    k_tall = k[tall]
-                    photo = sample_wall(
-                        roof_ids[j, k_tall],
-                        np.deg2rad(directions[start + j]),
-                        depth[tall],
-                        height_fraction[tall] * building[j, k_tall],
-                    )
-                    # Keep pale plaster, blue glazing and brick in the sampled
-                    # material, then apply the same lighting and air as the hill.
-                    wall_rgb[tall] = (0.8 * photo + 0.20 * wall_rgb[tall]) * wall_tone[
-                        tall, None
-                    ]
                 sample += (wall_rgb - sample) * wall_weight[:, None]
                 # Moderate terrestrial scattering retains different ridgelines
                 # behind valleys. No sun, cloud or photographed sky in the band.
@@ -327,8 +271,12 @@ def panorama(rays, ranges, ground):
                 # the cropped edge over 0.15° instead of extruding a 950 m wall.
                 edge = np.clip(1 + (elevations[visible] - angles[j, 0]) / 0.15, 0, 1)
                 column[visible, 3] = np.round(255 * edge)
+                # Extend the measured ridge into the transparent sky. A ray arriving
+                # above a crest must follow its surface as the eye moves; a synthetic
+                # 25-km sky depth here used to tear or double the edge of that crest.
+                depth_pixels[:, start + j, index] = encoded_depth[np.argmax(angles[j])]
                 depth_pixels[visible, start + j, index] = np.where(
-                    column[visible, 3] > 0, encoded_depth[k], 255
+                    column[visible, 3] > 0, encoded_depth[k], encoded_depth[0]
                 )
     for i, name in enumerate(["horizon-low", "horizon-high"]):
         save_webp(Image.fromarray(images[i]), name, 2048, BAND_WIDTH)
@@ -435,6 +383,7 @@ def main():
     for path in [args.cache, OUT, EVIDENCE]:
         path.mkdir(parents=True, exist_ok=True)
     near, mid, far = photo_grid(args.cache)
+    generate_frontage(args.cache, OUT)
     rays, ranges, ground, cover = ray_data(args.cache, near, far, mid)
     ridges = panorama(rays, ranges, ground)
     report = relief_report(rays, ranges, ground, cover, ridges)

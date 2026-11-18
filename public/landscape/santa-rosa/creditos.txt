@@ -32,11 +32,12 @@ Copas: World Resources Institute e Meta (2024), High Resolution Canopy Height Ma
 https://registry.opendata.aws/dataforgood-fb-forests/
 https://creativecommons.org/licenses/by/4.0/
 
-Textura fotográfica das fachadas: Loco085, Santa Rosa - RS - Panorámica centro, 11/02/2017. Recortes retificados de fachadas e folhagens (fachadas-santa-rosa.webp e folhagem-santa-rosa.webp), correção tonal e composição nos atlas settlement-*.webp e nas fachadas dos panoramas horizon-*.webp. Esses materiais fotográficos transformados são distribuídos sob CC BY-SA 3.0 Unported.
+Textura fotográfica das fachadas: Loco085, Santa Rosa - RS - Panorámica centro, 11/02/2017. Recortes retificados de fachadas e folhagens (fachadas-santa-rosa.webp e folhagem-santa-rosa.webp), correção tonal e composição nos atlas settlement-*.webp. Esses materiais fotográficos transformados são distribuídos sob CC BY-SA 3.0 Unported.
 https://commons.wikimedia.org/wiki/File:Santa_Rosa_-_RS_-_Panor%C3%A1mica_centro.jpg
 https://creativecommons.org/licenses/by-sa/3.0/
 
-Registro com as vias da cena: © colaboradores do OpenStreetMap, ODbL.
+Vias na faixa do parque e do bairro: © colaboradores do OpenStreetMap, ODbL 1.0. 33 eixos da consulta de 17/11/2026, via e versão conservadas em scripts/santa-rosa/frontage-roads.geojson. As larguras ópticas foram estimadas no CBERS de 12/02/2024. Composição em frontage-*.webp com o mosaico CBERS/Sentinel, contornos Microsoft e CHM WRI/Meta citados acima.
+https://api.openstreetmap.org/api/0.6/map?bbox=-54.501,-27.866,-54.456,-27.824
 https://www.openstreetmap.org/copyright
 
-Data de acesso dos insumos: 17 de novembro de 2026. Imagens do Google Earth usadas exclusivamente para a conferência visual do território.
+Data de acesso dos insumos: 17 e 18 de novembro de 2026. Conferência visual no Google Earth em 18/11/2026.

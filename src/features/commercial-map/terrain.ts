@@ -306,9 +306,10 @@ export function createTerrain(
             float modelWeight = 1.;
             if (landscapeActive) {
               vec2 maskUV = (parkSurfaceWorld - landscapeMaskFrame.xy) / landscapeMaskFrame.zw;
+              // Outside the surveyed window the park has zero coverage. At grazing angles
+              // coarse mip levels of the finite mask otherwise average in distant park pixels.
+              if (any(lessThan(maskUV, vec2(0.))) || any(greaterThan(maskUV, vec2(1.)))) discard;
               modelWeight = texture2D(landscapeMask, vec2(maskUV.x, 1. - maskUV.y)).r;
-              // The analytic aerial in the background now owns this terrain. Its ray hits even
-              // beyond the commercial frustum without affecting facade/lot depth precision.
               if (modelWeight < .004) discard;
             }`,
         );

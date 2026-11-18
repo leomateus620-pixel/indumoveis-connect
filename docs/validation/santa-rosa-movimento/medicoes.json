@@ -1,0 +1,948 @@
+{
+  "beforeCommit": "04db1295a1d5cca20eca219234e331a28e38d3fd",
+  "conditions": {
+    "os": "darwin 25.6.0",
+    "cpu": "Apple M5",
+    "logicalCores": 10,
+    "systemMemoryGiB": 16,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [],
+    "optionalContextAssets": [],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "httpCache": "Contexto novo no frio. Segunda navegação no mesmo contexto e cache HTTP nativo no quente. Ativos estáticos max-age=3600, fontes remotas bloqueadas.",
+    "browser": "157.0.8103.79"
+  },
+  "poses": {
+    "avenida": {
+      "position": [
+        136.83901780236857,
+        10.884257820656401,
+        89.98587875459374
+      ],
+      "target": [
+        80,
+        85
+      ],
+      "distance": 58.08614292583044,
+      "tiltDownDegrees": 10.800000000000011,
+      "bearingAboutSceneZ": 84.9868862449642,
+      "verticalFovDegrees": 38,
+      "buffer": [
+        1464,
+        897
+      ],
+      "tier": "detailed",
+      "heightMetres": 23.931,
+      "trueBearingDegrees": 155.815,
+      "lighting": "warm",
+      "level": "detail"
+    },
+    "pavilhoes": {
+      "position": [
+        212.0000000000001,
+        32.00000000000003,
+        69
+      ],
+      "target": [
+        77,
+        65
+      ],
+      "distance": 138.7984149765408,
+      "tiltDownDegrees": 13.329465485867033,
+      "bearingAboutSceneZ": 88.30284381039972,
+      "verticalFovDegrees": 38,
+      "buffer": [
+        1464,
+        897
+      ],
+      "tier": "detailed",
+      "heightMetres": 70.358,
+      "trueBearingDegrees": 152.499,
+      "lighting": "warm",
+      "level": "detail"
+    },
+    "arena": {
+      "position": [
+        -292.0000000000003,
+        112.00000000000007,
+        -42.00000000000004
+      ],
+      "target": [
+        66,
+        23
+      ],
+      "distance": 380.700669818166,
+      "tiltDownDegrees": 17.109235555817207,
+      "bearingAboutSceneZ": -100.29076196081152,
+      "verticalFovDegrees": 38,
+      "buffer": [
+        1464,
+        897
+      ],
+      "tier": "detailed",
+      "heightMetres": 246.253,
+      "trueBearingDegrees": 341.093,
+      "lighting": "warm",
+      "level": "detail"
+    },
+    "divisa": {
+      "position": [
+        -38.08221773295176,
+        215,
+        85.27941307825243
+      ],
+      "target": [
+        -38.08221773295176,
+        84.2794130782466
+      ],
+      "distance": 215.002325568818,
+      "tiltDownDegrees": 89.73350992394005,
+      "bearingAboutSceneZ": 0,
+      "verticalFovDegrees": 38,
+      "buffer": [
+        1464,
+        897
+      ],
+      "tier": "detailed",
+      "heightMetres": 472.718,
+      "trueBearingDegrees": 240.802,
+      "lighting": "warm",
+      "level": "detail"
+    }
+  },
+  "route": [
+    "avenida",
+    "pavilhoes",
+    "divisa",
+    "arena",
+    "divisa",
+    "pavilhoes",
+    "avenida"
+  ],
+  "before": {
+    "profiles": [
+      {
+        "buffer": [
+          1464,
+          897
+        ],
+        "tier": "detailed",
+        "level": "detail",
+        "usefulFrameMs": 832.0999999940395,
+        "compactMs": 1320.7999999970198,
+        "finalMs": 2483.7999999970198,
+        "transferBytes": 7289152,
+        "landscapeTransferBytes": 5373040,
+        "landscapeFiles": [
+          {
+            "file": "settlement.bin",
+            "transfer": 186564
+          },
+          {
+            "file": "far-compact.webp",
+            "transfer": 70692
+          },
+          {
+            "file": "near-compact.webp",
+            "transfer": 47426
+          },
+          {
+            "file": "mid-compact.webp",
+            "transfer": 43446
+          },
+          {
+            "file": "horizon-low-compact.webp",
+            "transfer": 29296
+          },
+          {
+            "file": "horizon-high-compact.webp",
+            "transfer": 35674
+          },
+          {
+            "file": "settlement-compact.webp",
+            "transfer": 512308
+          },
+          {
+            "file": "depth-compact.png",
+            "transfer": 52790
+          },
+          {
+            "file": "landscape-mask-B1OEq2iW.png",
+            "transfer": 26051
+          },
+          {
+            "file": "relief.png",
+            "transfer": 68230
+          },
+          {
+            "file": "near-detail.webp",
+            "transfer": 539942
+          },
+          {
+            "file": "mid-detail.webp",
+            "transfer": 561918
+          },
+          {
+            "file": "horizon-low-detail.webp",
+            "transfer": 127490
+          },
+          {
+            "file": "horizon-high-detail.webp",
+            "transfer": 187486
+          },
+          {
+            "file": "far-detail.webp",
+            "transfer": 955142
+          },
+          {
+            "file": "depth-detail.png",
+            "transfer": 132867
+          },
+          {
+            "file": "settlement-detail.webp",
+            "transfer": 1795718
+          }
+        ],
+        "peakLandscapeTextureBytes": 162478205,
+        "estimatedPeakSceneTextureBytes": 182794478,
+        "featureBytes": 186264,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "detailed",
+        "cache": "cold",
+        "beforeInput": {
+          "level": "pending",
+          "azimuth": -0.49098454725863055
+        },
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "1464×897"
+          ],
+          "levels": [
+            "detail"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          1464,
+          897
+        ],
+        "tier": "detailed",
+        "level": "detail",
+        "usefulFrameMs": 770.2999999970198,
+        "compactMs": 1274,
+        "finalMs": 2370.89999999851,
+        "transferBytes": 16372,
+        "landscapeTransferBytes": 0,
+        "landscapeFiles": [
+          {
+            "file": "settlement.bin",
+            "transfer": 0
+          },
+          {
+            "file": "near-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "mid-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "far-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-low-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-high-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "settlement-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "depth-compact.png",
+            "transfer": 0
+          },
+          {
+            "file": "landscape-mask-B1OEq2iW.png",
+            "transfer": 0
+          },
+          {
+            "file": "relief.png",
+            "transfer": 0
+          },
+          {
+            "file": "near-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "mid-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "far-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-low-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-high-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "settlement-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "depth-detail.png",
+            "transfer": 0
+          }
+        ],
+        "peakLandscapeTextureBytes": 162478205,
+        "estimatedPeakSceneTextureBytes": 182794478,
+        "featureBytes": 186264,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "detailed",
+        "cache": "warm",
+        "beforeInput": {
+          "level": "pending",
+          "azimuth": -0.49098454725863055
+        },
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "1464×897"
+          ],
+          "levels": [
+            "detail"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          390,
+          689
+        ],
+        "tier": "light",
+        "level": "compact",
+        "usefulFrameMs": 812.6000000014901,
+        "compactMs": 1316.8999999985099,
+        "finalMs": 1316.8999999985099,
+        "transferBytes": 2564286,
+        "landscapeTransferBytes": 1072477,
+        "landscapeFiles": [
+          {
+            "file": "settlement.bin",
+            "transfer": 186564
+          },
+          {
+            "file": "near-compact.webp",
+            "transfer": 47426
+          },
+          {
+            "file": "far-compact.webp",
+            "transfer": 70692
+          },
+          {
+            "file": "mid-compact.webp",
+            "transfer": 43446
+          },
+          {
+            "file": "horizon-low-compact.webp",
+            "transfer": 29296
+          },
+          {
+            "file": "horizon-high-compact.webp",
+            "transfer": 35674
+          },
+          {
+            "file": "settlement-compact.webp",
+            "transfer": 512308
+          },
+          {
+            "file": "depth-compact.png",
+            "transfer": 52790
+          },
+          {
+            "file": "landscape-mask-B1OEq2iW.png",
+            "transfer": 26051
+          },
+          {
+            "file": "relief.png",
+            "transfer": 68230
+          }
+        ],
+        "peakLandscapeTextureBytes": 19871865,
+        "estimatedPeakSceneTextureBytes": 30226666,
+        "featureBytes": 186264,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "light",
+        "cache": "cold",
+        "beforeInput": {
+          "level": "pending",
+          "azimuth": -0.49098454725863055
+        },
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "390×689"
+          ],
+          "levels": [
+            "compact"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          390,
+          689
+        ],
+        "tier": "light",
+        "level": "compact",
+        "usefulFrameMs": 768.6000000014901,
+        "compactMs": 1288.6999999955297,
+        "finalMs": 1288.6999999955297,
+        "transferBytes": 16372,
+        "landscapeTransferBytes": 0,
+        "landscapeFiles": [
+          {
+            "file": "settlement.bin",
+            "transfer": 0
+          },
+          {
+            "file": "near-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "mid-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "far-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-low-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-high-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "settlement-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "depth-compact.png",
+            "transfer": 0
+          },
+          {
+            "file": "landscape-mask-B1OEq2iW.png",
+            "transfer": 0
+          },
+          {
+            "file": "relief.png",
+            "transfer": 0
+          }
+        ],
+        "peakLandscapeTextureBytes": 19871865,
+        "estimatedPeakSceneTextureBytes": 30226666,
+        "featureBytes": 186264,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "light",
+        "cache": "warm",
+        "beforeInput": {
+          "level": "pending",
+          "azimuth": -0.49098454725863055
+        },
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "390×689"
+          ],
+          "levels": [
+            "compact"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      }
+    ],
+    "inducedPressure": {
+      "changes": [
+        {
+          "state": "1318×703 detail/detail balanced",
+          "atMs": 2481
+        },
+        {
+          "state": "1186×632 detail/compact balanced",
+          "atMs": 7311
+        },
+        {
+          "state": "1186×632 compact/compact balanced",
+          "atMs": 8262
+        }
+      ],
+      "statesDuringOrbit": 3,
+      "finalLevel": "compact"
+    }
+  },
+  "after": {
+    "profiles": [
+      {
+        "buffer": [
+          1464,
+          897
+        ],
+        "tier": "detailed",
+        "level": "detail",
+        "usefulFrameMs": 834.3999999985099,
+        "compactMs": 1325.5,
+        "finalMs": 2270.7000000029802,
+        "transferBytes": 4922293,
+        "landscapeTransferBytes": 3005000,
+        "landscapeFiles": [
+          {
+            "file": "settlement.bin",
+            "transfer": 597119
+          },
+          {
+            "file": "near-compact.webp",
+            "transfer": 47426
+          },
+          {
+            "file": "frontage-compact.webp",
+            "transfer": 33696
+          },
+          {
+            "file": "mid-compact.webp",
+            "transfer": 43446
+          },
+          {
+            "file": "horizon-low-compact.webp",
+            "transfer": 28446
+          },
+          {
+            "file": "far-compact.webp",
+            "transfer": 70692
+          },
+          {
+            "file": "horizon-high-compact.webp",
+            "transfer": 35452
+          },
+          {
+            "file": "settlement-compact.webp",
+            "transfer": 5640
+          },
+          {
+            "file": "depth-compact.png",
+            "transfer": 51507
+          },
+          {
+            "file": "landscape-mask-DPIpnGQj.png",
+            "transfer": 33670
+          },
+          {
+            "file": "relief.png",
+            "transfer": 68230
+          },
+          {
+            "file": "frontage-detail.webp",
+            "transfer": 113874
+          },
+          {
+            "file": "near-detail.webp",
+            "transfer": 539942
+          },
+          {
+            "file": "horizon-low-detail.webp",
+            "transfer": 121400
+          },
+          {
+            "file": "far-detail.webp",
+            "transfer": 330904
+          },
+          {
+            "file": "mid-detail.webp",
+            "transfer": 561918
+          },
+          {
+            "file": "horizon-high-detail.webp",
+            "transfer": 178472
+          },
+          {
+            "file": "settlement-detail.webp",
+            "transfer": 14180
+          },
+          {
+            "file": "depth-detail.png",
+            "transfer": 128986
+          }
+        ],
+        "peakLandscapeTextureBytes": 125266528,
+        "estimatedPeakSceneTextureBytes": 145582801,
+        "featureBytes": 2287782,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "detailed",
+        "cache": "cold",
+        "beforeInput": {
+          "level": "pending",
+          "azimuth": -0.49098454725863055
+        },
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "1464×897"
+          ],
+          "levels": [
+            "detail"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          1464,
+          897
+        ],
+        "tier": "detailed",
+        "level": "detail",
+        "usefulFrameMs": 770.7999999970198,
+        "compactMs": 1261.6000000014901,
+        "finalMs": 2187.6999999955297,
+        "transferBytes": 16372,
+        "landscapeTransferBytes": 0,
+        "landscapeFiles": [
+          {
+            "file": "settlement.bin",
+            "transfer": 0
+          },
+          {
+            "file": "frontage-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "near-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "mid-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "far-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-low-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-high-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "settlement-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "depth-compact.png",
+            "transfer": 0
+          },
+          {
+            "file": "landscape-mask-DPIpnGQj.png",
+            "transfer": 0
+          },
+          {
+            "file": "relief.png",
+            "transfer": 0
+          },
+          {
+            "file": "frontage-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "near-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "mid-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "far-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-low-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-high-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "settlement-detail.webp",
+            "transfer": 0
+          },
+          {
+            "file": "depth-detail.png",
+            "transfer": 0
+          }
+        ],
+        "peakLandscapeTextureBytes": 125266528,
+        "estimatedPeakSceneTextureBytes": 145582801,
+        "featureBytes": 2287782,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "detailed",
+        "cache": "warm",
+        "beforeInput": {
+          "level": "pending",
+          "azimuth": -0.49098454725863055
+        },
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "1464×897"
+          ],
+          "levels": [
+            "detail"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          390,
+          689
+        ],
+        "tier": "light",
+        "level": "compact",
+        "usefulFrameMs": 816.8999999985099,
+        "compactMs": 1324.7000000029802,
+        "finalMs": 1324.7000000029802,
+        "transferBytes": 2508314,
+        "landscapeTransferBytes": 1015324,
+        "landscapeFiles": [
+          {
+            "file": "settlement.bin",
+            "transfer": 597119
+          },
+          {
+            "file": "frontage-compact.webp",
+            "transfer": 33696
+          },
+          {
+            "file": "near-compact.webp",
+            "transfer": 47426
+          },
+          {
+            "file": "mid-compact.webp",
+            "transfer": 43446
+          },
+          {
+            "file": "horizon-low-compact.webp",
+            "transfer": 28446
+          },
+          {
+            "file": "far-compact.webp",
+            "transfer": 70692
+          },
+          {
+            "file": "horizon-high-compact.webp",
+            "transfer": 35452
+          },
+          {
+            "file": "settlement-compact.webp",
+            "transfer": 5640
+          },
+          {
+            "file": "depth-compact.png",
+            "transfer": 51507
+          },
+          {
+            "file": "landscape-mask-DPIpnGQj.png",
+            "transfer": 33670
+          },
+          {
+            "file": "relief.png",
+            "transfer": 68230
+          }
+        ],
+        "peakLandscapeTextureBytes": 15515569,
+        "estimatedPeakSceneTextureBytes": 25870370,
+        "featureBytes": 2287782,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "light",
+        "cache": "cold",
+        "beforeInput": {
+          "level": "pending",
+          "azimuth": -0.49098454725863055
+        },
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "390×689"
+          ],
+          "levels": [
+            "compact"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          390,
+          689
+        ],
+        "tier": "light",
+        "level": "compact",
+        "usefulFrameMs": 769.1999999955297,
+        "compactMs": 1277.6999999955297,
+        "finalMs": 1277.6999999955297,
+        "transferBytes": 16372,
+        "landscapeTransferBytes": 0,
+        "landscapeFiles": [
+          {
+            "file": "settlement.bin",
+            "transfer": 0
+          },
+          {
+            "file": "frontage-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "near-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "mid-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "far-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-low-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "horizon-high-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "settlement-compact.webp",
+            "transfer": 0
+          },
+          {
+            "file": "depth-compact.png",
+            "transfer": 0
+          },
+          {
+            "file": "landscape-mask-DPIpnGQj.png",
+            "transfer": 0
+          },
+          {
+            "file": "relief.png",
+            "transfer": 0
+          }
+        ],
+        "peakLandscapeTextureBytes": 15515569,
+        "estimatedPeakSceneTextureBytes": 25870370,
+        "featureBytes": 2287782,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "light",
+        "cache": "warm",
+        "beforeInput": {
+          "level": "pending",
+          "azimuth": -0.49098454725863055
+        },
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "390×689"
+          ],
+          "levels": [
+            "compact"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      }
+    ],
+    "inducedPressure": {
+      "changes": [
+        {
+          "state": "1318×703 detail/detail balanced",
+          "atMs": 2302
+        },
+        {
+          "state": "1186×632 detail/detail balanced",
+          "atMs": 10222
+        }
+      ],
+      "statesDuringOrbit": 1,
+      "finalLevel": "detail"
+    }
+  }
+}

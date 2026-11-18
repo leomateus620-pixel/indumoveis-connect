@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { createSettlementImpostors } from "./settlementImpostors";
+import { createSettlementMesh, decodeSettlement } from "./settlementImpostors";
+import { regionalAlbedo } from "./regionalAlbedo";
 import { URBAN_REFERENCE } from "./urbanReference";
 import maskUrl from "./assets/landscape-mask.png?url";
 import maskFrame from "./assets/landscape-mask.json";
@@ -10,7 +11,7 @@ const origin = [95, 28] as const; // AEQD centre in the registered park drawing
 const { u, v } = URBAN_REFERENCE.axis;
 type Level = "compact" | "detail";
 type TextureSet = Record<
-  "near" | "mid" | "far" | "low" | "high" | "settlement" | "depth",
+  "frontage" | "near" | "mid" | "far" | "low" | "high" | "settlement" | "depth",
   THREE.Texture
 >;
 
@@ -18,6 +19,7 @@ export function createLandscapeUniforms(radiance: THREE.Color, horizon: THREE.Co
   const sampler = () => ({ value: null as THREE.Texture | null });
   return {
     landscapeActive: { value: false },
+    landscapeFrontage: sampler(),
     landscapeNear: sampler(),
     landscapeMid: sampler(),
     landscapeFar: sampler(),
@@ -46,9 +48,7 @@ export type LandscapeUniforms = ReturnType<typeof createLandscapeUniforms>;
 // exposure and distance haze. Neither the aerial coordinates nor the panorama rotates with orbit.
 export const aerialShader = `
   uniform bool landscapeActive;
-  uniform sampler2D landscapeNear;
-  uniform sampler2D landscapeMid;
-  uniform sampler2D landscapeFar;
+  ${regionalAlbedo}
   uniform vec2 landscapeEast;
   uniform vec2 landscapeNorth;
   uniform vec2 landscapeOrigin;
@@ -61,16 +61,7 @@ export const aerialShader = `
   vec3 landscapeAerial(vec2 worldXZ) {
     vec2 metres = landscapeEN(worldXZ - landscapeOrigin) / landscapeScale;
     float radius = length(metres);
-    vec3 ground;
-    if (radius < 1990.) {
-      ground = texture2D(landscapeNear, metres / 4096. + .5).rgb;
-      if (radius > 1450.) ground = mix(ground, texture2D(landscapeMid, metres / 8192. + .5).rgb,
-        smoothstep(1450., 1990., radius));
-    } else if (radius < 3980.) {
-      ground = texture2D(landscapeMid, metres / 8192. + .5).rgb;
-      if (radius > 3450.) ground = mix(ground, texture2D(landscapeFar, metres / 50000. + .5).rgb,
-        smoothstep(3450., 3980., radius));
-    } else ground = texture2D(landscapeFar, metres / 50000. + .5).rgb;
+    vec3 ground = registeredAlbedo(metres);
     float haze = .18 * smoothstep(450., 4800., radius) + .44 * smoothstep(3500., 22000., radius);
     return mix(ground * mix(vec3(1.), landscapeLight, .72), landscapeAir, haze);
   }
@@ -174,8 +165,7 @@ function createRegionalRelief(uniforms: LandscapeUniforms) {
         vec2 world = landscapeOrigin + (metres.x * landscapeEast + metres.y * landscapeNorth) * landscapeScale;
         vec2 uv = (world - landscapeMaskFrame.xy) / landscapeMaskFrame.zw;
         float grade = texture2D(landscapeMask, vec2(uv.x, 1. - uv.y)).g;
-        float outer = 1. - smoothstep(3000., 3980., length(metres));
-        regionalWorld = vec3(world.x, -.18 + relativeHeight * landscapeScale * grade * outer, world.y);
+        regionalWorld = vec3(world.x, -.18 + relativeHeight * landscapeScale * grade, world.y);
         gl_Position = projectionMatrix * viewMatrix * vec4(regionalWorld, 1.);
       }
     `,
@@ -190,7 +180,7 @@ function createRegionalRelief(uniforms: LandscapeUniforms) {
         // The finite local underlay owns every pixel through the end of its feather.
         if (texture2D(landscapeMask, vec2(uv.x, 1. - uv.y)).r >= .004) discard;
         float radius = length(regionalWorld.xz - landscapeOrigin) / landscapeScale;
-        if (radius >= 3980.) discard;
+        if (radius >= 4096.) discard;
         vec3 surface = landscapeAerial(regionalWorld.xz);
         if (radius > 1350.) {
           vec3 ray = normalize(regionalWorld - cameraPosition);
@@ -252,6 +242,7 @@ export function createRegionalLandscape(
   uniforms: LandscapeUniforms,
   compile: (mesh: THREE.Mesh) => Promise<unknown>,
   invalidate: () => void,
+  navigating: () => boolean = () => false,
 ) {
   const stats: LandscapeDiagnostic = {
     level: "pending",
@@ -267,11 +258,12 @@ export function createRegionalLandscape(
   let disposed = false;
   let running = false;
   let failedLevel: Level | undefined;
+  let resumeUpgrade: (() => void) | undefined;
   const auxiliary: THREE.Texture[] = [];
   const group = new THREE.Group();
   group.name = "indumoveis-santa-rosa-landscape";
   let relief: ReturnType<typeof createRegionalRelief> | undefined;
-  let settlement: ReturnType<typeof createSettlementImpostors> | undefined;
+  let settlement: ReturnType<typeof createSettlementMesh> | undefined;
   const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
   // Decode concurrently. Upload at most one texture per turn after the park is interactive.
@@ -299,7 +291,9 @@ export function createRegionalLandscape(
       kind === "aerial" || kind === "panorama" ? THREE.SRGBColorSpace : THREE.NoColorSpace;
     texture.wrapS =
       kind === "depth" || kind === "panorama" ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-    texture.generateMipmaps = kind !== "depth" && kind !== "relief";
+    // Coverage and relief are fields with physical support. A grazing pixel must not
+    // promote the finite park underlay to a kilometre-wide opaque terrain sample.
+    texture.generateMipmaps = kind !== "depth" && kind !== "relief" && kind !== "mask";
     texture.minFilter = texture.generateMipmaps
       ? THREE.LinearMipmapLinearFilter
       : THREE.LinearFilter;
@@ -310,7 +304,16 @@ export function createRegionalLandscape(
     return texture;
   }
 
+  async function readSettlement(signal: AbortSignal) {
+    const response = await fetch(directory + "settlement.bin", { signal });
+    if (!response.ok) throw new Error("settlement-positions-unavailable");
+    const encoded = await response.arrayBuffer();
+    stats.downloadBytes += encoded.byteLength;
+    return decodeSettlement(encoded);
+  }
+
   function publish(tier: Level, textures: TextureSet) {
+    uniforms.landscapeFrontage.value = textures.frontage;
     uniforms.landscapeNear.value = textures.near;
     uniforms.landscapeMid.value = textures.mid;
     uniforms.landscapeFar.value = textures.far;
@@ -331,6 +334,7 @@ export function createRegionalLandscape(
 
   async function prepare(level: Level, signal: AbortSignal) {
     const files: [string, "mask" | "depth" | "relief" | "aerial" | "panorama"][] = [
+      [directory + "frontage-" + level + ".webp", "aerial"],
       [directory + "near-" + level + ".webp", "aerial"],
       [directory + "mid-" + level + ".webp", "aerial"],
       [directory + "far-" + level + ".webp", "aerial"],
@@ -340,22 +344,22 @@ export function createRegionalLandscape(
       [directory + "depth-" + level + ".png", "depth"],
     ];
     if (!auxiliary.length) files.push([maskUrl, "mask"], [directory + "relief.png", "relief"]);
-    let samples: Float32Array | undefined;
-    if (!auxiliary.length) {
-      const result = await fetch(directory + "settlement.bin", { signal });
-      if (!result.ok) throw new Error("settlement-positions-unavailable");
-      samples = new Float32Array(await result.arrayBuffer());
-      stats.downloadBytes += samples.byteLength;
-    }
-    const results = await Promise.allSettled(
-      files.map(([url, kind]) => readTexture(url, kind, signal)),
-    );
+    // Begin optics and geometry together. Wait for every decoder so a failed
+    // request or cancelled level can dispose the other successful textures.
+    const [geometryResult, results] = await Promise.all([
+      Promise.allSettled(auxiliary.length ? [] : [readSettlement(signal)]),
+      Promise.allSettled(files.map(([url, kind]) => readTexture(url, kind, signal))),
+    ]);
     const textures = results.flatMap((result) =>
       result.status === "fulfilled" ? [result.value] : [],
     );
     try {
+      const geometry = geometryResult[0];
+      if (geometry?.status === "rejected") throw geometry.reason;
+      const samples = geometry?.value;
       const rejected = results.find((result) => result.status === "rejected");
       if (rejected?.status === "rejected") throw rejected.reason;
+      signal.throwIfAborted();
       let inFlightBytes = stats.textureBytes;
       for (const texture of textures) {
         await new Promise<void>((resolve) => window.setTimeout(resolve, 24));
@@ -364,9 +368,9 @@ export function createRegionalLandscape(
         inFlightBytes += bytes(texture);
         stats.peakTextureBytes = Math.max(stats.peakTextureBytes, inFlightBytes);
       }
-      const [near, mid, far, low, high, atlas, depth, mask, heightmap] = textures;
+      const [frontage, near, mid, far, low, high, atlas, depth, mask, heightmap] = textures;
       if (samples) {
-        settlement = createSettlementImpostors(samples, uniforms);
+        settlement = createSettlementMesh(samples, uniforms);
         relief = createRegionalRelief(uniforms);
         await compile(relief);
         signal.throwIfAborted();
@@ -374,12 +378,27 @@ export function createRegionalLandscape(
         signal.throwIfAborted();
         group.add(relief, settlement);
         stats.featureBufferBytes = samples.byteLength;
-        stats.featureCount = settlement.geometry.instanceCount;
+        stats.featureCount = settlement.userData.featureCount;
         auxiliary.push(mask, heightmap);
         uniforms.landscapeRelief.value = heightmap;
         uniforms.landscapeMask.value = mask;
       }
-      publish(level, { near, mid, far, low, high, settlement: atlas, depth });
+      // Publish the first usable world immediately. Once a street is visible,
+      // retain its current material through the drag, even if a decode finishes.
+      if (current && navigating()) {
+        await new Promise<void>((resolve) => {
+          const resume = () => {
+            signal.removeEventListener("abort", resume);
+            resumeUpgrade = undefined;
+            resolve();
+          };
+          resumeUpgrade = resume;
+          signal.addEventListener("abort", resume, { once: true });
+          invalidate();
+        });
+        signal.throwIfAborted();
+      }
+      publish(level, { frontage, near, mid, far, low, high, settlement: atlas, depth });
     } catch (error) {
       if (settlement && !current) {
         settlement.geometry.dispose();
@@ -430,6 +449,7 @@ export function createRegionalLandscape(
       void reconcile();
     },
     presented(now: number) {
+      if (resumeUpgrade && !navigating()) resumeUpgrade();
       if (stats.level === "pending") return;
       if (stats.compactAt === undefined) {
         stats.compactAt = now;
@@ -456,6 +476,7 @@ export function createRegionalLandscape(
       relief = undefined;
       uniforms.landscapeActive.value = false;
       for (const sampler of [
+        uniforms.landscapeFrontage,
         uniforms.landscapeNear,
         uniforms.landscapeMid,
         uniforms.landscapeFar,

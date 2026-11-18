@@ -1,0 +1,22 @@
+# Divisa e primeiras quadras
+
+A saída sudoeste da Avenida Tuparendi se interrompia logo após a segunda rótula. A fotografia mostrava a continuação no rumo certo. A máscara da maquete ainda pintava gramado adiante do último polígono de asfalto, por até 26 m, incluída a margem. A faixa compacta de 8 m por texel reduzia o corredor visível a menos de dois texels. Na execução de referência com o entorno detalhado já carregado, o gramado continuava presente. [Recortes ópticos e quadros antes/depois](origem-divisa.webp)
+
+## Eixo, largura e encaixe
+
+O recorte de 1.280 × 1.280 m reúne os 33 eixos OSM que tiveram pelo menos quatro perfis transversais concordantes na PAN CBERS. Cada perfil amostra a imagem registrada a cada metro, por interpolação entre amostras nativas de 2 m. Os centros de perfil ficam a 8 m ou mais das pontas de cada segmento. A medição procura um mínimo próximo ao eixo, duas margens que atinjam metade do contraste local e centro do corredor a até 3 m do eixo OSM. Os 552 perfis aceitos conservam a largura observada e os quartis por via. A largura inclui acostamento ou estacionamento onde têm a mesma reflectância. [Vias, versões e medidas](../../../scripts/santa-rosa/frontage-roads.geojson) · [Verificação das medidas com a fonte](../../../scripts/santa-rosa/check_frontage.py)
+
+A Tuparendi a sudoeste da rótula tem corredor óptico mediano de 15 m (quartis de 14 e 16,5 m). O trecho modelado mede 14,1 m na escala da maquete. Na união, a máscara segue a largura do polígono registrado, prolonga o tom do asfalto e restitui o tom observado ao longo de 33 m. Nas quadras, somente a parte interior do corredor recebe a mediana de cor da própria via. O cálculo deixa de fora os telhados e as células ocupadas por copas. A Rua Otto Mayer, a leste do parque, tem corredor mediano de 11 m em 13 perfis. Sua esquina ilustra o ganho de definição nos dois níveis de textura. [Trecho da Tuparendi](https://www.openstreetmap.org/way/447054088) · [Rua Otto Mayer](https://www.openstreetmap.org/way/323164312)
+
+| Controle na pose superior detalhada | Coordenadas locais E/N | Quadro de 1464 × 897, origem superior esquerda | Largura na tela |
+| --- | --- | --- | ---: |
+| Saída da Tuparendi | +287 / −382 m | (235, 285) | 38,5 px para 14 m transversais |
+| Quadra de Otto Mayer | +345 / −166 m | (676, 712) | 22,0 px para 8 m transversais |
+
+A projeção usa a pose efetivamente limitada da câmera e a superfície interpolada localmente. Na saída, um texel de 8 m cobria cerca de 22 pixels de tela no plano transversal. Depois, a mesma projeção dá aproximadamente 6,9 pixels por texel compacto ou 3,4 pixels por texel detalhado. No eixo da câmera, as dimensões projetadas mudam segundo a inclinação e a distância. A janela passa gradualmente para a imagem de 4.096 m entre 560 e 638 m em cada eixo.
+
+## Conferência territorial e limites
+
+Em 18/11/2026, a vista vertical do Google Earth, com imagem datada de 19/03/2026, permitiu conferir a ilha da rótula, o bosque ao lado oposto às casas, a cobertura clara da Arena a noroeste, a pista de terra e o arruamento a leste. A vista regional documenta a abertura rural atrás da Arena e os quarteirões ao sul/sudeste. O registro óptico conserva a translação da PAN por 5,64 m para oeste e 7,50 m para sul. Os controles independentes da cobertura da Arena e da extremidade norte da pista apresentaram resíduos de 5,2 m e 1,9 m. [Vista de referência no Earth](https://earth.google.com/web/@-27.8450421,-54.4785109,327a,2000d,35y,0h,0t,0r) · [Controles independentes](../santa-rosa/controles-territoriais.webp)
+
+O detalhe de luminância vem da PAN de 2 m de 12/02/2024. A cor vem do Sentinel-2B de 10 m de 30/01/2024. A janela usa contornos Microsoft para restringir a mistura de cores de coberturas vizinhas e o modelo WRI/Meta de dossel a 1 m para manter a forma e a sombra de copas confirmadas pela cor óptica. Datas diferentes entre as fontes ainda afetam telhados recentes, solo vermelho junto a construções, calçadas sob árvores e caminhos estreitos nos talhões a noroeste. O aerolevantamento municipal possui fotos urbanas de maior resolução. A Prefeitura anuncia consulta pública, e a redistribuição desses recortes no aplicativo depende de autorização específica ou de uma licença publicada. [Créditos distribuídos](../../../public/landscape/santa-rosa/creditos.txt) · [Aerolevantamento municipal](https://prefeitura.santarosa.rs.gov.br/?p=11619)

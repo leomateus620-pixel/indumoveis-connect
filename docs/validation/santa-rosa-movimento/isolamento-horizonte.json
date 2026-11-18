@@ -1,0 +1,107 @@
+{
+  "buffer": [
+    1294,
+    655
+  ],
+  "stripXYWH": [
+    100,
+    105,
+    1100,
+    48
+  ],
+  "tower": {
+    "lonLat": [
+      -54.467276,
+      -27.864323
+    ],
+    "estimatedHeightM": 53.72,
+    "footprintIndexOneBased": 8668
+  },
+  "samples": [
+    {
+      "heightM": 24,
+      "beforeStripPixelsChangedOver8": 7917,
+      "afterStripPixelsChangedOver8": 0,
+      "towerXYWH": [
+        634,
+        121,
+        36,
+        21
+      ],
+      "maxTowerChannelDifference": {
+        "low": 0,
+        "high": 0,
+        "without-panorama": 0,
+        "without-depth": 0
+      }
+    },
+    {
+      "heightM": 40,
+      "beforeStripPixelsChangedOver8": 10017,
+      "afterStripPixelsChangedOver8": 0,
+      "towerXYWH": [
+        648,
+        127,
+        36,
+        20
+      ],
+      "maxTowerChannelDifference": {
+        "low": 0,
+        "high": 0,
+        "without-panorama": 0,
+        "without-depth": 0
+      }
+    },
+    {
+      "heightM": 44,
+      "beforeStripPixelsChangedOver8": 9818,
+      "afterStripPixelsChangedOver8": 0,
+      "towerXYWH": [
+        650,
+        129,
+        36,
+        20
+      ],
+      "maxTowerChannelDifference": {
+        "low": 0,
+        "high": 0,
+        "without-panorama": 0,
+        "without-depth": 0
+      }
+    },
+    {
+      "heightM": 48,
+      "beforeStripPixelsChangedOver8": 10031,
+      "afterStripPixelsChangedOver8": 0,
+      "towerXYWH": [
+        652,
+        130,
+        35,
+        20
+      ],
+      "maxTowerChannelDifference": {
+        "low": 0,
+        "high": 0,
+        "without-panorama": 0,
+        "without-depth": 0
+      }
+    },
+    {
+      "heightM": 72,
+      "beforeStripPixelsChangedOver8": 10999,
+      "afterStripPixelsChangedOver8": 0,
+      "towerXYWH": [
+        657,
+        138,
+        34,
+        19
+      ],
+      "maxTowerChannelDifference": {
+        "low": 0,
+        "high": 0,
+        "without-panorama": 0,
+        "without-depth": 0
+      }
+    }
+  ]
+}
