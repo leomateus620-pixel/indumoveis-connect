@@ -21,9 +21,8 @@ PIXELS = 2048
 TRANSFORM = rio.transform.from_bounds(-2048, -2048, 2048, 2048, PIXELS, PIXELS)
 
 
-def canopies(cache, near_rgb):
-    """Yield the footprint of each observed leafy group and its crown height."""
-    heights = read_grid(
+def load_canopy_height(cache):
+    return read_grid(
         Path(cache),
         "canopy-v1",
         [CANOPY_URL],
@@ -34,6 +33,10 @@ def canopies(cache, near_rgb):
         255,
         Resampling.bilinear,
     )[0]
+
+
+def canopies(cache, near_rgb, heights):
+    """Yield the footprint of each observed leafy group and its crown height."""
     roofs = rasterize(
         ((f["geometry"], 1) for f in load_footprints(cache)),
         out_shape=heights.shape,

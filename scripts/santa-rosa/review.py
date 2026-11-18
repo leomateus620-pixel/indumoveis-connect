@@ -177,14 +177,17 @@ def raster_report():
     """Check the encoded, distributed images, including angular wrap at north."""
     report = {"assets": {}, "panoramas": {}}
     for path in sorted(OUT.iterdir()):
-        if path.suffix not in (".webp", ".png") or path.name.startswith("settlement-"):
+        if path.suffix not in (".webp", ".png") and path.name != "settlement.bin":
+            continue
+        metadata = {
+            "bytes": path.stat().st_size,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        }
+        if path.name == "settlement.bin":
+            report["assets"][path.name] = metadata
             continue
         with Image.open(path) as image:
-            report["assets"][path.name] = {
-                "dimensions": image.size,
-                "bytes": path.stat().st_size,
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-            }
+            report["assets"][path.name] = {"dimensions": image.size, **metadata}
             if path.name.startswith("horizon-"):
                 a = np.asarray(image.convert("RGBA"))[:, :, 3] >= 128
                 if np.any(a[0]) or np.any(np.max(a, axis=0) == 0):

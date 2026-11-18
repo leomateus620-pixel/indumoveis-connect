@@ -25,7 +25,7 @@ Na oblíqua de 209°, o corredor escuro atrás da pista ocupa o centro-esquerda,
 
 ## Reprodução
 
-Sirva dois builds de produção em portas diferentes, um da PR 27 e outro da revisão avaliada. O adaptador do repositório é `node scripts/serve-commercial-map-build.mjs PORTA`. Configure a URL Supabase pública de compilação como no projeto. Os testes aplicam os fixtures locais do repositório às requisições do navegador.
+Sirva dois builds de produção em portas diferentes, um da PR 27 e outro da revisão avaliada. O adaptador do repositório é `node scripts/serve-commercial-map-build.mjs PORTA`. Configure a URL Supabase pública de compilação como no projeto. Os testes aplicam os fixtures locais do repositório às requisições do navegador. O roteiro procura o módulo Playwright local ou no runtime do Codex e também aceita seu caminho pela variável `PLAYWRIGHT_MODULE`. Para repetir a comparação dos pixels em Python, instale `opencv-python-headless` no ambiente de validação.
 
 ```sh
 MAP_BASE_URL=http://127.0.0.1:4291 MAP_LANDSCAPE_PHASE=before MAP_LANDSCAPE_TASK=metrics node scripts/commercial-map-landscape-validation.mjs

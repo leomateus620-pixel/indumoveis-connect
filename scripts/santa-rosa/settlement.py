@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
-from canopies import canopies
+from canopies import canopies, load_canopy_height
 from footprints import load_footprints
 from PIL import Image, ImageDraw
 from scipy.ndimage import gaussian_filter, map_coordinates, minimum_filter
@@ -379,10 +379,12 @@ def generate(cache):
             h = float(np.percentile(predicted, 70))
         if h and 2.2 <= h < 120:
             candidates.append((ring, h, "roof"))
-    candidates.extend((ring, h, "crown") for ring, h in canopies(cache, photo))
+    canopy_height = load_canopy_height(cache)
+    candidates.extend(
+        (ring, h, "crown") for ring, h in canopies(cache, photo, canopy_height)
+    )
     records = []
     counts = {"roof": 0, "crown": 0}
-    canopy_height = np.load(cache / "canopy-v1.npy", mmap_mode="r")[0]
     for ring, h, kind in candidates:
         center = ring.mean(0)
         rad = np.linalg.norm(center)
