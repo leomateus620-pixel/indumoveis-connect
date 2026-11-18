@@ -37,7 +37,7 @@ function triangulateSurface(surface: PavementSurface): Point[][] {
 
 /** Static broad phase only. Every candidate still undergoes polygon clipping;
  * a shared grid bucket never establishes occupancy or physical connection. */
-function pavementClipper(blockers: readonly Point[][]) {
+export function pavementClipper(blockers: readonly Point[][]) {
   if (!blockers.length) return (input: Point[][]) => input;
   const bounds = blockers.map(polygonBounds);
   const envelope = bounds.reduce((a, b) => ({

@@ -6,7 +6,9 @@ import type { SurfaceMaterials, SurfaceQuality } from "./surfaceMaterials";
 import { appendHouseArchitecture } from "./urbanArchitecture";
 import { subtractGround } from "./parkDetails";
 import { URBAN_REFERENCE, REFERENCE_WAYS } from "./urbanReference";
-import { deriveRoadRibbon, markRoadLanes } from "./roadGeometry";
+import { markRoadLanes } from "./roadGeometry";
+import { AVENUE_BOUNDS, AVENUE_END, deriveUrbanPavement } from "./urbanPavement";
+import { PAVEMENT, type PavementTopology } from "./pavement";
 import { deriveProtectedGround } from "./terrain";
 import { DAYLIGHT } from "./daylight";
 import { deriveUrbanContact } from "./urbanContact";
@@ -34,7 +36,6 @@ export {
 export type { UrbanHouse } from "./urbanLayout";
 
 const AVENUE = ENTITIES.find((e) => e.id === "indumoveis:road:benvenuto")!;
-const AVENUE_BOUNDS = polygonBounds(AVENUE.polygon);
 const AVENUE_SOUTH = URBAN_REFERENCE.avenueSouth;
 const ROUNDABOUT = URBAN_REFERENCE.roundabout.center;
 const PROTECTED_GROUND = deriveProtectedGround(ENTITIES);
@@ -45,10 +46,6 @@ const AVENUE_BLOCKERS = ENTITIES.filter(
     (e.kind === "support" && e.id !== "indumoveis:support:gate-03"),
 ).map((e) => e.polygon);
 const SECTION = URBAN_REFERENCE.avenueSection;
-/** The public avenue stops at the park's main gate. East of it the registered
- * park drawing owns the internal circulation, with its own width and finish. */
-const AVENUE_END = URBAN_REFERENCE.mainGate.x - 0.3;
-
 type Vertex = [number, number, number];
 type Bucket = { position: number[]; color: number[]; uv: number[] };
 type Category = "garden" | "walls" | "roof" | "detail" | "glass" | "foliage" | "ornament";
@@ -86,19 +83,38 @@ function quad(target: Bucket, a: Vertex, b: Vertex, c: Vertex, d: Vertex, color:
   triangle(target, a, b, c, color);
   triangle(target, a, c, d, color);
 }
+// A road and a cross-street can have different tessellation. Split both at
+// the two grade breaks so their shared material heights agree at every point.
+function splitAtZ(cell: Point[], z: number): Point[][] {
+  if (!cell.some((p) => p[1] < z) || !cell.some((p) => p[1] > z)) return [cell];
+  const near: Point[] = [],
+    far: Point[] = [];
+  for (const [i, p] of cell.entries()) {
+    const q = cell[(i + 1) % cell.length];
+    if (p[1] <= z) near.push(p);
+    if (p[1] >= z) far.push(p);
+    if ((p[1] - z) * (q[1] - z) < 0) {
+      const x = p[0] + ((z - p[1]) / (q[1] - p[1])) * (q[0] - p[0]);
+      near.push([x, z]);
+      far.push([x, z]);
+    }
+  }
+  return [near, far];
+}
 function floor(
   target: Bucket,
   polygon: readonly Point[],
   y: number,
   color: string,
-  publicAvenue = false,
+  clipping: "protected" | "avenue" | "prepared" = "protected",
 ) {
-  if (polygon.some(([, z]) => z < URBAN_CONTEXT.minimumZ)) return;
+  if (clipping !== "prepared" && polygon.some(([, z]) => z < URBAN_CONTEXT.minimumZ)) return;
   let cells = [[...polygon]];
   // The public avenue is one physical surface from its north kerb to the south
   // kerb. Only real volumes (lots, halls, supports) can cut it; superseded
   // source road outlines are not obstacles to their own carriageway.
-  const blockers = publicAvenue ? AVENUE_BLOCKERS : PROTECTED_GROUND;
+  const blockers =
+    clipping === "prepared" ? [] : clipping === "avenue" ? AVENUE_BLOCKERS : PROTECTED_GROUND;
   for (const polygon of blockers) {
     const bounds = polygonBounds(polygon);
     if (!cells.some((cell) => overlap(polygonBounds(cell), bounds))) continue;
@@ -116,6 +132,10 @@ function floor(
           : [cell],
       );
   }
+  if (clipping === "prepared" || y === -0.017)
+    cells = cells
+      .flatMap((cell) => splitAtZ(cell, AVENUE_SOUTH))
+      .flatMap((cell) => splitAtZ(cell, AVENUE_SOUTH + 5));
   for (const cell of cells) {
     const points = cell.map(([x, z]) => new THREE.Vector2(x, z));
     for (const [a, b, c] of THREE.ShapeUtils.triangulateShape(points, [])) {
@@ -147,11 +167,6 @@ function box(
   quad(target, [x1, y, z0], [x1, y1, z0], [x1, y1, z1], [x1, y, z1], color);
   quad(target, [x0, y1, z0], [x0, y1, z1], [x1, y1, z1], [x1, y1, z0], color);
 }
-function road(target: Bucket, path: readonly Point[], width: number, color: string, y = -0.11) {
-  const ribbon = deriveRoadRibbon(path, width);
-  if (ribbon.length >= 3) floor(target, ribbon, y, color);
-}
-
 function houseGeometry(house: UrbanHouse, index: number, batches: Record<Category, Bucket>) {
   const local = Object.fromEntries(Object.keys(batches).map((key) => [key, bucket()])) as Record<
     Category,
@@ -388,7 +403,11 @@ export function deriveAvenuePaint(
  * caster. Essential facade edges/crowns persist; LOD trims only ornaments.
  * The source park never participates in this context's LOD. */
 export function createUrbanContext(
-  options: { quality?: SurfaceQuality; sharedSurfaces?: SurfaceMaterials } = {},
+  options: {
+    quality?: SurfaceQuality;
+    sharedSurfaces?: SurfaceMaterials;
+    parkPavement?: PavementTopology;
+  } = {},
 ) {
   const group = new THREE.Group();
   group.name = "indumoveis-approximate-residential-context";
@@ -449,10 +468,12 @@ export function createUrbanContext(
         const p = geometry.getAttribute("position");
         for (let i = 0; i < p.count; i++) {
           const t = THREE.MathUtils.clamp((p.getZ(i) - AVENUE_SOUTH) / 5, 0, 1);
+          data.uv[i * 2] = p.getX(i) / PAVEMENT.grainTile;
+          data.uv[i * 2 + 1] = p.getZ(i) / PAVEMENT.grainTile;
           p.setY(
             i,
-            THREE.MathUtils.lerp(-0.025, -0.11, t) -
-              (category === "sidewalk" ? 0.015 : category === "paint" ? -0.008 : 0),
+            THREE.MathUtils.lerp(PAVEMENT.asphaltElevation, -0.11, t) +
+              (category === "sidewalk" ? 0.007 : category === "paint" ? 0.008 : 0),
           );
         }
       }
@@ -557,72 +578,17 @@ export function createUrbanContext(
       island = bucket(),
       paint = bucket();
     const roadGraph = deriveUrbanRoads();
-    // External avenue: a single carriageway from the parking edge to the
-    // south kerb, ending at the main gate. Nothing is drawn east of the gate.
-    floor(
-      roads,
-      [
-        [AVENUE_BOUNDS.minX, SECTION.asphaltNorth],
-        [AVENUE_END, SECTION.asphaltNorth],
-        [AVENUE_END, AVENUE_SOUTH],
-        [AVENUE_BOUNDS.minX, AVENUE_SOUTH],
-      ],
-      -0.025,
-      roadColor,
-      true,
-    );
-    floor(
-      walks,
-      [
-        [AVENUE_BOUNDS.minX, AVENUE_SOUTH],
-        [AVENUE_END, AVENUE_SOUTH],
-        [AVENUE_END, AVENUE_SOUTH + SECTION.southWalkWidth],
-        [AVENUE_BOUNDS.minX, AVENUE_SOUTH + SECTION.southWalkWidth],
-      ],
-      -0.04,
-      options.sharedSurfaces ? "#ffffff" : "#989f9b",
-    );
-    for (const segment of roadGraph) {
-      road(
-        walks,
-        segment.path,
-        segment.width + 1.05,
-        options.sharedSurfaces ? "#ffffff" : "#989f9b",
-        -0.13,
-      );
-      road(roads, segment.path, segment.width, roadColor);
-    }
+    const pavement = deriveUrbanPavement(options.parkPavement);
+    for (const polygon of pavement.asphalt) floor(roads, polygon, -0.025, roadColor, "prepared");
+    for (const polygon of pavement.gravel)
+      floor(roads, polygon, -0.025, options.sharedSurfaces ? "#f9d5ac" : "#977f69", "prepared");
+    for (const polygon of pavement.sidewalks)
+      floor(walks, polygon, -0.04, options.sharedSurfaces ? "#ffffff" : "#989f9b", "prepared");
     const ring = (center: Point, radius: number, width: number) => {
       const at = (angle: number, r: number): Point => [
         center[0] + Math.cos(angle) * r,
         center[1] + Math.sin(angle) * r,
       ];
-      for (let i = 0; i < 48; i++) {
-        const a = (i * Math.PI) / 24,
-          b = ((i + 1) * Math.PI) / 24;
-        floor(
-          walks,
-          [
-            at(a, radius - width / 2 - 0.6),
-            at(a, radius + width / 2 + 0.6),
-            at(b, radius + width / 2 + 0.6),
-            at(b, radius - width / 2 - 0.6),
-          ],
-          -0.13,
-          options.sharedSurfaces ? "#ffffff" : "#989f9b",
-        );
-        floor(
-          roads,
-          [
-            at(a, radius - width / 2),
-            at(a, radius + width / 2),
-            at(b, radius + width / 2),
-            at(b, radius - width / 2),
-          ],
-          -0.11,
-          roadColor,
-        );
-      }
       floor(
         island,
         Array.from({ length: 32 }, (_, i) => at((i * Math.PI) / 16, radius - width / 2 - 0.25)),
@@ -652,7 +618,7 @@ export function createUrbanContext(
     // centre line, and no road receives oversized direction arrows.
     const marked = roadGraph.filter((r) => ["tuparendi", "tuparendi-southwest"].includes(r.id));
     for (const r of marked) {
-      const marks = markRoadLanes(r.path, r.width, {
+      const marks = markRoadLanes(r.path.slice(1), r.width, {
         roadClass: "public-external",
         dashLength: 1.1,
         dashGap: 2.2,
@@ -680,9 +646,9 @@ export function createUrbanContext(
       for (const p of marks.centerDashes.filter(valid)) floor(paint, p, -0.017, "#cfc089");
     }
     const avenuePaint = deriveAvenuePaint(roadGraph);
-    for (const p of avenuePaint.stalls) floor(paint, p, -0.017, "#e2e0d4", true);
-    for (const p of avenuePaint.laneDashes) floor(paint, p, -0.017, "#e2e0d4", true);
-    for (const p of avenuePaint.centerLine) floor(paint, p, -0.017, "#cfc089", true);
+    for (const p of avenuePaint.stalls) floor(paint, p, -0.017, "#e2e0d4", "avenue");
+    for (const p of avenuePaint.laneDashes) floor(paint, p, -0.017, "#e2e0d4", "avenue");
+    for (const p of avenuePaint.centerLine) floor(paint, p, -0.017, "#cfc089", "avenue");
     // Secondary portal is an approximate representation of the access confirmed
     // by the user; OSM maps its approach and circle, not the gate hardware.
     const access = roadGraph.find((r) => r.id === "brasil-access")!.path;

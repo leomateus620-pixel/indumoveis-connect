@@ -4,6 +4,8 @@ import { DAYLIGHT } from "./daylight";
 import { signedPolygonArea } from "./geometry";
 import { subtractPolygons } from "./parkGeometry";
 import { PERMANENT_PARK_LANDMARKS } from "./permanentParkLayout";
+import { registeredHallFrame } from "./parkHallArchitecture";
+import { viaExpressaRoof } from "./parkSupportArchitecture";
 import type { SurfaceQuality } from "./surfaceMaterials";
 import { SUN_SHADOW, sweepShadowFootprint, unionShadowFootprints } from "./sunShadows";
 
@@ -15,26 +17,42 @@ export type ParkContextShadowSource = {
 };
 
 export const PARK_CONTEXT_SHADOW_SOURCES: readonly ParkContextShadowSource[] =
-  PERMANENT_PARK_LANDMARKS.map((landmark) => ({
-    id: landmark.id,
-    polygon: landmark.polygon,
-    height:
-      landmark.id === "arena"
-        ? 6.7
-        : landmark.id === "sede"
-          ? 4.4
-          : landmark.id === "palco-lactalis"
-            ? 3.3
-            : landmark.id.startsWith("pavilh")
-              ? 3
-              : landmark.id.startsWith("etnia")
-                ? 3.6
-                : landmark.id === "mirante"
-                  ? 3.9
-                  : landmark.id === "alameda"
-                    ? 2.9
-                    : 3.4,
-  }));
+  PERMANENT_PARK_LANDMARKS.map((landmark) => {
+    if (landmark.id === "via-expressa") {
+      const frame = registeredHallFrame(landmark.polygon);
+      const { left, right, near, far, peak } = viaExpressaRoof(frame.width, frame.depth);
+      const polygon = [
+        [left, near],
+        [right, near],
+        [right, far],
+        [left, far],
+      ].map(([x, z]): Point => {
+        const [wx, , wz] = frame.world([x, 0, z]);
+        return [wx, wz];
+      });
+      return { id: landmark.id, polygon, height: peak };
+    }
+    return {
+      id: landmark.id,
+      polygon: landmark.polygon,
+      height:
+        landmark.id === "arena"
+          ? 6.7
+          : landmark.id === "sede"
+            ? 4.4
+            : landmark.id === "palco-lactalis"
+              ? 3.3
+              : landmark.id.startsWith("pavilh")
+                ? 3
+                : landmark.id.startsWith("etnia")
+                  ? 3.6
+                  : landmark.id === "mirante"
+                    ? 3.9
+                    : landmark.id === "alameda"
+                      ? 2.9
+                      : 3.4,
+    };
+  });
 
 const triangulate = (polygon: readonly Point[]): Point[][] =>
   THREE.ShapeUtils.triangulateShape(
@@ -136,9 +154,9 @@ export function createParkContextShadows() {
         sunDirection: DAYLIGHT.sunDirection,
         protectedLotsClipped: true,
       },
-      // Context lies outside the detailed shadow camera fitted to the core.
-      // Its contact stays present at all quality tiers without another map.
-      setQuality(_quality: SurfaceQuality) {},
+      setQuality(quality: SurfaceQuality) {
+        mesh.visible = quality !== "detailed";
+      },
       dispose,
     };
   } catch (error) {

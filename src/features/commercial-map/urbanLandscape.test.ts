@@ -132,6 +132,30 @@ describe("persistent batched residential landscape", () => {
     );
   });
 
+  it("keeps branch sprays inside the registered clearance with graded vertex colours", () => {
+    for (const seed of [0, 19, 41, 73, 111, 191]) {
+      const out = batches();
+      const tree = appendBoundaryTrees([[0, 0]], seed, out, { scale: 1, groundElevation: 0 });
+      const { position, color } = out.canopy;
+      const tones = new Map<string, string>();
+      let gradedTriangles = 0;
+      for (let i = 0; i < position.length; i += 9) {
+        const triangleTones = [];
+        for (let v = i; v < i + 9; v += 3) {
+          expect(Math.hypot(position[v], position[v + 2])).toBeLessThan(tree.crownRadius);
+          const key = position.slice(v, v + 3).join(",");
+          const tone = color.slice(v, v + 3).join(",");
+          if (tones.has(key)) expect(tones.get(key)).toBe(tone);
+          tones.set(key, tone);
+          triangleTones.push(tone);
+        }
+        if (new Set(triangleTones).size > 1) gradedTriangles++;
+      }
+      expect(gradedTriangles).toBe(200);
+      expect(tree.persistentTriangles).toBe(280);
+    }
+  });
+
   it("adds grounded low planting wholly inside the usable circular island without introducing an object lifecycle", () => {
     for (const radius of [2.4, 4.8]) {
       const out = batches();

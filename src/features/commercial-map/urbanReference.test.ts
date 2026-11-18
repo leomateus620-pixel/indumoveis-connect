@@ -117,8 +117,27 @@ describe("selected OpenStreetMap context aligned to the approved schematic", () 
     expect(distance(southwest.path[0], southwest.path.at(-1)!)).toBeLessThan(80);
     const approach = REFERENCE_ROADS.find((road) => road.id === "benvenuto-approach")!;
     expect(approach.sourceNodeIds).toContain("8787950866");
-    expect(approach.sourceNodeIds).toContain("14102589768");
+    const entry = REFERENCE_ROADS.find((road) => road.id === "benvenuto-entry")!;
+    const exit = REFERENCE_ROADS.find((road) => road.id === "benvenuto-exit")!;
+    expect(entry.sourceNodeIds).toEqual(REFERENCE_WAYS["1553497180"].nodes);
+    expect(exit.sourceNodeIds).toEqual(REFERENCE_WAYS["1553497179"].nodes);
+    expect(entry.path[0]).toEqual(approach.path.at(-1));
+    expect(exit.path.at(-1)).toEqual(approach.path.at(-1));
+    expect(entry.path.at(-1)).not.toEqual(exit.path[0]);
     expect(approach.path).toContainEqual(campeira.path[0]);
+  });
+
+  it("records the reciprocal Tuparendi links at each mapped branch", () => {
+    for (const [approachId, branchId] of [
+      ["tuparendi", "tuparendi-entry-northeast"],
+      ["tuparendi-southwest", "tuparendi-entry-southwest"],
+    ]) {
+      const approach = ACTIVE_REFERENCE_ROADS.find((road) => road.id === approachId)!;
+      const branch = ACTIVE_REFERENCE_ROADS.find((road) => road.id === branchId)!;
+      expect(approach.connects).toContain(branchId);
+      expect(branch.connects).toContain(approachId);
+      expect(approach.path).toContainEqual(branch.path[0]);
+    }
   });
 
   it("fits only the original circular arc nodes and keeps exploration corridors over every useful road point", () => {

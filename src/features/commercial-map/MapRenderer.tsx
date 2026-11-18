@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { configureMapInput, prepareSecondaryPan } from "./mapInput";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
+import { createMapLighting } from "./mapLighting";
 import {
   createInitialGrassMaterial,
   createSurfaceMaterials,
@@ -49,12 +50,7 @@ import {
 } from "./commercialPresentation";
 import { createSolarShadows } from "./solarShadows";
 import { isSoftwareRasterizer, ResolutionBudget } from "./performanceBudget";
-import {
-  VISUAL_THEME as PALETTE,
-  COMMERCIAL_STATUS_COLORS,
-  PARK_DAYLIGHT,
-  SALES_MAP_COLORS,
-} from "./visualTheme";
+import { VISUAL_THEME as PALETTE, COMMERCIAL_STATUS_COLORS, SALES_MAP_COLORS } from "./visualTheme";
 import {
   STREET_LABEL,
   isWalkway,
@@ -91,7 +87,13 @@ import {
   touchTwistDelta,
   type QualityTier,
 } from "./navigation";
-import type { MapHandle, MapRendererProps, MapView, PavilionProjection } from "./types";
+import type {
+  MapHandle,
+  MapLightingMode,
+  MapRendererProps,
+  MapView,
+  PavilionProjection,
+} from "./types";
 import { pavilionMarkerScale } from "./pavilionSalesProgress";
 import { createPavement } from "./pavement";
 import {
@@ -133,6 +135,9 @@ type Diagnostic = {
   terrainPreparationMs: number;
   skyReadyAt?: number;
   daylight: {
+    mode: MapLightingMode;
+    profileKey: string;
+    mix: number;
     sunDirection: readonly number[];
     skyDetail: string;
     skyBytes: number;
@@ -372,6 +377,7 @@ const MapRenderer = forwardRef<MapHandle, MapRendererProps>(function MapRenderer
     props.view,
     props.viewRevision,
     props.quality,
+    props.lighting,
     props.gesture,
     props.insets.right,
     props.insets.bottom,
@@ -445,14 +451,14 @@ function initializeMapRuntime(
   renderer.setClearColor(PALETTE.background);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
-  renderer.toneMappingExposure = PARK_DAYLIGHT.exposure;
+  const lighting = createMapLighting(props().lighting ?? "natural");
+  renderer.toneMappingExposure = lighting.exposure;
   renderer.shadowMap.enabled = false;
   renderer.info.autoReset = true;
   const scene = new THREE.Scene();
   const commercialGroup = new THREE.Group();
   commercialGroup.name = "indumoveis-commercial-fixed";
   scene.add(commercialGroup);
-  scene.background = new THREE.Color(PALETTE.background);
   let sky = createDaylightSky();
   let fadingSky: typeof sky | null = null;
   const daylightAbort = new AbortController();
@@ -462,8 +468,8 @@ function initializeMapRuntime(
     sky.dispose();
   }
   rollback.push(disposeSky);
-  const daylightBackground = createDaylightBackground(sky.texture);
-  scene.background = new THREE.Color(DAYLIGHT.sky.horizon);
+  const daylightBackground = createDaylightBackground(sky.texture, lighting.skyRadiance);
+  scene.background = lighting.horizon;
   scene.add(daylightBackground.mesh);
   rollback.push(() => daylightBackground.dispose());
   const camera = new THREE.PerspectiveCamera(NAVIGATION.fovDegrees, 1, 0.1, DIAGONAL * 15);
@@ -631,6 +637,9 @@ function initializeMapRuntime(
     skyPreparationMs: 0,
     terrainPreparationMs: 0,
     daylight: {
+      mode: lighting.mode,
+      profileKey: lighting.profileKey,
+      mix: lighting.mix,
       sunDirection: DAYLIGHT.sunDirection,
       skyDetail: "simple",
       skyBytes: sky.textureBytes,
@@ -735,6 +744,7 @@ function initializeMapRuntime(
   }
   const presentationParams = new URLSearchParams(window.location.search);
   const surfaces = createSurfaceMaterials({
+    skyRadiance: lighting.skyRadiance,
     maps: !(diag.enabled && presentationParams.get("mapSurfaceMaps") === "off"),
     software: softwareRasterizer && props().quality === "auto",
   });
@@ -745,25 +755,14 @@ function initializeMapRuntime(
     enabled: softwareRasterizer && props().quality === "auto",
   });
   rollback.push(() => softwareMaterials.dispose());
-  scene.add(
-    new THREE.HemisphereLight(
-      DAYLIGHT.hemisphere.sky,
-      DAYLIGHT.hemisphere.ground,
-      DAYLIGHT.hemisphere.intensity,
-    ),
-  );
-  const sunlight = new THREE.DirectionalLight(DAYLIGHT.sunlight.color, DAYLIGHT.sunlight.intensity);
-  sunlight.position.set(...DAYLIGHT.sunDirection).multiplyScalar(180);
-  scene.add(sunlight);
+  const sunlight = lighting.sun;
+  scene.add(sunlight, lighting.hemisphere, lighting.fill);
   const solarShadows = createSolarShadows(sunlight, ENTITIES);
   scene.add(sunlight.target);
   rollback.push(() => solarShadows.dispose());
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   solarShadows.setQuality(tier);
-  const fill = new THREE.DirectionalLight(DAYLIGHT.fill.color, DAYLIGHT.fill.intensity);
-  fill.position.set(...PARK_DAYLIGHT.fill.position);
-  scene.add(fill);
   let envelope = createNavigationEnvelope({
     bounds: MAP_BOUNDS,
     smallestSelectableSpan: SMALLEST_LOT_SPAN,
@@ -792,7 +791,7 @@ function initializeMapRuntime(
   scene.add(terrain.group);
   const foundationMesh = terrain.group.getObjectByName("preserved-circulation-floor") as
     THREE.Mesh<THREE.BufferGeometry, THREE.Material> | undefined;
-  terrain.setAtmosphere(envelope.horizonFade, DAYLIGHT.sky.horizon);
+  terrain.setAtmosphere(envelope.horizonFade, lighting.horizon);
   rollback.push(() => terrain.dispose());
   diag.textureBytes += terrain.textureBytes;
   diag.terrain = {
@@ -1678,6 +1677,7 @@ function initializeMapRuntime(
       await renderer.compileAsync(vegetation.group, camera, scene);
       if (disposed || failed) return;
       vegetation.group.visible = true;
+      solarShadows.includeCasters(vegetation.group);
     } catch {
       ambientDisabled = true;
       diag.optionalFailures.push("vegetation-preparation");
@@ -1762,6 +1762,7 @@ function initializeMapRuntime(
           return;
         }
         permanentPark.group.visible = true;
+        solarShadows.includeCasters(permanentPark.group);
         try {
           if (!contextShadows) {
             const { createParkContextShadows } = await import("./parkContextShadows");
@@ -1773,6 +1774,7 @@ function initializeMapRuntime(
             rollback.push(() => contextShadows?.dispose());
             await renderer.compileAsync(contextShadows.group, camera, scene);
             if (disposed || failed) return;
+            contextShadows.setQuality(tier);
             contextShadows.group.visible = true;
           }
         } catch {
@@ -1804,7 +1806,11 @@ function initializeMapRuntime(
       commercialGroup.add(lotGrass.group);
       diag.realism.grass = lotGrass.metadata;
       rollback.push(() => lotGrass?.dispose());
-      urban = createUrbanContext({ quality: tier, sharedSurfaces: surfaces });
+      urban = createUrbanContext({
+        quality: tier,
+        sharedSurfaces: surfaces,
+        parkPavement: pavement.topology,
+      });
       contextVegetation = createVegetation({
         quality: tier,
         contextPlanting: [...CONTEXT_WOODLAND, ...getRegisteredParkWoodland()],
@@ -2250,6 +2256,12 @@ function initializeMapRuntime(
     diag.activeLoops = 0;
     if (disposed || failed || document.hidden || !essentialProgramsReady) return;
     const begin = performance.now();
+    if (lighting.update(now, reduceMotion.matches)) {
+      renderer.toneMappingExposure = lighting.exposure;
+      terrain.setAtmosphere(envelope.horizonFade, lighting.horizon);
+      diag.daylight.mix = lighting.mix;
+      if (lighting.transitioning) invalidate();
+    }
     if (!ready) {
       const live = props().readInitialTarget?.();
       if (live && Number.isFinite(live[0]) && Number.isFinite(live[1])) {
@@ -2484,6 +2496,7 @@ function initializeMapRuntime(
     lotGrass?.setQuality(tier);
     urban?.setQuality(tier);
     permanentPark?.setQuality(tier);
+    contextShadows?.setQuality(tier);
     if (softwareMode !== null) softwareMaterials.setEnabled(softwareMode);
     softwareMaterials.sync(scene);
     softwareMaterials.update();
@@ -2897,7 +2910,7 @@ function initializeMapRuntime(
     });
     navigationLimits();
     terrain.setExtent(envelope.terrainBounds);
-    terrain.setAtmosphere(envelope.horizonFade, DAYLIGHT.sky.horizon);
+    terrain.setAtmosphere(envelope.horizonFade, lighting.horizon);
     diag.navigation = envelope;
     if (diag.terrain) diag.terrain.bounds = envelope.terrainBounds;
   }
@@ -2908,6 +2921,9 @@ function initializeMapRuntime(
   let previousSaleSelection: ReadonlySet<string> | undefined;
   function update() {
     const state = props();
+    lighting.select(state.lighting ?? "natural", performance.now());
+    diag.daylight.mode = lighting.mode;
+    diag.daylight.profileKey = lighting.profileKey;
     configureMapInput(controls);
     if (!transition) navigationLimits();
     for (const [id, roof] of architecture.roofs) roof.visible = state.inspectedId !== id;

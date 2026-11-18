@@ -61,10 +61,10 @@ const placements: Partial<Record<PlantingZone, PlantingGroup>> = {
     setting: "Maciço no gramado ao sul da Rua Chile e copas esparsas junto à Rua Brasil",
     trees: [
       ["chile-west", [75.1, 9.15], "spreading", 0.97, 1.73],
-      ["chile-west-centre", [79.45, 10.7], "broadleaf", 1.14, 2.35],
-      ["chile-central", [85.8, 9.55], "upright", 0.96, 1.8],
-      ["chile-east-centre", [92.5, 10.65], "spreading", 1.08, 2.21],
-      ["chile-east", [97.0, 10.35], "broadleaf", 1.16, 2.48],
+      ["chile-west-centre", [79.45, 10.7], "broadleaf", 1.29, 2.35],
+      ["chile-central", [85.8, 9.55], "upright", 1.07, 1.8],
+      ["chile-east-centre", [92.5, 10.65], "spreading", 1.21, 2.21],
+      ["chile-east", [97.0, 10.35], "broadleaf", 1.32, 2.48],
       ["chile-montevideu", [104.85, 10.35], "spreading", 1.06, 2.14],
       ["chile-corner", [109.3, 9.8], "broadleaf", 1.09, 2.15],
       ["brasil-west", [75.1, 21.1], "upright", 0.48, 0.67, 58],
@@ -132,7 +132,7 @@ const placements: Partial<Record<PlantingZone, PlantingGroup>> = {
   },
   U: {
     setting: "Copa madura no gramado do setor oeste",
-    trees: [["grass-west", [17.4, -4.9], "spreading", 1.04, 2.23]],
+    trees: [["grass-west", [17.4, -4.9], "spreading", 1.2, 2.23]],
   },
   P: {
     setting: "Copa isolada junto à Rua Chile",
@@ -149,14 +149,14 @@ const placements: Partial<Record<PlantingZone, PlantingGroup>> = {
     setting: "Gramados laterais do Centro de Eventos, junto à Rua La Paz",
     trees: [
       ["events-north", [177.1, 29.2], "broadleaf", 0.96, 1.76],
-      ["events-south", [179.6, 41.65], "spreading", 1.11, 2.2],
+      ["events-south", [179.6, 41.65], "spreading", 1.27, 2.2],
     ],
   },
   B: {
     setting: "Copas periféricas no gramado a leste do palco e da sede, com passagem livre",
     trees: [
       ["lactalis-east", [173.1, 51.5], "broadleaf", 1.02, 1.82],
-      ["sede-east", [177.9, 61.8], "spreading", 1.13, 2.09],
+      ["sede-east", [177.9, 61.8], "spreading", 1.28, 2.09],
     ],
   },
   A: {
@@ -213,7 +213,7 @@ const sidePlanting: Partial<Record<PlantingZone, PlantingGroup>> = {
   },
   Q: {
     setting: "Copa ao sul dos pavilhões da Pecuária, na lateral oeste do parque",
-    trees: [["pecuaria-green-edge", [48.4, -17.9], "spreading", 1.03, 2.05]],
+    trees: [["pecuaria-green-edge", [48.4, -17.9], "spreading", 1.17, 2.05]],
   },
   P: {
     setting: "Copa junto à Rua Bolívia, com abertura de gramado até a Rua Chile",

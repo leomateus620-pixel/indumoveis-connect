@@ -1,0 +1,113 @@
+{
+  "checks": {
+    "renderer": {
+      "vendor": "WebKit",
+      "renderer": "WebKit WebGL",
+      "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+      "unmaskedVendor": "Google Inc. (Google)",
+      "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+      "gpuTimerQueryAvailable": true,
+      "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+    },
+    "before": {
+      "daylight": "natural",
+      "mix": 0,
+      "selected": "indumoveis:external:lot:01",
+      "tier": "light",
+      "software": true,
+      "programs": 30,
+      "shadows": 0,
+      "pmrem": 1,
+      "textures": 10
+    },
+    "warm": {
+      "daylight": "warm",
+      "mix": 1,
+      "selected": "indumoveis:external:lot:01",
+      "tier": "light",
+      "software": true,
+      "programs": 30,
+      "shadows": 0,
+      "pmrem": 1,
+      "textures": 10
+    },
+    "selected2D": "Lote 02",
+    "returned": {
+      "daylight": "warm",
+      "mix": 1,
+      "selected": "indumoveis:external:lot:02",
+      "tier": "light",
+      "software": true,
+      "programs": 30,
+      "shadows": 0,
+      "pmrem": 1,
+      "textures": 7
+    },
+    "natural": {
+      "daylight": "natural",
+      "mix": 0,
+      "selected": "indumoveis:external:lot:02",
+      "tier": "light",
+      "software": true,
+      "programs": 30,
+      "shadows": 0,
+      "pmrem": 1,
+      "textures": 7
+    },
+    "contexts": {
+      "created": 2,
+      "active": 1
+    },
+    "noGL": {
+      "selection": "Lote 03",
+      "contexts": {
+        "created": 0,
+        "active": 0
+      },
+      "lighting": "warm"
+    }
+  },
+  "errors": [],
+  "consoleErrors": [
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4265/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ]
+}

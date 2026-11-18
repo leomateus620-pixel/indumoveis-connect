@@ -122,7 +122,7 @@ function surfaceMap(kind: "mineral" | "sheet", data: boolean) {
 /** One owner per renderer. Architecture and pavement reuse this exact library;
  * no remote dependency, per-face materials, shaders or render-loop allocation. */
 export function createSurfaceMaterials(
-  options: { maps?: boolean; software?: boolean } = {},
+  options: { maps?: boolean; software?: boolean; skyRadiance?: THREE.Color } = {},
 ): SurfaceMaterials {
   const textures: PbrTexture[] = [];
   let disposed = false;
@@ -161,21 +161,46 @@ export function createSurfaceMaterials(
     concrete: make("concrete", 0.94),
     asphalt: make("asphalt", 1),
     whitePaint: make("whitePaint", 0.87),
-    paintedSheet: make("paintedSheet", 0.74),
+    paintedSheet: make("paintedSheet", 0.59),
     exposedMetal: make("exposedMetal", 0.43, 0.67),
-    glass: make("glass", 0.32, 0.06),
+    glass: make("glass", 0.23),
     warmAccent: make("warmAccent", 0.84),
     masonryBrick: make("masonryBrick", 0.94),
     paintedMasonry: make("paintedMasonry", 0.91),
-    architecturalFrame: make("architecturalFrame", 0.76, 0.025),
+    architecturalFrame: make("architecturalFrame", 0.65),
     grass: make("grass", 1),
   };
+  // Open halls have upward-facing sheet roofs. The default PCF depth pass
+  // culls their sunlit face. Keep both depth faces and single-sided colour.
+  materials.paintedSheet.shadowSide = THREE.DoubleSide;
   applyMasonryFinish(materials.masonryBrick);
   applyMasonryFinish(materials.paintedMasonry, true);
   for (const family of ["grass", "asphalt", "concrete"] as const) {
     materials[family].onBeforeCompile = (shader) => patchGroundVariation(shader, family);
     materials[family].customProgramCacheKey = () => `indumoveis-procedural-ground-v3-${family}`;
   }
+  function bindReflectionRadiance(material: THREE.MeshStandardMaterial) {
+    const radiance = options.skyRadiance;
+    if (!radiance || material === materials.grass) return;
+    const compile = material.onBeforeCompile;
+    const previousKey = material.customProgramCacheKey();
+    material.onBeforeCompile = (shader, renderer) => {
+      compile.call(material, shader, renderer);
+      shader.uniforms.parkSkyRadiance = { value: radiance };
+      // Prefiltering is linear in incident RGB. Scale the filtered sky by
+      // exactly the same radiance as the visible panorama at every roughness.
+      // The original per-family intensity is retained inside this scope.
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <envmap_physical_pars_fragment>",
+        `uniform vec3 parkSkyRadiance;
+         #define envMapIntensity (envMapIntensity * parkSkyRadiance)
+         #include <envmap_physical_pars_fragment>
+         #undef envMapIntensity`,
+      );
+    };
+    material.customProgramCacheKey = () => `${previousKey}:incident-sky-v1`;
+  }
+  for (const material of Object.values(materials)) bindReflectionRadiance(material);
   if (textures.length === 4) {
     const [mineralAlbedo, mineralData, sheetAlbedo, sheetData] = textures;
     for (const family of [
@@ -280,9 +305,9 @@ export function createSurfaceMaterials(
       concrete: 0.065,
       asphalt: 0.022,
       whitePaint: 0.075,
-      paintedSheet: 0.24,
+      paintedSheet: 0.3,
       exposedMetal: 0.47,
-      glass: 0.53,
+      glass: 0.64,
       warmAccent: 0.09,
       masonryBrick: 0.045,
       paintedMasonry: 0.065,
@@ -384,6 +409,7 @@ export function createSurfaceMaterials(
             bindPbrAtlas(material, cell, atlas);
             if (family === "masonryBrick") applyMasonryFinish(material);
             if (family === "paintedMasonry") applyMasonryFinish(material, true);
+            bindReflectionRadiance(material);
             const full = fullMaps.get(material)!;
             for (const key of detailMapKeys) full[key] = material[key];
             // Environment may have arrived while software maps were omitted;

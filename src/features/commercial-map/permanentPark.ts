@@ -1,5 +1,17 @@
 import * as THREE from "three";
-import type { SurfaceFamily, SurfaceMaterials, SurfaceQuality } from "./surfaceMaterials";
+import { buildParkSupport } from "./parkSupportArchitecture";
+import {
+  SURFACE_PALETTE,
+  type SurfaceFamily,
+  type SurfaceMaterials,
+  type SurfaceQuality,
+} from "./surfaceMaterials";
+import {
+  buildArenaHall,
+  buildLivestockHall,
+  createParkMember,
+  registeredHallFrame,
+} from "./parkHallArchitecture";
 import {
   PARK_CONTEXT_BLOCKS,
   PARK_RENDER_ENTITIES,
@@ -43,12 +55,26 @@ export function createPermanentPark(
     if (!b) buckets.set(family, (b = bucket()));
     return b;
   };
+  // Most legacy recipes author multipliers. The reconstructed halls specify
+  // final sRGB albedos, which must be divided by the shared family base in
+  // linear space, including values above one for light metals and pale glass.
+  let authoredAlbedo = false;
+  const colors = new Map<string, THREE.Color>();
   const emitTriangle = (family: SurfaceFamily, a: Vertex, b: Vertex, c: Vertex, color: string) => {
     const target = get(family);
-    const rgb = new THREE.Color(color);
-    const ab = new THREE.Vector3(...b).sub(new THREE.Vector3(...a));
-    const ac = new THREE.Vector3(...c).sub(new THREE.Vector3(...a));
-    const normal = new THREE.Vector3().crossVectors(ab, ac);
+    const key = authoredAlbedo ? family + color : color;
+    let rgb = colors.get(key);
+    if (!rgb) {
+      rgb = new THREE.Color(color);
+      if (authoredAlbedo) {
+        const base = new THREE.Color(SURFACE_PALETTE[family]);
+        rgb.setRGB(rgb.r / base.r, rgb.g / base.g, rgb.b / base.b);
+      }
+      colors.set(key, rgb);
+    }
+    const ab = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+    const ac = new THREE.Vector3(c[0] - a[0], c[1] - a[1], c[2] - a[2]);
+    const normal = ab.cross(ac);
     if (normal.lengthSq() < 1e-16) return;
     const axis =
       Math.abs(normal.y) >= Math.max(Math.abs(normal.x), Math.abs(normal.z))
@@ -59,7 +85,8 @@ export function createPermanentPark(
     for (const p of [a, b, c]) {
       target.positions.push(...p);
       target.colors.push(rgb.r, rgb.g, rgb.b);
-      target.uvs.push((axis === 0 ? p[2] : p[0]) / 2.8, (axis === 1 ? p[2] : p[1]) / 2.8);
+      const tile = family === "paintedSheet" ? 1.4 : 2.8;
+      target.uvs.push((axis === 0 ? p[2] : p[0]) / tile, (axis === 1 ? p[2] : p[1]) / tile);
     }
   };
   const tri = (family: SurfaceFamily, a: Vertex, b: Vertex, c: Vertex, color: string) => {
@@ -82,6 +109,7 @@ export function createPermanentPark(
     tri(family, a, b, c, color);
     tri(family, a, c, d, color);
   };
+  const member = createParkMember(quad);
   const box = (
     family: SurfaceFamily,
     x0: number,
@@ -177,6 +205,7 @@ export function createPermanentPark(
     family: SurfaceFamily,
     color: string,
     publicFront?: [number, number],
+    entryOnly = false,
   ) => {
     const polygon = PERMANENT_PARK_LANDMARKS.find((item) => item.id === id)!.polygon;
     let publicEdge = -1,
@@ -215,11 +244,13 @@ export function createPermanentPark(
             color,
           );
         };
-        const openings = [
-          [0.17, 0.31, bottom + (top - bottom) * 0.3, bottom + (top - bottom) * 0.75],
-          [0.44, 0.58, bottom, top * 0.8],
-          [0.71, 0.85, bottom + (top - bottom) * 0.3, bottom + (top - bottom) * 0.75],
-        ];
+        const openings = entryOnly
+          ? [[0.44, 0.57, bottom, top * 0.7]]
+          : [
+              [0.17, 0.31, bottom + (top - bottom) * 0.3, bottom + (top - bottom) * 0.75],
+              [0.44, 0.58, bottom, top * 0.8],
+              [0.71, 0.85, bottom + (top - bottom) * 0.3, bottom + (top - bottom) * 0.75],
+            ];
         let cursor = 0;
         for (const [from, to, sill, head] of openings) {
           wall(cursor, from, bottom, top);
@@ -269,6 +300,19 @@ export function createPermanentPark(
             [ip[0], head, ip[1]],
             color,
           );
+          const glazedMid = point((from + to) / 2, 0.047);
+          member(
+            [glazedMid[0], sill, glazedMid[1]],
+            [glazedMid[0], head, glazedMid[1]],
+            0.055,
+            0.055,
+            "#797f76",
+          );
+          for (const y of [sill + 0.04, head - 0.04]) {
+            const s = point(from, 0.043),
+              t = point(to, 0.043);
+            member([s[0], y, s[1]], [t[0], y, t[1]], 0.06, 0.064, "#818678");
+          }
           cursor = to;
         }
         wall(cursor, 1, bottom, top);
@@ -418,12 +462,21 @@ export function createPermanentPark(
       const footprint = PERMANENT_PARK_LANDMARKS.find((item) => item.id === id)!.polygon;
       flat(footprint, 0.03, "concrete", "#e4e3dc");
       perimeter(id, -0.15, 0.03, "concrete", "#cdd2c8");
-      const wall = id === "pavilhao-9" ? 2.85 : 2.4;
+      if (id === "pavilhoes-6-10-11") {
+        const frame = registeredHallFrame(footprint);
+        modelTransform = frame.world;
+        authoredAlbedo = true;
+        buildLivestockHall(frame.width, frame.depth, box, quad, member);
+        authoredAlbedo = false;
+        modelTransform = undefined;
+        clip = undefined;
+        continue;
+      }
+      const wall = id === "pavilhao-9" ? 2.85 : id === "pavilhao-5" ? 2.65 : 2.4;
       perimeter(id, 0.03, wall, "paintedWall", "#e9e9e1");
-      const count = id === "pavilhoes-6-10-11" ? 3 : 1;
-      for (let i = 0; i < count; i++) {
-        const a = x0 + ((x1 - x0) * i) / count,
-          b = x0 + ((x1 - x0) * (i + 1)) / count;
+      {
+        const a = x0,
+          b = x1;
         if (id === "pavilhao-9") {
           // Low-pitch gable with ridge along the long axis, following P9.
           const middle = (a + b) / 2;
@@ -446,7 +499,16 @@ export function createPermanentPark(
           for (let bay = 0; bay < 9; bay++)
             for (const x of [a, b]) narrow(x, z0 + 0.7 + (bay * (z1 - z0 - 1.4)) / 8, 0.03, wall);
         } else {
-          roof(a, z0, b, z1, wall, id === "pavilhao-5" ? 0.9 : 0.65, "#d7ddda", false);
+          roof(
+            a,
+            z0,
+            b,
+            z1,
+            wall,
+            id === "pavilhao-5" ? 0.9 : 0.65,
+            id === "pavilhao-5" ? "#e1e2d7" : "#cad2d0",
+            false,
+          );
           for (let bay = 0; bay < 4; bay++)
             narrow(a + 0.5 + (bay * (b - a - 1)) / 3, z1 - 0.3, 0.03, wall);
         }
@@ -649,7 +711,7 @@ export function createPermanentPark(
     // texture, or branded colours are brought from the source project.
     {
       setFootprintClip("arena");
-      const [x0, z0, x1, z1] = dimensions("arena");
+
       flat(
         PERMANENT_PARK_LANDMARKS.find((item) => item.id === "arena")!.polygon,
         0.03,
@@ -657,61 +719,14 @@ export function createPermanentPark(
         "#e4e3dc",
       );
       perimeter("arena", -0.15, 0.03, "concrete", "#cbd0c6");
-      const middle = (z0 + z1) / 2,
-        radius = (z1 - z0) / 2 - 0.45,
-        spring = 1.15,
-        rise = 5.5;
-      box("concrete", x0 + 1, 0.03, z0 + 1, x1 - 0.8, 0.5, z1 - 1, "#b2b8b2");
-      for (let i = 0; i < 20; i++) {
-        const a = (i * Math.PI) / 20,
-          b = ((i + 1) * Math.PI) / 20;
-        const za = middle - Math.cos(a) * radius,
-          zb = middle - Math.cos(b) * radius;
-        const ya = spring + Math.sin(a) * rise,
-          yb = spring + Math.sin(b) * rise;
-        quad(
-          "paintedSheet",
-          [x0 + 0.35, ya, za],
-          [x0 + 0.35, yb, zb],
-          [x1 - 0.25, yb, zb],
-          [x1 - 0.25, ya, za],
-          "#f0f2ed",
-        );
-        // A separate underside and nine structural arches remain visible when
-        // approaching either open end; none contains a graphic or logo.
-        quad(
-          "paintedSheet",
-          [x0 + 0.35, ya - 0.07, za],
-          [x1 - 0.25, ya - 0.07, za],
-          [x1 - 0.25, yb - 0.07, zb],
-          [x0 + 0.35, yb - 0.07, zb],
-          "#d7dbd7",
-        );
-        for (let arch = 0; arch < 9; arch++) {
-          const x = x0 + 0.6 + (arch * (x1 - x0 - 1.2)) / 8;
-          quad(
-            "exposedMetal",
-            [x - 0.06, ya - 0.13, za],
-            [x + 0.06, ya - 0.13, za],
-            [x + 0.06, yb - 0.13, zb],
-            [x - 0.06, yb - 0.13, zb],
-            "#909996",
-          );
-        }
-        // Darker fascia is geometry, with no texture or branding.
-        quad(
-          "exposedMetal",
-          [x0 + 0.22, ya - 0.12, za],
-          [x0 + 0.22, yb - 0.12, zb],
-          [x0 + 0.42, yb - 0.12, zb],
-          [x0 + 0.42, ya - 0.12, za],
-          "#909996",
-        );
-      }
-      for (const x of [x0 + 0.5, x1 - 0.5])
-        for (const z of [z0 + 0.5, z1 - 0.5]) narrow(x, z, 0.03, spring + 0.1);
-      // Small landing at the open side, intentionally kept off all roads.
-      box("concrete", x0 + 0.1, 0.04, z0 + 2.0, x0 + 1.1, 0.18, z1 - 2.0, "#d4d7d1");
+      const frame = registeredHallFrame(
+        PERMANENT_PARK_LANDMARKS.find((item) => item.id === "arena")!.polygon,
+      );
+      modelTransform = frame.world;
+      authoredAlbedo = true;
+      buildArenaHall(frame.width, frame.depth, box, quad);
+      authoredAlbedo = false;
+      modelTransform = undefined;
       clip = undefined;
     }
     // B12/B13 use the five-volume headquarters and independent stage recipe
@@ -750,8 +765,17 @@ export function createPermanentPark(
         [-4.5, 4.325, -2.46, 7.575, 2.5, 3.15],
       ];
       for (const [a, c, b, d, eave, ridge] of volumes) {
-        box("paintedWall", a, 0, c, b, eave, d, "#e9e5da");
         if (eave === 4.6) {
+          // Recess the entrance into the front, inside the A2 outline. The
+          // two side returns and head carry the front instead of a solid box
+          // underneath the windows.
+          box("paintedWall", a, 0, c, b, eave, d - 0.42, "#efece2");
+          for (const [x0, x1] of [
+            [a, a + 0.25],
+            [b - 0.25, b],
+          ])
+            box("paintedWall", x0, 0, d - 0.42, x1, eave, d, "#e9e5d9");
+          box("paintedWall", a + 0.25, 2.6, d - 0.42, b - 0.25, 4.12, d, "#e9e5d9");
           const middle = (a + b) / 2;
           quad(
             "paintedSheet",
@@ -769,26 +793,66 @@ export function createPermanentPark(
             [b + 0.36, eave, c - 0.36],
             "#c1c5bd",
           );
-          tri("paintedWall", [a, eave, d], [b, eave, d], [middle, ridge, d], "#ece8df");
+          // The entrance gable retains the photographed triangular glazing
+          // and its horizontal lower strip. All panes face the public side.
+          const facade = d - 0.16;
           tri(
-            "glass",
-            [-2.025, 5.38, d + 0.012],
-            [2.025, 5.38, d + 0.012],
-            [0, 7.73, d + 0.012],
-            "#a5c0bd",
+            "paintedWall",
+            [a, eave, facade - 0.12],
+            [b, eave, facade - 0.12],
+            [middle, ridge, facade - 0.12],
+            "#ece8df",
           );
-          box("glass", -2.025, 4.12, d + 0.008, 2.025, 5.0, d + 0.025, "#afc6c3");
-          for (const x of [-2.2, 0, 2.2])
-            box("glass", x - 0.72, 0.25, d + 0.01, x + 0.72, 2.5, d + 0.026, "#b3c9c6");
-          box("exposedMetal", -3.25, 3.15, d + 0.03, 3.25, 3.32, d + 0.18, "#566d62");
-        } else hipRoof(a - 0.12, c - 0.12, b + 0.12, d + 0.12, eave, ridge - eave, "#b9b7aa");
+          tri("glass", [-2.025, 5.38, facade], [2.025, 5.38, facade], [0, 7.73, facade], "#c1dcdd");
+          box("glass", -2.025, 4.12, facade - 0.02, 2.025, 5.0, facade, "#c8dedb");
+          const trim = "#858e89";
+          member([-2.025, 5.38, facade + 0.015], [0, 7.73, facade + 0.015], 0.11, 0.1, trim);
+          member([0, 7.73, facade + 0.015], [2.025, 5.38, facade + 0.015], 0.11, 0.1, trim);
+          for (const x of [-1, 0, 1]) {
+            box(
+              "exposedMetal",
+              x - 0.042,
+              5.38,
+              facade + 0.005,
+              x + 0.042,
+              7.68 - Math.abs(x) * 1.15,
+              facade + 0.05,
+              trim,
+            );
+            box("exposedMetal", x - 0.042, 4.12, facade + 0.005, x + 0.042, 5, facade + 0.05, trim);
+          }
+          for (const y of [4.12, 5.0, 5.38])
+            box("exposedMetal", -2.05, y - 0.045, facade, 2.05, y + 0.045, facade + 0.07, trim);
+          for (const [l, r] of [
+            [a + 0.25, -0.84],
+            [-0.84, 0.84],
+            [0.84, b - 0.25],
+          ]) {
+            const sunk = d - 0.3;
+            box("glass", l, 0.12, sunk - 0.03, r, 2.56, sunk, "#b7cccc");
+            for (const x of [l, r])
+              box("exposedMetal", x - 0.045, 0.1, sunk, x + 0.045, 2.6, sunk + 0.075, trim);
+            box("exposedMetal", l, 2.16, sunk, r, 2.23, sunk + 0.075, trim);
+          }
+          box("concrete", a + 0.19, 0, d - 0.4, b - 0.19, 0.09, d, "#ccc9bc");
+          box("exposedMetal", -3.15, 3.16, d - 0.28, 3.15, 3.43, d - 0.025, "#69756d");
+          for (const x of [a + 0.1, b - 0.1])
+            box("paintedSheet", x - 0.08, eave - 0.13, c, x + 0.08, eave, d, "#d1cbc1");
+        } else {
+          box("concrete", a, 0, c, b, 0.17, d, "#c6bcb0");
+          box("paintedWall", a, 0.17, c, b, eave, d, "#e9e5da");
+          hipRoof(a - 0.12, c - 0.12, b + 0.12, d + 0.12, eave, ridge - eave, "#b9b7aa");
+        }
       }
       modelTransform = undefined;
       clip = undefined;
       localModel("B13", [-8.55, -9.2]);
-      box("concrete", -8.55, -0.12, -9.2, 8.55, 0.45, 9.2, "#d5d1c5");
+      box("concrete", -8.55, -0.12, -9.2, 8.55, 0.055, 9.2, "#d5d1c5");
+      box("concrete", -8.4, 0.055, -9.0, 8.4, 0.45, -2.9, "#b2ab9d");
+      box("paintedWall", -8.36, 0.12, -2.9, 8.36, 0.44, -2.87, "#777b76");
       box("paintedWall", -8.3, 0.45, -9, 8.3, 4.8, -8.6, "#e3dfd4");
-      for (const x of [-8.25, 8.25]) for (const z of [-8.8, -2.5, 4, 8.8]) narrow(x, z, 0.45, 4.8);
+      for (const x of [-8.25, 8.25])
+        for (const z of [-8.8, -2.5, 4, 8.8]) narrow(x, z, z < -2.9 ? 0.45 : 0.055, 4.8);
       // Symmetric pitched canopy, open to the audience at local +Z / world -X.
       for (const sign of [-1, 1]) {
         const a: Vertex = [sign * 8.91, 4.8, -9.55],
@@ -800,8 +864,15 @@ export function createPermanentPark(
         if (sign < 0) quad("paintedSheet", a, b, c, d, "#d7dcd5");
         else quad("paintedSheet", d, c, b, a, "#d7dcd5");
       }
-      for (const z of [-8.8, -3, 3, 8.8])
-        box("exposedMetal", -8.4, 4.56, z - 0.06, 8.4, 4.72, z + 0.06, "#708177");
+      for (const z of [-8.8, -2.5, 4, 8.8]) {
+        box("exposedMetal", -8.4, 4.56, z - 0.09, 8.4, 4.72, z + 0.09, "#7e8984");
+        for (const sign of [-1, 1]) {
+          member([sign * 8.25, 4.68, z], [0, 6.51, z], 0.17, 0.2, "#8c9890");
+          member([sign * 4.12, 4.68, z], [sign * 2.2, 6.02, z], 0.11, 0.11, "#9ca59d");
+        }
+      }
+      for (const x of [-8.25, 8.25])
+        box("paintedSheet", x - 0.105, 4.64, -9, x + 0.105, 4.81, 9, "#b9c0b8");
       modelTransform = undefined;
       clip = undefined;
     }
@@ -847,23 +918,22 @@ export function createPermanentPark(
       }
       for (const z of [z0 + 1.1, z1 - 1.1]) narrow(x0 + 0.22, z, 0.03, 1.9);
       box("paintedSheet", x0 + 0.1, 1.85, z0 + 0.8, x0 + 0.9, 1.96, z1 - 0.8, "#b5b8af");
-      for (const z of [z0 + 1.6, z1 - 2.0])
-        box("glass", x0 + 0.39, 0.65, z, x0 + 0.42, 1.65, z + 0.65, "#b5c8c6");
+
       if (index === 2) {
         // Timber rhythm suggests the German house without reproducing marks.
         for (const z of [z0 + 1.4, (z0 + z1) / 2, z1 - 1.4])
-          box("exposedMetal", x0 + 0.36, 0.3, z - 0.045, x0 + 0.43, 2.1, z + 0.045, "#715c4d");
+          box("warmAccent", x0 + 0.36, 0.3, z - 0.045, x0 + 0.43, 2.1, z + 0.045, "#c3a68c");
         for (const [za, zb] of [
           [z0 + 1.4, (z0 + z1) / 2],
           [(z0 + z1) / 2, z1 - 1.4],
         ])
           quad(
-            "exposedMetal",
+            "warmAccent",
             [x0 + 0.35, 0.4, za],
             [x0 + 0.35, 0.5, za],
             [x0 + 0.35, 2.0, zb],
             [x0 + 0.35, 1.9, zb],
-            "#715c4d",
+            "#c3a68c",
           );
       }
       mirrorX = undefined;
@@ -885,13 +955,19 @@ export function createPermanentPark(
       const [x0, z0, x1, z1] = item.bounds;
       flat(item.polygon, 0.03, "concrete", "#e4e3dc");
       perimeter(id, -0.15, 0.03, "concrete", "#cbd0c6");
-      const eave = id === "terceira-idade" ? 3.3 : id === "via-expressa" ? 2.4 : 2.25;
-      perimeter(id, 0.03, eave, "paintedWall", "#e4e4d9");
-      roof(x0, z0, x1, z1, eave, id === "terceira-idade" ? 1.25 : 0.65, "#bfc8c0", false);
-      closeGables(id, eave, id === "terceira-idade" ? 1.25 : 0.65, 1);
-      for (let i = 0; i < 4; i++) {
-        const x = x0 + 0.5 + ((i + 0.5) * (x1 - x0 - 1)) / 4;
-        box("glass", x - 0.35, 0.5, z1 - 0.115, x + 0.35, 1.7, z1 - 0.09, "#b8ceca");
+      if (id === "terceira-idade") {
+        // B22's low sheet roof and existing registered front. Secondary
+        // facade openings are unverified, so give only its entrance a recess.
+        perimeter(id, 0.03, 2.55, "paintedWall", "#d2d0c9", item.front, true);
+        roof(x0, z0, x1, z1, 2.55, 0.53, "#c4c9c5", false);
+        closeGables(id, 2.55, 0.53, 1);
+      } else {
+        const frame = registeredHallFrame(item.polygon);
+        authoredAlbedo = true;
+        modelTransform = frame.world;
+        buildParkSupport(id, frame.width, frame.depth, { box, quad, tri, member });
+        modelTransform = undefined;
+        authoredAlbedo = false;
       }
       clip = undefined;
     }
@@ -995,6 +1071,12 @@ export function createPermanentPark(
       mesh.name = `permanent-park-${family}`;
       mesh.userData.commercialPickable = false;
       mesh.raycast = () => {};
+      mesh.receiveShadow = true;
+      mesh.castShadow =
+        family === "paintedWall" ||
+        family === "paintedSheet" ||
+        family === "exposedMetal" ||
+        family === "masonryBrick";
       mesh.frustumCulled = true;
       group.add(mesh);
     }

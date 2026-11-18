@@ -5,6 +5,43 @@ import { getArchitectureDefinition } from "./architecture";
 import { createSolarShadows } from "./solarShadows";
 import { DAYLIGHT } from "./daylight";
 describe("cached directional architectural shadows", () => {
+  it("fits a deferred, transformed canopy and its projected shadow once", () => {
+    const light = new THREE.DirectionalLight();
+    const model = createSolarShadows(light, ENTITIES);
+    const geometry = new THREE.BoxGeometry(4, 8, 3);
+    const material = new THREE.MeshLambertMaterial();
+    const crown = new THREE.InstancedMesh(geometry, material, 1);
+    crown.castShadow = true;
+    crown.setMatrixAt(0, new THREE.Matrix4().makeTranslation(42, 4, -58));
+    const group = new THREE.Group();
+    group.position.set(180, 0, 0);
+    group.add(crown);
+    model.setQuality("detailed");
+    light.shadow.needsUpdate = false;
+    model.includeCasters(group);
+    expect(light.shadow.needsUpdate).toBe(true);
+    const sun = new THREE.Vector3(...DAYLIGHT.sunDirection);
+    for (const x of [220, 224])
+      for (const z of [-59.5, -56.5]) {
+        const top = new THREE.Vector3(x, 8, z);
+        const shadow = top.clone().addScaledVector(sun, (-0.18 - top.y) / sun.y);
+        for (const point of [top, shadow])
+          expect(
+            point
+              .project(light.shadow.camera)
+              .toArray()
+              .every((v) => Math.abs(v) < 1),
+          ).toBe(true);
+      }
+    light.shadow.needsUpdate = false;
+    model.includeCasters(group);
+    expect(light.shadow.needsUpdate).toBe(false);
+    model.dispose();
+    crown.dispose();
+    geometry.dispose();
+    material.dispose();
+  });
+
   it("fits only source volumes, preserves solar direction and updates on explicit invalidation", () => {
     const light = new THREE.DirectionalLight(),
       model = createSolarShadows(light, ENTITIES);

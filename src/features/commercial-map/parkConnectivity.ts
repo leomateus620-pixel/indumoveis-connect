@@ -9,13 +9,12 @@ import {
   subtractGround,
 } from "./parkDetails";
 import { getPavilionPresentation } from "./architectureOrientation";
-import { deriveUrbanRoads } from "./urbanLayout";
-import { URBAN_REFERENCE } from "./urbanReference";
-import { deriveRoadRibbon } from "./roadGeometry";
+import { deriveUrbanPavement, EAST_APPROACH } from "./urbanPavement";
 import { buildSurfaceConnectivityGrid } from "./surfaceConnectivityGrid";
 import {
   PARK_CORE_ENTITIES,
   PARK_GATES,
+  MAIN_GATE_PORTAL,
   PARK_PHYSICAL_BLOCKS,
   PARK_RENDER_ENTITIES,
   PERMANENT_PARK_LANDMARKS,
@@ -584,37 +583,7 @@ export function auditParkConnectivity() {
   const pavement = derivePavement(PARK_RENDER_ENTITIES);
   const asphalt = pavement.asphaltCells,
     walks = pavement.walkCells;
-  // These are the same external street ribbons and shared avenue band owned by
-  // urbanContext. Their inclusion closes a real gate interface, not a shortcut.
-  const external = deriveUrbanRoads().map((road) => deriveRoadRibbon(road.path, road.width));
-  const avenue = polygonBounds(
-    PARK_CORE_ENTITIES.find((entity) => entity.id === "indumoveis:road:benvenuto")!.polygon,
-  );
-  const imigrantes = polygonBounds(
-    PARK_CORE_ENTITIES.find((entity) => entity.id === "indumoveis:road:imigrantes")!.polygon,
-  );
-  external.push([
-    [avenue.minX, avenue.minY],
-    [imigrantes.maxX, avenue.minY],
-    [imigrantes.maxX, URBAN_REFERENCE.avenueSouth],
-    [avenue.minX, URBAN_REFERENCE.avenueSouth],
-  ]);
-  for (const ring of [URBAN_REFERENCE.roundabout, URBAN_REFERENCE.secondaryJunction]) {
-    for (let i = 0; i < 32; i++) {
-      const a = (i * Math.PI) / 16,
-        b = ((i + 1) * Math.PI) / 16;
-      const at = (angle: number, radius: number): Point => [
-        ring.center[0] + Math.cos(angle) * radius,
-        ring.center[1] + Math.sin(angle) * radius,
-      ];
-      external.push([
-        at(a, ring.centerlineRadius - ring.roadWidth / 2),
-        at(a, ring.centerlineRadius + ring.roadWidth / 2),
-        at(b, ring.centerlineRadius + ring.roadWidth / 2),
-        at(b, ring.centerlineRadius - ring.roadWidth / 2),
-      ]);
-    }
-  }
+  const external = deriveUrbanPavement(pavement);
   const aprons = deriveParkDetails(PARK_RENDER_ENTITIES).concrete;
   const blockers = [
     ...PARK_CORE_ENTITIES.filter(
@@ -623,6 +592,12 @@ export function auditParkConnectivity() {
         entity.kind === "pavilion" ||
         (entity.kind === "support" && entity.id !== "indumoveis:support:gate-03"),
     ).map((entity) => entity.polygon),
+    ...MAIN_GATE_PORTAL.piers.map(([north, south]): Point[] => [
+      [MAIN_GATE_PORTAL.x[0], north],
+      [MAIN_GATE_PORTAL.x[1], north],
+      [MAIN_GATE_PORTAL.x[1], south],
+      [MAIN_GATE_PORTAL.x[0], south],
+    ]),
     ...PERMANENT_PARK_LANDMARKS.map((item) => item.polygon),
   ];
   const approaches = Object.values(ARENA_APPROACH_POLYGONS);
@@ -694,12 +669,59 @@ export function auditParkConnectivity() {
       trace: (from: Point, to: Point) => (distance(from, root) < 1e-8 ? grid.trace(to) : null),
     };
   };
-  const vehicles = physicalNetwork([...asphalt, ...external]);
+  const vehicles = physicalNetwork([...asphalt, ...external.asphalt, ...external.gravel]);
+  const a5 = PARK_GATES.find((gate) => gate.id === "A5")!;
+  const [east, west] = EAST_APPROACH.returnArm.slice(-2);
+  // A passage is an opening, not a zero-width marker. Try the middle and
+  // both central quarter-lines inside each documented clear span. Report the
+  // actual verified path and its clearance, retaining a gap on failure.
+  const fractions = [0, -0.125, 0.125];
+  const clearance = 0.24;
+  const crossings = MAIN_GATE_PORTAL.piers.slice(1).map(([upper], i) => {
+    const lower = MAIN_GATE_PORTAL.piers[i][1];
+    return {
+      id: `A3-${i + 1}`,
+      paths: fractions.map((fraction): Point[] => {
+        const z = (upper + lower) / 2 + fraction * (upper - lower);
+        return [
+          [MAIN_GATE_PORTAL.x[0] - 2, z],
+          [MAIN_GATE_PORTAL.x[1] + 2, z],
+        ];
+      }),
+    };
+  });
+  crossings.push({
+    id: "A5",
+    paths: fractions.map((fraction): Point[] => {
+      const offset = fraction * a5.width;
+      const opening: Point = [a5.point[0] - a5.axis[1] * offset, a5.point[1] + a5.axis[0] * offset];
+      const t = Math.min(1, Math.max(0, (opening[0] - east[0]) / (west[0] - east[0])));
+      const onStreet: Point = [
+        east[0] + (west[0] - east[0]) * t,
+        east[1] + (west[1] - east[1]) * t,
+      ];
+      const inside: Point = [opening[0] + a5.axis[0], opening[1] + a5.axis[1]];
+      return [...EAST_APPROACH.returnArm.slice(0, -1), onStreet, opening, inside];
+    }),
+  });
+  const externalPassages = crossings.map(({ id, paths }) => {
+    const probes = paths.map((path) => ({
+      path,
+      ...sampleSurfacePath(path, vehicles.surfaces, {
+        contains: vehicles.contains,
+        boundaryCandidates: vehicles.boundaryCandidates,
+        halfWidth: clearance,
+      }),
+    }));
+    return { id, halfWidth: clearance, ...(probes.find((probe) => probe.supported) ?? probes[0]) };
+  });
   const pedestrians = physicalNetwork([
     ...asphalt,
     ...walks,
     ...aprons,
-    ...external,
+    ...external.asphalt,
+    ...external.gravel,
+    ...external.sidewalks,
     ...approaches,
   ]);
   const anchors = deriveParkConnectivityAnchors();
@@ -767,6 +789,7 @@ export function auditParkConnectivity() {
       surfaceCells: pedestrians.grid.surfaceCells,
       safeCells: pedestrians.grid.safeCells,
     },
+    externalPassages,
     anchors: results,
     pending: results.filter((anchor) => anchor.status !== "connected"),
     verified: results.filter((anchor) => anchor.status === "connected").length,

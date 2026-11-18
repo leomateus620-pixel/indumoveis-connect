@@ -1,0 +1,333 @@
+{
+  "conditions": {
+    "os": "darwin 25.6.0",
+    "cpu": "Apple M5",
+    "logicalCores": 10,
+    "systemMemoryGiB": 16,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": [
+      "/assets/MapRenderer-CApj-UVD.js"
+    ],
+    "optionalContextAssets": [
+      "/assets/urbanContext-BVunV7VD.js"
+    ],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "httpCache": "Disabled by Playwright request routing; warm means SPA/module reentry in the same document, not a cached HTTP load",
+    "browser": "157.0.8103.79"
+  },
+  "results": [
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "renderer": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Apple)",
+        "unmaskedRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "gpuTimerQueryAvailable": true,
+        "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+      },
+      "reducedMotion": false,
+      "afterDecode": {
+        "mode": "warm",
+        "mix": 1,
+        "profile": "warm@1",
+        "tier": "detailed",
+        "target": [
+          95.5,
+          55
+        ],
+        "position": [
+          21.045488346763946,
+          226.1211094653837,
+          194.25751253660823
+        ],
+        "instance": "08921245-2740-4b36-a273-4f50b8955bf5",
+        "selected": null,
+        "preparations": 1,
+        "shadowUpdates": 3,
+        "programs": 36,
+        "textures": 16,
+        "bytes": 20316273
+      },
+      "before": {
+        "mode": "natural",
+        "mix": 0,
+        "profile": "natural@2",
+        "tier": "detailed",
+        "target": [
+          73.55227500000001,
+          60.208285
+        ],
+        "position": [
+          69.27385799087477,
+          12.993710916602586,
+          68.21050940595646
+        ],
+        "instance": "08921245-2740-4b36-a273-4f50b8955bf5",
+        "selected": "indumoveis:external:lot:01",
+        "preparations": 1,
+        "shadowUpdates": 3,
+        "programs": 36,
+        "textures": 16,
+        "bytes": 20316273
+      },
+      "warm": {
+        "mode": "warm",
+        "mix": 1,
+        "profile": "warm@1",
+        "tier": "detailed",
+        "target": [
+          73.55227500000001,
+          60.208285
+        ],
+        "position": [
+          69.27385799087477,
+          12.993710916602586,
+          68.21050940595646
+        ],
+        "instance": "08921245-2740-4b36-a273-4f50b8955bf5",
+        "selected": "indumoveis:external:lot:01",
+        "preparations": 1,
+        "shadowUpdates": 3,
+        "programs": 36,
+        "textures": 16,
+        "bytes": 20316273
+      },
+      "resized": {
+        "mode": "warm",
+        "mix": 1,
+        "profile": "warm@1",
+        "tier": "balanced",
+        "target": [
+          73.55227500000001,
+          60.208285
+        ],
+        "position": [
+          69.27385799087477,
+          12.993710916602586,
+          68.21050940595646
+        ],
+        "instance": "08921245-2740-4b36-a273-4f50b8955bf5",
+        "selected": "indumoveis:external:lot:01",
+        "preparations": 1,
+        "shadowUpdates": 3,
+        "programs": 50,
+        "textures": 16,
+        "bytes": 20316273
+      },
+      "returned": {
+        "mode": "warm",
+        "mix": 1,
+        "profile": "warm@1",
+        "tier": "balanced",
+        "target": [
+          92.35252225562976,
+          85.57690061885968
+        ],
+        "position": [
+          76.03449769424542,
+          49.55844496420439,
+          116.09765026144896
+        ],
+        "instance": "4743ff09-b201-42cf-9e2b-576eb0596ea3",
+        "selected": "indumoveis:pavilion:12",
+        "preparations": 1,
+        "shadowUpdates": 0,
+        "programs": 31,
+        "textures": 12,
+        "bytes": 10354801
+      },
+      "contexts": {
+        "created": 3,
+        "active": 1
+      }
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "renderer": {
+        "vendor": "WebKit",
+        "renderer": "WebKit WebGL",
+        "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "unmaskedVendor": "Google Inc. (Apple)",
+        "unmaskedRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "gpuTimerQueryAvailable": true,
+        "gpuMemoryMeasurement": "unavailable through WebGL; resource bytes are estimates"
+      },
+      "reducedMotion": true,
+      "afterDecode": {
+        "mode": "warm",
+        "mix": 1,
+        "profile": "warm@1",
+        "tier": "detailed",
+        "target": [
+          95.5,
+          55
+        ],
+        "position": [
+          -71.33023396715572,
+          506.6695994558064,
+          367.03432649412457
+        ],
+        "instance": "fb3df17e-a62f-48d9-8354-c20615ef3860",
+        "selected": null,
+        "preparations": 1,
+        "shadowUpdates": 3,
+        "programs": 42,
+        "textures": 16,
+        "bytes": 20316273
+      },
+      "before": {
+        "mode": "natural",
+        "mix": 0,
+        "profile": "natural@2",
+        "tier": "detailed",
+        "target": [
+          72.1959266108107,
+          62.74515883903926
+        ],
+        "position": [
+          65.03029469816933,
+          21.762289512466385,
+          76.14754445342403
+        ],
+        "instance": "fb3df17e-a62f-48d9-8354-c20615ef3860",
+        "selected": "indumoveis:external:lot:01",
+        "preparations": 1,
+        "shadowUpdates": 3,
+        "programs": 42,
+        "textures": 16,
+        "bytes": 20316273
+      },
+      "warm": {
+        "mode": "warm",
+        "mix": 1,
+        "profile": "warm@1",
+        "tier": "detailed",
+        "target": [
+          72.1959266108107,
+          62.74515883903926
+        ],
+        "position": [
+          65.03029469816933,
+          21.762289512466385,
+          76.14754445342403
+        ],
+        "instance": "fb3df17e-a62f-48d9-8354-c20615ef3860",
+        "selected": "indumoveis:external:lot:01",
+        "preparations": 1,
+        "shadowUpdates": 3,
+        "programs": 42,
+        "textures": 16,
+        "bytes": 20316273
+      },
+      "resized": {
+        "mode": "warm",
+        "mix": 1,
+        "profile": "warm@1",
+        "tier": "balanced",
+        "target": [
+          72.1959266108107,
+          62.74515883903926
+        ],
+        "position": [
+          65.03029469816933,
+          21.762289512466385,
+          76.14754445342403
+        ],
+        "instance": "fb3df17e-a62f-48d9-8354-c20615ef3860",
+        "selected": "indumoveis:external:lot:01",
+        "preparations": 1,
+        "shadowUpdates": 3,
+        "programs": 56,
+        "textures": 16,
+        "bytes": 20316273
+      },
+      "returned": {
+        "mode": "warm",
+        "mix": 1,
+        "profile": "warm@1",
+        "tier": "balanced",
+        "target": [
+          101.88626524433431,
+          90.6741493454938
+        ],
+        "position": [
+          85.56618942281793,
+          49.56467471719792,
+          121.19873560425592
+        ],
+        "instance": "061a627c-8a81-4474-84f6-1c0b08ca5115",
+        "selected": "indumoveis:pavilion:12",
+        "preparations": 1,
+        "shadowUpdates": 0,
+        "programs": 31,
+        "textures": 12,
+        "bytes": 10354801
+      },
+      "contexts": {
+        "created": 3,
+        "active": 1
+      }
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1&pavilhao=%2212%22",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "url": "http://127.0.0.1:4268/mapa?mapDiagnostics=1&pavilhao=%2212%22",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ]
+}

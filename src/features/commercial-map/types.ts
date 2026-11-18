@@ -3,6 +3,7 @@ import type { PermanentParkLandmark } from "./permanentParkLayout";
 
 export type MapView = "perspective" | "top" | "front";
 export type MapQuality = "auto" | "light" | "balanced" | "detailed";
+export type MapLightingMode = "natural" | "warm";
 export type MapGesture = "move" | "rotate";
 export type MapCameraSnapshot =
   | { kind: "2d"; x: number; y: number; width: number; height: number }
@@ -48,6 +49,7 @@ export interface MapRendererProps {
   viewRevision?: number;
   onManualOrientation?(): void;
   quality: MapQuality;
+  lighting?: MapLightingMode;
   /** Retained for callers; mouse/touch bindings are stable and ignore modes. */
   gesture: MapGesture;
   insets: MapInsets;

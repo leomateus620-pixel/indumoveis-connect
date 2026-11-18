@@ -308,11 +308,15 @@ export function createTerrain(
         .replace(
           "#include <color_fragment>",
           `#include <color_fragment>
-            float parkImportance = 1.0 - smoothstep(.78, 2.0,
-              length((parkSurfaceWorld - terrainParkCenter) / terrainParkRadius));
+            vec2 parkPosition = (parkSurfaceWorld - terrainParkCenter) / terrainParkRadius;
+            float parkImportance = 1.0 - smoothstep(.78, 2.0, length(parkPosition));
+            // Rear fields extend past the rural exhibition area and around
+            // the east perimeter. Feather these relations in the registered
+            // park frame, independently of tile, parcel and viewport bounds.
+            float meadow = smoothstep(.22, .63, max(-parkPosition.y, parkPosition.x));
             if (parkImportance > 0.0) {
               diffuseColor.rgb = mix(terrainDistantSoil,
-                diffuseColor.rgb * parkGrassVariation(parkSurfaceWorld), parkImportance);
+                diffuseColor.rgb * parkGrassVariation(parkSurfaceWorld, meadow), parkImportance);
             } else {
               diffuseColor.rgb = terrainDistantSoil;
             }`,
@@ -325,7 +329,7 @@ export function createTerrain(
             #include <opaque_fragment>`,
         );
     };
-    material.customProgramCacheKey = () => "indumoveis-ground-horizon-v4";
+    material.customProgramCacheKey = () => "indumoveis-ground-horizon-v5";
     if (options.maps !== false && options.deferMaps) {
       // Compile USE_MAP in the first useful frame without generating the full
       // deterministic field. Keeping a map on both sides avoids a later shader
@@ -472,7 +476,10 @@ export function createTerrain(
       setQuality,
       updateDetail,
       prepareMaps,
-      setAtmosphere(fade: { center: Point; start: number; end: number }, color: string) {
+      setAtmosphere(
+        fade: { center: Point; start: number; end: number },
+        color: THREE.ColorRepresentation,
+      ) {
         atmosphere.center.value.set(...fade.center);
         atmosphere.range.value.set(
           Math.min(fade.start, protectedDiagonal * TERRAIN.hazeStartDiagonals),

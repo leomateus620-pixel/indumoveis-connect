@@ -625,6 +625,8 @@ export function buildArchitecture(
           ["indumoveis:pavilion:1", "indumoveis:pavilion:14"].includes(entity.id))
       )
         continue;
+      // C1 owns its complete glazed entrance and deep portico on this edge.
+      if (eventCentre && Math.max(a[0], b[0]) < frame.width * 0.05) continue;
       const doorHalf = Math.min((span * 0.075) / length, 0.14);
       const entries = localAccesses
         .filter((access) => access.edge === i)
@@ -662,8 +664,8 @@ export function buildArchitecture(
           // protected footprint. Other faces remain conservative estimates.
           const frontRibbon =
             ["indumoveis:pavilion:8", "indumoveis:pavilion:13"].includes(entity.id) && front;
-          // Rua Brasília front: the edge lying on the frame's x minimum.
-          const eventFront = eventCentre && Math.max(a[0], b[0]) < frame.width * 0.05;
+          // Lateral glazing between piers is described in the C1 reference.
+          const eventSide = eventCentre && Math.abs(b[0] - a[0]) > length * 0.94;
           const foodFront = FOOD_HALL_IDS.has(entity.id) && i === 1;
           const p12Front = entity.id === "indumoveis:pavilion:12" && front;
           const p3Front = entity.id === "indumoveis:pavilion:3" && front;
@@ -675,13 +677,13 @@ export function buildArchitecture(
             Math.abs(worldB[1] - worldA[1]) < Math.abs(worldB[0] - worldA[0]) * 0.1;
           const panel = p12Front || brickAnnex ? localBrick : localWalls;
           const shade = bay % 2 ? "#f0f3f2" : "#ffffff";
-          if (frontRibbon || eventFront || foodFront || p12Front || p3Front || p14Front || p1Side) {
+          if (frontRibbon || eventSide || foodFront || p12Front || p3Front || p14Front || p1Side) {
             const sill =
               foundationTop +
-              (wallTop - foundationTop) * (eventFront || foodFront || p3Front ? 0.24 : 0.64);
+              (wallTop - foundationTop) * (eventSide || foodFront || p3Front ? 0.24 : 0.64);
             const head =
               foundationTop +
-              (wallTop - foundationTop) * (eventFront || foodFront || p3Front ? 0.78 : 0.82);
+              (wallTop - foundationTop) * (eventSide || foodFront || p3Front ? 0.78 : 0.82);
             wallPrism(panel, panelP, panelQ, ip, iq, foundationTop, sill, shade);
             wallPrism(panel, panelP, panelQ, ip, iq, head, wallTop, shade);
             const gp = interpolate(panelP, ip, 0.35),
@@ -698,7 +700,7 @@ export function buildArchitecture(
             // Narrow recessed mullions and sills give the ribbon real depth.
             // Their outer face stays behind the structural frontage, so the
             // glass/paint never compete for the same plane at oblique angles.
-            if (entity.kind === "pavilion") {
+            if (entity.kind === "pavilion" || eventSide) {
               const mid = (from + to) / 2,
                 half = Math.min((definition.wallThickness * 0.14) / length, (to - from) * 0.03);
               wallPrism(
