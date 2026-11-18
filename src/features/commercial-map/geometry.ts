@@ -44,6 +44,31 @@ export function pointInPolygon(point: Point, polygon: readonly Point[]): boolean
   return inside;
 }
 
+/** Return the nearest point on or inside a simple polygon, including concave gates. */
+export function clampPointToPolygon(point: Point, polygon: readonly Point[]): Point {
+  if (pointInPolygon(point, polygon)) return point;
+  let nearest = point;
+  let best = Infinity;
+  for (let i = 0; i < polygon.length; i++) {
+    const [ax, az] = polygon[i];
+    const [bx, bz] = polygon[(i + 1) % polygon.length];
+    const dx = bx - ax,
+      dz = bz - az;
+    const lengthSq = dx * dx + dz * dz;
+    const t = lengthSq
+      ? Math.max(0, Math.min(1, ((point[0] - ax) * dx + (point[1] - az) * dz) / lengthSq))
+      : 0;
+    const x = ax + t * dx,
+      z = az + t * dz;
+    const distanceSq = (x - point[0]) ** 2 + (z - point[1]) ** 2;
+    if (distanceSq < best) {
+      best = distanceSq;
+      nearest = [x, z];
+    }
+  }
+  return nearest;
+}
+
 export function hasSelfIntersections(polygon: readonly Point[]): boolean {
   const cross = (a: Point, b: Point, c: Point) =>
     (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);

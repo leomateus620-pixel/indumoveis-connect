@@ -6,14 +6,14 @@ import {
   PARK_CONTEXT_ROADS,
   PARK_CONTEXT_WALKS,
   PERMANENT_PARK_LANDMARKS,
-  PERMANENT_PARK_EXPLORATION,
+  PARK_NAVIGATION_FOOTPRINT,
   PARK_GATES,
 } from "./permanentParkLayout";
 import type { MapEntity, Point } from "./data/territory";
 import type { MapHandle, MapRendererProps, PavilionProjection } from "./types";
 import { MOTION } from "./motion";
 import { createSelectionNavigationSession, isClick, normalizedWheelDelta } from "./navigation";
-import { pointInPolygon, polygonBounds } from "./geometry";
+import { clampPointToPolygon, pointInPolygon, polygonBounds } from "./geometry";
 import {
   isWalkway,
   STREET_LABEL,
@@ -29,7 +29,7 @@ import { PARK_LOT_TREES } from "./parkLotPlanting";
 
 const fullWidth = MAP_BOUNDS.maxX - MAP_BOUNDS.minX;
 const fullHeight = MAP_BOUNDS.maxY - MAP_BOUNDS.minY;
-const parkBounds = polygonBounds(PERMANENT_PARK_EXPLORATION.flat());
+const parkBounds = polygonBounds(PARK_NAVIGATION_FOOTPRINT);
 const parkWidth = parkBounds.maxX - parkBounds.minX;
 type Box = { x: number; y: number; width: number; height: number };
 type Map2DProps = MapRendererProps & {
@@ -167,12 +167,14 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     const b = box.current;
     const rect = svg.current?.getBoundingClientRect();
     const aspect = rect?.width && rect.height ? rect.height / rect.width : base.height / base.width;
-    const cx = b.x + b.width / 2,
-      cy = b.y + b.height / 2;
+    const [cx, cy] = clampPointToPolygon(
+      [b.x + b.width / 2, b.y + b.height / 2],
+      PARK_NAVIGATION_FOOTPRINT,
+    );
     b.width = Math.min(parkWidth * 2.2, Math.max(fullWidth * 0.035, b.width));
     b.height = b.width * aspect;
-    b.x = Math.max(parkBounds.minX, Math.min(parkBounds.maxX, cx)) - b.width / 2;
-    b.y = Math.max(parkBounds.minY, Math.min(parkBounds.maxY, cy)) - b.height / 2;
+    b.x = cx - b.width / 2;
+    b.y = cy - b.height / 2;
     svg.current?.setAttribute("viewBox", `${b.x} ${b.y} ${b.width} ${b.height}`);
     svg.current?.classList.toggle("im-map-near", b.width < fullWidth * 0.7);
     if (!rect?.width) return;
