@@ -1,0 +1,1269 @@
+{
+  "originWgs84": [
+    -54.478510885847626,
+    -27.845042119845623
+  ],
+  "originSceneXZ": [
+    95,
+    28
+  ],
+  "parkSurfaceM": 323.0,
+  "radiusM": 25000,
+  "minimumPanoramaRangeM": 950,
+  "heightsAGLm": [
+    16,
+    72
+  ],
+  "maxSilhouetteChangeDeg": 1.218,
+  "sectors": [
+    {
+      "direction": "N",
+      "centralTrueAzimuthDeg": 0,
+      "landCoverByArea": {
+        "0.4–2 km": {
+          "árvores": 47.7,
+          "campo": 13.0,
+          "lavoura": 35.4,
+          "urbanizado": 3.2,
+          "solo exposto": 0.1,
+          "água": 0.6
+        },
+        "2–8 km": {
+          "árvores": 24.5,
+          "campo": 9.5,
+          "lavoura": 64.6,
+          "urbanizado": 0.7,
+          "solo exposto": 0.2,
+          "água": 0.5,
+          "área úmida": 0.0
+        },
+        "8–25 km": {
+          "árvores": 33.7,
+          "campo": 12.4,
+          "lavoura": 52.2,
+          "urbanizado": 1.6,
+          "solo exposto": 0.1,
+          "água": 0.1
+        }
+      },
+      "sightlines": [
+        {
+          "heightAGLm": 16,
+          "horizon": {
+            "distanceM": 1550,
+            "surfaceM": 350.2,
+            "angleDeg": 0.407,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": []
+        },
+        {
+          "heightAGLm": 40,
+          "horizon": {
+            "distanceM": 3104,
+            "surfaceM": 351.4,
+            "angleDeg": -0.229,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 11.4
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 1550,
+              "surfaceM": 350.2,
+              "angleDeg": -0.48,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 72,
+          "horizon": {
+            "distanceM": 9480,
+            "surfaceM": 329.1,
+            "angleDeg": -0.441,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 1590,
+              "surfaceM": 349.8,
+              "angleDeg": -1.638,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 3104,
+              "surfaceM": 351.4,
+              "angleDeg": -0.819,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 11.4
+            },
+            {
+              "distanceM": 7816,
+              "surfaceM": 308.8,
+              "angleDeg": -0.667,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 110,
+          "horizon": {
+            "distanceM": 25000,
+            "surfaceM": 234.5,
+            "angleDeg": -0.567,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 9480,
+              "surfaceM": 329.1,
+              "angleDeg": -0.671,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 14900,
+              "surfaceM": 277.6,
+              "angleDeg": -0.664,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 16460,
+              "surfaceM": 267.6,
+              "angleDeg": -0.65,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "direction": "NE",
+      "centralTrueAzimuthDeg": 45,
+      "landCoverByArea": {
+        "0.4–2 km": {
+          "árvores": 27.9,
+          "campo": 10.9,
+          "lavoura": 53.8,
+          "urbanizado": 6.2,
+          "solo exposto": 0.7,
+          "água": 0.5
+        },
+        "2–8 km": {
+          "árvores": 22.6,
+          "campo": 5.8,
+          "lavoura": 70.9,
+          "urbanizado": 0.4,
+          "solo exposto": 0.0,
+          "água": 0.2
+        },
+        "8–25 km": {
+          "árvores": 28.1,
+          "arbustos": 0.0,
+          "campo": 6.9,
+          "lavoura": 63.8,
+          "urbanizado": 0.3,
+          "solo exposto": 0.0,
+          "água": 0.8,
+          "área úmida": 0.0
+        }
+      },
+      "sightlines": [
+        {
+          "heightAGLm": 16,
+          "horizon": {
+            "distanceM": 2306,
+            "surfaceM": 354.7,
+            "angleDeg": 0.379,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 1594,
+              "surfaceM": 346.2,
+              "angleDeg": 0.252,
+              "cover": "campo",
+              "estimatedBuildingHeightM": 5.1
+            }
+          ]
+        },
+        {
+          "heightAGLm": 40,
+          "horizon": {
+            "distanceM": 24380,
+            "surfaceM": 345.4,
+            "angleDeg": -0.151,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 1594,
+              "surfaceM": 346.2,
+              "angleDeg": -0.611,
+              "cover": "campo",
+              "estimatedBuildingHeightM": 5.1
+            },
+            {
+              "distanceM": 2306,
+              "surfaceM": 354.7,
+              "angleDeg": -0.218,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 21940,
+              "surfaceM": 324.5,
+              "angleDeg": -0.199,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 72,
+          "horizon": {
+            "distanceM": 24380,
+            "surfaceM": 345.4,
+            "angleDeg": -0.226,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 13520,
+              "surfaceM": 264.5,
+              "angleDeg": -0.614,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 16700,
+              "surfaceM": 294.2,
+              "angleDeg": -0.421,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 21940,
+              "surfaceM": 324.5,
+              "angleDeg": -0.283,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 110,
+          "horizon": {
+            "distanceM": 25000,
+            "surfaceM": 344.7,
+            "angleDeg": -0.315,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 16700,
+              "surfaceM": 294.2,
+              "angleDeg": -0.551,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 21940,
+              "surfaceM": 324.5,
+              "angleDeg": -0.382,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 24400,
+              "surfaceM": 345.4,
+              "angleDeg": -0.316,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "direction": "L",
+      "centralTrueAzimuthDeg": 90,
+      "landCoverByArea": {
+        "0.4–2 km": {
+          "árvores": 38.1,
+          "campo": 15.3,
+          "lavoura": 21.8,
+          "urbanizado": 24.5,
+          "solo exposto": 0.1,
+          "água": 0.1
+        },
+        "2–8 km": {
+          "árvores": 29.4,
+          "campo": 10.9,
+          "lavoura": 52.0,
+          "urbanizado": 7.2,
+          "solo exposto": 0.3,
+          "água": 0.1
+        },
+        "8–25 km": {
+          "árvores": 27.0,
+          "campo": 4.2,
+          "lavoura": 67.7,
+          "urbanizado": 1.0,
+          "solo exposto": 0.0,
+          "água": 0.1
+        }
+      },
+      "sightlines": [
+        {
+          "heightAGLm": 16,
+          "horizon": {
+            "distanceM": 3134,
+            "surfaceM": 350.0,
+            "angleDeg": 0.186,
+            "cover": "campo",
+            "estimatedBuildingHeightM": 13.9
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 1024,
+              "surfaceM": 335.8,
+              "angleDeg": -0.186,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 9.2
+            }
+          ]
+        },
+        {
+          "heightAGLm": 40,
+          "horizon": {
+            "distanceM": 20380,
+            "surfaceM": 334.9,
+            "angleDeg": -0.171,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 3882,
+              "surfaceM": 349.6,
+              "angleDeg": -0.216,
+              "cover": "campo",
+              "estimatedBuildingHeightM": 7.3
+            },
+            {
+              "distanceM": 16000,
+              "surfaceM": 329.9,
+              "angleDeg": -0.191,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 18500,
+              "surfaceM": 333.6,
+              "angleDeg": -0.174,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 72,
+          "horizon": {
+            "distanceM": 20380,
+            "surfaceM": 334.9,
+            "angleDeg": -0.261,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 9720,
+              "surfaceM": 305.5,
+              "angleDeg": -0.571,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 16000,
+              "surfaceM": 329.9,
+              "angleDeg": -0.305,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 18500,
+              "surfaceM": 333.6,
+              "angleDeg": -0.274,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 110,
+          "horizon": {
+            "distanceM": 20380,
+            "surfaceM": 334.9,
+            "angleDeg": -0.367,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 12200,
+              "surfaceM": 279.8,
+              "angleDeg": -0.774,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 16000,
+              "surfaceM": 329.9,
+              "angleDeg": -0.441,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 18520,
+              "surfaceM": 333.5,
+              "angleDeg": -0.391,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "direction": "SE",
+      "centralTrueAzimuthDeg": 135,
+      "landCoverByArea": {
+        "0.4–2 km": {
+          "árvores": 40.2,
+          "campo": 5.3,
+          "lavoura": 0.7,
+          "urbanizado": 53.5,
+          "solo exposto": 0.3,
+          "água": 0.1
+        },
+        "2–8 km": {
+          "árvores": 25.9,
+          "campo": 9.6,
+          "lavoura": 48.6,
+          "urbanizado": 15.6,
+          "solo exposto": 0.3,
+          "água": 0.1
+        },
+        "8–25 km": {
+          "árvores": 21.9,
+          "campo": 4.8,
+          "lavoura": 71.5,
+          "urbanizado": 1.5,
+          "solo exposto": 0.0,
+          "água": 0.3,
+          "área úmida": 0.0
+        }
+      },
+      "sightlines": [
+        {
+          "heightAGLm": 16,
+          "horizon": {
+            "distanceM": 14400,
+            "surfaceM": 378.2,
+            "angleDeg": 0.091,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 2806,
+              "surfaceM": 335.7,
+              "angleDeg": -0.081,
+              "cover": "urbanizado",
+              "estimatedBuildingHeightM": 14.2
+            },
+            {
+              "distanceM": 3748,
+              "surfaceM": 337.0,
+              "angleDeg": -0.048,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 13180,
+              "surfaceM": 358.1,
+              "angleDeg": 0.023,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 40,
+          "horizon": {
+            "distanceM": 14420,
+            "surfaceM": 378.3,
+            "angleDeg": -0.004,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 5526,
+              "surfaceM": 334.2,
+              "angleDeg": -0.324,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 11280,
+              "surfaceM": 339.5,
+              "angleDeg": -0.17,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 13180,
+              "surfaceM": 358.1,
+              "angleDeg": -0.081,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 72,
+          "horizon": {
+            "distanceM": 19960,
+            "surfaceM": 384.3,
+            "angleDeg": -0.121,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 11280,
+              "surfaceM": 339.5,
+              "angleDeg": -0.333,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 13200,
+              "surfaceM": 358.0,
+              "angleDeg": -0.22,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 14420,
+              "surfaceM": 378.3,
+              "angleDeg": -0.131,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 110,
+          "horizon": {
+            "distanceM": 19960,
+            "surfaceM": 384.3,
+            "angleDeg": -0.23,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 13200,
+              "surfaceM": 358.0,
+              "angleDeg": -0.385,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 14420,
+              "surfaceM": 378.3,
+              "angleDeg": -0.282,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 17360,
+              "surfaceM": 374.4,
+              "angleDeg": -0.272,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "direction": "S",
+      "centralTrueAzimuthDeg": 180,
+      "landCoverByArea": {
+        "0.4–2 km": {
+          "árvores": 33.9,
+          "campo": 2.5,
+          "urbanizado": 63.6
+        },
+        "2–8 km": {
+          "árvores": 29.5,
+          "campo": 10.8,
+          "lavoura": 38.4,
+          "urbanizado": 21.0,
+          "solo exposto": 0.2,
+          "água": 0.2
+        },
+        "8–25 km": {
+          "árvores": 24.3,
+          "campo": 6.4,
+          "lavoura": 68.5,
+          "urbanizado": 0.4,
+          "solo exposto": 0.0,
+          "água": 0.3,
+          "área úmida": 0.0
+        }
+      },
+      "sightlines": [
+        {
+          "heightAGLm": 16,
+          "horizon": {
+            "distanceM": 19520,
+            "surfaceM": 376.7,
+            "angleDeg": 0.023,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 2804,
+              "surfaceM": 323.0,
+              "angleDeg": -0.34,
+              "cover": "urbanizado",
+              "estimatedBuildingHeightM": 32.5
+            },
+            {
+              "distanceM": 9300,
+              "surfaceM": 329.8,
+              "angleDeg": -0.099,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 10560,
+              "surfaceM": 330.4,
+              "angleDeg": -0.094,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 40,
+          "horizon": {
+            "distanceM": 19520,
+            "surfaceM": 376.7,
+            "angleDeg": -0.048,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 7726,
+              "surfaceM": 288.1,
+              "angleDeg": -0.59,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 9300,
+              "surfaceM": 329.8,
+              "angleDeg": -0.247,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 10580,
+              "surfaceM": 330.3,
+              "angleDeg": -0.225,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 72,
+          "horizon": {
+            "distanceM": 19520,
+            "surfaceM": 376.7,
+            "angleDeg": -0.142,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 10580,
+              "surfaceM": 330.3,
+              "angleDeg": -0.398,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 11200,
+              "surfaceM": 328.8,
+              "angleDeg": -0.389,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 16280,
+              "surfaceM": 318.8,
+              "angleDeg": -0.342,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 110,
+          "horizon": {
+            "distanceM": 19520,
+            "surfaceM": 376.7,
+            "angleDeg": -0.253,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 11220,
+              "surfaceM": 328.6,
+              "angleDeg": -0.584,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 13780,
+              "surfaceM": 314.5,
+              "angleDeg": -0.555,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 16280,
+              "surfaceM": 318.8,
+              "angleDeg": -0.475,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "direction": "SO",
+      "centralTrueAzimuthDeg": 225,
+      "landCoverByArea": {
+        "0.4–2 km": {
+          "árvores": 34.8,
+          "campo": 9.6,
+          "lavoura": 15.1,
+          "urbanizado": 39.7,
+          "solo exposto": 0.8
+        },
+        "2–8 km": {
+          "árvores": 43.1,
+          "campo": 11.2,
+          "lavoura": 37.4,
+          "urbanizado": 7.1,
+          "solo exposto": 0.7,
+          "água": 0.4
+        },
+        "8–25 km": {
+          "árvores": 19.6,
+          "campo": 9.1,
+          "lavoura": 70.4,
+          "urbanizado": 0.6,
+          "solo exposto": 0.1,
+          "água": 0.3,
+          "área úmida": 0.0
+        }
+      },
+      "sightlines": [
+        {
+          "heightAGLm": 16,
+          "horizon": {
+            "distanceM": 22000,
+            "surfaceM": 366.8,
+            "angleDeg": -0.027,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 6496,
+              "surfaceM": 302.1,
+              "angleDeg": -0.355,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 11520,
+              "surfaceM": 287.6,
+              "angleDeg": -0.308,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 13980,
+              "surfaceM": 344.9,
+              "angleDeg": -0.039,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 40,
+          "horizon": {
+            "distanceM": 22000,
+            "surfaceM": 366.8,
+            "angleDeg": -0.089,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 13980,
+              "surfaceM": 344.9,
+              "angleDeg": -0.137,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 20120,
+              "surfaceM": 352.9,
+              "angleDeg": -0.119,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 21120,
+              "surfaceM": 357.0,
+              "angleDeg": -0.111,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 72,
+          "horizon": {
+            "distanceM": 22000,
+            "surfaceM": 366.8,
+            "angleDeg": -0.172,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 17660,
+              "surfaceM": 340.3,
+              "angleDeg": -0.257,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 20120,
+              "surfaceM": 352.9,
+              "angleDeg": -0.211,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 21120,
+              "surfaceM": 357.0,
+              "angleDeg": -0.198,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 110,
+          "horizon": {
+            "distanceM": 22000,
+            "surfaceM": 366.8,
+            "angleDeg": -0.271,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 17660,
+              "surfaceM": 340.3,
+              "angleDeg": -0.38,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 20120,
+              "surfaceM": 352.9,
+              "angleDeg": -0.319,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 21120,
+              "surfaceM": 357.0,
+              "angleDeg": -0.301,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "direction": "O",
+      "centralTrueAzimuthDeg": 270,
+      "landCoverByArea": {
+        "0.4–2 km": {
+          "árvores": 32.7,
+          "campo": 8.8,
+          "lavoura": 48.1,
+          "urbanizado": 9.1,
+          "solo exposto": 1.2
+        },
+        "2–8 km": {
+          "árvores": 36.7,
+          "campo": 7.5,
+          "lavoura": 52.8,
+          "urbanizado": 2.6,
+          "solo exposto": 0.2,
+          "água": 0.2
+        },
+        "8–25 km": {
+          "árvores": 33.5,
+          "campo": 18.1,
+          "lavoura": 46.3,
+          "urbanizado": 1.9,
+          "solo exposto": 0.1,
+          "água": 0.1
+        }
+      },
+      "sightlines": [
+        {
+          "heightAGLm": 16,
+          "horizon": {
+            "distanceM": 18920,
+            "surfaceM": 340.2,
+            "angleDeg": -0.081,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 10400,
+              "surfaceM": 295.4,
+              "angleDeg": -0.287,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 15400,
+              "surfaceM": 303.0,
+              "angleDeg": -0.203,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 17560,
+              "surfaceM": 325.3,
+              "angleDeg": -0.124,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 40,
+          "horizon": {
+            "distanceM": 18920,
+            "surfaceM": 340.2,
+            "angleDeg": -0.154,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 10400,
+              "surfaceM": 295.4,
+              "angleDeg": -0.419,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 15400,
+              "surfaceM": 303.0,
+              "angleDeg": -0.293,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 17560,
+              "surfaceM": 325.3,
+              "angleDeg": -0.202,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 72,
+          "horizon": {
+            "distanceM": 23240,
+            "surfaceM": 337.6,
+            "angleDeg": -0.246,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 15420,
+              "surfaceM": 302.9,
+              "angleDeg": -0.411,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 17560,
+              "surfaceM": 325.3,
+              "angleDeg": -0.306,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 18940,
+              "surfaceM": 340.2,
+              "angleDeg": -0.251,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 110,
+          "horizon": {
+            "distanceM": 23240,
+            "surfaceM": 337.6,
+            "angleDeg": -0.34,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 17560,
+              "surfaceM": 325.3,
+              "angleDeg": -0.43,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 19220,
+              "surfaceM": 339.7,
+              "angleDeg": -0.365,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 20800,
+              "surfaceM": 335.9,
+              "angleDeg": -0.361,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "direction": "NO",
+      "centralTrueAzimuthDeg": 315,
+      "landCoverByArea": {
+        "0.4–2 km": {
+          "árvores": 29.7,
+          "campo": 9.8,
+          "lavoura": 58.6,
+          "urbanizado": 1.4,
+          "solo exposto": 0.2,
+          "água": 0.4
+        },
+        "2–8 km": {
+          "árvores": 29.3,
+          "campo": 13.2,
+          "lavoura": 57.0,
+          "urbanizado": 0.2,
+          "solo exposto": 0.1,
+          "água": 0.2
+        },
+        "8–25 km": {
+          "árvores": 32.0,
+          "campo": 15.8,
+          "lavoura": 51.9,
+          "urbanizado": 0.3,
+          "solo exposto": 0.0,
+          "água": 0.1
+        }
+      },
+      "sightlines": [
+        {
+          "heightAGLm": 16,
+          "horizon": {
+            "distanceM": 11160,
+            "surfaceM": 303.3,
+            "angleDeg": -0.233,
+            "cover": "lavoura",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 4766,
+              "surfaceM": 300.1,
+              "angleDeg": -0.489,
+              "cover": "árvores",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 6126,
+              "surfaceM": 308.4,
+              "angleDeg": -0.314,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 10500,
+              "surfaceM": 304.2,
+              "angleDeg": -0.237,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 40,
+          "horizon": {
+            "distanceM": 19460,
+            "surfaceM": 281.3,
+            "angleDeg": -0.328,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 9040,
+              "surfaceM": 294.0,
+              "angleDeg": -0.478,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 10500,
+              "surfaceM": 304.2,
+              "angleDeg": -0.368,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 11160,
+              "surfaceM": 303.3,
+              "angleDeg": -0.357,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 72,
+          "horizon": {
+            "distanceM": 19460,
+            "surfaceM": 281.3,
+            "angleDeg": -0.422,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 10520,
+              "surfaceM": 304.1,
+              "angleDeg": -0.543,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 11160,
+              "surfaceM": 303.3,
+              "angleDeg": -0.521,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 13340,
+              "surfaceM": 291.9,
+              "angleDeg": -0.503,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        },
+        {
+          "heightAGLm": 110,
+          "horizon": {
+            "distanceM": 19460,
+            "surfaceM": 281.3,
+            "angleDeg": -0.534,
+            "cover": "árvores",
+            "estimatedBuildingHeightM": 0.0
+          },
+          "nearerVisibleCrests": [
+            {
+              "distanceM": 10540,
+              "surfaceM": 303.9,
+              "angleDeg": -0.75,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 11160,
+              "surfaceM": 303.3,
+              "angleDeg": -0.716,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            },
+            {
+              "distanceM": 13340,
+              "surfaceM": 291.9,
+              "angleDeg": -0.666,
+              "cover": "lavoura",
+              "estimatedBuildingHeightM": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

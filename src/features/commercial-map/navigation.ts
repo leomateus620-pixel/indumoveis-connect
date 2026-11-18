@@ -1,6 +1,6 @@
 import type { MapInsets, MapView } from "./types";
 import { MOTION } from "./motion";
-import { pointInPolygon, polygonBounds, type Bounds } from "./geometry";
+import { clampPointToPolygon, polygonBounds, type Bounds } from "./geometry";
 import type { Point } from "./data/territory";
 
 /** All distances use the authored drawing units (10 PDF points), never metres.
@@ -15,8 +15,6 @@ export const NAVIGATION = {
   maximumFitMultiplier: 1.35,
   minimumSelectableSpans: 1.4,
   roofClearanceSpans: 0.12,
-  targetMarginFraction: 0.08,
-  commercialWitnessNdc: 0.4,
   terrainSafetyFraction: 0.06,
   horizonFadeStartDistances: 1.4,
   horizonFadeEndDistances: 3,
@@ -121,10 +119,8 @@ export type NavigationEnvelope = {
   groundReach: number;
   farPlane: number;
   horizonFade: { center: Point; start: number; end: number };
-  groundTangent: number;
   protectedRegions: readonly NavigationRegion[];
-  /** Visibility witnesses only; these regions do not enable commercial picking
-   * or become part of the protected terrain/implantation perimeter. */
+  /** Permitted orbit targets and vertices for the full-park fit. */
   navigationRegions: readonly NavigationRegion[];
 };
 
@@ -166,8 +162,7 @@ export function createNavigationEnvelope({
   height: number;
   insets: MapInsets;
   protectedPolygons?: readonly (readonly Point[])[];
-  /** Explicit roads/parcels/landmarks that may be explored, not a terrain box.
-   * Empty or non-finite polygons are ignored rather than unbounding the camera. */
+  /** Complete navigable footprint. Callers without one fall back to commercial geometry. */
   explorationPolygons?: readonly (readonly Point[])[];
   fov?: number;
 }): NavigationEnvelope {
@@ -181,7 +176,7 @@ export function createNavigationEnvelope({
       (polygon) => polygon.length >= 3 && polygon.every((point) => point.every(Number.isFinite)),
     )
     .map((polygon) => ({ polygon, bounds: polygonBounds(polygon) }));
-  const navigationRegions = [...protectedRegions, ...explorationRegions];
+  const navigationRegions = explorationRegions.length ? explorationRegions : protectedRegions;
   const viewBounds = explorationRegions.reduce<Bounds>(
     (combined, region) => ({
       minX: Math.min(combined.minX, region.bounds.minX),
@@ -234,13 +229,7 @@ export function createNavigationEnvelope({
     cameraClearance / Math.cos(maxPolarAngle),
     fitDistance * NAVIGATION.maximumFitMultiplier,
   );
-  const margin = Math.min(box.width, box.depth) * NAVIGATION.targetMarginFraction;
-  const targetBounds = {
-    minX: viewBounds.minX - margin,
-    minY: viewBounds.minY - margin,
-    maxX: viewBounds.maxX + margin,
-    maxY: viewBounds.maxY + margin,
-  };
+  const targetBounds = { ...viewBounds };
   const tanVertical = Math.tan(halfFov);
   const tanHorizontal = (tanVertical * Math.max(1, width)) / Math.max(1, height);
   const horizonFade = {
@@ -277,7 +266,6 @@ export function createNavigationEnvelope({
     groundReach,
     farPlane,
     horizonFade,
-    groundTangent: Math.min(tanHorizontal, tanVertical),
     protectedRegions,
     navigationRegions,
   };
@@ -316,47 +304,23 @@ export function constrainNavigationPose(
     0,
     clamp(pose.target[2], envelope.targetBounds.minY, envelope.targetBounds.maxY),
   ];
-  // A target box alone permits a close camera to show only a concave corner's
-  // ambient ground. Keep one commercial or explicit context surface in the central 40%
-  // of screen width/height. The conservative perspective bound also accounts
-  // for the ground witness being closer to the camera than the orbit target.
+  // Only the orbit target slides along the boundary. Reconstructing the camera
+  // with its original azimuth allows a full rotation even at a gate.
   const point: Point = [target[0], target[2]];
-  let nearest: Point | undefined,
-    nearestDistanceSq = Infinity;
-  for (const region of envelope.navigationRegions) {
-    const { bounds, polygon } = region;
+  let best = Infinity;
+  for (const { polygon, bounds } of envelope.navigationRegions) {
     const boxDistanceSq =
       Math.max(bounds.minX - point[0], 0, point[0] - bounds.maxX) ** 2 +
       Math.max(bounds.minY - point[1], 0, point[1] - bounds.maxY) ** 2;
-    if (boxDistanceSq > nearestDistanceSq) continue;
-    if (!boxDistanceSq && pointInPolygon(point, polygon)) {
-      nearestDistanceSq = 0;
-      break;
+    if (boxDistanceSq > best) continue;
+    const candidate = clampPointToPolygon(point, polygon);
+    const distanceSq = (point[0] - candidate[0]) ** 2 + (point[1] - candidate[1]) ** 2;
+    if (distanceSq < best) {
+      best = distanceSq;
+      target[0] = candidate[0];
+      target[2] = candidate[1];
+      if (!best) break;
     }
-    for (let edge = 0; edge < polygon.length; edge++) {
-      const a = polygon[edge],
-        b = polygon[(edge + 1) % polygon.length];
-      const dx = b[0] - a[0],
-        dy = b[1] - a[1],
-        lengthSq = dx * dx + dy * dy;
-      const t = lengthSq
-        ? clamp(((point[0] - a[0]) * dx + (point[1] - a[1]) * dy) / lengthSq, 0, 1)
-        : 0;
-      const x = a[0] + dx * t,
-        y = a[1] + dy * t;
-      const distanceSq = (point[0] - x) ** 2 + (point[1] - y) ** 2;
-      if (distanceSq < nearestDistanceSq) {
-        nearestDistanceSq = distanceSq;
-        nearest = [x, y];
-      }
-    }
-  }
-  const tangent = envelope.groundTangent * NAVIGATION.commercialWitnessNdc;
-  const allowedMargin = (distance * tangent) / (1 + tangent);
-  if (nearest && nearestDistanceSq > allowedMargin ** 2) {
-    const ratio = allowedMargin / Math.sqrt(nearestDistanceSq);
-    target[0] = nearest[0] + (point[0] - nearest[0]) * ratio;
-    target[2] = nearest[1] + (point[1] - nearest[1]) * ratio;
   }
   return {
     target,

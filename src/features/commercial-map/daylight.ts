@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { aerialShader, horizonShader, type LandscapeUniforms } from "./regionalLandscape";
 import panoramaUrl from "./assets/daylight.png?url";
 import daylightPalette from "./daylightPalette.json";
 import { PARK_DAYLIGHT } from "./visualTheme";
@@ -246,6 +247,7 @@ export function createDaylightReflectionSource(sky?: DaylightSky) {
 export function createDaylightBackground(
   texture: THREE.Texture,
   skyRadiance = new THREE.Color(1, 1, 1),
+  landscape?: LandscapeUniforms,
 ) {
   const geometry = new THREE.BoxGeometry(1, 1, 1);
   let material: THREE.ShaderMaterial | undefined;
@@ -258,7 +260,13 @@ export function createDaylightBackground(
     let blendAwaitingFrame = false;
     material = new THREE.ShaderMaterial({
       name: "indumoveis-world-daylight-background",
-      uniforms: { panorama, previousPanorama, panoramaBlend, skyRadiance: { value: skyRadiance } },
+      uniforms: {
+        panorama,
+        previousPanorama,
+        panoramaBlend,
+        skyRadiance: { value: skyRadiance },
+        ...landscape,
+      },
       side: THREE.BackSide,
       // Draw after opaque floors: the depth test rejects hidden sky fragments
       // before sampling the panorama, avoiding a second full-screen shading
@@ -277,6 +285,7 @@ export function createDaylightBackground(
       `,
       fragmentShader: `
         uniform sampler2D panorama;
+        ${landscape ? aerialShader + horizonShader : ""}
         uniform sampler2D previousPanorama;
         uniform float panoramaBlend;
         uniform vec3 skyRadiance;
@@ -291,7 +300,9 @@ export function createDaylightBackground(
           if (panoramaBlend < 1.0) {
             sky = mix(texture2D(previousPanorama, uv).rgb, sky, panoramaBlend);
           }
-          gl_FragColor = vec4(sky * skyRadiance, 1.0);
+          sky *= skyRadiance;
+          ${landscape ? "if (landscapeActive) sky = landscapeBackground(sky, direction);" : ""}
+          gl_FragColor = vec4(sky, 1.0);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }

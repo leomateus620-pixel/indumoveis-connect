@@ -1,0 +1,154 @@
+{
+  "assets": {
+    "depth-compact.png": {
+      "dimensions": [
+        2048,
+        256
+      ],
+      "bytes": 52490,
+      "sha256": "81c996906a8c3ce88c2221b84488c412556ed94ef3986e3b219e396e235b9369"
+    },
+    "depth-detail.png": {
+      "dimensions": [
+        4096,
+        512
+      ],
+      "bytes": 132567,
+      "sha256": "c2bfc2cf7d0e838eb0b3b1019245c7b5d46d46263a0149a4cd5bb213564e9037"
+    },
+    "far-compact.webp": {
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 70392,
+      "sha256": "6a47523ac52e7c8344081b0e3330887277786c719b7320a12fdeddcdbbdb2b1a"
+    },
+    "far-detail.webp": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "bytes": 954842,
+      "sha256": "7ca3b71f8758c9f03b55b0e98af6311448bdfa1d579f35c85c20e7b1ab924758"
+    },
+    "horizon-high-compact.webp": {
+      "dimensions": [
+        2048,
+        256
+      ],
+      "bytes": 35374,
+      "sha256": "91840b5a8c377d2056e105dd5b29f5b6b6cead4bc1e9ddce491f5eb4b89d52be"
+    },
+    "horizon-high-detail.webp": {
+      "dimensions": [
+        8192,
+        512
+      ],
+      "bytes": 187186,
+      "sha256": "ffe00ff74db2cf854a96bcf306e42c866a5724e4ce07371ff48a33c699eaf973"
+    },
+    "horizon-low-compact.webp": {
+      "dimensions": [
+        2048,
+        256
+      ],
+      "bytes": 28996,
+      "sha256": "6de62a4e45ab59576ab04b9a64e5fbabcc1c62c17d3fe310b922be54bf8a8952"
+    },
+    "horizon-low-detail.webp": {
+      "dimensions": [
+        8192,
+        512
+      ],
+      "bytes": 127190,
+      "sha256": "b64787b859b69c6ec6fcb4f7afdcbcd3ab0e4898634a97553c47bacabdb22f2c"
+    },
+    "mid-compact.webp": {
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 43146,
+      "sha256": "eaadddbf96815d73595dabd524246757259805451c9674a8147496ae94680dc6"
+    },
+    "mid-detail.webp": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "bytes": 561618,
+      "sha256": "29a49a52169acf710a706abfd44d9b9b5c77a7f819c2fd017adcb56a957f83f5"
+    },
+    "near-compact.webp": {
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 47126,
+      "sha256": "d81092eadc538179de47ff5d6080fd06e2b8eecf0a6f26f48e68de8513961ab0"
+    },
+    "near-detail.webp": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "bytes": 539642,
+      "sha256": "156f21cd86b033b456cfa68d3791bbd883b3a8e06daf5ebac15a95c6b1ee7437"
+    },
+    "relief.png": {
+      "dimensions": [
+        512,
+        512
+      ],
+      "bytes": 67930,
+      "sha256": "5e014b0273c59c55d5751ccdb8a5c99ea00add5192ffcedbc5aaf1ef3c69b5be"
+    },
+    "settlement-compact.webp": {
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "bytes": 512008,
+      "sha256": "462c783263945c5defb1b3ead1097715a65835289ec51c3e96e2f70a99417d01"
+    },
+    "settlement-detail.webp": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "bytes": 1795418,
+      "sha256": "4fd393ea2a3800f3cba6167f2df8094a36eeaecdaff2ccef12f809512cdc975b"
+    },
+    "settlement.bin": {
+      "bytes": 186264,
+      "sha256": "e84e27d521a65c2ec6b4ff1227021a1502feafa5bcbacfabfd4f3d9fc18bc82f"
+    }
+  },
+  "panoramas": {
+    "horizon-high-compact.webp": {
+      "opaqueRidgeMinDeg": -0.578,
+      "opaqueRidgeMaxDeg": -0.016,
+      "adjacentNorthSeamDeltaDeg": 0.0,
+      "sourceAngularSampleDeg": 0.175781
+    },
+    "horizon-high-detail.webp": {
+      "opaqueRidgeMinDeg": -0.602,
+      "opaqueRidgeMaxDeg": 0.008,
+      "adjacentNorthSeamDeltaDeg": 0.0,
+      "sourceAngularSampleDeg": 0.043945
+    },
+    "horizon-low-compact.webp": {
+      "opaqueRidgeMinDeg": -0.391,
+      "opaqueRidgeMaxDeg": 0.734,
+      "adjacentNorthSeamDeltaDeg": 0.0,
+      "sourceAngularSampleDeg": 0.175781
+    },
+    "horizon-low-detail.webp": {
+      "opaqueRidgeMinDeg": -0.367,
+      "opaqueRidgeMaxDeg": 0.758,
+      "adjacentNorthSeamDeltaDeg": 0.0,
+      "sourceAngularSampleDeg": 0.043945
+    }
+  }
+}

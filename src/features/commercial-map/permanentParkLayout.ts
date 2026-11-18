@@ -22,6 +22,7 @@ import {
   PARK_A2_BUILDING_FOOTPRINTS,
   PARK_A2_ROAD_SURFACES,
   PARK_A2_GATES,
+  PARK_A2_SOURCE_CONDITION,
 } from "./parkA2Reference";
 import {
   PARK_SUPPLEMENTAL_WALKS,
@@ -402,6 +403,11 @@ export const ARENA_APPROACH_CONDITION = {
 export const PARK_CONTEXT_BLOCKS = PARK_PHYSICAL_BLOCKS.filter(
   (b) => b.coverage !== "whole-commercial-envelope",
 );
+/** Civil3D outer boundary, path 5308 in the same registered A2 frame as the gates. */
+export const PARK_NAVIGATION_FOOTPRINT = registerA2Polygon(
+  PARK_A2_SOURCE_CONDITION.roadExtraction.frame,
+);
+
 export const PERMANENT_PARK_EXPLORATION: Point[][] = [
   ...PARK_PHYSICAL_BLOCKS.flatMap((b) => b.polygons),
   ...PERMANENT_PARK_LANDMARKS.map((l) => l.polygon),

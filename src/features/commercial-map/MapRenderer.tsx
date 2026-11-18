@@ -3,6 +3,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { configureMapInput, prepareSecondaryPan } from "./mapInput";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
+import {
+  createLandscapeUniforms,
+  createRegionalLandscape,
+  landscapeQuality,
+  type LandscapeDiagnostic,
+} from "./regionalLandscape";
 import { createMapLighting } from "./mapLighting";
 import {
   createInitialGrassMaterial,
@@ -12,7 +18,7 @@ import {
 import { createSoftwareMaterials } from "./softwareMaterials";
 import { createVegetation, CONTEXT_WOODLAND } from "./vegetation";
 import { createPhotoPavilionSetting } from "./photoPavilionSettingGeometry";
-import { getRegisteredParkWoodland, PARK_WOODLAND_MASSES } from "./parkPlanting";
+import { getRegisteredParkWoodland } from "./parkPlanting";
 import { selectParkLotTrees } from "./parkLotPlanting";
 import { createTerrain, TERRAIN } from "./terrain";
 import { derivePavilionGround } from "./pavilionGround";
@@ -28,14 +34,12 @@ import type { createUrbanContext } from "./urbanContext";
 import type { createPermanentPark } from "./permanentPark";
 import type { createParkContextShadows } from "./parkContextShadows";
 import {
-  PERMANENT_PARK_EXPLORATION,
+  PARK_NAVIGATION_FOOTPRINT,
   PERMANENT_PARK_LANDMARKS,
   PARK_CORE_ENTITIES,
   PARK_RENDER_ENTITIES,
 } from "./permanentParkLayout";
 import type { PermanentParkLandmark } from "./permanentParkLayout";
-import { deriveUrbanHouses, deriveUrbanVacantLots } from "./urbanLayout";
-import { EXPLORATION_POLYGONS } from "./urbanReference";
 import { pointInPolygon } from "./geometry";
 import { createParkDetails, deriveParkDetails, lotStatusBands } from "./parkDetails";
 import { createCommercialBoundaries } from "./commercialBoundaries";
@@ -133,6 +137,7 @@ type Diagnostic = {
   environmentReadyAt?: number;
   skyPreparationMs: number;
   terrainPreparationMs: number;
+  landscape: LandscapeDiagnostic;
   skyReadyAt?: number;
   daylight: {
     mode: MapLightingMode;
@@ -262,20 +267,6 @@ const COMMERCIAL_POLYGONS = ENTITIES.map((entity) => entity.polygon);
 /** Generous illustrative height (about 13 m) for identifying a permanent
  * structure by a click on its walls or roof; not a surveyed level. */
 const LANDMARK_PICK_HEIGHT = 6;
-const CONTEXT_EXPLORATION = [
-  ...EXPLORATION_POLYGONS,
-  ...PERMANENT_PARK_EXPLORATION,
-  ...deriveUrbanHouses().map((house) => house.parcel),
-  ...deriveUrbanVacantLots().map((lot) => lot.parcel),
-  ...PARK_WOODLAND_MASSES.map((mass) => mass.polygon),
-  ...CONTEXT_WOODLAND.map((tree) =>
-    Array.from({ length: 12 }, (_, i): Point => [
-      tree.world[0] + Math.cos((i * Math.PI) / 6) * 5,
-      tree.world[1] + Math.sin((i * Math.PI) / 6) * 5,
-    ]),
-  ),
-];
-
 function polygonGeometry(polygon: Point[], height: number) {
   const triangles = THREE.ShapeUtils.triangulateShape(
     polygon.map(([x, y]) => new THREE.Vector2(x, y)),
@@ -468,7 +459,20 @@ function initializeMapRuntime(
     sky.dispose();
   }
   rollback.push(disposeSky);
-  const daylightBackground = createDaylightBackground(sky.texture, lighting.skyRadiance);
+  const landscapeUniforms = createLandscapeUniforms(lighting.skyRadiance, lighting.horizon);
+  const landscape = createRegionalLandscape(
+    renderer,
+    landscapeUniforms,
+    (mesh) => renderer.compileAsync(mesh, camera, scene),
+    invalidate,
+  );
+  scene.add(landscape.group);
+  rollback.push(() => landscape.dispose());
+  const daylightBackground = createDaylightBackground(
+    sky.texture,
+    lighting.skyRadiance,
+    landscapeUniforms,
+  );
   scene.background = lighting.horizon;
   scene.add(daylightBackground.mesh);
   rollback.push(() => daylightBackground.dispose());
@@ -615,6 +619,7 @@ function initializeMapRuntime(
   const up = new THREE.Vector3(0, 1, 0);
   const projection = new THREE.Vector3();
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let reportedLandscapeBytes = 0;
   const diag: Diagnostic = {
     enabled: new URLSearchParams(window.location.search).get("mapDiagnostics") === "1",
     instance: crypto.randomUUID(),
@@ -636,6 +641,7 @@ function initializeMapRuntime(
     essentialProgramsPreparationMs: 0,
     skyPreparationMs: 0,
     terrainPreparationMs: 0,
+    landscape: landscape.stats,
     daylight: {
       mode: lighting.mode,
       profileKey: lighting.profileKey,
@@ -771,7 +777,7 @@ function initializeMapRuntime(
     height,
     insets: props().insets,
     protectedPolygons: COMMERCIAL_POLYGONS,
-    explorationPolygons: CONTEXT_EXPLORATION,
+    explorationPolygons: [PARK_NAVIGATION_FOOTPRINT],
     fov: camera.fov,
   });
   const pavilionGround = derivePavilionGround(PARK_RENDER_ENTITIES);
@@ -779,6 +785,7 @@ function initializeMapRuntime(
   const getParkDetailsTopology = () =>
     (parkDetailsTopology ??= deriveParkDetails(PARK_RENDER_ENTITIES, pavilionGround));
   const terrain = createTerrain(ENTITIES, {
+    landscape: landscapeUniforms,
     foundationExclusions: pavilionGround.foundationExclusions,
     extent: envelope.terrainBounds,
     quality: tier,
@@ -2322,6 +2329,7 @@ function initializeMapRuntime(
     const topGroundDepth =
       Math.cos(polar) - Math.sin(polar) * Math.tan((camera.fov * Math.PI) / 360);
     daylightBackground.mesh.visible =
+      landscapeUniforms.landscapeActive.value ||
       topGroundDepth <= 0 ||
       (camera.position.y - TERRAIN.baseElevation) / topGroundDepth >= camera.far * 0.98;
     const navigationActive = activePointers.size > 0 || !!transition || now - lastActivity < 240;
@@ -2364,6 +2372,9 @@ function initializeMapRuntime(
       fail(error instanceof Error ? error.message : "screen-draw-failed");
       return;
     }
+    landscape.presented(performance.now());
+    diag.textureBytes += landscape.stats.textureBytes - reportedLandscapeBytes;
+    reportedLandscapeBytes = landscape.stats.textureBytes;
     frame++;
     diag.frames = frame;
     diag.drawCalls = renderer.info.render.calls;
@@ -2455,6 +2466,7 @@ function initializeMapRuntime(
       performance.mark("indumoveis-map:first-valid-draw");
       performance.mark("indumoveis-map:controls-ready");
       props().onReady();
+      requestLandscape();
       optionalTask = window.setTimeout(addTrees, 0);
       contextTask = window.setTimeout(prepareContext, 160);
       environmentTask = window.setTimeout(prepareEnvironment, 350);
@@ -2474,6 +2486,12 @@ function initializeMapRuntime(
       diag.cameraState = "idle";
       scheduleAmbient();
     }
+  }
+  function requestLandscape() {
+    if (ready && !failed && !disposed)
+      landscape.request(
+        landscapeQuality(tier, canvas.width, renderer.capabilities.maxTextureSize, memory),
+      );
   }
   function applyQuality(next: QualityTier) {
     const softwareMode = pendingSoftwareMode;
@@ -2516,6 +2534,7 @@ function initializeMapRuntime(
     camera.updateProjectionMatrix();
     diag.dpr = dpr;
     diag.buffer = [canvas.width, canvas.height];
+    requestLandscape();
     invalidate();
   }
   function pick(clientX: number, clientY: number) {
@@ -2905,7 +2924,7 @@ function initializeMapRuntime(
       height,
       insets: props().insets,
       protectedPolygons: COMMERCIAL_POLYGONS,
-      explorationPolygons: CONTEXT_EXPLORATION,
+      explorationPolygons: [PARK_NAVIGATION_FOOTPRINT],
       fov: camera.fov,
     });
     navigationLimits();
@@ -3184,6 +3203,7 @@ function initializeMapRuntime(
       terrain.dispose();
       sunShadows.dispose();
       daylightBackground.dispose();
+      landscape.dispose();
       disposeSky();
       environmentResource?.dispose();
       surfaces.dispose();

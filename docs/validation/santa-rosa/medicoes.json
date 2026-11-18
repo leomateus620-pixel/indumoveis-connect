@@ -1,0 +1,912 @@
+{
+  "baselineCommit": "c403745d71bd6623605610ae3d0a3b285f18912e",
+  "conditions": {
+    "os": "darwin 25.6.0",
+    "cpu": "Apple M5",
+    "logicalCores": 10,
+    "systemMemoryGiB": 16,
+    "renderer": "host GPU requested; inspect renderer evidence",
+    "authAndData": "Local intercepted fixtures, active edition, zero persisted commercial spaces. No production session or database mutation.",
+    "physicalDevices": "Automated local host browser; no physical Android/iPhone or manual touch/trackpad validation",
+    "rendererAssets": ["/assets/MapRenderer-4pr0nu9e.js"],
+    "optionalContextAssets": ["/assets/urbanContext-CyAnqz5m.js"],
+    "usabilityParticipants": "None; scripted objective journeys only",
+    "httpCache": "Disabled by Playwright request routing; warm means SPA/module reentry in the same document, not a cached HTTP load",
+    "browser": "157.0.8103.79"
+  },
+  "profiles": [
+    {
+      "phase": "before",
+      "layout": "desktop",
+      "quality": "detailed",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "startup": [
+        {
+          "usefulFrameMs": 867.2,
+          "compactMs": null,
+          "finalMs": null,
+          "environmentReadyMs": 1328.9,
+          "fullSceneMs": 2098.5,
+          "maxLoadMainTaskMs": 381,
+          "maxLoadRafGapMs": 350,
+          "appResourceBytes": 1866849
+        },
+        {
+          "usefulFrameMs": 833.2,
+          "compactMs": null,
+          "finalMs": null,
+          "environmentReadyMs": 1292,
+          "fullSceneMs": 2065,
+          "maxLoadMainTaskMs": 405,
+          "maxLoadRafGapMs": 400,
+          "appResourceBytes": 1866849
+        },
+        {
+          "usefulFrameMs": 828.8,
+          "compactMs": null,
+          "finalMs": null,
+          "environmentReadyMs": 1294.3,
+          "fullSceneMs": 2060.4,
+          "maxLoadMainTaskMs": 382,
+          "maxLoadRafGapMs": 366.7,
+          "appResourceBytes": 1866849
+        }
+      ],
+      "gpu": {
+        "residentSceneTextureBytes": 20316273,
+        "landscape": {}
+      },
+      "landscapeTransfers": [],
+      "orbit": {
+        "initial": {
+          "position": [98, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": 0,
+          "verticalFovDegrees": 38,
+          "buffer": [1294, 655],
+          "tier": "detailed"
+        },
+        "final": {
+          "position": [98.0, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": -0.0,
+          "verticalFovDegrees": 38,
+          "buffer": [1294, 655],
+          "tier": "detailed"
+        },
+        "durationMs": 60030,
+        "framesSampled": 3600,
+        "p95FrameMs": 16.7,
+        "maxFrameMs": 16.8,
+        "over50Ms": 0
+      },
+      "lighting": null,
+      "interiorAndReentry": {
+        "elapsedMs": 1249,
+        "activeContexts": 1,
+        "lighting": "warm",
+        "profile": "detailed",
+        "textureBytes": 20316273,
+        "landscape": null
+      }
+    },
+    {
+      "phase": "after",
+      "layout": "desktop",
+      "quality": "detailed",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "startup": [
+        {
+          "usefulFrameMs": 872.3,
+          "compactMs": 1393,
+          "finalMs": 2555.6,
+          "environmentReadyMs": 1352.2,
+          "fullSceneMs": 2570.2,
+          "maxLoadMainTaskMs": 366,
+          "maxLoadRafGapMs": 350,
+          "appResourceBytes": 7242379
+        },
+        {
+          "usefulFrameMs": 866.6,
+          "compactMs": 1370.7,
+          "finalMs": 2566.6,
+          "environmentReadyMs": 1339.7,
+          "fullSceneMs": 2581.3,
+          "maxLoadMainTaskMs": 378,
+          "maxLoadRafGapMs": 366.7,
+          "appResourceBytes": 7242379
+        },
+        {
+          "usefulFrameMs": 817.5,
+          "compactMs": 1338.9,
+          "finalMs": 2467.8,
+          "environmentReadyMs": 1296.2,
+          "fullSceneMs": 2482.5,
+          "maxLoadMainTaskMs": 360,
+          "maxLoadRafGapMs": 350.1,
+          "appResourceBytes": 7242379
+        }
+      ],
+      "gpu": {
+        "residentSceneTextureBytes": 165318208,
+        "landscape": {
+          "level": "detail",
+          "requested": "detail",
+          "textureBytes": 145001935,
+          "peakTextureBytes": 162478205,
+          "downloadBytes": 5367940,
+          "featureCount": 5174,
+          "featureBufferBytes": 186264
+        }
+      },
+      "landscapeTransfers": [
+        {
+          "path": "/landscape/santa-rosa/settlement.bin",
+          "encodedBodyBytes": 186264,
+          "transferBytes": 186564
+        },
+        {
+          "path": "/landscape/santa-rosa/near-compact.webp",
+          "encodedBodyBytes": 47126,
+          "transferBytes": 47426
+        },
+        {
+          "path": "/landscape/santa-rosa/mid-compact.webp",
+          "encodedBodyBytes": 43146,
+          "transferBytes": 43446
+        },
+        {
+          "path": "/landscape/santa-rosa/far-compact.webp",
+          "encodedBodyBytes": 70392,
+          "transferBytes": 70692
+        },
+        {
+          "path": "/landscape/santa-rosa/horizon-low-compact.webp",
+          "encodedBodyBytes": 28996,
+          "transferBytes": 29296
+        },
+        {
+          "path": "/landscape/santa-rosa/horizon-high-compact.webp",
+          "encodedBodyBytes": 35374,
+          "transferBytes": 35674
+        },
+        {
+          "path": "/landscape/santa-rosa/settlement-compact.webp",
+          "encodedBodyBytes": 512008,
+          "transferBytes": 512308
+        },
+        {
+          "path": "/assets/landscape-mask-B1OEq2iW.png",
+          "encodedBodyBytes": 25751,
+          "transferBytes": 26051
+        },
+        {
+          "path": "/landscape/santa-rosa/depth-compact.png",
+          "encodedBodyBytes": 52490,
+          "transferBytes": 52790
+        },
+        {
+          "path": "/landscape/santa-rosa/relief.png",
+          "encodedBodyBytes": 67930,
+          "transferBytes": 68230
+        },
+        {
+          "path": "/landscape/santa-rosa/near-detail.webp",
+          "encodedBodyBytes": 539642,
+          "transferBytes": 539942
+        },
+        {
+          "path": "/landscape/santa-rosa/mid-detail.webp",
+          "encodedBodyBytes": 561618,
+          "transferBytes": 561918
+        },
+        {
+          "path": "/landscape/santa-rosa/far-detail.webp",
+          "encodedBodyBytes": 954842,
+          "transferBytes": 955142
+        },
+        {
+          "path": "/landscape/santa-rosa/horizon-high-detail.webp",
+          "encodedBodyBytes": 187186,
+          "transferBytes": 187486
+        },
+        {
+          "path": "/landscape/santa-rosa/horizon-low-detail.webp",
+          "encodedBodyBytes": 127190,
+          "transferBytes": 127490
+        },
+        {
+          "path": "/landscape/santa-rosa/settlement-detail.webp",
+          "encodedBodyBytes": 1795418,
+          "transferBytes": 1795718
+        },
+        {
+          "path": "/landscape/santa-rosa/depth-detail.png",
+          "encodedBodyBytes": 132567,
+          "transferBytes": 132867
+        }
+      ],
+      "orbit": {
+        "initial": {
+          "position": [98, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": 0,
+          "verticalFovDegrees": 38,
+          "buffer": [1294, 655],
+          "tier": "detailed"
+        },
+        "final": {
+          "position": [98.0, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": -0.0,
+          "verticalFovDegrees": 38,
+          "buffer": [1294, 655],
+          "tier": "detailed"
+        },
+        "durationMs": 60028.3,
+        "framesSampled": 3600,
+        "p95FrameMs": 16.7,
+        "maxFrameMs": 16.8,
+        "over50Ms": 0
+      },
+      "lighting": {
+        "pose": {
+          "position": [98.0, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": -0.0,
+          "verticalFovDegrees": 38,
+          "buffer": [1294, 655],
+          "tier": "detailed"
+        },
+        "resources": {
+          "instance": "4d2f9ae1-2aee-403f-98a2-156a6a0aec34",
+          "textures": 26,
+          "textureBytes": 165318208,
+          "landscapeBytes": 5367940,
+          "localImageRequests": 16
+        }
+      },
+      "interiorAndReentry": {
+        "elapsedMs": 1722.4,
+        "exteriorRequestsDuringInterior": 0,
+        "activeContexts": 1,
+        "lighting": "warm",
+        "profile": "detailed",
+        "textureBytes": 165318208,
+        "landscape": {
+          "level": "detail",
+          "requested": "detail",
+          "textureBytes": 145001935,
+          "peakTextureBytes": 162478205,
+          "downloadBytes": 5367940,
+          "featureCount": 5174,
+          "featureBufferBytes": 186264,
+          "finalAt": 64777.1,
+          "compactAt": 63811.5
+        }
+      }
+    },
+    {
+      "phase": "before",
+      "layout": "mobile",
+      "quality": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "startup": [
+        {
+          "usefulFrameMs": 842.3,
+          "compactMs": null,
+          "finalMs": null,
+          "environmentReadyMs": 1289,
+          "fullSceneMs": 2057,
+          "maxLoadMainTaskMs": 395,
+          "maxLoadRafGapMs": 383.3,
+          "appResourceBytes": 1442546
+        },
+        {
+          "usefulFrameMs": 863.4,
+          "compactMs": null,
+          "finalMs": null,
+          "environmentReadyMs": 1318.8,
+          "fullSceneMs": 2095.4,
+          "maxLoadMainTaskMs": 385,
+          "maxLoadRafGapMs": 366.6,
+          "appResourceBytes": 1442546
+        },
+        {
+          "usefulFrameMs": 865.1,
+          "compactMs": null,
+          "finalMs": null,
+          "environmentReadyMs": 1317.9,
+          "fullSceneMs": 2096.8,
+          "maxLoadMainTaskMs": 387,
+          "maxLoadRafGapMs": 366.7,
+          "appResourceBytes": 1442546
+        }
+      ],
+      "gpu": {
+        "residentSceneTextureBytes": 10354801,
+        "landscape": {}
+      },
+      "landscapeTransfers": [],
+      "orbit": {
+        "initial": {
+          "position": [98, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": 0,
+          "verticalFovDegrees": 38,
+          "buffer": [390, 689],
+          "tier": "light"
+        },
+        "final": {
+          "position": [98.0, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": -0.0,
+          "verticalFovDegrees": 38,
+          "buffer": [390, 689],
+          "tier": "light"
+        },
+        "durationMs": 60031.2,
+        "framesSampled": 3600,
+        "p95FrameMs": 16.7,
+        "maxFrameMs": 16.8,
+        "over50Ms": 0
+      },
+      "lighting": null,
+      "interiorAndReentry": {
+        "elapsedMs": 1199.6,
+        "activeContexts": 1,
+        "lighting": "warm",
+        "profile": "light",
+        "textureBytes": 10354801,
+        "landscape": null
+      }
+    },
+    {
+      "phase": "after",
+      "layout": "mobile",
+      "quality": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+      "startup": [
+        {
+          "usefulFrameMs": 885.4,
+          "compactMs": 1390,
+          "finalMs": 1390,
+          "environmentReadyMs": 1362.3,
+          "fullSceneMs": 2050.7,
+          "maxLoadMainTaskMs": 376,
+          "maxLoadRafGapMs": 366.6,
+          "appResourceBytes": 2519613
+        },
+        {
+          "usefulFrameMs": 867.9,
+          "compactMs": 1372.5,
+          "finalMs": 1372.5,
+          "environmentReadyMs": 1341.9,
+          "fullSceneMs": 2016.3,
+          "maxLoadMainTaskMs": 376,
+          "maxLoadRafGapMs": 366.7,
+          "appResourceBytes": 2519613
+        },
+        {
+          "usefulFrameMs": 864.8,
+          "compactMs": 1369.6,
+          "finalMs": 1369.6,
+          "environmentReadyMs": 1331.4,
+          "fullSceneMs": 2030.3,
+          "maxLoadMainTaskMs": 371,
+          "maxLoadRafGapMs": 350.1,
+          "appResourceBytes": 2519613
+        }
+      ],
+      "gpu": {
+        "residentSceneTextureBytes": 30226666,
+        "landscape": {
+          "level": "compact",
+          "requested": "compact",
+          "textureBytes": 19871865,
+          "peakTextureBytes": 19871865,
+          "downloadBytes": 1069477,
+          "featureCount": 5174,
+          "featureBufferBytes": 186264
+        }
+      },
+      "landscapeTransfers": [
+        {
+          "path": "/landscape/santa-rosa/settlement.bin",
+          "encodedBodyBytes": 186264,
+          "transferBytes": 186564
+        },
+        {
+          "path": "/landscape/santa-rosa/near-compact.webp",
+          "encodedBodyBytes": 47126,
+          "transferBytes": 47426
+        },
+        {
+          "path": "/landscape/santa-rosa/mid-compact.webp",
+          "encodedBodyBytes": 43146,
+          "transferBytes": 43446
+        },
+        {
+          "path": "/landscape/santa-rosa/far-compact.webp",
+          "encodedBodyBytes": 70392,
+          "transferBytes": 70692
+        },
+        {
+          "path": "/landscape/santa-rosa/horizon-low-compact.webp",
+          "encodedBodyBytes": 28996,
+          "transferBytes": 29296
+        },
+        {
+          "path": "/assets/landscape-mask-B1OEq2iW.png",
+          "encodedBodyBytes": 25751,
+          "transferBytes": 26051
+        },
+        {
+          "path": "/landscape/santa-rosa/horizon-high-compact.webp",
+          "encodedBodyBytes": 35374,
+          "transferBytes": 35674
+        },
+        {
+          "path": "/landscape/santa-rosa/depth-compact.png",
+          "encodedBodyBytes": 52490,
+          "transferBytes": 52790
+        },
+        {
+          "path": "/landscape/santa-rosa/settlement-compact.webp",
+          "encodedBodyBytes": 512008,
+          "transferBytes": 512308
+        },
+        {
+          "path": "/landscape/santa-rosa/relief.png",
+          "encodedBodyBytes": 67930,
+          "transferBytes": 68230
+        }
+      ],
+      "orbit": {
+        "initial": {
+          "position": [98, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": 0,
+          "verticalFovDegrees": 38,
+          "buffer": [390, 689],
+          "tier": "light"
+        },
+        "final": {
+          "position": [98.0, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": -0.0,
+          "verticalFovDegrees": 38,
+          "buffer": [390, 689],
+          "tier": "light"
+        },
+        "durationMs": 60030.1,
+        "framesSampled": 3600,
+        "p95FrameMs": 16.7,
+        "maxFrameMs": 16.8,
+        "over50Ms": 0
+      },
+      "lighting": {
+        "pose": {
+          "position": [98.0, 24.6, 181],
+          "target": [98, 55],
+          "distance": 128.379,
+          "tiltDownDegrees": 11.0474,
+          "bearingAboutSceneZ": -0.0,
+          "verticalFovDegrees": 38,
+          "buffer": [390, 689],
+          "tier": "light"
+        },
+        "resources": {
+          "instance": "56687052-ce7b-4d12-819f-691d9255d038",
+          "textures": 23,
+          "textureBytes": 30226666,
+          "landscapeBytes": 1069477,
+          "localImageRequests": 9
+        }
+      },
+      "interiorAndReentry": {
+        "elapsedMs": 1230.2,
+        "exteriorRequestsDuringInterior": 0,
+        "activeContexts": 1,
+        "lighting": "warm",
+        "profile": "light",
+        "textureBytes": 30226666,
+        "landscape": {
+          "level": "compact",
+          "requested": "compact",
+          "textureBytes": 19871865,
+          "peakTextureBytes": 19871865,
+          "downloadBytes": 1069477,
+          "featureCount": 5174,
+          "featureBufferBytes": 186264,
+          "compactAt": 63275.1,
+          "finalAt": 63275.1
+        }
+      }
+    }
+  ],
+  "beforeCameraPoses": {
+    "21-10-16": {
+      "position": [213.505, 28.056, -31.264],
+      "target": [95.36, 56.327],
+      "distance": 149.725,
+      "tiltDownDegrees": 10.8001,
+      "bearingAboutSceneZ": 126.5527,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 114.2493
+    },
+    "21-10-21": {
+      "position": [173.649, 28.41, 178.779],
+      "target": [95.409, 53.527],
+      "distance": 150.3885,
+      "tiltDownDegrees": 10.8892,
+      "bearingAboutSceneZ": 31.9914,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 208.8106
+    },
+    "21-10-27": {
+      "position": [-24.601, 28.843, 136.053],
+      "target": [97.36, 55.141],
+      "distance": 149.1749,
+      "tiltDownDegrees": 11.1484,
+      "bearingAboutSceneZ": -56.4387,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 297.2407
+    },
+    "superior": {
+      "position": [93, 590, 15.4],
+      "target": [93, 13.5],
+      "distance": 590.0031,
+      "tiltDownDegrees": 89.8155,
+      "bearingAboutSceneZ": 0,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 240.802
+    },
+    "borda": {
+      "position": [147, 8.2026, 50.0005],
+      "target": [147, 93],
+      "distance": 43.7749,
+      "tiltDownDegrees": 10.8,
+      "bearingAboutSceneZ": 180,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 60.802
+    }
+  },
+  "afterCameraPoses": {
+    "21-10-16": {
+      "position": [213.505, 28.056, -31.264],
+      "target": [95.36, 56.327],
+      "distance": 149.725,
+      "tiltDownDegrees": 10.8001,
+      "bearingAboutSceneZ": 126.5527,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 114.2493
+    },
+    "21-10-21": {
+      "position": [173.649, 28.41, 178.779],
+      "target": [95.409, 53.527],
+      "distance": 150.3885,
+      "tiltDownDegrees": 10.8892,
+      "bearingAboutSceneZ": 31.9914,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 208.8106
+    },
+    "21-10-27": {
+      "position": [-24.601, 28.843, 136.053],
+      "target": [97.36, 55.141],
+      "distance": 149.1749,
+      "tiltDownDegrees": 11.1484,
+      "bearingAboutSceneZ": -56.4387,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 297.2407
+    },
+    "superior": {
+      "position": [93, 590, 15.4],
+      "target": [93, 13.5],
+      "distance": 590.0031,
+      "tiltDownDegrees": 89.8155,
+      "bearingAboutSceneZ": 0,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 240.802
+    },
+    "borda": {
+      "position": [147, 8.2026, 50.0005],
+      "target": [147, 93],
+      "distance": 43.7749,
+      "tiltDownDegrees": 10.8,
+      "bearingAboutSceneZ": 180,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 60.802
+    },
+    "natural": {
+      "position": [173.649, 28.41, 178.779],
+      "target": [95.409, 53.527],
+      "distance": 150.3885,
+      "tiltDownDegrees": 10.8892,
+      "bearingAboutSceneZ": 31.9914,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 208.8106
+    },
+    "N": {
+      "position": [95, 11.0, 28.0],
+      "target": [144.7575, 55.8063],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": -119.198,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 360.0
+    },
+    "NE": {
+      "position": [95, 11.0, 28.0],
+      "target": [110.5218, 82.8459],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": -164.198,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 45.0
+    },
+    "L": {
+      "position": [95.0, 11.0, 28.0],
+      "target": [67.1937, 77.7575],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": 150.802,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 90.0
+    },
+    "SE": {
+      "position": [95.0, 11.0, 28],
+      "target": [40.1541, 43.5218],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": 105.802,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 135.0
+    },
+    "S": {
+      "position": [95, 11.0, 28.0],
+      "target": [45.2425, 0.1937],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": 60.802,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 180.0
+    },
+    "S-travelling": {
+      "position": [96.7074, 11.0, 24.9447],
+      "target": [46.9499, -2.8616],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": 60.802,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 180.0
+    },
+    "SO": {
+      "position": [95.0, 11.0, 28.0],
+      "target": [79.4782, -26.8459],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": 15.802,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 225.0
+    },
+    "O": {
+      "position": [95, 11.0, 28.0],
+      "target": [122.8063, -21.7575],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": -29.198,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 270.0
+    },
+    "NO": {
+      "position": [95, 11.0, 28.0],
+      "target": [149.8459, 12.4782],
+      "distance": 58.0517,
+      "tiltDownDegrees": 10.9228,
+      "bearingAboutSceneZ": -74.198,
+      "verticalFovDegrees": 38,
+      "buffer": [1468, 860],
+      "tier": "detailed",
+      "viewTrueAzimuthDegrees": 315.0
+    }
+  },
+  "returnToNorthPixelDiff": {
+    "meanChannelDifference": 0,
+    "fractionChangedOver8": 0
+  },
+  "edgeControls": {
+    "exteriorClickCss": [1229.3, 622.25],
+    "outsideClickPose": {
+      "position": [93, 590, 15.4],
+      "target": [93, 13.5],
+      "distance": 590.0031,
+      "tiltDownDegrees": 89.8155,
+      "bearingAboutSceneZ": 0,
+      "verticalFovDegrees": 38,
+      "buffer": [1294, 655],
+      "tier": "detailed"
+    },
+    "clamped": {
+      "position": [275.6454, 24.6, 230.8815],
+      "target": [275.6454, 104.8815],
+      "distance": 128.379,
+      "tiltDownDegrees": 11.0474,
+      "bearingAboutSceneZ": 0,
+      "verticalFovDegrees": 38,
+      "buffer": [1294, 655],
+      "tier": "detailed"
+    },
+    "distanceToParkEdge": 0.0,
+    "keyboardRotation": {
+      "start": {
+        "position": [275.6454, 24.6, 230.8815],
+        "target": [275.6454, 104.8815],
+        "distance": 128.379,
+        "tiltDownDegrees": 11.0474,
+        "bearingAboutSceneZ": 0,
+        "verticalFovDegrees": 38,
+        "buffer": [1294, 655],
+        "tier": "detailed"
+      },
+      "end": {
+        "position": [275.6454, 24.6, 230.8815],
+        "target": [275.6454, 104.8815],
+        "distance": 128.379,
+        "tiltDownDegrees": 11.0474,
+        "bearingAboutSceneZ": -0.0,
+        "verticalFovDegrees": 38,
+        "buffer": [1294, 655],
+        "tier": "detailed"
+      }
+    },
+    "overview": {
+      "position": [92.7748, 74.444, 394.8033],
+      "target": [92.7748, 13.5047],
+      "distance": 388.4978,
+      "tiltDownDegrees": 11.0474,
+      "bearingAboutSceneZ": -0.0,
+      "verticalFovDegrees": 38,
+      "buffer": [1294, 655],
+      "tier": "detailed"
+    }
+  },
+  "movie": {
+    "initial": {
+      "position": [98, 8.7, 100],
+      "target": [98, 55],
+      "distance": 45.8333,
+      "tiltDownDegrees": 10.9422,
+      "bearingAboutSceneZ": 0,
+      "verticalFovDegrees": 38,
+      "buffer": [1294, 655],
+      "tier": "detailed"
+    },
+    "final": {
+      "position": [93, 590, 15.4],
+      "target": [93, 13.5],
+      "distance": 590.0031,
+      "tiltDownDegrees": 89.8155,
+      "bearingAboutSceneZ": 0,
+      "verticalFovDegrees": 38,
+      "buffer": [1294, 655],
+      "tier": "detailed"
+    },
+    "durationMs": 19182.2,
+    "framesSampled": 1149,
+    "p95FrameMs": 16.8,
+    "maxFrameMs": 16.8,
+    "over50Ms": 0
+  },
+  "navigationChecks": [
+    "primary-orbit-help-closed",
+    "secondary-pan",
+    "shift-primary-pan",
+    "top-primary-orbit-help-closed",
+    "cursor-wheel-single-owner",
+    "wheel-equivalent-deltaModes-first-response",
+    "precision-trackpad-stream-no-tail",
+    "rapid-wheel-and-trackpad-direction-reversal",
+    "zoom-buttons-immediate-reversal",
+    "horizon-stable-target",
+    "A-B-Escape-return",
+    "close-button-return",
+    "repeat-selection-and-hover-leave",
+    "manual-cancels-live-focus",
+    "wheel-cancels-live-focus",
+    "touch-and-panel-390x844",
+    "touch-and-panel-844x390"
+  ],
+  "navigationErrors": [],
+  "routeErrors": [],
+  "productionLandscapeSha256": {
+    "depth-compact.png": "81c996906a8c3ce88c2221b84488c412556ed94ef3986e3b219e396e235b9369",
+    "depth-detail.png": "c2bfc2cf7d0e838eb0b3b1019245c7b5d46d46263a0149a4cd5bb213564e9037",
+    "far-compact.webp": "6a47523ac52e7c8344081b0e3330887277786c719b7320a12fdeddcdbbdb2b1a",
+    "far-detail.webp": "7ca3b71f8758c9f03b55b0e98af6311448bdfa1d579f35c85c20e7b1ab924758",
+    "horizon-high-compact.webp": "91840b5a8c377d2056e105dd5b29f5b6b6cead4bc1e9ddce491f5eb4b89d52be",
+    "horizon-high-detail.webp": "ffe00ff74db2cf854a96bcf306e42c866a5724e4ce07371ff48a33c699eaf973",
+    "horizon-low-compact.webp": "6de62a4e45ab59576ab04b9a64e5fbabcc1c62c17d3fe310b922be54bf8a8952",
+    "horizon-low-detail.webp": "b64787b859b69c6ec6fcb4f7afdcbcd3ab0e4898634a97553c47bacabdb22f2c",
+    "mid-compact.webp": "eaadddbf96815d73595dabd524246757259805451c9674a8147496ae94680dc6",
+    "mid-detail.webp": "29a49a52169acf710a706abfd44d9b9b5c77a7f819c2fd017adcb56a957f83f5",
+    "near-compact.webp": "d81092eadc538179de47ff5d6080fd06e2b8eecf0a6f26f48e68de8513961ab0",
+    "near-detail.webp": "156f21cd86b033b456cfa68d3791bbd883b3a8e06daf5ebac15a95c6b1ee7437",
+    "relief.png": "5e014b0273c59c55d5751ccdb8a5c99ea00add5192ffcedbc5aaf1ef3c69b5be",
+    "settlement-compact.webp": "462c783263945c5defb1b3ead1097715a65835289ec51c3e96e2f70a99417d01",
+    "settlement-detail.webp": "4fd393ea2a3800f3cba6167f2df8094a36eeaecdaff2ccef12f809512cdc975b",
+    "settlement.bin": "e84e27d521a65c2ec6b4ff1227021a1502feafa5bcbacfabfd4f3d9fc18bc82f"
+  }
+}

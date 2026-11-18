@@ -1,0 +1,51 @@
+{
+  "inputSize": [
+    2048,
+    2048
+  ],
+  "captureSize": [
+    1468,
+    860
+  ],
+  "matches": 787,
+  "inliers": 412,
+  "quadrantsTopLeftTopRightBottomLeftBottomRight": [
+    83,
+    20,
+    277,
+    32
+  ],
+  "eastClockwiseDegreesFromScreenRight": 119.68829055815426,
+  "determinant": 3.607051198299977,
+  "affinePhotoPixelToScreenPixel": [
+    [
+      -0.946239993293452,
+      -1.6466410076293105,
+      3394.2777366382848
+    ],
+    [
+      1.659723360737904,
+      -0.9237430856693183,
+      -293.5602684408048
+    ]
+  ],
+  "lateralMotionSceneUnits": 3.5,
+  "lateralMotion": {
+    "horizon": {
+      "screenRows": [
+        170,
+        220
+      ],
+      "trackedCorners": 395,
+      "medianHorizontalShiftPixels": -4.884002685546875
+    },
+    "parkForeground": {
+      "screenRows": [
+        330,
+        620
+      ],
+      "trackedCorners": 445,
+      "medianHorizontalShiftPixels": -74.11968994140625
+    }
+  }
+}

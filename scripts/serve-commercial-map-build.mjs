@@ -16,6 +16,8 @@ const mime = {
   ".css": "text/css",
   ".json": "application/json",
   ".png": "image/png",
+  ".webp": "image/webp",
+  ".txt": "text/plain; charset=utf-8",
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",

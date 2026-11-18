@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { ENTITIES, MAP_BOUNDS, type Point } from "./data/territory";
+import { pointInPolygon } from "./geometry";
+import { PARK_NAVIGATION_FOOTPRINT } from "./permanentParkLayout";
 import { architectureVisualHeight } from "./architecture";
 import {
   createNavigationEnvelope,
@@ -191,6 +193,31 @@ describe("commercial navigation envelope", () => {
         ],
       ]),
     ).toBe(4);
+  });
+
+  it("keeps the pivot inside the registered perimeter and the orbit free around it", () => {
+    const envelope = envelopeFor(1440, 800, [PARK_NAVIGATION_FOOTPRINT]);
+    for (let angle = 0; angle <= 360; angle += 15) {
+      const target = new THREE.Vector3(60, 0, 160); // Residential side of the avenue
+      const offset = new THREE.Vector3().setFromSpherical(
+        new THREE.Spherical(135, envelope.maxPolarAngle, (angle * Math.PI) / 180),
+      );
+      const bounded = constrainNavigationPose(
+        {
+          target: target.toArray(),
+          position: target.clone().add(offset).toArray(),
+        },
+        envelope,
+      );
+      expect(
+        pointInPolygon([bounded.target[0], bounded.target[2]], PARK_NAVIGATION_FOOTPRINT),
+      ).toBe(true);
+      expect(
+        new THREE.Vector3(...bounded.position)
+          .sub(new THREE.Vector3(...bounded.target))
+          .distanceTo(offset),
+      ).toBeLessThan(1e-9);
+    }
   });
 
   it("projects all commercial corners inside each preset at the global far distance", () => {
@@ -566,7 +593,7 @@ describe("explicit context navigation", () => {
     const original = envelopeFor(390, 844);
     const envelope = envelopeFor(390, 844, explorationPolygons);
     expect(envelope.protectedRegions).toEqual(original.protectedRegions);
-    expect(envelope.navigationRegions.length).toBe(ENTITIES.length + explorationPolygons.length);
+    expect(envelope.navigationRegions.map((region) => region.polygon)).toEqual(explorationPolygons);
     expect(
       envelope.protectedRegions.some((region) => region.polygon === explorationPolygons[0]),
     ).toBe(false);

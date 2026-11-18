@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { aerialShader, type LandscapeUniforms } from "./regionalLandscape";
 import type { MapEntity, Point } from "./data/territory";
 import { polygonBounds, type Bounds } from "./geometry";
 import { pavementUnionCells } from "./pavement";
@@ -225,6 +226,7 @@ export function createTerrain(
   entities: readonly MapEntity[],
   options: {
     extent: Bounds;
+    landscape?: LandscapeUniforms;
     quality?: SurfaceQuality;
     maps?: boolean;
     deferMaps?: boolean;
@@ -292,6 +294,25 @@ export function createTerrain(
     };
     material.onBeforeCompile = (shader) => {
       patchGroundCoordinates(shader);
+      const landscape = options.landscape;
+      if (landscape) {
+        Object.assign(shader.uniforms, landscape);
+        shader.fragmentShader = `${aerialShader}
+          uniform sampler2D landscapeMask;
+          uniform vec4 landscapeMaskFrame;
+          ${shader.fragmentShader}`.replace(
+          "void main() {",
+          `void main() {
+            float modelWeight = 1.;
+            if (landscapeActive) {
+              vec2 maskUV = (parkSurfaceWorld - landscapeMaskFrame.xy) / landscapeMaskFrame.zw;
+              modelWeight = texture2D(landscapeMask, vec2(maskUV.x, 1. - maskUV.y)).r;
+              // The analytic aerial in the background now owns this terrain. Its ray hits even
+              // beyond the commercial frustum without affecting facade/lot depth precision.
+              if (modelWeight < .004) discard;
+            }`,
+        );
+      }
       shader.uniforms.terrainHorizonCenter = atmosphere.center;
       shader.uniforms.terrainHorizonRange = atmosphere.range;
       shader.uniforms.terrainHorizonColor = atmosphere.color;
@@ -325,11 +346,20 @@ export function createTerrain(
           "#include <opaque_fragment>",
           `float distantAtmosphere = smoothstep(terrainHorizonRange.x, terrainHorizonRange.y,
               distance(parkSurfaceWorld, terrainHorizonCenter));
+            ${
+              landscape
+                ? `if (landscapeActive) {
+              if (modelWeight < .999)
+                outgoingLight = mix(landscapeAerial(parkSurfaceWorld), outgoingLight, modelWeight);
+            } else`
+                : ""
+            }
             outgoingLight = mix(outgoingLight, terrainHorizonColor, distantAtmosphere);
             #include <opaque_fragment>`,
         );
     };
-    material.customProgramCacheKey = () => "indumoveis-ground-horizon-v5";
+    material.customProgramCacheKey = () =>
+      options.landscape ? "indumoveis-santa-rosa-ground-v1" : "indumoveis-ground-horizon-v5";
     if (options.maps !== false && options.deferMaps) {
       // Compile USE_MAP in the first useful frame without generating the full
       // deterministic field. Keeping a map on both sides avoids a later shader
