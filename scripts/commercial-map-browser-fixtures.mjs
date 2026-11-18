@@ -139,6 +139,7 @@ async function newContext({
   apiFailure = false,
   reducedMotion = false,
   fontDelayMs = 0,
+  nativeHttpCache = false,
   commercialOverview,
   commercialLots = [],
 } = {}) {
@@ -268,6 +269,86 @@ async function newContext({
       });
     }
   });
+  function backendResponse(url, method, reply) {
+    const headers = {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "access-control-allow-headers": "*",
+    };
+    if (method === "OPTIONS") return reply({ status: 204, headers });
+    if (url.pathname === "/auth/v1/user")
+      return reply({ status: 200, headers, body: JSON.stringify(user) });
+    if (url.pathname === "/rest/v1/rpc/ensure_profile" && method === "POST")
+      return reply({ status: 200, headers, body: "null" });
+    if (url.pathname === "/rest/v1/rpc/search_documents" && method === "POST")
+      return reply({ status: 200, headers, body: "[]" });
+    if (url.pathname === "/rest/v1/rpc/get_commercial_overview" && method === "POST")
+      return reply({
+        status: 200,
+        headers,
+        body: JSON.stringify(commercialOverview ?? { segments: [] }),
+      });
+    if (url.pathname === "/rest/v1/rpc/get_commercial_lots" && method === "POST")
+      return reply({
+        status: apiFailure ? 503 : 200,
+        headers,
+        body: JSON.stringify(
+          apiFailure ? { message: "Local laboratory unavailable fixture" } : commercialLots,
+        ),
+      });
+    assert.equal(method, "GET", `Blocked backend mutation: ${url.pathname}`);
+    const table = url.pathname.split("/").at(-1);
+    const payloads = {
+      user_roles: [{ user_id: userId, role: "admin" }],
+      role_permissions: [],
+      profiles: { id: userId, full_name: "Validação local" },
+      editions: [
+        {
+          id: editionId,
+          name: "Indumóveis 2027",
+          year: 2027,
+          starts_on: "2027-05-14",
+          ends_on: "2027-05-23",
+          is_active: true,
+          timezone: "America/Sao_Paulo",
+        },
+      ],
+      space_status_v: [],
+      deals: null,
+      installments: [],
+      payments: [],
+      contracts: [],
+    };
+    if (!(table in payloads)) report.unexpectedRequests.push(url.pathname);
+    if (apiFailure && table === "space_status_v")
+      return reply({
+        status: 503,
+        headers,
+        body: JSON.stringify({ message: "Local laboratory unavailable fixture" }),
+      });
+    return reply({ status: 200, headers, body: JSON.stringify(payloads[table] ?? []) });
+  }
+  // Playwright routing disables the browser HTTP cache, including unrelated origins.
+  // For cache benchmarks keep the application network native and fixture only Supabase fetch.
+  if (nativeHttpCache) {
+    await context.exposeBinding("__mapFixture", (_, href, method) =>
+      backendResponse(new URL(href), method, (response) => response),
+    );
+    await context.addInitScript(
+      ({ api, app }) => {
+        if (location.origin !== app) return;
+        const nativeFetch = window.fetch;
+        window.fetch = async (input, init) => {
+          const href = new URL(input instanceof Request ? input.url : input, location.href);
+          if (href.origin !== api) return nativeFetch(input, init);
+          const result = await window.__mapFixture(href.href, new Request(input, init).method);
+          return new Response(result.body ?? null, result);
+        };
+      },
+      { api: backend.origin, app: new URL(baseURL).origin },
+    );
+    return context;
+  }
   await context.route("**/*", async (route) => {
     const request = route.request();
     const url = new URL(request.url());
@@ -283,65 +364,8 @@ async function newContext({
       !report.conditions.optionalContextAssets.includes(url.pathname)
     )
       report.conditions.optionalContextAssets.push(url.pathname);
-    if (url.origin === backend.origin) {
-      const headers = {
-        "content-type": "application/json",
-        "access-control-allow-origin": "*",
-        "access-control-allow-headers": "*",
-      };
-      if (request.method() === "OPTIONS") return route.fulfill({ status: 204, headers });
-      if (url.pathname === "/auth/v1/user")
-        return route.fulfill({ status: 200, headers, body: JSON.stringify(user) });
-      if (url.pathname === "/rest/v1/rpc/ensure_profile" && request.method() === "POST")
-        return route.fulfill({ status: 200, headers, body: "null" });
-      if (url.pathname === "/rest/v1/rpc/search_documents" && request.method() === "POST")
-        return route.fulfill({ status: 200, headers, body: "[]" });
-      if (url.pathname === "/rest/v1/rpc/get_commercial_overview" && request.method() === "POST")
-        return route.fulfill({
-          status: 200,
-          headers,
-          body: JSON.stringify(commercialOverview ?? { segments: [] }),
-        });
-      if (url.pathname === "/rest/v1/rpc/get_commercial_lots" && request.method() === "POST")
-        return route.fulfill({
-          status: apiFailure ? 503 : 200,
-          headers,
-          body: JSON.stringify(
-            apiFailure ? { message: "Local laboratory unavailable fixture" } : commercialLots,
-          ),
-        });
-      assert.equal(request.method(), "GET", `Blocked backend mutation: ${url.pathname}`);
-      const table = url.pathname.split("/").at(-1);
-      const payloads = {
-        user_roles: [{ user_id: userId, role: "admin" }],
-        role_permissions: [],
-        profiles: { id: userId, full_name: "Validação local" },
-        editions: [
-          {
-            id: editionId,
-            name: "Indumóveis 2027",
-            year: 2027,
-            starts_on: "2027-05-14",
-            ends_on: "2027-05-23",
-            is_active: true,
-            timezone: "America/Sao_Paulo",
-          },
-        ],
-        space_status_v: [],
-        deals: null,
-        installments: [],
-        payments: [],
-        contracts: [],
-      };
-      if (!(table in payloads)) report.unexpectedRequests.push(url.pathname);
-      if (apiFailure && table === "space_status_v")
-        return route.fulfill({
-          status: 503,
-          headers,
-          body: JSON.stringify({ message: "Local laboratory unavailable fixture" }),
-        });
-      return route.fulfill({ status: 200, headers, body: JSON.stringify(payloads[table] ?? []) });
-    }
+    if (url.origin === backend.origin)
+      return backendResponse(url, request.method(), (response) => route.fulfill(response));
     if (chunkFailure && /\/MapRenderer(?:-|\.|\/)/.test(url.pathname)) return route.abort("failed");
     if (fontDelayMs && url.hostname === "fonts.googleapis.com") {
       await new Promise((resolve) => setTimeout(resolve, fontDelayMs));

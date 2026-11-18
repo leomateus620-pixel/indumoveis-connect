@@ -12,6 +12,10 @@ from rasterio.warp import reproject, transform_bounds
 from rasterio.windows import Window, from_bounds
 
 LON, LAT = -54.478510885847626, -27.845042119845623
+# The registered park drawing. Rows rotate local east/north metres into XZ.
+SCENE_SCALE = 0.4548161444
+SCENE_AXES = np.array([[-0.4878298036, 0.8729387623], [0.8729387623, 0.4878298036]])
+SCENE_ORIGIN = np.array([95., 28.])
 CRS = f"+proj=aeqd +lat_0={LAT} +lon_0={LON} +datum=WGS84 +units=m +no_defs"
 S2 = "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/21/J/YK/2024/1/S2B_21JYK_20240130_0_L2A/TCI.tif"
 CBERS_PAN = "https://data.inpe.br/bdc/data/CB4A-WPM-L4-DN/2024_02/CBERS_4A_WPM_RAW_2024_02_12.13_51_56_ETC2/211_148_0/4_BC_UTM_WGS84/CBERS_4A_WPM_20240212_211_148_L4_BAND0.tif"

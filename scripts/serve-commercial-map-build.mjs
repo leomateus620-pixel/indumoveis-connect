@@ -41,6 +41,9 @@ const server = http.createServer(async (incoming, outgoing) => {
         outgoing.writeHead(200, {
           "content-type": mime[path.extname(asset)] ?? "application/octet-stream",
           "content-length": body.length,
+          ...(process.env.MAP_HTTP_CACHE === "1"
+            ? { "cache-control": "public, max-age=3600" }
+            : {}),
           ...(compress ? { "content-encoding": "gzip", vary: "Accept-Encoding" } : {}),
         });
         outgoing.end(body);

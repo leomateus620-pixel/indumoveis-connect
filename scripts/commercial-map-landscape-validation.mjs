@@ -9,7 +9,7 @@ process.env.MAP_ARTIFACT_DIR ??= `artifacts.local/map-landscape/${phase}`;
 const { browser, newContext, report, baseURL, artifactDir } =
   await import("./commercial-map-browser-fixtures.mjs");
 assert(["before", "after"].includes(phase));
-assert(["metrics", "visual", "video", "controls", "startup"].includes(task));
+assert(["metrics", "visual", "video", "controls", "startup", "journey", "pressure"].includes(task));
 const controls = {
   "21-10-16": { position: [213.505, 28.056, -31.264], target: [95.36, 56.327] },
   "21-10-21": { position: [173.649, 28.41, 178.779], target: [95.409, 53.527] },
@@ -446,12 +446,19 @@ async function exercise(layout, viewport, quality) {
   }
 }
 try {
-  for (let i = 0; i < (task === "startup" ? 3 : 1); i++) {
-    if (!["metrics", "startup"].includes(task) || process.env.MAP_LAYOUT !== "mobile")
-      await exercise("desktop", { width: 1366, height: 768 }, "detailed");
-    if (["metrics", "startup"].includes(task) && process.env.MAP_LAYOUT !== "desktop")
-      await exercise("mobile", { width: 390, height: 844 }, "light");
-  }
+  if (task === "journey") {
+    const { journey } = await import("./commercial-map-landscape-journey.mjs");
+    output.entries = await journey({ phase, segments, setPose });
+  } else if (task === "pressure") {
+    const { pressure } = await import("./commercial-map-landscape-journey.mjs");
+    output.entries.push(await pressure(phase));
+  } else
+    for (let i = 0; i < (task === "startup" ? 3 : 1); i++) {
+      if (!["metrics", "startup"].includes(task) || process.env.MAP_LAYOUT !== "mobile")
+        await exercise("desktop", { width: 1366, height: 768 }, "detailed");
+      if (["metrics", "startup"].includes(task) && process.env.MAP_LAYOUT !== "desktop")
+        await exercise("mobile", { width: 390, height: 844 }, "light");
+    }
   assert.deepEqual(report.errors, []);
 } finally {
   output.errors = report.errors;

@@ -13,15 +13,22 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function fixture() {
+function fixture(navigating = () => false) {
   vi.useFakeTimers();
   vi.stubGlobal(
     "fetch",
-    vi.fn(async () => ({
-      ok: true,
-      blob: async () => new Blob(["payload"]),
-      arrayBuffer: async () => new Float32Array(9).buffer,
-    })),
+    vi.fn(async (url: string) => {
+      if (url.endsWith("/settlement.bin")) {
+        const triangle = new ArrayBuffer(20 + 3 * 10 + 3 * 4);
+        new Uint8Array(triangle).set([83, 82, 77, 49]); // SRM1
+        const header = new DataView(triangle);
+        header.setUint32(4, 1, true);
+        header.setUint32(12, 3, true);
+        header.setUint32(16, 3, true);
+        return { ok: true, arrayBuffer: async () => triangle };
+      }
+      return { ok: true, blob: async () => new Blob(["payload"]) };
+    }),
   );
   vi.stubGlobal("URL", { createObjectURL: () => "blob:fixture", revokeObjectURL: vi.fn() });
   vi.stubGlobal(
@@ -38,7 +45,7 @@ function fixture() {
     initTexture: vi.fn(),
   } as unknown as THREE.WebGLRenderer;
   return {
-    scene: createRegionalLandscape(renderer, uniforms, async () => {}, vi.fn()),
+    scene: createRegionalLandscape(renderer, uniforms, async () => {}, vi.fn(), navigating),
     uniforms,
     renderer,
   };
@@ -74,7 +81,7 @@ describe("Santa Rosa landscape", () => {
     const { scene, uniforms, renderer } = fixture();
     const dispose = vi.spyOn(THREE.Texture.prototype, "dispose");
     scene.request("detail");
-    await vi.advanceTimersByTimeAsync(225);
+    await vi.advanceTimersByTimeAsync(249);
     expect(scene.stats.level).toBe("compact");
     expect(scene.stats.finalAt).toBeUndefined();
     scene.presented(200);
@@ -87,15 +94,15 @@ describe("Santa Rosa landscape", () => {
     expect(scene.group.children).toHaveLength(2);
     expect(scene.group.children[0]).toBe(relief);
     expect(scene.stats.featureCount).toBe(1);
-    expect(dispose).toHaveBeenCalledTimes(7);
-    expect(renderer.initTexture).toHaveBeenCalledTimes(16);
+    expect(dispose).toHaveBeenCalledTimes(8);
+    expect(renderer.initTexture).toHaveBeenCalledTimes(18);
     expect(scene.stats.peakTextureBytes).toBeGreaterThan(scene.stats.textureBytes);
     scene.presented(300);
     expect(scene.stats.finalAt).toBe(300);
     scene.dispose();
     scene.dispose();
     expect(scene.stats.textureBytes).toBe(0);
-    expect(dispose).toHaveBeenCalledTimes(16);
+    expect(dispose).toHaveBeenCalledTimes(18);
     expect(uniforms.landscapeActive.value).toBe(false);
   });
 
@@ -109,5 +116,22 @@ describe("Santa Rosa landscape", () => {
     expect(uniforms.landscapeNear.value).toBeNull();
     expect(scene.stats.level).toBe("pending");
     expect(scene.group.children).toHaveLength(0);
+  });
+
+  it("keeps the compact world anchored until the current gesture ends", async () => {
+    let dragging = true;
+    const { scene, uniforms } = fixture(() => dragging);
+    scene.request("detail");
+    await vi.runAllTimersAsync();
+    expect(scene.stats.level).toBe("compact");
+    const displayed = uniforms.landscapeNear.value;
+    scene.presented(500);
+    expect(uniforms.landscapeNear.value).toBe(displayed);
+    dragging = false;
+    scene.presented(700);
+    await vi.runAllTimersAsync();
+    expect(scene.stats.level).toBe("detail");
+    expect(uniforms.landscapeNear.value).not.toBe(displayed);
+    scene.dispose();
   });
 });

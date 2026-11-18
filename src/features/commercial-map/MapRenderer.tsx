@@ -465,6 +465,7 @@ function initializeMapRuntime(
     landscapeUniforms,
     (mesh) => renderer.compileAsync(mesh, camera, scene),
     invalidate,
+    isNavigating,
   );
   scene.add(landscape.group);
   rollback.push(() => landscape.dispose());
@@ -533,6 +534,7 @@ function initializeMapRuntime(
   const resolutionBudget = new ResolutionBudget({
     software: softwareRasterizer && props().quality === "auto",
   });
+  let pendingResolution = false;
   let ambientDisabled = false;
   let ambientSlowFrames = 0;
   type CameraAction = "focus" | "view" | "wheel" | "zoom" | "rotate";
@@ -2258,6 +2260,9 @@ function initializeMapRuntime(
       diag.activeLoops = 1;
     }
   }
+  function isNavigating(now = performance.now()) {
+    return activePointers.size > 0 || !!transition || now - lastActivity < 240;
+  }
   function draw(now: number) {
     scheduled = 0;
     diag.activeLoops = 0;
@@ -2332,7 +2337,7 @@ function initializeMapRuntime(
       landscapeUniforms.landscapeActive.value ||
       topGroundDepth <= 0 ||
       (camera.position.y - TERRAIN.baseElevation) / topGroundDepth >= camera.far * 0.98;
-    const navigationActive = activePointers.size > 0 || !!transition || now - lastActivity < 240;
+    const navigationActive = isNavigating(now);
     if (fadingSky) {
       if (daylightBackground.update(now)) invalidate();
       else {
@@ -2419,19 +2424,22 @@ function initializeMapRuntime(
           adaptiveSamples.reduce((sum, value) => sum + value, 0) / adaptiveSamples.length;
         const sorted = [...adaptiveSamples].sort((a, b) => a - b);
         const p95 = sorted[Math.ceil(sorted.length * 0.95) - 1];
-        const resolutionChanged = resolutionBudget.observe(p95, now);
-        if (resolutionChanged) {
-          diag.realism.adaptiveResolution = resolutionBudget.scale;
-          resizeBuffer();
+        const resolutionChanged = !pendingResolution && resolutionBudget.observe(p95, now);
+        if (resolutionChanged || pendingResolution) {
+          // Keep a tracked feature steady through ordinary pressure. Software and
+          // severely stalled hardware still get immediate fill-rate relief.
+          if (softwareRasterizer || mean > 65) resizeBuffer(false);
+          else pendingResolution = true;
         }
         if (p95 > 35) ambientDisabled = true;
         // A window measured at the previous resolution cannot condemn the new
         // buffer. Give it fresh samples before reducing quality or falling back.
-        slowWindows = resolutionChanged
-          ? 0
-          : mean > (softwareRasterizer ? 35 : 33) || p95 > 50
-            ? slowWindows + 1
-            : 0;
+        slowWindows =
+          resolutionChanged || pendingResolution
+            ? 0
+            : mean > (softwareRasterizer ? 35 : 33) || p95 > 50
+              ? slowWindows + 1
+              : 0;
         fastWindows = resolutionChanged ? 0 : mean < 18 && p95 < 22 ? fastWindows + 1 : 0;
         diag.slowFrameWindows = slowWindows;
         diag.sampledFrameWindows++;
@@ -2481,6 +2489,7 @@ function initializeMapRuntime(
       applyQuality(pendingTier ?? tier);
       pendingTier = null;
     }
+    if (pendingResolution && !navigationActive) resizeBuffer(false);
     if (transition || !ready || active || pendingTier || pendingSoftwareMode !== null) invalidate();
     else {
       diag.cameraState = "idle";
@@ -2525,7 +2534,9 @@ function initializeMapRuntime(
     window.clearTimeout(ambientTimer);
     resizeBuffer();
   }
-  function resizeBuffer() {
+  function resizeBuffer(reconsiderLandscape = true) {
+    pendingResolution = false;
+    diag.realism.adaptiveResolution = resolutionBudget.scale;
     const dpr =
       resolvePixelRatio(width, height, window.devicePixelRatio, tier) * resolutionBudget.scale;
     renderer.setPixelRatio(dpr);
@@ -2534,7 +2545,8 @@ function initializeMapRuntime(
     camera.updateProjectionMatrix();
     diag.dpr = dpr;
     diag.buffer = [canvas.width, canvas.height];
-    requestLandscape();
+    // A change in raster budget alone does not evict an already registered world.
+    if (reconsiderLandscape) requestLandscape();
     invalidate();
   }
   function pick(clientX: number, clientY: number) {

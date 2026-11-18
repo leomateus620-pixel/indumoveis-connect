@@ -4,3 +4,5 @@ rasterio==1.4.3
 pyproj==3.6.1
 scipy==1.13.1
 matplotlib==3.9.4
+mapbox-earcut==1.0.3
+fast-simplification==0.1.10
