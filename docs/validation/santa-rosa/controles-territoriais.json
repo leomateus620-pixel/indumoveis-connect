@@ -1,0 +1,50 @@
+[
+  {
+    "feature": "Arena",
+    "registeredPx": [
+      930.47,
+      908.34
+    ],
+    "observedPx": [
+      932.9,
+      907.5
+    ],
+    "residualM": 5.2,
+    "referenceLonLat": [
+      -54.48041,
+      -27.8429547
+    ]
+  },
+  {
+    "feature": "Pista campeira",
+    "registeredPx": [
+      942.29,
+      1064.49
+    ],
+    "observedPx": [
+      942.0,
+      1063.6
+    ],
+    "residualM": 1.9,
+    "referenceLonLat": [
+      -54.48017,
+      -27.8457729
+    ]
+  },
+  {
+    "feature": "Rotatória da Benvenuto",
+    "registeredPx": [
+      1167.18,
+      1124.25
+    ],
+    "observedPx": [
+      1167.18,
+      1124.25
+    ],
+    "residualM": 0.0,
+    "referenceLonLat": [
+      -54.4756037,
+      -27.8468514
+    ]
+  }
+]
