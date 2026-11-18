@@ -816,16 +816,20 @@ export function CommercialMapWorkspace({
           )}
         </div>
         {representation === "ready" && (
-          <a
-            className="im-map-attribution"
-            style={{ bottom: Math.max(5, insets.bottom + 5) }}
-            href="https://www.openstreetmap.org/copyright"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Entorno: dados de OpenStreetMap, licença ODbL"
-          >
-            Entorno © OpenStreetMap
-          </a>
+          <div className="im-map-attribution" style={{ bottom: Math.max(5, insets.bottom + 5) }}>
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Entorno: dados de OpenStreetMap, licença ODbL"
+            >
+              © OpenStreetMap
+            </a>
+            <span aria-hidden="true"> · </span>
+            <a href="/landscape/santa-rosa/creditos.txt" target="_blank" rel="noreferrer">
+              Créditos da paisagem
+            </a>
+          </div>
         )}
         {(notice || commercialState === "unavailable") && (
           <div className="im-map-notice" role="status">
