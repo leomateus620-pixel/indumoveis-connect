@@ -7,12 +7,14 @@ from pathlib import Path
 import numpy as np
 from footprints import load_footprints
 from frontage import generate as generate_frontage
+from materials import sample_horizon_material
 from PIL import Image
 from rasterio.features import rasterize
 from rasterio.transform import from_origin
 from scipy.ndimage import gaussian_filter, map_coordinates, minimum_filter, shift
 from scipy.signal import find_peaks
 from sources import LAT, LON, load_source
+from towers import family_at
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "public/landscape/santa-rosa"
@@ -138,6 +140,21 @@ def ray_data(cache, near, far, mid=None):
     # turning into needles. Unmeasured roofs retain the existing DSM silhouette.
     footprints = load_footprints(cache)
     labels, estimate = footprint_heights(cache, footprints)
+    # Per-footprint façade bearing and type remain fixed as the observation
+    # switches from the low to the high projection.
+    bearings = np.zeros((len(footprints) + 1, 2), dtype=np.float32)
+    styles = np.zeros(len(footprints) + 1, dtype=np.uint8)
+    for index, f in enumerate(footprints, 1):
+        ring = np.asarray(f["geometry"]["coordinates"][0])
+        edges = np.diff(ring, axis=0)
+        lengths = np.linalg.norm(edges, axis=1)
+        longest = int(np.argmax(lengths))
+        bearings[index] = edges[longest] / max(0.01, lengths[longest])
+        centre = ring[:-1].mean(0)
+        if estimate[index] >= 8 and np.linalg.norm(centre) >= 1500:
+            styles[index] = 16 + family_at(centre, lengths[longest], estimate[index])
+        else:
+            styles[index] = 6 + index % 2 if lengths[longest] > 32 else index % 4
     mass = estimate[labels]
     center_radii = np.array(
         [
@@ -200,6 +217,8 @@ def ray_data(cache, near, far, mid=None):
             building,
             np.stack(rgb, axis=-1),
             side,
+            tree_or_land,
+            grid_samples(labels, e, n, 8192, 0),
         )
 
     offsets = (np.arange(512, dtype="float32") + 0.5) * 16 - 4096
@@ -207,7 +226,7 @@ def ray_data(cache, near, far, mid=None):
     height_grid = grid_samples(surface, east, north, 50000) - ground
     encoded = np.clip(np.rint(height_grid) + 128, 0, 255).astype("uint8")
     Image.fromarray(encoded).save(OUT / "relief.png")
-    return rays, ranges, ground, cover
+    return rays, ranges, ground, cover, bearings, styles
 
 
 def skyline_angle(z, ranges, eye):
@@ -216,7 +235,7 @@ def skyline_angle(z, ranges, eye):
     return np.rad2deg(np.arctan2(z - drop - eye, ranges))
 
 
-def panorama(rays, ranges, ground):
+def panorama(rays, ranges, ground, bearings, styles):
     # Sample actual centres. The last column borders the first at geographic north.
     size = BAND_WIDTH * 2
     directions = (np.arange(size) + 0.5) * 360 / size
@@ -231,7 +250,10 @@ def panorama(rays, ranges, ground):
         "uint8"
     )
     for start in range(0, size, 64):
-        z, building, rgb, side = rays(directions[start : start + 64])
+        azimuths = np.deg2rad(directions[start : start + 64])
+        z, building, rgb, side, land_cover, labels = rays(
+            directions[start : start + 64]
+        )
         for index, agl in enumerate([16, 72]):
             angles = skyline_angle(z, ranges, ground + agl)
             envelope = np.maximum.accumulate(angles, axis=1)
@@ -258,9 +280,55 @@ def panorama(rays, ranges, ground):
                 wall_tone = 0.72 + 0.24 * side[j, k] + 0.06 * height_fraction
                 wall_rgb = (sample * 0.58 + [71, 72, 70]) * wall_tone[:, None]
                 sample += (wall_rgb - sample) * wall_weight[:, None]
+                east = depth * np.sin(azimuths[j])
+                north = depth * np.cos(azimuths[j])
+                wall = (wall_weight > 0.03) & (labels[j, k] > 0)
+                if wall.any():
+                    ids = labels[j, k[wall]]
+                    bearing = bearings[ids]
+                    # Pick the visible wall axis rather than sampling end-on.
+                    end_on = (
+                        np.abs(
+                            bearing[:, 0] * np.sin(azimuths[j])
+                            + bearing[:, 1] * np.cos(azimuths[j])
+                        )
+                        > 0.72
+                    )
+                    u = np.where(
+                        end_on,
+                        -east[wall] * bearing[:, 1] + north[wall] * bearing[:, 0],
+                        east[wall] * bearing[:, 0] + north[wall] * bearing[:, 1],
+                    )
+                    style = styles[ids]
+                    height = building[j, k[wall]]
+                    floors = np.where(
+                        style >= 16,
+                        np.maximum(1.0, np.rint(height / 14.0)),
+                        np.where(
+                            style >= 6, 1.0, np.maximum(1.0, np.rint(height / 3.7))
+                        ),
+                    )
+                    v = height_fraction[wall] * floors
+                    texel = sample_horizon_material(
+                        style, u / np.where(style >= 6, 16.0, 8.6), v
+                    )
+                    amount = (0.78 * wall_weight[wall])[:, None]
+                    sample[wall] += amount * (
+                        texel * wall_tone[wall, None] - sample[wall]
+                    )
+                trees = (land_cover[j, k] == 10) & (depth < 9200) & ~wall
+                if trees.any():
+                    canopy = sample_horizon_material(
+                        13,
+                        (east[trees] + 0.27 * north[trees]) / 44.0,
+                        (north[trees] - 0.27 * east[trees]) / 44.0,
+                    )
+                    mod = np.clip((canopy[:, 1] - 90.0) / 135.0, -0.30, 0.33)
+                    fade = np.clip((9200.0 - depth[trees]) / 4800.0, 0, 1)
+                    sample[trees] *= (1 + mod * fade)[:, None]
                 # Moderate terrestrial scattering retains different ridgelines
                 # behind valleys. No sun, cloud or photographed sky in the band.
-                transmission = 0.88 * np.exp(-depth / 18000)
+                transmission = 0.94 * np.exp(-depth / 21500)
                 colour = sample * transmission[:, None] + np.array([174, 192, 193]) * (
                     1 - transmission[:, None]
                 )
@@ -384,8 +452,8 @@ def main():
         path.mkdir(parents=True, exist_ok=True)
     near, mid, far = photo_grid(args.cache)
     generate_frontage(args.cache, OUT)
-    rays, ranges, ground, cover = ray_data(args.cache, near, far, mid)
-    ridges = panorama(rays, ranges, ground)
+    rays, ranges, ground, cover, bearings, styles = ray_data(args.cache, near, far, mid)
+    ridges = panorama(rays, ranges, ground, bearings, styles)
     report = relief_report(rays, ranges, ground, cover, ridges)
     (EVIDENCE / "sightlines.json").write_text(
         json.dumps(report, indent=2, ensure_ascii=False) + "\n"

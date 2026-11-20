@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-from scipy.ndimage import find_objects, label
+from scipy.ndimage import binary_erosion, find_objects, label
 
 
 def rgb(directory, layer, height):
@@ -42,9 +42,11 @@ def check(before, after, output):
         mask = (
             np.abs(actual - rgb(after, "without-settlement", height)).max(axis=2) > 12
         )
-        components = find_objects(label(mask[95:175, 610:705])[0])
-        y, x = max(
-            components, key=lambda cell: np.prod([s.stop - s.start for s in cell])
+        labels, _ = label(mask[95:175, 610:705])
+        components = find_objects(labels)
+        number, (y, x) = max(
+            enumerate(components, 1),
+            key=lambda pair: np.prod([s.stop - s.start for s in pair[1]]),
         )
         left, top = x.start + 610, y.start + 95
         right, bottom = x.stop + 610, y.stop + 95
@@ -52,7 +54,16 @@ def check(before, after, output):
             "Tower missing from test frame"
         )
         row["towerXYWH"] = [left, top, right - left, bottom - top]
-        roi = (slice(top + 2, top + 11), slice(left + 3, right - 3))
+        # The technical roof is narrower than the footprint. A rectangular
+        # patch at the very top would test visible sky between roof volumes.
+        # Erode the independent hide-geometry difference to sample interiors.
+        inside = binary_erosion(labels == number)
+        yy = np.indices(inside.shape)[0] + 95
+        inside &= (yy >= top + 2) & (yy < top + (bottom - top) * 0.72)
+        row["interiorTowerPixels"] = int(inside.sum())
+        assert row["interiorTowerPixels"] >= 24, row
+        roi = np.nonzero(inside)
+        roi = (roi[0] + 95, roi[1] + 610)
         modes = ["low", "high", "without-panorama", "without-depth"]
         row["maxTowerChannelDifference"] = {
             mode: int(np.abs(actual[roi] - rgb(after, mode, height)[roi]).max())

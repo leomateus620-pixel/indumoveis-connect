@@ -18,7 +18,7 @@ function fixture(navigating = () => false) {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) => {
-      if (url.endsWith("/settlement.bin")) {
+      if (url.split("?")[0].endsWith("/settlement.bin")) {
         const triangle = new ArrayBuffer(20 + 3 * 10 + 3 * 4);
         new Uint8Array(triangle).set([83, 82, 77, 49]); // SRM1
         const header = new DataView(triangle);

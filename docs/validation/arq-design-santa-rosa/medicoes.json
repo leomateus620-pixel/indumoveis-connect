@@ -1,0 +1,805 @@
+{
+  "base": "f9c9c8f",
+  "conditions": {
+    "os": "darwin 25.6.0",
+    "cpu": "Apple M5",
+    "systemMemoryGiB": 16,
+    "browser": "157.0.8103.79",
+    "httpCache": "Contexto novo no frio. Segunda navegação no mesmo contexto e cache HTTP nativo no quente. Ativos estáticos max-age=3600, fontes remotas bloqueadas."
+  },
+  "referenceFit": [
+    {
+      "name": "anexo-09",
+      "position": [
+        355.09973,
+        61.60126,
+        -11.59779
+      ],
+      "target": [
+        95.20961,
+        54.96174
+      ],
+      "w": 1398,
+      "h": 626,
+      "referencePoints": 65,
+      "medianFitPixels": 0.38
+    },
+    {
+      "name": "anexo-17",
+      "position": [
+        282.13317,
+        51.32529,
+        247.49148
+      ],
+      "target": [
+        94.19356,
+        53.2705
+      ],
+      "w": 1396,
+      "h": 623,
+      "referencePoints": 82,
+      "medianFitPixels": 0.64
+    },
+    {
+      "name": "anexo-25",
+      "position": [
+        -47.86064,
+        55.55811,
+        280.69203
+      ],
+      "target": [
+        95.91456,
+        55.87423
+      ],
+      "w": 1462,
+      "h": 857,
+      "referencePoints": 74,
+      "medianFitPixels": 0.44
+    }
+  ],
+  "referenceViews": {
+    "17": {
+      "position": [
+        282.1037325003326,
+        51.547701032892604,
+        247.46105863201828
+      ],
+      "target": [
+        94.19355999999999,
+        53.2705
+      ],
+      "distance": 275.09520437967757,
+      "tiltDownDegrees": 10.800000000000011,
+      "bearingAboutSceneZ": 44.05834459203568,
+      "verticalFovDegrees": 38,
+      "buffer": [
+        1396,
+        623
+      ],
+      "tier": "detailed"
+    },
+    "25": {
+      "position": [
+        -47.860639999999876,
+        55.55810999999997,
+        280.6920299999998
+      ],
+      "target": [
+        95.91456,
+        55.87423
+      ],
+      "distance": 272.5821984625041,
+      "tiltDownDegrees": 11.760518927969159,
+      "bearingAboutSceneZ": -32.59967779049431,
+      "verticalFovDegrees": 38,
+      "buffer": [
+        1462,
+        857
+      ],
+      "tier": "detailed"
+    },
+    "09": {
+      "position": [
+        355.0997300000002,
+        61.60126000000004,
+        -11.597789999999996
+      ],
+      "target": [
+        95.20961,
+        54.96174
+      ],
+      "distance": 275.2594426010178,
+      "tiltDownDegrees": 12.931938766289292,
+      "bearingAboutSceneZ": 104.36505915886713,
+      "verticalFovDegrees": 38,
+      "buffer": [
+        1398,
+        626
+      ],
+      "tier": "detailed"
+    }
+  },
+  "park": {
+    "before": [
+      {
+        "buffer": [
+          1464,
+          897
+        ],
+        "tier": "detailed",
+        "level": "detail",
+        "usefulFrameMs": 1009.1999999992549,
+        "compactMs": 1603.5999999977648,
+        "finalMs": 2759.699999999255,
+        "transferBytes": 4922293,
+        "landscapeTransferBytes": 3005000,
+        "peakLandscapeTextureBytes": 125266528,
+        "estimatedPeakSceneTextureBytes": 145582801,
+        "featureBytes": 2287782,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "detailed",
+        "cache": "cold",
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.799999999999272,
+          "buffers": [
+            "1464×897"
+          ],
+          "levels": [
+            "detail"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          1464,
+          897
+        ],
+        "tier": "detailed",
+        "level": "detail",
+        "usefulFrameMs": 799.6999999992549,
+        "compactMs": 1324.699999999255,
+        "finalMs": 2383.5,
+        "transferBytes": 16372,
+        "landscapeTransferBytes": 0,
+        "peakLandscapeTextureBytes": 125266528,
+        "estimatedPeakSceneTextureBytes": 145582801,
+        "featureBytes": 2287782,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "detailed",
+        "cache": "warm",
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "1464×897"
+          ],
+          "levels": [
+            "detail"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          390,
+          689
+        ],
+        "tier": "light",
+        "level": "compact",
+        "usefulFrameMs": 876.3000000007451,
+        "compactMs": 1418.0999999977648,
+        "finalMs": 1418.0999999977648,
+        "transferBytes": 2508314,
+        "landscapeTransferBytes": 1015324,
+        "peakLandscapeTextureBytes": 15515569,
+        "estimatedPeakSceneTextureBytes": 25870370,
+        "featureBytes": 2287782,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "light",
+        "cache": "cold",
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.799999999999272,
+          "buffers": [
+            "390×689"
+          ],
+          "levels": [
+            "compact"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          390,
+          689
+        ],
+        "tier": "light",
+        "level": "compact",
+        "usefulFrameMs": 804.8000000007451,
+        "compactMs": 1449.1000000014901,
+        "finalMs": 1449.1000000014901,
+        "transferBytes": 16372,
+        "landscapeTransferBytes": 0,
+        "peakLandscapeTextureBytes": 15515569,
+        "estimatedPeakSceneTextureBytes": 25870370,
+        "featureBytes": 2287782,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "light",
+        "cache": "warm",
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "390×689"
+          ],
+          "levels": [
+            "compact"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      }
+    ],
+    "after": [
+      {
+        "buffer": [
+          1464,
+          897
+        ],
+        "tier": "detailed",
+        "level": "detail",
+        "usefulFrameMs": 1442.2000000029802,
+        "compactMs": 3886.900000002235,
+        "finalMs": 5191.400000002235,
+        "transferBytes": 5491178,
+        "landscapeTransferBytes": 3567054,
+        "peakLandscapeTextureBytes": 127887968,
+        "estimatedPeakSceneTextureBytes": 148204241,
+        "featureBytes": 4131990,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "detailed",
+        "cache": "cold",
+        "orbit": {
+          "frames": 665,
+          "p95FrameMs": 16.799999999999272,
+          "buffers": [
+            "1464×897"
+          ],
+          "levels": [
+            "detail"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          1464,
+          897
+        ],
+        "tier": "detailed",
+        "level": "detail",
+        "usefulFrameMs": 902,
+        "compactMs": 2571.5,
+        "finalMs": 3603.800000000745,
+        "transferBytes": 16372,
+        "landscapeTransferBytes": 0,
+        "peakLandscapeTextureBytes": 127887968,
+        "estimatedPeakSceneTextureBytes": 148204241,
+        "featureBytes": 4131990,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "detailed",
+        "cache": "warm",
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.799999999999272,
+          "buffers": [
+            "1464×897"
+          ],
+          "levels": [
+            "detail"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          390,
+          689
+        ],
+        "tier": "light",
+        "level": "compact",
+        "usefulFrameMs": 1392.199999999255,
+        "compactMs": 3734.599999997765,
+        "finalMs": 3734.599999997765,
+        "transferBytes": 2695543,
+        "landscapeTransferBytes": 1195722,
+        "peakLandscapeTextureBytes": 15690332,
+        "estimatedPeakSceneTextureBytes": 26045133,
+        "featureBytes": 4131990,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "light",
+        "cache": "cold",
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.799999999999272,
+          "buffers": [
+            "390×689"
+          ],
+          "levels": [
+            "compact"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      },
+      {
+        "buffer": [
+          390,
+          689
+        ],
+        "tier": "light",
+        "level": "compact",
+        "usefulFrameMs": 1133,
+        "compactMs": 2233.699999999255,
+        "finalMs": 2233.699999999255,
+        "transferBytes": 16372,
+        "landscapeTransferBytes": 0,
+        "peakLandscapeTextureBytes": 15690332,
+        "estimatedPeakSceneTextureBytes": 26045133,
+        "featureBytes": 4131990,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "failures": [],
+        "profile": "light",
+        "cache": "warm",
+        "orbit": {
+          "frames": 685,
+          "p95FrameMs": 16.700000000000728,
+          "buffers": [
+            "390×689"
+          ],
+          "levels": [
+            "compact"
+          ],
+          "returnedPosition": [
+            136.83901780236857,
+            10.884257820656401,
+            89.98587875459374
+          ]
+        }
+      }
+    ]
+  },
+  "pavilion1": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "roomCount": 15,
+      "entries": [
+        {
+          "file": "/map-assets/pavilion-1/arq-design-plan.webp",
+          "bytes": 156728
+        },
+        {
+          "file": "/map-assets/pavilion-1/arq-design.glb",
+          "bytes": 1797848
+        },
+        {
+          "file": "/map-assets/pavilion-1/arq-design-plan-detail.webp",
+          "bytes": 573640
+        }
+      ],
+      "focusedRooms": [
+        "12",
+        "01",
+        "04",
+        "salon"
+      ],
+      "firstFrameMs": 233,
+      "orbit": {
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "pointerSteps": 120,
+        "discardedInitialIntervals": 2,
+        "sampleCount": 119,
+        "medianMs": 16.7,
+        "p95Ms": 16.7,
+        "fps": 60,
+        "intervalsMs": [
+          16.7,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.8,
+          16.5,
+          16.7,
+          16.7,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.8,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.8,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.8,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7
+        ]
+      },
+      "ignoredPickWhileLoading": true,
+      "preservedOnModelFailure": "14"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "roomCount": 15,
+      "entries": [
+        {
+          "file": "/map-assets/pavilion-1/arq-design-plan.webp",
+          "bytes": 156728
+        },
+        {
+          "file": "/map-assets/pavilion-1/arq-design.glb",
+          "bytes": 1797848
+        },
+        {
+          "file": "/map-assets/pavilion-1/arq-design-plan-detail.webp",
+          "bytes": 573640
+        }
+      ],
+      "focusedRooms": [
+        "12"
+      ],
+      "firstFrameMs": 225,
+      "orbit": {
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5, Unspecified Version)",
+        "pointerSteps": 120,
+        "discardedInitialIntervals": 2,
+        "sampleCount": 118,
+        "medianMs": 16.7,
+        "p95Ms": 16.7,
+        "fps": 60,
+        "intervalsMs": [
+          16.6,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.8,
+          16.6,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.8,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.8,
+          16.6,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.8,
+          16.6,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.6,
+          16.8,
+          16.6,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6,
+          16.7,
+          16.7,
+          16.6
+        ]
+      },
+      "ignoredPickWhileLoading": true,
+      "preservedOnModelFailure": "14"
+    }
+  ],
+  "pavilion1Commercial": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "dashboard": true,
+      "fixedPrice": true,
+      "reload": true,
+      "selection9000": true,
+      "checkout": true
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "dashboard": true,
+      "fixedPrice": true,
+      "reload": true,
+      "selection9000": true,
+      "checkout": true
+    }
+  ],
+  "pressure": [
+    {
+      "changes": [
+        {
+          "state": "1318×703 detail/detail balanced",
+          "atMs": 4506
+        },
+        {
+          "state": "1186×632 detail/detail balanced",
+          "atMs": 12485
+        }
+      ],
+      "statesDuringOrbit": 1,
+      "finalLevel": "detail"
+    }
+  ],
+  "referenceAzimuths": {
+    "northReturn": {
+      "meanChannelDifference": 0,
+      "fractionChangedOver8": 0
+    }
+  },
+  "facadeSamples": {
+    "reference": "Paredes projetadas a partir da malha de f9c9c8f, a 1,5–4 km. Para cada câmera, 35 fachadas com pelo menos dez pixels internos. Amostra descritiva. Exclui a borda de dois pixels e a região inferior de cada parede.",
+    "results": {
+      "17": {
+        "before": {
+          "medianInteriorChromaRGB": 5.0,
+          "medianWithinFacadeLuminanceSpreadP90P10": 13.8,
+          "medianAcrossFacadesLabColourDistanceIgnoringLightness": 2.2,
+          "medianAcrossFacadesLabDistance": 4.2
+        },
+        "after": {
+          "medianInteriorChromaRGB": 4.0,
+          "medianWithinFacadeLuminanceSpreadP90P10": 23.7,
+          "medianAcrossFacadesLabColourDistanceIgnoringLightness": 1.7,
+          "medianAcrossFacadesLabDistance": 4.0
+        }
+      },
+      "09": {
+        "before": {
+          "medianInteriorChromaRGB": 7.0,
+          "medianWithinFacadeLuminanceSpreadP90P10": 11.2,
+          "medianAcrossFacadesLabColourDistanceIgnoringLightness": 2.3,
+          "medianAcrossFacadesLabDistance": 3.9
+        },
+        "after": {
+          "medianInteriorChromaRGB": 4.0,
+          "medianWithinFacadeLuminanceSpreadP90P10": 22.1,
+          "medianAcrossFacadesLabColourDistanceIgnoringLightness": 1.6,
+          "medianAcrossFacadesLabDistance": 3.8
+        }
+      }
+    }
+  }
+}

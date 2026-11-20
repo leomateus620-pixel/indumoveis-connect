@@ -9,7 +9,18 @@ process.env.MAP_ARTIFACT_DIR ??= `artifacts.local/map-landscape/${phase}`;
 const { browser, newContext, report, baseURL, artifactDir } =
   await import("./commercial-map-browser-fixtures.mjs");
 assert(["before", "after"].includes(phase));
-assert(["metrics", "visual", "video", "controls", "startup", "journey", "pressure"].includes(task));
+assert(
+  [
+    "metrics",
+    "visual",
+    "video",
+    "controls",
+    "startup",
+    "journey",
+    "pressure",
+    "reference-views",
+  ].includes(task),
+);
 const controls = {
   "21-10-16": { position: [213.505, 28.056, -31.264], target: [95.36, 56.327] },
   "21-10-21": { position: [173.649, 28.41, 178.779], target: [95.409, 53.527] },
@@ -315,8 +326,50 @@ async function exercise(layout, viewport, quality) {
     );
     await page.goto(`${baseURL}/mapa?mapDiagnostics=1`, { waitUntil: "domcontentloaded" });
     await fresh(page);
+    if (task === "reference-views") {
+      // Compare completed panoramas at the same LOD on both frozen builds.
+      await page.waitForFunction(() => window.__indumoveisMap.landscape.level === "detail");
+      await pause(page);
+    }
     const entry = { layout, viewport, quality, opening: await opening(page) };
     output.entries.push(entry);
+    if (task === "reference-views") {
+      // Natural daylight. Poses registered against independent park landmarks in the three November 20 captures.
+      const references = [
+        {
+          stamp: "09",
+          size: [1398, 626],
+          position: [355.09973, 61.60126, -11.59779],
+          target: [95.20961, 54.96174],
+        },
+        {
+          stamp: "17",
+          size: [1396, 623],
+          position: [282.13317, 51.32529, 247.49148],
+          target: [94.19356, 53.2705],
+        },
+        {
+          stamp: "25",
+          size: [1462, 857],
+          position: [-47.86064, 55.55811, 280.69203],
+          target: [95.91456, 55.87423],
+        },
+      ];
+      const stage = page.locator(".im-map-stage");
+      entry.poses = {};
+      for (const { stamp, size, ...pose } of references) {
+        const rect = await stage.boundingBox();
+        const current = page.viewportSize();
+        await page.setViewportSize({
+          width: Math.round(current.width + size[0] - rect.width),
+          height: Math.round(current.height + size[1] - rect.height),
+        });
+        await pause(page);
+        entry.poses[stamp] = await setPose(page, pose);
+        await stage.screenshot({ path: path.join(artifactDir, "anexo-" + stamp + ".png") });
+      }
+      return;
+    }
     if (task === "startup") return;
     if (task === "metrics") {
       entry.orbit = await orbit(page);
