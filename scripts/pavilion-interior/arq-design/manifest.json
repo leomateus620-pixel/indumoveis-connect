@@ -1,0 +1,58 @@
+{
+  "source": {
+    "type": "Higgsfield 3D Jutsu",
+    "project": "https://higgsfield.ai/3d-jutsu/2158e908-c2fd-4fc5-884f-f8b27fefc9d5",
+    "revision": 4,
+    "glbSha256": "b986d69522fa34840cdf24e821b9ee9e0fb269d65d90f58a0448f8ae4bd76923",
+    "plan": "src/features/pavilion-interior/plan.generated.json",
+    "planRevision": 2,
+    "planSourceSha256": "088ab9d98e61ed98c98b45834c5813416d9fd09a10af195aeeae29bfc9a4c02a",
+    "coordinateSystem": "glTF X = plan x, Z = plan y; Y is up; plan units are PDF points.",
+    "bounds": {
+      "minX": 28,
+      "minY": 66,
+      "maxX": 1080,
+      "maxY": 532
+    }
+  },
+  "artwork": "Projeto de ambientação ilustrativo da mostra. Os usos documentados de Recepção, Café, Banheiros, Salão de Design e circulações foram mantidos. Os mobiliários e acabamentos dos demais espaços são propostas autorais.",
+  "surfaceAtlas": {
+    "size": [1024, 512],
+    "swatches": 32,
+    "maps": ["sRGB base color", "linear roughness/metalness"]
+  },
+  "packaging": {
+    "gltfpack": "1.3.0",
+    "flags": "-cc -ce ext -kn -ke -si 0.72 -se 0.0004 -slb -vp 16",
+    "sourceStages": ["assemble.py layout", "assemble.py exhibition"],
+    "glb": "package.py <gltfpack-output.glb> <deployed.glb>",
+    "plan": "bake.mjs <working-directory>, then plan_webp.py <working-directory> <output-directory>. Camera and height passes use the deployed GLB."
+  },
+  "files": {
+    "arq-design.glb": {
+      "bytes": 1797848,
+      "sha256": "8794b11f3b9161dcef4fb421a44f8764db9cc541cb6d9167d8a9dc43bca00939",
+      "meshPrimitives": 26,
+      "materials": 2,
+      "triangles": 114339,
+      "extensions": [
+        "KHR_mesh_quantization",
+        "EXT_meshopt_compression",
+        "KHR_texture_transform",
+        "EXT_texture_webp"
+      ]
+    },
+    "arq-design-plan.webp": {
+      "bytes": 156728,
+      "sha256": "a10569a3deeff7530b90fb8bef0193e8921ba77a0aa73ced23f5d35a15f98337",
+      "size": [2104, 932],
+      "alpha": true
+    },
+    "arq-design-plan-detail.webp": {
+      "bytes": 573640,
+      "sha256": "f6b965d02f1e2f570971cce028a7b1d143c8ae3bf2bcc6a98d47720bd72c4755",
+      "size": [4208, 1864],
+      "alpha": true
+    }
+  }
+}

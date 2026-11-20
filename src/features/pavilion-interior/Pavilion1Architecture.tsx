@@ -1,5 +1,6 @@
 import { useId } from "react";
 import type { InteriorPoint, PavilionPlan } from "./data";
+import { hasPavilion1Artwork, PAVILION_1_ARTWORK } from "./pavilion1Artwork";
 import "./pavilion1-architecture.css";
 
 // Soleiras sobre os vãos identificados na revisão documental, em pontos PDF.
@@ -10,7 +11,13 @@ const thresholds = [
   { x: 526.89, y: 482.6, width: 14.16, height: 7, kind: "service" },
 ] as const;
 
-export function Pavilion1Architecture({ plan }: { plan: PavilionPlan }) {
+export function Pavilion1Architecture({
+  plan,
+  detailed,
+}: {
+  plan: PavilionPlan;
+  detailed?: boolean;
+}) {
   const id = useId();
   const mineral = `${id}-mineral`;
   const rear = `${id}-rear`;
@@ -22,6 +29,7 @@ export function Pavilion1Architecture({ plan }: { plan: PavilionPlan }) {
   const salonJoints = `${id}-salon-joints`;
   const terraceJoints = `${id}-terrace-joints`;
   const supportJoints = `${id}-support-joints`;
+  const artworkClip = `${id}-artwork`;
   const distinctRoomFinishes: Record<string, string> = {
     "01": `url(#${reception})`,
     "14": `url(#${cafe})`,
@@ -35,6 +43,13 @@ export function Pavilion1Architecture({ plan }: { plan: PavilionPlan }) {
   return (
     <g className="arq-p1-structure" aria-hidden="true" pointerEvents="none">
       <defs>
+        {hasPavilion1Artwork(plan) && (
+          <clipPath id={artworkClip}>
+            {plan.environments.flatMap((environment) =>
+              environment.parts.map((part) => <path key={part.id} d={part.path} />),
+            )}
+          </clipPath>
+        )}
         <linearGradient id={mineral} x2="86%" y2="100%">
           <stop stopColor="#f0e8df" />
           <stop offset="100%" stopColor="#e4d6ca" />
@@ -111,6 +126,21 @@ export function Pavilion1Architecture({ plan }: { plan: PavilionPlan }) {
         });
       })}
 
+      {hasPavilion1Artwork(plan) &&
+        [PAVILION_1_ARTWORK.image, ...(detailed ? [PAVILION_1_ARTWORK.detailImage] : [])].map(
+          (asset) => (
+            <image
+              key={asset}
+              href={asset}
+              x={PAVILION_1_ARTWORK.x}
+              y={PAVILION_1_ARTWORK.y}
+              width={PAVILION_1_ARTWORK.width}
+              height={PAVILION_1_ARTWORK.height}
+              preserveAspectRatio="none"
+              clipPath={`url(#${artworkClip})`}
+            />
+          ),
+        )}
       {plan.source.revisionName === "mostra-arq-design-1-2026-11-08" &&
         thresholds.map(({ kind, ...bounds }) => (
           <rect
@@ -124,7 +154,13 @@ export function Pavilion1Architecture({ plan }: { plan: PavilionPlan }) {
   );
 }
 
-export function Pavilion1NumberPlate({ center: [x, y] }: { center: InteriorPoint }) {
+export function Pavilion1NumberPlate({
+  center: [x, y],
+  stockColor,
+}: {
+  center: InteriorPoint;
+  stockColor?: string;
+}) {
   return (
     <g
       className="arq-p1-number-plate"
@@ -134,6 +170,7 @@ export function Pavilion1NumberPlate({ center: [x, y] }: { center: InteriorPoint
     >
       <rect x={-16} y={-9} width={32} height={21} rx={2} className="arq-p1-plate-edge" />
       <rect x={-16} y={-10.5} width={32} height={21} rx={2} className="arq-p1-plate-face" />
+      {stockColor && <rect className="arq-p1-stock-strip" fill={stockColor} />}
     </g>
   );
 }

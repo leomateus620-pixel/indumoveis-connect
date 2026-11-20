@@ -9,10 +9,14 @@ import {
 import {
   ArrowLeft,
   ArrowRight,
+  Box,
+  Layers2,
   Maximize2,
   Minus,
   PanelLeft,
   Plus,
+  RotateCcw,
+  RotateCw,
   Scan,
   Search,
   ShoppingCart,
@@ -27,6 +31,9 @@ import { COMMERCIAL_STATUS_COLORS } from "@/features/commercial-map/visualTheme"
 import { useCommercialSaleMode } from "@/features/guided-sales/sale-mode-context";
 import { commercialPriceLabel, commercialUnitPrice } from "@/lib/commercial";
 import { Pavilion1Architecture, Pavilion1NumberPlate } from "./Pavilion1Architecture";
+import { Pavilion1Model } from "./Pavilion1Model";
+import { pavilion1DesignNote } from "./pavilion1Curation";
+import { hasPavilion1Artwork, type Pavilion1ModelControls } from "./pavilion1Artwork";
 import { Pavilion3Architecture, Pavilion3Directory } from "./Pavilion3Architecture";
 import { normalizePavilion3LotCode, pavilion3Neighbor } from "./pavilion3";
 import { Pavilion12Architecture } from "./Pavilion12Architecture";
@@ -88,6 +95,15 @@ export function PavilionInterior({
 }: Props) {
   const selected = plan.environments.find((e) => e.code === selectedCode);
   const isPavilion1 = presentation.pavilionNumber === 1;
+  const [modelOpen, setModelOpen] = useState(false);
+  const [modelError, setModelError] = useState(false);
+  const modelControls = useRef<Pavilion1ModelControls | null>(null);
+  const modelToggle = useRef<HTMLButtonElement>(null);
+  const artwork = isPavilion1 && hasPavilion1Artwork(plan);
+  const showingModel = artwork && modelOpen;
+  const designNote = artwork && selected ? pavilion1DesignNote(selected.code) : undefined;
+  const [detailArtwork, setDetailArtwork] = useState(false);
+  const detailRequested = useRef(false);
   const isPavilion3 = presentation.pavilionNumber === 3;
   const isPavilion8 = presentation.pavilionNumber === 8;
   const isPavilion12 = presentation.pavilionNumber === 12;
@@ -124,6 +140,15 @@ export function PavilionInterior({
     (next: PlanCamera) => {
       camera.current = boundCamera(next, plan.bounds, size.current);
       const c = camera.current;
+      if (
+        !detailRequested.current &&
+        artwork &&
+        svg.current?.style.display !== "none" &&
+        c.scale * window.devicePixelRatio > 2.1
+      ) {
+        detailRequested.current = true;
+        setDetailArtwork(true);
+      }
       drawing.current?.setAttribute("transform", `translate(${c.x} ${c.y}) scale(${c.scale})`);
       const fitted = fitPlan(plan.bounds, size.current).scale;
       svg.current?.classList.toggle("is-near", c.scale > fitted * 1.6);
@@ -133,7 +158,7 @@ export function PavilionInterior({
         `${Math.min(presentation.numberLabelMaxSize ?? Infinity, Math.max(14, 10.5 / c.scale))}px`,
       );
     },
-    [plan.bounds, presentation.numberLabelMaxSize],
+    [plan.bounds, presentation.numberLabelMaxSize, artwork],
   );
   const fitViewport = useCallback(
     (compact: boolean) => {
@@ -304,7 +329,11 @@ export function PavilionInterior({
     onSelect(code);
     if (code) setPanelOpen(true);
   };
-  const collapse = (focusTarget: SVGElement | null = svg.current) => {
+  const collapse = (
+    focusTarget: SVGElement | HTMLElement | null = showingModel
+      ? (viewport.current?.querySelector<HTMLElement>(".arq-p1-model") ?? null)
+      : svg.current,
+  ) => {
     setPanelOpen(false);
     size.current.left = 0;
     requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
@@ -407,7 +436,7 @@ export function PavilionInterior({
   return (
     <main
       data-guided-sales-host=""
-      className={`arq-interior is-pavilion-${presentation.pavilionNumber} ${lotsMode ? "has-lot-layout" : ""} ${panelOpen ? "is-panel-open" : ""} ${salesActive ? "is-sales-active" : ""}`}
+      className={`arq-interior is-pavilion-${presentation.pavilionNumber} ${artwork ? "has-p1-artwork" : ""} ${lotsMode ? "has-lot-layout" : ""} ${panelOpen ? "is-panel-open" : ""} ${salesActive ? "is-sales-active" : ""}`}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           event.stopPropagation();
@@ -512,7 +541,10 @@ export function PavilionInterior({
                   {selected.code}
                 </span>
               )}
-              <h2 ref={lotTitle} tabIndex={isPavilion13 || navigableLots ? -1 : undefined}>
+              <h2
+                ref={lotTitle}
+                tabIndex={artwork || isPavilion13 || navigableLots ? -1 : undefined}
+              >
                 {selected.name}
               </h2>
               {lotsMode && (
@@ -574,6 +606,32 @@ export function PavilionInterior({
                 </dl>
               )}
               {pricingNote && <p className="arq-function">{pricingNote}</p>}
+              {designNote && (
+                <div className="arq-p1-design-note">
+                  <strong>Projeto ilustrativo</strong>
+                  <p>{designNote}</p>
+                </div>
+              )}
+              {artwork && !showingModel && selected.kind !== "circulation" && (
+                <button
+                  className="arq-view-plan"
+                  onClick={() => {
+                    setModelError(false);
+                    setModelOpen(true);
+                    if (mobile) {
+                      setPanelOpen(false);
+                      size.current.left = 0;
+                    }
+                    requestAnimationFrame(() =>
+                      viewport.current
+                        ?.querySelector<HTMLElement>(".arq-p1-model")
+                        ?.focus({ preventScroll: true }),
+                    );
+                  }}
+                >
+                  <Box size={16} /> Ver ambiente em 3D
+                </button>
+              )}
               {navigableLots ? (
                 <button className="arq-view-plan" onClick={locateSelected}>
                   Localizar na planta <Scan size={16} />
@@ -581,7 +639,7 @@ export function PavilionInterior({
               ) : (
                 mobile && (
                   <button className="arq-view-plan" onClick={() => collapse()}>
-                    Ver na planta <ArrowRight size={16} />
+                    {showingModel ? "Ver na maquete" : "Ver na planta"} <ArrowRight size={16} />
                   </button>
                 )
               )}
@@ -767,8 +825,29 @@ export function PavilionInterior({
             statuses={[...(lotsByEnvironment?.values() ?? [])].map((lot) => lot.status)}
             salesActive={salesActive}
           />
+          {artwork && <small className="arq-p1-caption">Ambientação ilustrativa.</small>}
         </aside>
         <div className="arq-canvas" ref={viewport}>
+          {artwork && (
+            <button
+              type="button"
+              className="arq-p1-view-toggle"
+              ref={modelToggle}
+              aria-label={showingModel ? "Mostrar planta humanizada" : "Abrir maquete 3D"}
+              onClick={() => {
+                setModelError(false);
+                setModelOpen(!modelOpen);
+              }}
+            >
+              {showingModel ? <Layers2 size={16} /> : <Box size={16} />}
+              {showingModel ? "Ver planta" : "Maquete 3D"}
+            </button>
+          )}
+          {modelError && (
+            <p className="arq-p1-fallback" role="status">
+              A maquete ficou indisponível. Você pode explorar a planta.
+            </p>
+          )}
           {salesActive && saleNotice && (
             <p className="arq-sales-notice" role="status">
               {saleNotice}
@@ -797,6 +876,7 @@ export function PavilionInterior({
           <svg
             ref={svg}
             className="arq-plan"
+            style={showingModel ? { display: "none" } : undefined}
             role="group"
             aria-label={`Planta interativa do Pavilhão ${presentation.pavilionNumber}`}
             aria-describedby="arq-navigation-help"
@@ -887,7 +967,7 @@ export function PavilionInterior({
             onPointerCancel={(e) => stopGesture(e, true)}
           >
             <g ref={drawing}>
-              {isPavilion1 && <Pavilion1Architecture plan={plan} />}
+              {isPavilion1 && <Pavilion1Architecture plan={plan} detailed={detailArtwork} />}
               {isPavilion3 && <Pavilion3Architecture plan={plan} />}
               {isPavilion8 && <Pavilion8Architecture plan={plan} />}
               {isPavilion12 && <Pavilion12Architecture plan={plan} />}
@@ -1022,7 +1102,12 @@ export function PavilionInterior({
                       ))}
                     {isPavilion8 && <Pavilion8NumberPlate center={environment.label} />}
                     {isPavilion1 && /^\d{2}$/.test(environment.code) && (
-                      <Pavilion1NumberPlate center={environment.label} />
+                      <Pavilion1NumberPlate
+                        center={environment.label}
+                        stockColor={
+                          artwork && status ? COMMERCIAL_STATUS_COLORS[status] : undefined
+                        }
+                      />
                     )}
                     <text
                       x={environment.label[0]}
@@ -1134,15 +1219,79 @@ export function PavilionInterior({
               })}
             </g>
           </svg>
-          <div ref={viewControls} className="arq-view-controls" aria-label="Controles da planta">
-            <button className="arq-icon" aria-label="Aproximar" onClick={() => zoom(1.35)}>
+          {showingModel && (
+            <Pavilion1Model
+              plan={plan}
+              selected={selected}
+              controls={modelControls}
+              status={saleStatus}
+              saleSelected={saleSelected}
+              salesActive={salesActive}
+              onChoose={(code) => {
+                focusDirectorySelection.current = !salesActive && selectedCode !== code;
+                choose(code);
+              }}
+              onUnavailable={() => {
+                const restoreFocus = !!viewport.current
+                  ?.querySelector(".arq-p1-model")
+                  ?.contains(document.activeElement);
+                setModelOpen(false);
+                setModelError(true);
+                if (restoreFocus)
+                  requestAnimationFrame(() => modelToggle.current?.focus({ preventScroll: true }));
+              }}
+            />
+          )}
+          <div
+            ref={viewControls}
+            className="arq-view-controls"
+            aria-label={showingModel ? "Controles da maquete" : "Controles da planta"}
+          >
+            {showingModel && (
+              <>
+                <button
+                  className="arq-icon"
+                  aria-label="Girar à esquerda"
+                  onClick={() => modelControls.current?.rotate(-Math.PI / 8)}
+                >
+                  <RotateCcw size={17} />
+                </button>
+                <button
+                  className="arq-icon"
+                  aria-label="Girar à direita"
+                  onClick={() => modelControls.current?.rotate(Math.PI / 8)}
+                >
+                  <RotateCw size={17} />
+                </button>
+              </>
+            )}
+            <button
+              className="arq-icon"
+              aria-label="Aproximar"
+              onClick={() => (showingModel ? modelControls.current?.zoom(1.35) : zoom(1.35))}
+            >
               <Plus size={19} />
             </button>
-            <button className="arq-icon" aria-label="Afastar" onClick={() => zoom(1 / 1.35)}>
+            <button
+              className="arq-icon"
+              aria-label="Afastar"
+              onClick={() =>
+                showingModel ? modelControls.current?.zoom(1 / 1.35) : zoom(1 / 1.35)
+              }
+            >
               <Minus size={19} />
             </button>
             <span />
-            <button className="arq-icon" aria-label="Ajustar à tela" onClick={fit}>
+            <button
+              className="arq-icon"
+              aria-label="Ajustar à tela"
+              onClick={() => {
+                if (showingModel) {
+                  if (mobile) setPanelOpen(false);
+                  modelControls.current?.fit();
+                } else fit();
+              }}
+            >
               <Scan size={19} />
             </button>
             <button

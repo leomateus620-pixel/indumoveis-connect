@@ -1,8 +1,22 @@
 import { useState, type ComponentProps } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { PavilionInterior } from "./PavilionInterior";
 import { PAVILION_1_PLAN } from "./data";
+import { PAVILION_1_ARTWORK } from "./pavilion1Artwork";
+
+const model = vi.hoisted(() => ({
+  open: vi.fn(),
+  controls: {
+    fit: vi.fn(),
+    focus: vi.fn(),
+    highlight: vi.fn(),
+    zoom: vi.fn(),
+    rotate: vi.fn(),
+    dispose: vi.fn(),
+  },
+}));
+vi.mock("./pavilion1Renderer", () => ({ openPavilion1Model: model.open }));
 
 type Props = ComponentProps<typeof PavilionInterior>;
 const onSelect = vi.fn(),
@@ -105,6 +119,75 @@ afterEach(() => {
 });
 
 describe("Mostra pavilion interaction", () => {
+  it("opens the selected room directly in the model, giving it the full mobile viewport", async () => {
+    mobile = true;
+    model.open.mockImplementation(({ onReady }) => {
+      onReady();
+      return model.controls;
+    });
+    render(<Harness initial="12" />);
+    expect(screen.getByText("Projeto ilustrativo")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Ver ambiente em 3D" }));
+    const scene = await screen.findByRole("group", { name: "Maquete interativa do Pavilhão 1" });
+    await waitFor(() => expect(scene).toHaveAttribute("aria-busy", "false"));
+    expect(screen.queryByRole("complementary")).toBeNull();
+    expect(model.controls.focus).toHaveBeenCalledWith(expect.objectContaining({ code: "12" }));
+    expect(within(scene).getByRole("button", { name: "12 · Espaço 12" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+  it("requests the higher resolution only when the plan zoom needs more than two source pixels per unit", () => {
+    const { container } = render(<Harness />);
+    const detail = () => container.querySelector(`image[href="${PAVILION_1_ARTWORK.detailImage}"]`);
+    expect(detail()).toBeNull();
+    const zoom = screen.getByRole("button", { name: "Aproximar" });
+    for (let i = 0; i < 4; i++) fireEvent.click(zoom);
+    expect(detail()).toBeInTheDocument();
+    expect(
+      container.querySelector(`image[href="${PAVILION_1_ARTWORK.image}"]`),
+    ).toBeInTheDocument();
+  });
+  it("uses the documentary plan image and loads the interactive model on demand with the same selection", async () => {
+    model.open.mockImplementation(({ onReady }) => {
+      onReady();
+      return model.controls;
+    });
+    const { container } = render(
+      <Harness initial="09" commercial={{ "09": { status: "reservado" } }} />,
+    );
+    expect(container.querySelector(`image[href="${PAVILION_1_ARTWORK.image}"]`)).toHaveAttribute(
+      "clip-path",
+    );
+    expect(model.open).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Abrir maquete 3D" }));
+    const scene = await screen.findByRole("group", { name: "Maquete interativa do Pavilhão 1" });
+    await waitFor(() => expect(scene).toHaveAttribute("aria-busy", "false"));
+    expect(model.controls.focus).toHaveBeenCalledWith(expect.objectContaining({ code: "09" }));
+    expect(within(scene).getByRole("button", { name: "09 · Espaço 09" })).toHaveAttribute(
+      "data-commercial-status",
+      "reservado",
+    );
+    fireEvent.click(within(scene).getByRole("button", { name: "14 · Café" }));
+    expect(screen.getByRole("heading", { name: "Café" })).toBeVisible();
+    expect(model.controls.focus).toHaveBeenCalledWith(expect.objectContaining({ code: "14" }));
+    fireEvent.click(screen.getByRole("button", { name: "Aproximar" }));
+    expect(model.controls.zoom).toHaveBeenCalledWith(1.35);
+    fireEvent.click(screen.getByRole("button", { name: "Mostrar planta humanizada" }));
+    expect(path(container, "14")).toHaveAttribute("aria-pressed", "true");
+    expect(model.controls.dispose).toHaveBeenCalledOnce();
+  });
+  it("returns to the selected documentary polygon if the 3D asset or graphics context fails", async () => {
+    model.open.mockImplementation(() => model.controls);
+    render(<Harness initial="12" />);
+    fireEvent.click(screen.getByRole("button", { name: "Abrir maquete 3D" }));
+    await waitFor(() => expect(model.open).toHaveBeenCalledOnce());
+    act(() => model.open.mock.calls[0][0].onUnavailable());
+    expect(screen.getByRole("status")).toHaveTextContent("maquete ficou indisponível");
+    expect(screen.getByRole("group", { name: "Planta interativa do Pavilhão 1" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Espaço 12" })).toBeVisible();
+    expect(model.controls.dispose).toHaveBeenCalledOnce();
+  });
   it("shows the bathroom's persisted fixed price without a square-metre tariff", () => {
     const environmentId = "indumoveis:pavilion:1:environment:15";
     render(

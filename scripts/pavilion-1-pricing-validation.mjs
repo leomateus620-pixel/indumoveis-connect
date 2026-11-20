@@ -18,6 +18,7 @@ Object.assign(plan, {
   databasePlanId: "33333333-3333-4333-8333-333333333333",
   revisionId: "44444444-4444-4444-8444-444444444444",
 });
+const gallery = process.env.PAVILION_1_GALLERY_PHASE;
 const prices = [
   450000, 660000, 660000, 1020000, 1020000, 660000, 660000, 1020000, 1020000, 660000, 960000,
   1500000, 960000, 1500000, 450000,
@@ -150,6 +151,14 @@ try {
     });
     const page = await context.newPage();
     page.setDefaultTimeout(15000);
+    if (gallery) {
+      const { checkGallery } = await import("./pavilion-interior/check-arq-design.mjs");
+      report.checks.push(
+        await checkGallery({ page, plan, lots, gallery, viewport, baseURL, artifactDir }),
+      );
+      await context.close();
+      continue;
+    }
     await page.goto(`${baseURL}/dashboard-comercial?segmento=p1`);
     await page.getByText("15 lotes comerciais", { exact: true }).waitFor();
     assert.match(await page.locator(".cd-overview").innerText(), /132\.000,00/);

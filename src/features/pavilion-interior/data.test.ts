@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { pavilion1RoomForHit } from "./pavilion1Artwork";
 import {
   PAVILION_1_PLAN as plan,
   isInteriorEnvironmentCode,
@@ -51,6 +52,21 @@ const declaredAreas = [
 ];
 
 describe("Pavilhão 1 documentary plan", () => {
+  it("resolves model furniture, every floor and the five terraces to their documentary owner", () => {
+    for (const room of plan.environments) {
+      const expected = room.kind === "circulation" ? undefined : room.code;
+      expect(pavilion1RoomForHit(plan, room.label)).toBe(expected);
+      // A sloped viewing ray may place the top of a chair across the floor projection of a wall.
+      expect(pavilion1RoomForHit(plan, [0, 0], room.code)).toBe(expected);
+      for (const part of room.parts.filter((item) => item.kind === "external")) {
+        const [left, top] = part.polygon[0];
+        const x = (left + Math.max(...part.polygon.map(([px]) => px))) / 2;
+        const y = (top + Math.max(...part.polygon.map(([, py]) => py))) / 2;
+        expect(pavilion1RoomForHit(plan, [x, y])).toBe(room.code);
+      }
+    }
+    expect(pavilion1RoomForHit(plan, [0, 0], "nonexistent")).toBeUndefined();
+  });
   it("preserves all fifteen numbered spaces and exactly fifteen sellable identities", () => {
     const numbered = plan.environments.filter((e) => /^\d{2}$/.test(e.code));
     expect(numbered.map((e) => e.code)).toEqual(
