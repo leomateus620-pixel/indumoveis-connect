@@ -11,9 +11,11 @@ import numpy as np
 from build import footprint_heights, fuse_pan, grid_samples
 from canopies import canopy_surface, load_canopy_height
 from footprints import load_footprints
-from PIL import Image, ImageDraw, ImageOps
+from materials import write_atlases
+from PIL import Image, ImageDraw
 from scipy.ndimage import gaussian_filter, map_coordinates, minimum_filter
 from sources import SCENE_AXES, SCENE_ORIGIN, SCENE_SCALE, load_source
+from towers import family_at, tower_envelope
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "public/landscape/santa-rosa"
@@ -86,7 +88,7 @@ def roof_envelope(ring, height, terrain):
     n = len(ring)
     lengths = np.linalg.norm(np.roll(ring, -1, axis=0) - ring, axis=1)
     pitch = (
-        min(height * 0.23, lengths.min() * 0.15, 2.8) if n == 4 and height < 12 else 0
+        min(height * 0.31, lengths.min() * 0.27, 3.5) if n == 4 and height < 12 else 0
     )
     base = np.column_stack((ring, np.full(n, ground.min() - 1.5)))
     eaves = np.column_stack((ring, np.full(n, peak - pitch)))
@@ -100,9 +102,14 @@ def roof_envelope(ring, height, terrain):
         # measured corners, and each gable meets its two slopes at shared vertices.
         a = int((lengths[0] + lengths[2]) > (lengths[1] + lengths[3]))
         b, c, d = [(a + i) % 4 for i in (1, 2, 3)]
-        vertices.extend(
-            [(*((ring[a] + ring[b]) / 2), peak), (*((ring[c] + ring[d]) / 2), peak)]
-        )
+        start = (ring[a] + ring[b]) / 2
+        end = (ring[c] + ring[d]) / 2
+        if lengths.max() < 32 and int(abs(ring[0, 0])) % 3:
+            # Hip ends are typical on detached houses. Inset both peaks along
+            # the ridge while preserving its bearing and all measured corners.
+            inset = min(0.33, lengths[a] * 0.38 / max(1.0, np.linalg.norm(end - start)))
+            start, end = start + inset * (end - start), end - inset * (end - start)
+        vertices.extend([(*start, peak), (*end, peak)])
         a, b, c, d = [i + n for i in (a, b, c, d)]
         faces.extend(((a, b, 8), (c, d, 9), (b, c, 9), (b, 9, 8), (d, a, 8), (d, 8, 9)))
     else:
@@ -111,37 +118,6 @@ def roof_envelope(ring, height, terrain):
         )
         faces.extend(n + top.reshape(-1, 3))
     return np.asarray(vertices), np.asarray(faces, dtype=np.uint32)
-
-
-def materials():
-    # Each tile has a mirrored gutter at every edge. Two atlas sizes share UVs,
-    # so the already-published geometry never changes between budget levels.
-    from facades import ATLAS, SAMPLES, TILE
-
-    facades = Image.open(ATLAS).convert("RGB")
-    tiles = [
-        facades.crop((0, i * TILE[1], TILE[0], (i + 1) * TILE[1]))
-        for i in range(len(SAMPLES))
-    ]
-    tiles.append(
-        Image.open(Path(__file__).with_name("folhagem-santa-rosa.webp")).convert("RGB")
-    )
-    atlas = Image.new("RGB", (256, 512))
-    for i, tile in enumerate(tiles):
-        tile = tile.resize((112, 112), Image.Resampling.LANCZOS)
-        if i == 5:
-            tile = ImageOps.grayscale(tile)
-            # Leaf texture modulates colour from the local optical crop.
-            a = np.asarray(tile, dtype=np.float32)
-            tile = Image.fromarray(
-                np.clip(175 + (a - a.mean()) * 1.6, 60, 240).astype("uint8")
-            ).convert("RGB")
-        block = np.pad(np.asarray(tile), ((8, 8), (8, 8), (0, 0)), mode="reflect")
-        atlas.paste(Image.fromarray(block), ((i % 2) * 128, (i // 2) * 128))
-    for level, width in (("compact", 128), ("detail", 256)):
-        atlas.resize((width, width * 2), Image.Resampling.LANCZOS).save(
-            OUT / f"settlement-{level}.webp", quality=86, method=6
-        )
 
 
 def generate(cache):
@@ -161,6 +137,8 @@ def generate(cache):
     vertex_count = 0
     roofs = 0
     distant = 0
+    skyline = np.zeros(8, dtype=int)
+    modelled_details = 0
     for idx, f in enumerate(footprints, 1):
         ring = np.asarray(f["geometry"]["coordinates"][0][:-1])
         center = ring.mean(0)
@@ -187,17 +165,29 @@ def generate(cache):
         in_dem = grid_samples(raised, center[:1], center[1:], 50000)[0]
         # A fully embedded structure contributes no second roof above the DSM.
         exposed = max(0.2, measured - max(0.0, in_dem))
-        points, faces = roof_envelope(ring, exposed, terrain)
         image, extent = (middle, 8192) if tower else (photo, 4096)
         y, x = interior_pixels(ring, extent, len(image))
         colour = np.median(image[y, x], axis=0)
         width = np.max(np.linalg.norm(np.roll(ring, -1, axis=0) - ring, axis=1))
-        tile = 4 if width > 32 and measured < 12 else (0, 1, 2, 3, 3)[roofs % 5]
-        if tower:
-            tile = (0, 1, 3)[idx % 3]
-            distant += 1
+        if measured >= 12:
+            family = family_at(center, width, measured)
+            detailed = measured / max(radius, 450) >= 0.014 and measured >= 17
+            points, faces, attributes_for_roof = tower_envelope(
+                ring, exposed, measured, terrain, family, detailed
+            )
+            if tower:
+                distant += 1
+                skyline[family] += 1
+                modelled_details += int(detailed)
+        else:
+            points, faces = roof_envelope(ring, exposed, terrain)
+            industrial = width > 32
+            tile = 6 + idx % 2 if industrial else idx % 4
+            courses = 1 if industrial else max(1, round(measured / 3.7))
+            attributes_for_roof = np.tile([*colour, tile], (len(points), 1))
+            attributes_for_roof[len(ring) :, 3] += 16 * courses
         positions.append(points)
-        attributes.append(np.tile([*colour, tile], (len(points), 1)))
+        attributes.append(attributes_for_roof)
         indices.append(faces + vertex_count)
         vertex_count += len(points)
         roofs += 1
@@ -219,7 +209,11 @@ def generate(cache):
     (OUT / "settlement.bin").write_bytes(
         gzip.compress(payload, compresslevel=9, mtime=0)
     )
-    materials()
+    write_atlases(OUT)
+    print(
+        f"Centre families: {skyline.tolist()}. Modelled balcony/fins: {modelled_details} tall footprints."
+    )
+
     print(
         f"{roofs} roofs ({distant} distant towers), {stands} stands, {len(xyz)} vertices, {len(faces)} triangles",
         flush=True,

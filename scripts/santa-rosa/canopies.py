@@ -34,6 +34,81 @@ def load_canopy_height(cache):
     )[0]
 
 
+def crown_caps(keep, heights, rgb, terrain):
+    """Small alpha-cut domes on measured canopy cells, in the same indexed draw."""
+    # Prefer observed local peaks, then fill broad continuous stands. A crown's
+    # horizontal reach is bounded by its distance to a clearing or building.
+    distance = nd.distance_transform_edt(keep) * 2
+    top = nd.gaussian_filter(heights.astype(np.float32) * keep, 0.65)
+    y, x = np.nonzero(keep[::2, ::2])
+    y, x = 2 * y, 2 * x
+    radius = np.hypot(x - 1023.5, y - 1023.5) * 2
+    near = radius < 1300
+    y, x, radius = y[near], x[near], radius[near]
+    peak = top[y, x] >= nd.maximum_filter(top, 3)[y, x] - 0.1
+    priority = peak * 25 + top[y, x] + np.minimum(distance[y, x], 8) - radius / 1600
+    # Keep the render budget proportional to screen size. Each spatial cell
+    # elects its most legible peak; cells away from the park are larger.
+    grid_m = np.where(radius < 600, 13, np.where(radius < 900, 23, 37))
+    key = np.column_stack((grid_m, np.floor(x * 2 / grid_m), np.floor(y * 2 / grid_m)))
+    ranked = np.argsort(-priority, kind="stable")
+    _, unique = np.unique(key[ranked], axis=0, return_index=True)
+    elected = ranked[np.sort(unique)]
+    # Preserve close edges first if a future canopy release has more stands.
+    elected = elected[np.argsort(radius[elected], kind="stable")][:2400]
+    covered = np.zeros_like(keep)
+    selected = []
+    for i in elected:
+        row, col = int(y[i]), int(x[i])
+        if covered[row, col]:
+            continue
+        h = heights[row, col]
+        r = min(2.3 + h * 0.30, distance[row, col] * 1.2 + 0.8, 8.0)
+        spacing = r * (0.73 + 0.34 * radius[i] / 1300)
+        cells = int(np.ceil(spacing / 2))
+        yy, xx = np.ogrid[-cells : cells + 1, -cells : cells + 1]
+        covered[row - cells : row + cells + 1, col - cells : col + cells + 1] |= (
+            xx * xx + yy * yy
+        ) * 4 <= spacing**2
+        selected.append((row, col, r))
+    selected = np.asarray(selected)
+    y, x = selected[:, 0].astype(int), selected[:, 1].astype(int)
+    centres = np.column_stack(((x - 1023.5) * 2, (1023.5 - y) * 2))
+    # The atlas carries individual tuft boundaries. Each mapped cap has its
+    # own stable bearing, optical brightness and one of four editable finishes.
+    heading = ((x * 37 + y * 61) % 89) / 89 * 2 * np.pi
+    r = selected[:, 2]
+    crest = heights[y, x]
+    base = terrain.elevation(centres) + crest
+    depth = np.minimum(crest * 0.62, r * 1.27)
+    angle = np.arange(8) * np.pi / 4
+    ring = np.column_stack((np.cos(angle), np.sin(angle)))
+    local = np.vstack(([[0, 0]], ring * 0.63, ring))
+    geo_angle = heading[:, None] + np.arctan2(local[:, 1], local[:, 0])
+    reach = np.linalg.norm(local, axis=1)[None, :] * r[:, None]
+    xx = centres[:, 0, None] + reach * np.cos(geo_angle)
+    yy = centres[:, 1, None] + reach * np.sin(geo_angle)
+    zz = base[:, None] - depth[:, None] * np.r_[0.0, np.full(8, 0.18), np.ones(8)]
+    points = np.stack((xx, yy, zz), axis=-1).reshape(-1, 3)
+    i = np.arange(8)
+    j = (i + 1) % 8
+    facets = np.vstack(
+        (
+            np.column_stack((np.zeros_like(i), i + 1, j + 1)),
+            np.column_stack((i + 1, i + 9, j + 9)),
+            np.column_stack((i + 1, j + 9, j + 1)),
+        )
+    )
+    faces = (facets + np.arange(len(r))[:, None, None] * len(local)).reshape(-1, 3)
+    appearance = np.empty((len(r), len(local), 4), dtype=np.uint8)
+    appearance[:, :, :2] = np.round((local * 0.5 + 0.5) * 255)
+    appearance[:, :, 2] = np.clip(
+        np.sum(rgb[y, x] * [0.2126, 0.7152, 0.0722], axis=1), 0, 255
+    ).astype("uint8")[:, None]
+    appearance[:, :, 3] = (12 + ((x // 2) * 11 + (y // 2) * 17) % 4)[:, None]
+    return points, faces, appearance.reshape(-1, 4)
+
+
 def canopy_surface(footprints, photo, heights, terrain, radius):
     """Build crown volumes from occupied 2 m cells. Openings remain boundaries."""
     import fast_simplification
@@ -107,7 +182,11 @@ def canopy_surface(footprints, photo, heights, terrain, radius):
     for i in (0, 1):
         np.add.at(outward, edge[:, i], normals)
     outward /= np.maximum(0.01, np.linalg.norm(outward, axis=1, keepdims=True))
-    lower_en = en[boundary] - outward * np.minimum(1.4, h[boundary, None] * 0.15)
+    lower_en = en[boundary] - outward * np.minimum(3.2, h[boundary, None] * 0.26)
+    # Make room below the observed height for scalloped crowns inside
+    # the close band. Far stands retain their measured top envelope.
+    cap_weight = np.clip((1350 - np.linalg.norm(en, axis=1)) / 85, 0, 1)
+    h *= 1 - 0.085 * cap_weight
     points = np.vstack(
         (
             np.column_stack((en, z + h)),
@@ -128,7 +207,7 @@ def canopy_surface(footprints, photo, heights, terrain, radius):
     # vertices than an equally wide gap one kilometre beyond it.
     weight = 1.0 / (1.0 + np.linalg.norm(points[:, :2], axis=1) / 650.0)
     points, triangles = fast_simplification.simplify(
-        points * weight[:, None], triangles, target_count=49000
+        points * weight[:, None], triangles, target_count=36500
     )
     points /= (1.0 - np.linalg.norm(points[:, :2], axis=1) / 650.0)[:, None]
     sample = np.stack((1023.5 - points[:, 1] / 2, 1023.5 + points[:, 0] / 2))
@@ -174,10 +253,21 @@ def canopy_surface(footprints, photo, heights, terrain, radius):
     stem_faces = (
         template[None, :, :] + np.arange(len(bases))[:, None, None] * 6 + len(points)
     )
-    appearance = np.column_stack((np.clip(colours, 20, 178), np.full(len(colours), 5)))
+    appearance = np.column_stack(
+        (np.clip(colours, 20, 178), 8 + 16 * np.rint(np.clip(fraction, 0, 1) * 15))
+    )
+    caps, cap_faces, cap_appearance = crown_caps(keep, heights, rgb, terrain)
     return (
-        np.vstack((points, supports)),
-        np.vstack((triangles, stem_faces.reshape(-1, 3))).astype(np.uint32),
-        np.vstack((appearance, np.tile([78, 69, 53, 6], (len(supports), 1)))),
+        np.vstack((points, supports, caps)),
+        np.vstack(
+            (
+                triangles,
+                stem_faces.reshape(-1, 3),
+                cap_faces + len(points) + len(supports),
+            )
+        ).astype(np.uint32),
+        np.vstack(
+            (appearance, np.tile([78, 69, 53, 9], (len(supports), 1)), cap_appearance)
+        ),
         count,
     )

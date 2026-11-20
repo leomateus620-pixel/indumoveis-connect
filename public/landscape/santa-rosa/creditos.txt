@@ -32,9 +32,17 @@ Copas: World Resources Institute e Meta (2024), High Resolution Canopy Height Ma
 https://registry.opendata.aws/dataforgood-fb-forests/
 https://creativecommons.org/licenses/by/4.0/
 
-Textura fotográfica das fachadas: Loco085, Santa Rosa - RS - Panorámica centro, 11/02/2017. Recortes retificados de fachadas e folhagens (fachadas-santa-rosa.webp e folhagem-santa-rosa.webp), correção tonal e composição nos atlas settlement-*.webp. Esses materiais fotográficos transformados são distribuídos sob CC BY-SA 3.0 Unported.
+Recortes fotográficos históricos da revisão de 18/11/2026: Loco085, Santa Rosa - RS - Panorámica centro, 11/02/2017. Recortes retificados de fachadas e folhagens (fachadas-santa-rosa.webp e folhagem-santa-rosa.webp), correção tonal e composição na versão anterior dos atlas. Esses materiais fotográficos transformados são distribuídos sob CC BY-SA 3.0 Unported.
 https://commons.wikimedia.org/wiki/File:Santa_Rosa_-_RS_-_Panor%C3%A1mica_centro.jpg
 https://creativecommons.org/licenses/by-sa/3.0/
+
+Materiais ilustrativos do entorno, novembro de 2026. Cena de arquitetura e vegetação produzida em Higgsfield 3D Jutsu, projeto 26f8f2ad-8a7d-496b-9521-e1b40f01ed54, revisão 1. Acabamentos sintetizados no Higgsfield com GPT Image 2.6, trabalho 276ed4d2-8030-4a1c-a346-75736f284814. Exportações de cobertura e recorte foliar da cena combinadas com a prancha fotográfica em materiais-higgsfield.webp, nos atlas settlement-*.webp e nas duas bandas do horizonte. A representação de acabamentos e espécies é ilustrativa. Localização de edifícios, altura do dossel e ocupação do solo provêm das fontes geográficas acima.
+https://higgsfield.ai/3d-jutsu/26f8f2ad-8a7d-496b-9521-e1b40f01ed54
+
+Edifícios do centro, novembro de 2026. Oito estudos arquitetônicos modelados em Higgsfield 3D Jutsu, projeto a82046ce-228f-43a8-91e3-6e8d2730da7b, revisão 2. As seções tridimensionais, a frente e as laterais foram exportadas da cena para torres-higgsfield.json e torres-higgsfield.webp. As famílias são ajustadas aos contornos e às alturas estimadas das edificações. A galeria de obras da Itamar Engenharia em Santa Rosa e a panorâmica do centro de Loco085 serviram de referências visuais para os acabamentos e a volumetria.
+https://higgsfield.ai/3d-jutsu/a82046ce-228f-43a8-91e3-6e8d2730da7b
+https://www.itamarengenharia.com.br/galeriaDeObras.php
+https://commons.wikimedia.org/wiki/File:Santa_Rosa_-_RS_-_Panor%C3%A1mica_centro.jpg
 
 Vias na faixa do parque e do bairro: © colaboradores do OpenStreetMap, ODbL 1.0. 33 eixos da consulta de 17/11/2026, via e versão conservadas em scripts/santa-rosa/frontage-roads.geojson. As larguras ópticas foram estimadas no CBERS de 12/02/2024. Composição em frontage-*.webp com o mosaico CBERS/Sentinel, contornos Microsoft e CHM WRI/Meta citados acima.
 https://api.openstreetmap.org/api/0.6/map?bbox=-54.501,-27.866,-54.456,-27.824

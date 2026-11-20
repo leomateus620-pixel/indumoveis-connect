@@ -37,48 +37,48 @@
         512,
         512
       ],
-      "bytes": 33396,
-      "sha256": "cbab47cb00143b291d0ab7a3e6101bd2b2daba5ec354cbe7d99a31d53e9c4221"
+      "bytes": 82118,
+      "sha256": "fa873df8f195e6b1dd5651a57c834855a5e58bf4abf2accc61174ce8c52d0fa8"
     },
     "frontage-detail.webp": {
       "dimensions": [
         1024,
         1024
       ],
-      "bytes": 113574,
-      "sha256": "7825ea3c07842ac162c8f544cd5c9a8514dcf9dd0a1c02dc6d516f955c474e9b"
+      "bytes": 234716,
+      "sha256": "ec7ad83231e48a16cf3a62dc697abd6a4111d010e990571b57a107171c625121"
     },
     "horizon-high-compact.webp": {
       "dimensions": [
         2048,
         256
       ],
-      "bytes": 35152,
-      "sha256": "1b86f1f398eaf361588e089b1b72d626007d30c077c3fa94263cdd03f7770617"
+      "bytes": 37214,
+      "sha256": "75b76b150d2aba882ba4a55bdff70ad228eaab409db6e35fa2add2150f31eabe"
     },
     "horizon-high-detail.webp": {
       "dimensions": [
         8192,
         512
       ],
-      "bytes": 178172,
-      "sha256": "22f18d8dde43da5c078e608949a3f658a14c6a897336b8a9d7ff9e88d4776902"
+      "bytes": 216510,
+      "sha256": "2beb1a604b14e02c3f8faf1dde172d767e8ce4e710e2f0f1b6dcf86e2b5ce4a5"
     },
     "horizon-low-compact.webp": {
       "dimensions": [
         2048,
         256
       ],
-      "bytes": 28146,
-      "sha256": "c048f2fc22f60fd87cd87be252ad03e256aeb81d46f124ecd60c57ecb23ad779"
+      "bytes": 28898,
+      "sha256": "a2138edf274fa6c0a6b5f18c9efcd0b5c6843a51d70cb8a8d69fef537b49776e"
     },
     "horizon-low-detail.webp": {
       "dimensions": [
         8192,
         512
       ],
-      "bytes": 121100,
-      "sha256": "e0cb1a08c99ee062967876a47351a29837cc99bd3a9f6e88b13de583b109d355"
+      "bytes": 138356,
+      "sha256": "fe056258945b430bcf792b49fea5b65ba6f2da7b7feac71ee9f611e28d9a6774"
     },
     "mid-compact.webp": {
       "dimensions": [
@@ -122,23 +122,23 @@
     },
     "settlement-compact.webp": {
       "dimensions": [
-        128,
+        256,
         256
       ],
-      "bytes": 5340,
-      "sha256": "ee5c2581be2802245c5b8bca34743db1e62d545c06dc604b3ffede67a33808ff"
+      "bytes": 32282,
+      "sha256": "d53b32d827b1942de6ed7d896ebc9f9e15762eedcc47750292be4e7d55362aee"
     },
     "settlement-detail.webp": {
       "dimensions": [
-        256,
-        512
+        768,
+        768
       ],
-      "bytes": 13880,
-      "sha256": "98e032b3bd5ea16e565fd5471c6c41122d2e0d362fac3165101e993670354b84"
+      "bytes": 218800,
+      "sha256": "7d5e5a24000985b9017e3f5fc93517381d871de234bd82660d473d8c9d8cb798"
     },
     "settlement.bin": {
-      "bytes": 596819,
-      "sha256": "3e9a442dfda260d98de6781919203f6fd9e8c475c7d83a07256a28203491290f"
+      "bytes": 698739,
+      "sha256": "24e2731cdb373e9d08efead08ae431c9eea499794c40c580a58e9aa236006e63"
     }
   },
   "panoramas": {

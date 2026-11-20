@@ -137,7 +137,7 @@ def draw_controls():
 
 
 def plot_relief(cache):
-    rays, ranges, ground, _ = ray_data(cache, None, None)
+    rays, ranges, ground, *_ = ray_data(cache, None, None)
     heights, *_ = rays(np.arange(8) * 45, False)
     fig, axes = plt.subplots(
         4, 2, figsize=(12, 10), sharex=True, sharey=True, layout="constrained"

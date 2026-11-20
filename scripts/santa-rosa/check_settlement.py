@@ -42,6 +42,15 @@ def decoded_mesh():
     index = np.frombuffer(data, "<u4", length, 20 + 10 * n)
     faces = np.cumsum(index, dtype=np.uint32).reshape(-1, 3)
     assert np.max(faces) < n
+    # Material is flat on a triangle. Only the wall course or canopy height
+    # may interpolate, otherwise the fragment shader crosses atlas cells.
+    material = rgba[:, 3] % 16
+    assert np.all(np.ptp(material[faces], axis=1) == 0)
+    assert set(np.unique(material)) == {0, 1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
+    tower_vertices = material == 10
+    assert set(np.unique(rgba[tower_vertices, 2] % 8)) == set(range(8))
+    assert set(np.unique((rgba[tower_vertices, 2] // 8) % 4)) == {0, 1, 2}
+    assert np.max(rgba[material < 8, 3] // 16) > 1
     graph = csr_matrix(
         (np.ones(faces.size), (faces.ravel(), faces[:, [1, 2, 0]].ravel())),
         shape=(n, n),
@@ -84,7 +93,33 @@ def screen_crop(pose, vertices):
     return (int(left), int(top), int(left + 72), int(top + 45))
 
 
+def check_tower_materials():
+    # Read the actual compressed textures with the same cell and inset sizes
+    # as the shader. Mineral masonry should keep its low chroma at both LODs;
+    # windows, slabs and recesses should still span distinct light levels.
+    for level in ("compact", "detail"):
+        with Image.open(OUT / f"settlement-{level}.webp") as texture:
+            atlas = texture.convert("RGB")
+        cell = atlas.width // 4
+        gutter = cell // 16
+        content = cell - 2 * gutter
+        quadrant = content / 2
+        margin = quadrant / 16
+        for family in range(8):
+            left = (family // 4) * cell + gutter + (family % 2) * quadrant + margin
+            top = cell + gutter + (family % 4 // 2) * quadrant + margin
+            side = quadrant - 2 * margin
+            # First two thirds of each swatch are the front elevation.
+            box = tuple(round(p) for p in (left, top, left + 0.64 * side, top + side))
+            pixels = np.asarray(atlas.crop(box), dtype=float)
+            chroma = float(np.median(np.ptp(pixels, axis=2)))
+            light = pixels @ np.array([0.2126, 0.7152, 0.0722])
+            spread = float(np.ptp(np.percentile(light, [10, 90])))
+            assert chroma <= 12 and spread > 30, (level, family, chroma, spread)
+
+
 def compare(cache, captures, output):
+    check_tower_materials()
     xyz, appearance, faces, component = decoded_mesh()
     centres = xyz[faces].mean(axis=1)
     cards = np.frombuffer(original("settlement.bin"), "<f4").reshape(-1, 9)
@@ -145,9 +180,9 @@ def compare(cache, captures, output):
         axes[row, 1].imshow(sprite, interpolation="nearest")
         axes[row, 1].set_xlabel(f"{sprite.width} × {sprite.height} px", fontsize=9)
         allowed = (
-            appearance[faces[:, 0], 3] < 5
+            appearance[faces[:, 0], 3] % 16 < 8
             if row == 0
-            else appearance[faces[:, 0], 3] == 5
+            else appearance[faces[:, 0], 3] % 16 == 8
         )
         nearest = np.flatnonzero(allowed)[
             np.linalg.norm(centres[allowed, :2] - xy, axis=1).argmin()

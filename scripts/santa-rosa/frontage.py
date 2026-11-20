@@ -13,7 +13,7 @@ from rasterio.enums import Resampling
 from rasterio.features import rasterize
 from rasterio.transform import from_origin
 from scipy import ndimage as nd
-from sources import CRS, SCENE_AXES, SCENE_ORIGIN, SCENE_SCALE, read_grid
+from sources import CRS, SCENE_AXES, SCENE_ORIGIN, SCENE_SCALE, WORLD_COVER, read_grid
 
 # One temporary sample per metre. North is the top edge of every source.
 EXTENT = 1280
@@ -55,6 +55,40 @@ def resolve_roads(photo, canopy, roofs):
         tone = rgb * 0.38 + mid * 0.62 + 0.30 * (light[:, None] - mid)
         weight = coverage[mask, None] * 0.86
         result[mask] += weight * (tone - photo[mask])
+    return result, paths
+
+
+def crop_passes(luminance, cropland):
+    """Broad planting passes follow the dominant direction in the registered PAN.
+
+    Below its native resolution these are representative material variations.
+    Leave small patches and fields without a reliable direction untouched.
+    """
+    groups, count = nd.label(cropland)
+    result = np.zeros(luminance.shape, dtype="float32")
+    gradient_y, gradient_x = np.gradient(nd.gaussian_filter(luminance, 1.5))
+    for label, box in enumerate(nd.find_objects(groups, count), 1):
+        if box is None:
+            continue
+        patch = groups[box] == label
+        if patch.sum() < 1500:
+            continue
+        inner = nd.binary_erosion(patch, iterations=3)
+        gx, gy = gradient_x[box][inner], gradient_y[box][inner]
+        if gx.size < 100:
+            continue
+        # The positive eigenvector is across, rather than along, optical lines.
+        xx, yy, xy = np.mean(gx * gx), np.mean(gy * gy), np.mean(gx * gy)
+        alignment = np.hypot(xx - yy, 2 * xy) / max(0.01, xx + yy)
+        if alignment < 0.12:
+            continue
+        angle = 0.5 * np.arctan2(2 * xy, xx - yy)
+        y, x = np.indices(patch.shape, dtype="float32")
+        along = y * np.cos(angle) - x * np.sin(angle)
+        across = x * np.cos(angle) + y * np.sin(angle)
+        phase = across * (2 * np.pi / (5.5 + label % 4)) + 0.5 * np.sin(along / 31)
+        shape = 0.70 * np.cos(phase) + 0.30 * np.cos(2 * phase + 0.4)
+        result[box][patch] = shape[patch] * min(1.0, alignment * 2.5)
     return result
 
 
@@ -86,7 +120,7 @@ def generate(cache, output):
         255,
         Resampling.bilinear,
     )[0].astype("float32")
-    result = resolve_roads(photo, chm, roofs)
+    result, roads = resolve_roads(photo, chm, roofs)
 
     # Fix colour at each observed footprint from its interior pixels. These
     # never include its neighbouring road. Keep roof slopes in the photograph.
@@ -137,9 +171,41 @@ def generate(cache, output):
     factor = contact * (1 - cover) * (roofs == 0)
     result += factor[:, :, None] * (np.array([101.0, 100.0, 98.0]) - result) * 0.94
 
+    # Gate sub-texel ground detail with surveyed land cover and the observed
+    # road/roof/canopy exclusions. The same colour texture carries this weight
+    # in its unused alpha channel, so switching LOD needs no extra sampler.
+    land = read_grid(
+        cache,
+        "land-cover-frontage",
+        [WORLD_COVER],
+        [1],
+        128,
+        EXTENT,
+        "uint8",
+        0,
+        Resampling.nearest,
+    )[0]
+    fields = np.isin(land, (30, 40, 60)).repeat(10, axis=0).repeat(10, axis=1)
+    protected = nd.maximum_filter((roads > 0) | (roofs > 0) | (chm >= 3), size=9)
+    open_land = nd.gaussian_filter((fields & ~protected).astype("float32"), 3)
+    open_land[protected] = 0
+    chroma = np.max(photo, axis=2) - np.min(photo, axis=2)
+    open_land *= np.clip((chroma - 5) / 15, 0, 1) * (1 - contact)
+    # Restore local contrast already present in the registered imagery.
+    result += (
+        open_land[:, :, None] * 0.42 * (photo - nd.gaussian_filter(photo, (3, 3, 0)))
+    )
+    crop = (land == 40).repeat(10, axis=0).repeat(10, axis=1) & ~protected
+    passes = crop_passes(
+        photo @ np.array([0.2126, 0.7152, 0.0722], dtype="float32"), crop
+    )
+    result *= 1 + (0.12 * passes * open_land)[:, :, None]
     image = Image.fromarray(np.rint(result).clip(0, 255).astype("uint8"))
+    field_mask = Image.fromarray(np.rint(255 - 160 * open_land).astype("uint8"))
     for level, size, quality in [("compact", 512, 82), ("detail", 1024, 90)]:
-        image.resize((size, size), Image.Resampling.LANCZOS).save(
+        annotated = image.resize((size, size), Image.Resampling.LANCZOS)
+        annotated.putalpha(field_mask.resize((size, size), Image.Resampling.BOX))
+        annotated.save(
             output / f"frontage-{level}.webp",
             quality=quality,
             method=6,

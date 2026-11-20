@@ -7,6 +7,9 @@ import maskFrame from "./assets/landscape-mask.json";
 import type { QualityTier } from "./navigation";
 
 const directory = "/landscape/santa-rosa/";
+// The atlas layout and packed vertex appearance must be fetched as one revision
+// even on a warm browser upgrading from the previous deployment.
+const materialRevision = "?v=2";
 const origin = [95, 28] as const; // AEQD centre in the registered park drawing
 const { u, v } = URBAN_REFERENCE.axis;
 type Level = "compact" | "detail";
@@ -58,10 +61,32 @@ export const aerialShader = `
   vec2 landscapeEN(vec2 worldOffset) {
     return vec2(dot(worldOffset, landscapeEast), dot(worldOffset, landscapeNorth));
   }
+  // Smooth, ground-locked variation in open fields below the sensor resolution.
+  // The optical source supplies the field boundaries, broad texture and colour.
+  float grassHash(vec2 p) {
+    vec3 x = fract(vec3(p.xyx) * vec3(.1031, .11369, .13787));
+    x += dot(x, x.yzx + 19.19);
+    return fract((x.x + x.y) * x.z);
+  }
+  float fieldGrain(vec2 point) {
+    vec2 cell = floor(point), t = fract(point);
+    t = t * t * (3. - 2. * t);
+    return mix(mix(grassHash(cell), grassHash(cell + vec2(1.,0.)), t.x),
+               mix(grassHash(cell + vec2(0.,1.)), grassHash(cell + vec2(1.)), t.x), t.y) - .5;
+  }
   vec3 landscapeAerial(vec2 worldXZ) {
     vec2 metres = landscapeEN(worldXZ - landscapeOrigin) / landscapeScale;
     float radius = length(metres);
-    vec3 ground = registeredAlbedo(metres);
+    vec4 surface = registeredSurface(metres);
+    vec3 ground = surface.rgb;
+    // Mipmapped alpha is opaque on roads, roofs, woodland and all distant windows.
+    float openLand = clamp((1. - surface.a) * (255. / 160.), 0., 1.);
+    float pixelMetres = max(length(dFdx(metres)), length(dFdy(metres)));
+    if (openLand > .015 && pixelMetres < 4.) {
+      float clumps = fieldGrain(metres * .36) * (1. - smoothstep(1.1, 4., pixelMetres));
+      float fine = fieldGrain(metres * 1.4) * (1. - smoothstep(.3, .95, pixelMetres));
+      ground *= 1. + openLand * (.48 * clumps + .23 * fine);
+    }
     float haze = .18 * smoothstep(450., 4800., radius) + .44 * smoothstep(3500., 22000., radius);
     return mix(ground * mix(vec3(1.), landscapeLight, .72), landscapeAir, haze);
   }
@@ -305,7 +330,7 @@ export function createRegionalLandscape(
   }
 
   async function readSettlement(signal: AbortSignal) {
-    const response = await fetch(directory + "settlement.bin", { signal });
+    const response = await fetch(directory + "settlement.bin" + materialRevision, { signal });
     if (!response.ok) throw new Error("settlement-positions-unavailable");
     const encoded = await response.arrayBuffer();
     stats.downloadBytes += encoded.byteLength;
@@ -334,13 +359,13 @@ export function createRegionalLandscape(
 
   async function prepare(level: Level, signal: AbortSignal) {
     const files: [string, "mask" | "depth" | "relief" | "aerial" | "panorama"][] = [
-      [directory + "frontage-" + level + ".webp", "aerial"],
+      [directory + "frontage-" + level + ".webp" + materialRevision, "aerial"],
       [directory + "near-" + level + ".webp", "aerial"],
       [directory + "mid-" + level + ".webp", "aerial"],
       [directory + "far-" + level + ".webp", "aerial"],
-      [directory + "horizon-low-" + level + ".webp", "panorama"],
-      [directory + "horizon-high-" + level + ".webp", "panorama"],
-      [directory + "settlement-" + level + ".webp", "aerial"],
+      [directory + "horizon-low-" + level + ".webp" + materialRevision, "panorama"],
+      [directory + "horizon-high-" + level + ".webp" + materialRevision, "panorama"],
+      [directory + "settlement-" + level + ".webp" + materialRevision, "aerial"],
       [directory + "depth-" + level + ".png", "depth"],
     ];
     if (!auxiliary.length) files.push([maskUrl, "mask"], [directory + "relief.png", "relief"]);
