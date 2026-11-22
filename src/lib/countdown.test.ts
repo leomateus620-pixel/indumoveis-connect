@@ -23,6 +23,17 @@ describe("edition countdown", () => {
     expect(resolveOpening(null)).toEqual({ status: "unconfigured" });
   });
 
+  it("reports an invalid opening date when the last day has not been entered", () => {
+    expect(
+      resolveOpening({
+        ...edition,
+        starts_on: "2027-02-30",
+        ends_on: null,
+        opening_time: "15:00",
+      }),
+    ).toEqual({ status: "invalid" });
+  });
+
   it("converts the official civil time using the edition timezone", () => {
     expect(zonedTimeToUtc("2027-05-14", "15:00", "America/Sao_Paulo")).toBe(
       Date.UTC(2027, 4, 14, 18, 0, 0),

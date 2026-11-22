@@ -93,11 +93,11 @@ export function resolveOpening(edition: EditionSchedule | null | undefined): Ope
   if (!edition?.starts_on || !edition.opening_time) return { status: "unconfigured" };
   const timeZone = edition.timezone || "America/Sao_Paulo";
   const openingAt = zonedTimeToUtc(edition.starts_on, edition.opening_time, timeZone);
+  if (openingAt === null) return { status: "invalid" };
   const endDate =
     edition.ends_on && parseDate(edition.ends_on) ? edition.ends_on : edition.starts_on;
   const closingAt = zonedTimeToUtc(nextCivilDay(endDate), "00:00", timeZone);
-  if (openingAt === null || closingAt === null || closingAt <= openingAt)
-    return { status: "invalid" };
+  if (closingAt === null || closingAt <= openingAt) return { status: "invalid" };
   return { status: "configured", openingAt, closingAt, timeZone };
 }
 

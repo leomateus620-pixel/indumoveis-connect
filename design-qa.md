@@ -1,3 +1,31 @@
+# Contagem oficial em tela cheia
+
+final result: passed
+
+Revisão de 22/11/2026 no portal autenticado, usando seus componentes reais com a edição de demonstração e um perfil administrativo local. A referência do painel compacto foi a captura anterior de 1366 × 768 em [portal-integrado](docs/validation/portal-integrado/after-1366x768.jpg), na mesma composição das imagens fornecidas. A ampliação segue o pavilhão com câmera fixa escolhido pelo usuário e o acabamento das quatro molduras.
+
+## Evidência visual
+
+| Comparação | Verificação |
+| --- | --- |
+| [Portal antes e depois](docs/validation/contagem-imersiva/portal-comparacao.jpg) | Duas capturas de 1366 × 768 CSS a 1×, alinhadas lado a lado. A marca, os nichos e os acessos preservam a composição. O novo acionador cabe no piso da cena. |
+| [Detalhe das molduras](docs/validation/contagem-imersiva/bordas-comparacao.jpg) | Recortes do card de horas com o valor 23, ampliados à mesma largura para inspecionar o contorno, o filete de luz e a base metálica nas duas escalas. |
+| [Telão](docs/validation/contagem-imersiva/show-desktop.jpg) e [tablet](docs/validation/contagem-imersiva/show-tablet.jpg) | Capturas a 1× em 1920 × 1080 e 768 × 1024. Em paisagem as quatro unidades ocupam uma fileira. Em retrato formam duas linhas sobre o cenário de mobiliário. |
+| [Portal no celular](docs/validation/contagem-imersiva/portal-mobile.jpg) e [apresentação](docs/validation/contagem-imersiva/show-mobile.jpg) | Duas capturas em 390 × 844 CSS a 1×. O portal oferece a entrada ao lado da contagem e o ícone de retorno ocupa o canto superior direito da apresentação. |
+| [Gravação de entrada e contagem](docs/validation/contagem-imersiva/contagem-em-movimento.webm) | Captura do portal em movimento, 8,33 segundos, codificada em 1024 × 576. |
+
+A cena gerada com Higgsfield tem duas versões AVIF, 2048 × 1152 e 896 × 504. A interface desenha a marca, a data, o horário e os números por cima da imagem. As fontes do portal, Figtree e Plus Jakarta Sans, preservam a hierarquia entre rótulos e valores tabulares. A luz das sancas varia lentamente e o vermelho marca a contagem e a data. No navegador, o acesso inicial ao portal carregou o relógio antes de solicitar a imagem da apresentação.
+
+## Ajustes verificados
+
+- A primeira versão repetia o ano já impresso no arquivo da marca. O portal e a ampliação passaram a compartilhar o recorte do letreiro oficial. As capturas finais mostram o ano dinâmico uma única vez por assinatura.
+- Os primeiros números ampliados tinham apenas um separador vertical. A revisão adotou molduras completas e o mesmo acabamento dos quatro nichos no portal. O botão de pausa foi removido a pedido do usuário e o retorno ficou com um ícone de 13 px em uma área acionável de 44 × 44 px.
+- Com texto a 200% no celular, o rótulo de segundos ultrapassava a borda do card. Quando a área útil fica estreita, número e unidade agora dividem uma linha por card. A verificação geométrica confirmou que os oito elementos de texto cabem nas quatro molduras. A tela permite rolagem vertical para leitura ampliada.
+- A apresentação coube integralmente nas janelas de 320 × 568, 390 × 844, 844 × 390, 768 × 1024, 1366 × 768 e 1920 × 1080, com os rótulos dentro dos cards e sem rolagem horizontal.
+- O navegador confirmou a ativação da tela cheia nativa no gesto de entrada e o retorno de foco ao acionador após Escape. O cenário também foi exercitado em uma prévia local com a API nativa indisponível. A preferência de movimento reduzido desligou os efeitos e o relógio continuou atualizando os segundos.
+
+---
+
 # Pavilhão 3 — revisão visual
 
 final result: passed

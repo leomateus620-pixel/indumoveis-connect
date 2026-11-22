@@ -15,7 +15,7 @@ function PortalStage({ me, onSignOut }: { me: Me; onSignOut: () => void }) {
     <div className="portal-stage">
       <div className="portal-wrap">
         <div className="portal-stage__grid">
-          <PortalHero year={edition.data?.year} />
+          <PortalHero year={edition.data?.is_active ? edition.data.year : undefined} />
           <PortalTopBar me={me} onSignOut={onSignOut} />
           <EditionCountdown
             edition={edition.data}
