@@ -1,6 +1,7 @@
 import {
   memo,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -10,7 +11,9 @@ import {
   type RefObject,
 } from "react";
 import { Link } from "@tanstack/react-router";
-import { CalendarClock, PartyPopper, RotateCw, Settings2 } from "lucide-react";
+import { flushSync } from "react-dom";
+import * as Dialog from "@radix-ui/react-dialog";
+import { CalendarClock, Maximize2, PartyPopper, RotateCw, Settings2 } from "lucide-react";
 import type { Edition } from "@/lib/api";
 import {
   countdownAt,
@@ -21,7 +24,9 @@ import {
   resolveOpening,
   timeZoneShortLabel,
   type CountdownSnapshot,
+  type OpeningSchedule,
 } from "@/lib/countdown";
+import { CountdownShow } from "./CountdownShow";
 
 const MAX_TIMEOUT = 2_147_000_000;
 const REVEAL_MS = 1400;
@@ -88,65 +93,80 @@ function plural(n: number, one: string, many: string) {
   return `${n} ${n === 1 ? one : many}`;
 }
 
-const ZERO = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+const UNITS = [
+  ["days", "dias"],
+  ["hours", "horas"],
+  ["minutes", "minutos"],
+  ["seconds", "segundos"],
+] as const;
+type ClockStyle = "portal-count" | "countdown-show";
 
 const Unit = memo(function Unit({
   label,
   value,
-  primary,
+  unit,
+  style,
   index,
 }: {
   label: string;
   value: number;
-  primary?: boolean;
+  unit: (typeof UNITS)[number][0];
+  style: ClockStyle;
   index: number;
 }) {
   return (
     <div
-      className="portal-count__unit"
-      data-primary={primary || undefined}
+      className={`${style}__unit`}
+      data-primary={unit === "days" || undefined}
+      data-unit={unit}
       style={{ "--i": index } as CSSProperties}
     >
-      <span className="portal-count__value">
+      <span className={`${style}__value`}>
         {/* A chave reinicia a transição apenas no número que mudou. */}
-        <span key={value} className="portal-count__digits">
+        <span key={value} className={`${style}__digits`}>
           {pad2(value)}
         </span>
       </span>
-      <span className="portal-count__label">{label}</span>
+      <span className={`${style}__label`}>{label}</span>
     </div>
   );
 });
 
-function Units({ value }: { value: Pick<CountdownSnapshot, keyof typeof ZERO> }) {
+function Units({ value, style }: { value: CountdownSnapshot; style: ClockStyle }) {
   return (
-    <div className="portal-count__units" aria-hidden="true">
-      <Unit index={0} label="dias" value={value.days} primary />
-      <Unit index={1} label="horas" value={value.hours} />
-      <Unit index={2} label="minutos" value={value.minutes} />
-      <Unit index={3} label="segundos" value={value.seconds} />
+    <div className={`${style}__units`} aria-hidden="true">
+      {UNITS.map(([unit, label], index) => (
+        <Unit
+          key={unit}
+          index={index}
+          unit={unit}
+          label={label}
+          value={value[unit]}
+          style={style}
+        />
+      ))}
     </div>
   );
 }
 
-function LiveCountdown({
-  openingAt,
-  closingAt,
+function ClockReadout({
+  snapshot,
   editionName,
+  style = "portal-count",
 }: {
-  openingAt: number;
-  closingAt: number;
+  snapshot: CountdownSnapshot;
   editionName: string;
+  style?: ClockStyle;
 }) {
-  const now = useEditionClock(openingAt, closingAt);
-  const snapshot = countdownAt(now, openingAt, closingAt);
+  const isShow = style === "countdown-show";
+  const clockClass = isShow ? "countdown-show__clock" : "portal-count__live";
 
   if (snapshot.phase !== "countdown")
     return (
-      <div className="portal-count__live">
-        <Units value={ZERO} />
-        <p className="portal-count__done" role="status">
-          <PartyPopper aria-hidden="true" />
+      <div className={clockClass}>
+        {!isShow && <Units value={snapshot} style={style} />}
+        <p className={isShow ? "countdown-show__status" : "portal-count__done"} role="status">
+          {!isShow && <PartyPopper aria-hidden="true" />}
           {snapshot.phase === "open"
             ? `A ${editionName} começou!`
             : `A ${editionName} foi encerrada.`}
@@ -155,13 +175,13 @@ function LiveCountdown({
     );
 
   return (
-    <div className="portal-count__live" role="timer" aria-label="Tempo restante para a abertura">
+    <div className={clockClass} role="timer" aria-label="Tempo restante para a abertura">
       {/* Texto por minuto para leitores de tela; os segundos não são anunciados. */}
       <p className="sr-only">
         Faltam {plural(snapshot.days, "dia", "dias")}, {plural(snapshot.hours, "hora", "horas")} e{" "}
         {plural(snapshot.minutes, "minuto", "minutos")} para a abertura.
       </p>
-      <Units value={snapshot} />
+      <Units value={snapshot} style={style} />
     </div>
   );
 }
@@ -338,18 +358,19 @@ function Frame({
   compact?: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
+  const titleId = useId();
   useRevealOnce(ref);
   return (
     <section
       ref={ref}
       className="portal-count"
       data-compact={compact || undefined}
-      aria-labelledby="portal-count-title"
+      aria-labelledby={titleId}
       aria-busy={busy || undefined}
     >
       <Scene />
       <div className="portal-count__head">
-        <h2 id="portal-count-title" className="portal-count__title">
+        <h2 id={titleId} className="portal-count__title">
           {title}
         </h2>
       </div>
@@ -396,13 +417,105 @@ type Props = {
   canConfigure: boolean;
 };
 
-export const EditionCountdown = memo(function EditionCountdown({
+type ConfiguredSchedule = Extract<OpeningSchedule, { status: "configured" }>;
+
+function ConfiguredCountdown({
   edition,
+  schedule,
+}: {
+  edition: Edition;
+  schedule: ConfiguredSchedule;
+}) {
+  const [show, setShow] = useState(false);
+  const screen = useRef<HTMLDivElement>(null);
+  const nativeScreen = useRef<HTMLElement | null>(null);
+  const now = useEditionClock(schedule.openingAt, schedule.closingAt);
+  const snapshot = countdownAt(now, schedule.openingAt, schedule.closingAt);
+  const period = formatEditionPeriod(edition.starts_on, edition.ends_on);
+  const opening = useMemo(() => {
+    const time = formatOpeningTime(schedule.openingAt, schedule.timeZone);
+    const zone = timeZoneShortLabel(schedule.timeZone, schedule.openingAt);
+    return { time, zone };
+  }, [schedule.openingAt, schedule.timeZone]);
+
+  useEffect(() => {
+    const host = screen.current;
+    if (!show || !host) return;
+    const change = () => {
+      if (document.fullscreenElement === host) nativeScreen.current = host;
+      else if (nativeScreen.current === host) setShow(false);
+    };
+    document.addEventListener("fullscreenchange", change);
+    return () => {
+      document.removeEventListener("fullscreenchange", change);
+      nativeScreen.current = null;
+      if (document.fullscreenElement === host) void document.exitFullscreen?.().catch(() => {});
+    };
+  }, [show]);
+
+  async function changeShow(next: boolean) {
+    if (!next) {
+      setShow(false);
+      return;
+    }
+    // O navegador exige o gesto original; a superfície precisa existir antes da chamada.
+    flushSync(() => setShow(true));
+    const host = screen.current;
+    if (!host || document.fullscreenElement || !host.requestFullscreen) return;
+    try {
+      await host.requestFullscreen();
+      if (document.fullscreenElement === host && screen.current === host)
+        nativeScreen.current = host;
+    } catch {
+      // O diálogo já ocupa a janela, inclusive em navegadores que recusam a API.
+    }
+  }
+
+  return (
+    <Dialog.Root open={show} onOpenChange={(next) => void changeShow(next)}>
+      <Frame
+        title={<Signature name={edition.name} />}
+        foot={
+          <>
+            {period && <p className="portal-count__period">{period}</p>}
+            <p className="portal-count__meta">
+              Abertura às <span className="portal-count__nowrap">{opening.time}</span>{" "}
+              <span className="portal-count__nowrap">· {opening.zone}</span>
+            </p>
+            <Dialog.Trigger asChild>
+              <button type="button" className="portal-count__expand">
+                <Maximize2 aria-hidden="true" />
+                <span>Ver em tela cheia</span>
+              </button>
+            </Dialog.Trigger>
+          </>
+        }
+      >
+        <ClockReadout snapshot={snapshot} editionName={edition.name} />
+      </Frame>
+      {show && (
+        <CountdownShow
+          screen={screen}
+          edition={edition}
+          phase={snapshot.phase}
+          period={period}
+          opening={`Abertura às ${opening.time} · ${opening.zone}`}
+        >
+          <ClockReadout snapshot={snapshot} editionName={edition.name} style="countdown-show" />
+        </CountdownShow>
+      )}
+    </Dialog.Root>
+  );
+}
+
+export const EditionCountdown = memo(function EditionCountdown({
+  edition: selectedEdition,
   isLoading,
   isError,
   onRetry,
   canConfigure,
 }: Props) {
+  const edition = selectedEdition?.is_active ? selectedEdition : null;
   const schedule = useMemo(() => resolveOpening(edition), [edition]);
 
   if (isLoading)
@@ -456,30 +569,5 @@ export const EditionCountdown = memo(function EditionCountdown({
       </Frame>
     );
 
-  const period = formatEditionPeriod(edition.starts_on, edition.ends_on);
-  return (
-    <Frame
-      title={<Signature name={edition.name} />}
-      foot={
-        <>
-          {period && <p className="portal-count__period">{period}</p>}
-          <p className="portal-count__meta">
-            Abertura às{" "}
-            <span className="portal-count__nowrap">
-              {formatOpeningTime(schedule.openingAt, schedule.timeZone)}
-            </span>{" "}
-            <span className="portal-count__nowrap">
-              · {timeZoneShortLabel(schedule.timeZone, schedule.openingAt)}
-            </span>
-          </p>
-        </>
-      }
-    >
-      <LiveCountdown
-        openingAt={schedule.openingAt}
-        closingAt={schedule.closingAt}
-        editionName={edition.name}
-      />
-    </Frame>
-  );
+  return <ConfiguredCountdown edition={edition} schedule={schedule} />;
 });
