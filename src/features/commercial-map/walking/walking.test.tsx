@@ -3,7 +3,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { advanceGuidance, matchPosition, startGuidance } from "./guidance";
 import { distance, findWalkingRoute, lengthOf, type Metres, type WalkingNetwork } from "./network";
 import { readFix, filterFix, permitsAvatar } from "./position";
-import { findWalkingAlternatives, walkingDestinationTimes, walkingMinutes } from "./network";
+import {
+  findWalkingAlternatives,
+  walkingDestinationTimes,
+  walkingDistances,
+  walkingMinutes,
+  walkingTimeLabel,
+} from "./network";
 import extendedPreview from "../../../../scripts/park-walking-preview/extended-network.json";
 import { INDOMOVEIS_WALKING_PILOT as pilot } from "./pilot";
 import { useParkWalking } from "./useParkWalking";
@@ -126,6 +132,87 @@ describe("rede de caminhada", () => {
     expect(primary.metres).toBeLessThan(alternate.metres);
     const exit = { id: "exit", label: "", entries: network.exits! };
     expect(findWalkingRoute(network, { node: network.starts[1] }, exit)).not.toBeNull();
+  });
+
+  const expanded = extendedPreview as unknown as WalkingNetwork;
+  const expandedLot = (number: number) =>
+    expanded.destinations.find(({ id }) => id.endsWith(`:lot:${number}`))!;
+
+  it.each([
+    { lot: 28, range: [95, 105], eta: 1 },
+    { lot: 42, range: [118, 128], eta: 2 },
+    { lot: 56, range: [141, 152], eta: 2 },
+  ])("usa o corredor direto da Brasília até o lote $lot", ({ lot, range, eta }) => {
+    const route = findWalkingRoute(expanded, { node: expanded.starts[0] }, expandedLot(lot))!;
+    expect(route.metres).toBeGreaterThan(range[0]);
+    expect(route.metres).toBeLessThan(range[1]);
+    expect(walkingMinutes(route.metres, expanded.speedMps)).toBe(eta);
+    expect(route.metres).toBeCloseTo(lengthOf(route.path), 7);
+    expect(route.path.map(referenceMetresToScene).every(([x]) => x >= 143)).toBe(true);
+  });
+
+  it("confere os extremos e a metragem das ligações do preview", () => {
+    const unsupported = expanded.edges.filter(
+      (edge) =>
+        !Number.isFinite(edge.metres) ||
+        edge.metres <= 1e-8 ||
+        distance(expanded.nodes[edge.from].point, edge.path[0]) > 1e-6 ||
+        distance(expanded.nodes[edge.to].point, edge.path.at(-1)!) > 1e-6,
+    );
+    expect(unsupported.map(({ id }) => id)).toEqual([]);
+    expect(new Set(expanded.edges.map(({ id }) => id)).size).toBe(expanded.edges.length);
+  });
+
+  it.each([
+    [149.0625, 80],
+    [149.0625, 60],
+    [149.0625, 38],
+    [114.15, 57],
+    [90, 65.8125],
+    [133, 46.3],
+    [70, 47],
+    [100, 24.5],
+  ])("calcula a rede dos 68 lotes a partir da leitura em %s, %s", (x, z) => {
+    const point = sceneToReferenceMetres([x, z]);
+    const first = matchPosition(expanded, filtered(point, 1_000, 3), null);
+    expect(first).not.toBeNull();
+    const match = matchPosition(expanded, filtered(point, 3_000, 3), first);
+    expect(match?.samples).toBe(2);
+    const distances = walkingDistances(expanded, match!.location);
+    expect(
+      expanded.destinations.filter(
+        ({ id, entries }) => id.includes(":lot:") && entries.some((entry) => distances.has(entry)),
+      ),
+    ).toHaveLength(68);
+  });
+
+  it("desconta o trecho já percorrido e usa outra frente quando ela é mais próxima", () => {
+    const lot = expandedLot(56);
+    const firstPoint = sceneToReferenceMetres([149.0625, 60]);
+    const secondPoint = sceneToReferenceMetres([149.0625, 55]);
+    const first = matchPosition(expanded, filtered(firstPoint, 1_000, 3), null)!;
+    const second = matchPosition(expanded, filtered(secondPoint, 5_000, 3), first)!;
+    expect(second.samples).toBe(2);
+    const route = findWalkingRoute(expanded, first.location, lot)!;
+    const remaining = findWalkingRoute(expanded, second.location, lot)!;
+    const guidance = advanceGuidance(
+      expanded,
+      lot,
+      startGuidance(route),
+      filtered(secondPoint, 5_000, 3),
+      second,
+    )!;
+    expect(guidance.progress).toBeCloseTo(5 / REFERENCE_UNITS_PER_METRE, 4);
+    expect(route.metres - guidance.progress).toBeCloseTo(remaining.metres, 4);
+    const west = matchPosition(
+      expanded,
+      filtered(sceneToReferenceMetres([133, 24.5]), 1_000, 3),
+      null,
+    )!;
+    const westRoute = findWalkingRoute(expanded, west.location, lot)!;
+    expect(westRoute.entry).not.toBe(route.entry);
+    expect(westRoute.metres).toBeLessThan(30);
+    expect(walkingTimeLabel(westRoute.metres, expanded.speedMps)).toBe("menos de 1 min");
   });
 
   it("preserva ambiguidade entre corredores paralelos", () => {

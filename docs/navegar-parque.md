@@ -45,13 +45,34 @@ O limite de localização combina o contorno A2 com as áreas detalhadas de expl
 ## Rede e comportamento
 
 - **Piloto `2027-piloto-exterior.1`.** Portão 3, via dos Imigrantes, Brasília/Argentina, travessia de referência na Argentina, Mercosul e ponto externo de chegada ao Pavilhão 1. Pavilhão 12 é a alternativa de destino. Seis segmentos verificam o piso do modelo independentemente da busca de rota. A primeira ligação usa a passagem A3‑1, entre pilares. O P1 termina no limiar externo da fachada pela Mercosul.
-- **Ampliada `2027-cobertura-em-revisao.1`.** 104 destinos de ensaio e 224 trechos, incluindo todos os 68 lotes, seis pavilhões, 19 estruturas e 11 portões. Em lotes, a chegada é a frente externa voltada para uma via do modelo. O compilador procura uma borda com piso conectável e testa a ligação contra os volumes e a prova de piso, incluindo dez conexões adicionais verificadas. Os portões 2 e 3 são candidatos no botão de saída. A malha ampliada e seus pontos ficam no preview e podem ser revistos independentemente do cadastro comercial.
+- **Ampliada `2027-cobertura-em-revisao.2`.** 104 destinos e 625 trechos, incluindo 68 lotes, seis pavilhões, 19 estruturas e 11 portões. Seis eixos formam uma malha com cruzamentos compartilhados. O compilador verifica cada segmento contra o piso e os obstáculos da A2, liga as frentes alcançáveis dos lotes à rua e recupera conexões restantes quando reduzem desvios relevantes. Uma leitura de GPS ao longo de uma rua pode começar no interior de um trecho. Trechos paralelos da malha anterior só são tratados como a mesma rua nas faixas com ligação comprovada no modelo. Os portões 2 e 3 continuam candidatos no botão de saída.
 - IDs estáveis conectam geometrias públicas às entradas. Os dados incluem nós, polilinhas, comprimento métrico, estado de circulação e evidência de degraus. Dijkstra escolhe o menor custo válido, rejeita trechos fechados/restritos e suporta múltiplas entradas. A segunda opção precisa usar outra entrada ou corredor com diferença geométrica relevante. Um trajeto único aparece sozinho. A cobertura de circulação sem degraus continua desconhecida.
 - A estimativa soma o trecho fracionado de partida e as ligações seguintes. A referência fixa é **1,25 m/s**, com distância na interface arredondada a 5 m e duração em minutos inteiros. Piloto Portão 3 → P1: **281,64 m modelados**, apresentados como **280 m e cerca de 4 min**. Portão 3 → P12: **239,48 m**, cerca de **3 min**. A duração ainda depende de ritmo, lotação, travessias e operação.
 - O navegador solicita alta precisão após **Minha localização**. Se o provedor falhar, uma segunda tentativa de baixa energia busca a estimativa do dispositivo. **Tentar novamente** reinicia o observador e uma leitura acima de 12 s expira. O filtro considera deslocamento, tempo e erros informados, descarta saltos e aumenta a área de incerteza pelo deslocamento introduzido pela suavização. O encaixe exige leituras consecutivas compatíveis, precisão do aparelho de até 9 m e corredor único ou nó compartilhado próximo. A rota só recalcula depois de três confirmações e pelo menos 5 s de desvio sustentado. A chegada exige leituras no trecho/entrada corretos, sem outra entrada plausível e com incerteza contida.
 - Em 3D, o ícone e o personagem compartilham a âncora no piso. O boneco entra com 25 px estimados e 34° de inclinação em relação à vertical, e sai abaixo de 19 px ou 26°. Movimentos curtos e inconsistentes preservam o personagem em repouso. A câmera deixa de seguir ao navegar manualmente e **Recentralizar** retoma o acompanhamento. A preferência de movimento reduzido elimina animação do personagem e de reenquadramento.
 - A faixa principal é azul com contorno, a alternativa é azul-clara, as setas indicam mudanças relevantes e a bandeira assinala a entrada modelada. O ponto de partida manual, os nomes do trajeto e os indicadores textuais ficam disponíveis na planta sem WebGL. A ficha existente fornece acesso interno quando há planta correspondente. O piloto não determina estande, piso ou navegação interior.
 - O painel usa Figtree variável em arquivo local sob OFL e cartões com estados de seleção textuais e gráficos. O layout mantém controles, chegada e estimativa legíveis no desktop e na planta móvel. [Figtree](https://fonts.google.com/specimen/Figtree).
+
+## Revisão de rotas da Rua Brasília
+
+A primeira rede reunia traçados de auditoria calculados a partir de uma única origem. A Rua Brasília aparecia contínua na maquete, mas os ramos da rede não se encontravam ao longo dela. A revisão inclui o eixo inteiro, os cruzamentos com Argentina, Uruguai e Brasil, a passagem entre quadras e a Alameda Mercosul. Quem parte de outra rua pode chegar por outra frente verificada do mesmo lote. O tempo usa o comprimento restante antes de arredondar os metros da interface. A velocidade de ensaio é de 1,25 m/s e durações abaixo de 60 segundos aparecem como “menos de 1 min”.
+
+Em 26/11/2026, usei a régua do Google Earth no mosaico exibido de 19/03/2026. Os marcos escolhidos por imagem foram o Portão 3 e os cruzamentos visíveis da Rua Brasília. A comparação com os valores da A2 foi usada para conferir o arranjo e a escala. A posição das frentes vem da planta comercial e a aprovação das passagens segue pendente de inspeção. [Vista consultada no Google Earth](https://earth.google.com/web/@-27.84403156,-54.47930683,322.34276037a,995.26308251d,35y,245.99571214h,0t,0r/data=CgRCAggBOgMKATBCAggA).
+
+| Corredor a partir do Portão 3 | Régua no Google Earth | Rede A2 revisada |
+| ----------------------------- | --------------------: | ---------------: |
+| Rua Brasília até a Argentina  |                 ~71 m |            ~66 m |
+| Rua Brasília até a Uruguai    |                ~114 m |           ~109 m |
+| Rua Brasília até a Rua Brasil |                ~156 m |           ~157 m |
+
+| Destino desde o Portão 3 | Rede anterior | Rede revisada | Interface              |
+| ------------------------ | ------------: | ------------: | ---------------------- |
+| Lote 28                  |        97,5 m |       100,0 m | 100 m · cerca de 1 min |
+| Lote 42                  |       301,5 m |       121,6 m | 120 m · cerca de 2 min |
+| Lote 56                  |       322,3 m |       147,4 m | 145 m · cerca de 2 min |
+| Lote 66                  |       269,6 m |       228,3 m | 230 m · cerca de 3 min |
+
+Uma origem simulada na Rua Brasil, na altura do Lote 53, selecionou a frente do Lote 56 por essa rua. A rota modelada foi de 27,2 m. O teste automatizado calcula trajetos para os 68 lotes a partir de oito pontos em setores diferentes e verifica todas as ligações contra obstáculos e superfícies. [Capturas da revisão](validation/navegar-parque/revisao-rotas) · [Relatório de navegador](validation/navegar-parque/revisao-rotas/browser.json).
 
 ## Privacidade e ensaios
 

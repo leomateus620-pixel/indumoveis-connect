@@ -384,6 +384,42 @@ try {
   );
   await ext.context.close();
 
+  const lots = await open();
+  await lots.page.getByLabel("Rede", { exact: true }).selectOption("extended");
+  await startBrowserGps(lots.page);
+  await ready(lots.page);
+  await lots.page.waitForFunction(() => window.__indumoveisMap.realism.ready);
+  for (const [scene, number, distanceLabel, eta, filename] of [
+    [gate, "28", "100 m", 1, "11-rota-lote-28"],
+    [gate, "42", "120 m", 2, "12-rota-lote-42"],
+    [gate, "56", "145 m", 2, "13-rota-lote-56"],
+    [[133, 24.5], "56", "25 m", 0, "14-rota-rua-brasil"],
+  ]) {
+    if (await button(lots.page, "Limpar rota").isVisible())
+      await button(lots.page, "Limpar rota").click();
+    await send(lots.page, scene, 3, 16_000);
+    await send(lots.page, scene, 3);
+    await find(lots.page, `Lote ${number}`, `Lote ${number}`);
+    await button(lots.page, "Traçar rota a pé").click();
+    const metrics = lots.page.locator(".im-walking-metrics");
+    await metrics.getByText(distanceLabel, { exact: true }).waitFor();
+    await metrics
+      .getByText(eta ? `cerca de ${eta} min` : "menos de 1 min", { exact: true })
+      .waitFor();
+    await setPose(
+      lots.page,
+      filename.startsWith("14") ? [138, 27] : [144, 62],
+      filename.startsWith("14") ? 62 : 145,
+      25,
+    );
+    await lots.page.locator(".im-map-popover-search").waitFor({ state: "hidden" });
+    await snap(lots.page, filename);
+  }
+  report.checks.push(
+    "lotes 28, 42 e 56 a partir do GPS simulado no Portão 3 e lote 56 a partir da Rua Brasil",
+  );
+  await lots.context.close();
+
   const a = await open({ noWebGL: true }),
     b = await open({ noWebGL: true });
   await startBrowserGps(a.page);

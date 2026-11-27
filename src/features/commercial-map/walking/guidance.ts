@@ -2,6 +2,7 @@ import {
   distance,
   findWalkingRoute,
   isOpen,
+  nearbyNetworkDistance,
   pathAfter,
   projectOnPath,
   type NetworkPosition,
@@ -18,79 +19,74 @@ export function matchPosition(
   previous: Match | null,
 ): Match | null {
   if (fix.accuracy > 9) return null;
-  const candidates = network.edges
+  const projections = network.edges
     .filter((edge) => isOpen(edge))
-    .map((edge) => ({
-      edge,
-      ...projectOnPath(fix.point, edge.path),
-    }))
+    .map((edge) => ({ edge, ...projectOnPath(fix.point, edge.path) }))
     .filter((candidate) => candidate.offset <= Math.max(3, Math.min(7, fix.accuracy)))
     .sort((a, b) => a.offset - b.offset);
-  const best = candidates[0];
-  if (!best) return null;
+  const streetHits = projections.filter(({ edge }) => !edge.connector);
+  const hits = streetHits.length ? streetHits : projections;
+  const nearbyAxes = new Set(hits.flatMap(({ edge }) => (edge.corridor ? [edge.corridor] : [])));
+  const candidates = hits.filter(
+    ({ edge, metresAlong }) =>
+      !edge.axisCoverage?.some(
+        ({ corridor, from, to }) =>
+          nearbyAxes.has(corridor) && metresAlong >= from && metresAlong <= to,
+      ),
+  );
+  const closest = candidates[0];
+  if (!closest) return null;
+  const projected = ({ edge, metresAlong }: (typeof candidates)[number]): NetworkPosition => ({
+    edge: edge.id,
+    metresAlong,
+  });
+  const axis = candidates.find(({ edge }) => edge.corridor);
+  // Prefer the registered street axis when it is the nearest interpretation,
+  // or when the two projections actually connect on the same piece of street.
+  const followsAxis =
+    axis &&
+    (axis === closest ||
+      nearbyNetworkDistance(network, projected(closest), projected(axis), 8) <= 8);
+  const best = followsAxis ? axis : closest;
   const plausible = candidates.filter(
     (entry) => entry.offset - best.offset < fix.accuracy * 0.8 + 1,
   );
-  let location: NetworkPosition = { edge: best.edge.id, metresAlong: best.metresAlong };
-  if (plausible.length > 1) {
+  let location = projected(best);
+  // Coincident pieces of a single axis are one corridor. For any competing
+  // unlabelled route require a short local joining path, not mere proximity.
+  const competing = plausible.filter(
+    (entry) =>
+      entry !== best &&
+      (!best.edge.corridor || entry.edge.corridor !== best.edge.corridor) &&
+      !(
+        followsAxis &&
+        !entry.edge.corridor &&
+        nearbyNetworkDistance(network, location, projected(entry), 8) <= 8
+      ),
+  );
+  if (competing.length) {
     const shared = [best.edge.from, best.edge.to].find(
       (node) =>
-        plausible.every(({ edge }) => edge.from === node || edge.to === node) &&
+        competing.every(({ edge }) => edge.from === node || edge.to === node) &&
         distance(network.nodes[node].point, fix.point) <= Math.min(4, fix.accuracy + 1) &&
-        plausible.every((entry) => distance(entry.point, network.nodes[node].point) <= 5),
+        [...competing, best].every(
+          (entry) => distance(entry.point, network.nodes[node].point) <= 5,
+        ),
     );
-    if (!shared) return null;
-    location = { node: shared };
+    if (shared) location = { node: shared };
+    else if (
+      competing.some((entry) => nearbyNetworkDistance(network, location, projected(entry), 8) > 8)
+    )
+      return null;
   }
-  const adjacent = (before: NetworkPosition) => {
-    if ("node" in location && "node" in before) return location.node === before.node;
-    if ("edge" in location && "edge" in before) {
-      if (location.edge === before.edge)
-        return (
-          Math.abs(location.metresAlong - before.metresAlong) <=
-          (4 * (fix.at - previous!.at)) / 1000 + fix.accuracy
-        );
-      const a = network.edges.find((edge) => edge.id === locationEdge(location));
-      const b = network.edges.find((edge) => edge.id === before.edge);
-      const at = (edge: NonNullable<typeof a>, node: string, offset: number) =>
-        edge.from === node ? offset : edge.to === node ? edge.metres - offset : Infinity;
-      const along = location.metresAlong;
-      return (
-        a &&
-        b &&
-        [a.from, a.to].some(
-          (node) =>
-            at(a, node, along) + at(b, node, before.metresAlong) <=
-            (4 * (fix.at - previous!.at)) / 1000 + fix.accuracy * 2,
-        )
-      );
-    }
-    const node = "node" in location ? location.node : "node" in before ? before.node : "";
-    const part = "edge" in location ? location : "edge" in before ? before : null;
-    const edge = network.edges.find((candidate) => candidate.id === part?.edge);
-    return (
-      !!edge &&
-      !!part &&
-      (edge.from === node
-        ? part.metresAlong
-        : edge.to === node
-          ? edge.metres - part.metresAlong
-          : Infinity) <=
-        (4 * (fix.at - previous!.at)) / 1000 + fix.accuracy * 2
-    );
-  };
-  const samples =
+  const elapsed = previous ? fix.at - previous.at : 0;
+  const speedBound = (4 * elapsed) / 1000 + 2 * fix.accuracy;
+  const continued =
     previous &&
-    fix.at > previous.at &&
-    fix.at - previous.at <= 10_000 &&
-    adjacent(previous.location)
-      ? previous.samples + 1
-      : 1;
-  return { location, at: fix.at, samples };
-}
-
-function locationEdge(location: NetworkPosition) {
-  return "edge" in location ? location.edge : undefined;
+    elapsed > 0 &&
+    elapsed <= 10_000 &&
+    nearbyNetworkDistance(network, previous.location, location, speedBound) <= speedBound;
+  return { location, at: fix.at, samples: continued ? previous.samples + 1 : 1 };
 }
 
 export type Guidance = {
@@ -140,13 +136,7 @@ export function advanceGuidance(
   }
   const remaining = current.route.metres - projection.metresAlong;
   const atEntry =
-    "node" in match.location
-      ? match.location.node === current.route.entry
-      : network.edges.some(
-          (edge) =>
-            edge.id === locationEdge(match.location) &&
-            (edge.from === current.route.entry || edge.to === current.route.entry),
-        );
+    nearbyNetworkDistance(network, match.location, { node: current.route.entry }, 8) <= 8;
   const arrivalPoint = network.nodes[current.route.entry].point;
   const otherEntryPlausible = destination.entries.some(
     (entry) =>

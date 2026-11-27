@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import {
   walkingDestinationTimes,
-  walkingMinutes,
+  walkingTimeLabel,
   type NetworkPosition,
   type WalkingNetwork,
 } from "./network";
@@ -58,8 +58,8 @@ export function WalkingPanel({
   const liveProgress =
     signal === "tracking" && !!state.match && state.match.samples >= 2 && !guidance?.offRouteCount;
   const arrival = guidance && network?.nodes[guidance.route.entry];
-  const metres =
-    guidance && Math.round(Math.max(0, guidance.route.metres - guidance.progress) / 5) * 5;
+  const remaining = guidance ? Math.max(0, guidance.route.metres - guidance.progress) : null;
+  const metres = remaining === null ? null : Math.round(remaining / 5) * 5;
   const start: NetworkPosition | null = state.origin
     ? { node: state.origin }
     : liveProgress
@@ -191,12 +191,15 @@ export function WalkingPanel({
                     ) : (
                       "Você chegou"
                     )
-                  ) : (liveProgress || state.origin) && metres !== null && network ? (
+                  ) : (liveProgress || state.origin) &&
+                    metres !== null &&
+                    remaining !== null &&
+                    network ? (
                     <span className="im-walking-metrics">
                       <strong>{metres === 0 ? "menos de 5 m" : `${metres} m`}</strong>
                       <span>{state.origin ? "no trajeto" : "restantes"}</span>
                       <span className="im-walking-eta">
-                        cerca de {walkingMinutes(metres, network.speedMps)} min
+                        {walkingTimeLabel(remaining, network.speedMps)}
                       </span>
                     </span>
                   ) : (
@@ -229,7 +232,7 @@ export function WalkingPanel({
                           <strong>{index ? "Alternativa" : "Mais curta"}</strong>
                           <small>
                             {Math.round(option.metres / 5) * 5} m ·{" "}
-                            {walkingMinutes(option.metres, network.speedMps)} min
+                            {walkingTimeLabel(option.metres, network.speedMps, true)}
                           </small>
                         </button>
                       ))}
@@ -361,7 +364,7 @@ export function WalkingPanel({
                       dispatch({ type: "destination", destination: item });
                     }}
                   >
-                    {item.label} · cerca de {walkingMinutes(metres, network.speedMps)} min
+                    {item.label} · {walkingTimeLabel(metres, network.speedMps)}
                   </button>
                 </li>
               ))}

@@ -14,6 +14,12 @@ export type WalkingEdge = {
   path: Path;
   metres: number;
   access: "open" | "closed" | "restricted";
+  /** Adjacent sections of the same, continuous, verified street axis. */
+  corridor?: string;
+  /** Prefer a nearby street projection when this link overlaps it. */
+  connector?: boolean;
+  /** Parts of a legacy trace that represent the same pavement as a street axis. */
+  axisCoverage?: { corridor: string; from: number; to: number }[];
   steps: "unknown" | "stairs" | "step-free";
 };
 export type WalkingDestination = { id: string; label: string; entries: readonly string[] };
@@ -192,13 +198,45 @@ export function findWalkingRoute(
   return null;
 }
 
-export function walkingDestinationTimes(network: WalkingNetwork, start: NetworkPosition) {
-  const distances = new Map(
+/** Distance between two projected positions, bounded for GPS matching. */
+export function nearbyNetworkDistance(
+  network: WalkingNetwork,
+  start: NetworkPosition,
+  end: NetworkPosition,
+  limit: number,
+): number {
+  if ("edge" in start && "edge" in end && start.edge === end.edge) {
+    const distance = Math.abs(start.metresAlong - end.metresAlong);
+    const edge = network.edges.find(({ id }) => id === start.edge);
+    return edge && isOpen(edge) && distance <= limit ? distance : Infinity;
+  }
+  const offsets = new Map<string, number>();
+  if ("node" in end) offsets.set(end.node, 0);
+  else {
+    const edge = network.edges.find(({ id }) => id === end.edge);
+    if (!edge || !isOpen(edge)) return Infinity;
+    offsets.set(edge.from, end.metresAlong);
+    offsets.set(edge.to, edge.metres - end.metresAlong);
+  }
+  let closest = Infinity;
+  for (const { node, metres } of reachable(network, start, false, undefined, false)) {
+    if (metres > limit || metres >= closest) break;
+    closest = Math.min(closest, metres + (offsets.get(node) ?? Infinity));
+  }
+  return closest <= limit ? closest : Infinity;
+}
+
+export function walkingDistances(network: WalkingNetwork, start: NetworkPosition) {
+  return new Map(
     Array.from(reachable(network, start, false, undefined, false), ({ node, metres }) => [
       node,
       metres,
     ]),
   );
+}
+
+export function walkingDestinationTimes(network: WalkingNetwork, start: NetworkPosition) {
+  const distances = walkingDistances(network, start);
   return network.destinations
     .flatMap((item) => {
       const metres = Math.min(...item.entries.map((entry) => distances.get(entry) ?? Infinity));
@@ -209,6 +247,11 @@ export function walkingDestinationTimes(network: WalkingNetwork, start: NetworkP
 
 export function walkingMinutes(metres: number, speedMps: number) {
   return Math.max(1, Math.round(metres / speedMps / 60));
+}
+
+export function walkingTimeLabel(metres: number, speedMps: number, short = false) {
+  if (metres / speedMps < 60) return "menos de 1 min";
+  return `${short ? "" : "cerca de "}${walkingMinutes(metres, speedMps)} min`;
 }
 
 /** Second route must use a different entrance or a materially different
@@ -244,7 +287,9 @@ export function findWalkingAlternatives(
       .map(({ edge }) => findWalkingRoute(network, start, destination, false, edge)),
   ].filter(
     (route): route is WalkingRoute =>
-      route !== null && (route.entry !== primary.entry || differentCorridor(route)),
+      route !== null &&
+      route.metres - primary.metres <= Math.max(15, primary.metres * 0.25) &&
+      (route.entry !== primary.entry || differentCorridor(route)),
   );
   alternatives.sort((a, b) => a.metres - b.metres);
   return alternatives[0] ? [primary, alternatives[0]] : [primary];
