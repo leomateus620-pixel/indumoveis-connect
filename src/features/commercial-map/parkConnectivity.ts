@@ -578,7 +578,10 @@ export function deriveParkConnectivityAnchors(): ParkConnectivityAnchor[] {
   return [...gates, ...pavilions, ...equipment, ...blocks];
 }
 
-export function auditParkConnectivity() {
+export function auditParkConnectivity(
+  candidatePaths: readonly Point[][] = [],
+  exportPreviewPaths = false,
+) {
   const started = performance.now();
   const pavement = derivePavement(PARK_RENDER_ENTITIES);
   const asphalt = pavement.asphaltCells,
@@ -774,6 +777,62 @@ export function auditParkConnectivity() {
         anchor.kind === "gate" ? Boolean(vehicles.trace(root, anchor.points[0])) : undefined,
     };
   });
+  const previewPaths = !exportPreviewPaths
+    ? []
+    : (() => {
+        const roads = PARK_RENDER_ENTITIES.filter((entity) => entity.kind === "road");
+        const lotFrontage = (polygon: Point[]) => {
+          const orientation = Math.sign(signedPolygonArea(polygon));
+          return polygon
+            .flatMap((a, i) => {
+              const b = polygon[(i + 1) % polygon.length];
+              const length = distance(a, b);
+              if (length < 1) return [];
+              const normal: Point = [
+                (orientation * (b[1] - a[1])) / length,
+                (orientation * (a[0] - b[0])) / length,
+              ];
+              return [0.5, 0.3, 0.7].flatMap((t) => {
+                const point: Point = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+                const gap = firstRoadDistance(point, normal, roads);
+                if (gap === null || gap > 1.6) return [];
+                const offset = gap + 0.22;
+                return [
+                  {
+                    point: [point[0] + normal[0] * offset, point[1] + normal[1] * offset] as Point,
+                    gap,
+                  },
+                ];
+              });
+            })
+            .sort((a, b) => a.gap - b.gap)
+            .map(({ point }) => point);
+        };
+        const a3Outside = externalPassages
+          .find(({ id, supported }) => id === "A3-1" && supported)
+          ?.path.at(-1);
+        const routeAnchors = [
+          ...(a3Outside
+            ? [{ id: "A3-exterior", name: "Portão 3", kind: "gate" as const, points: [a3Outside] }]
+            : []),
+          ...anchors.filter(
+            ({ kind }) => kind === "pavilion" || kind === "equipment" || kind === "gate",
+          ),
+          ...PARK_CORE_ENTITIES.filter((entity) => entity.kind === "lot").map((entity) => ({
+            id: entity.id,
+            name: entity.label,
+            kind: "lot" as const,
+            points: lotFrontage(entity.polygon),
+          })),
+        ];
+        return routeAnchors.map(({ id, name, kind, points }) => {
+          const candidates = points.flatMap((point, index) => {
+            const path = pedestrians.grid.trace(point, true);
+            return path ? [{ index: index + 1, path }] : [];
+          });
+          return { id, name, kind, paths: kind === "lot" ? candidates.slice(0, 1) : candidates };
+        });
+      })();
   return {
     preparationMs: performance.now() - started,
     criteria: PARK_CONNECTIVITY_CRITERIA,
@@ -790,6 +849,14 @@ export function auditParkConnectivity() {
       safeCells: pedestrians.grid.safeCells,
     },
     externalPassages,
+    previewPaths,
+    candidatePaths: candidatePaths.map((path) =>
+      sampleSurfacePath(path, pedestrians.surfaces, {
+        contains: pedestrians.contains,
+        boundaryCandidates: pedestrians.boundaryCandidates,
+        halfWidth: 0.06,
+      }),
+    ),
     anchors: results,
     pending: results.filter((anchor) => anchor.status !== "connected"),
     verified: results.filter((anchor) => anchor.status === "connected").length,

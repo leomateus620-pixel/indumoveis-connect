@@ -24,6 +24,8 @@ import {
   Check,
   BarChart3,
   ShoppingCart,
+  Footprints,
+  Route as RouteIcon,
 } from "lucide-react";
 import { ENTITIES } from "./data/territory";
 import type { Point } from "./data/territory";
@@ -66,7 +68,13 @@ import {
 import type { ParkPavilionNumber } from "@/features/pavilion-interior/connections";
 import { useCommercialSaleMode } from "@/features/guided-sales/sale-mode-context";
 import { CommercialLotLegend } from "./CommercialLotLegend";
+import type { WalkingNetwork } from "./walking/network";
+import { referenceMetresToScene } from "./urbanReference";
+import { useParkWalking } from "./walking/useParkWalking";
+import { INDOMOVEIS_WALKING_PILOT } from "./walking/pilot";
+import { WalkingPanel } from "./walking/WalkingPanel";
 import "./map.css";
+import "./walking/walking.css";
 import "./commercial-lot-legend.css";
 
 type Renderer = ComponentType<MapRendererProps & RefAttributes<MapHandle>>;
@@ -96,6 +104,9 @@ function selectionReducer(state: Selection, action: Action): Selection {
 }
 interface WorkspaceProps {
   editionId?: string;
+  editionYear?: number;
+  walkingPreview?: WalkingNetwork;
+  walkingGeolocation?: Geolocation;
   restorePark?: boolean;
   initialPavilionNumber?: ParkPavilionNumber;
   parkSearch?: { status?: string; space?: string; deal?: string };
@@ -140,6 +151,9 @@ function LotPricing({ lot }: { lot: CommercialLot }) {
 
 export function CommercialMapWorkspace({
   editionId,
+  editionYear,
+  walkingPreview,
+  walkingGeolocation,
   restorePark = true,
   initialPavilionNumber,
   parkSearch,
@@ -263,6 +277,74 @@ export function CommercialMapWorkspace({
   const [insets, setInsets] = useState<MapInsets>({ right: 0, bottom: 0 });
   const [landscapeLayout, setLandscapeLayout] = useState(false);
   const [compactHeader, setCompactHeader] = useState(false);
+  const pilot = walkingPreview ?? INDOMOVEIS_WALKING_PILOT;
+  const walkingNetwork =
+    editionYear === pilot.editionYear && (walkingPreview || pilot.validation === "approved")
+      ? pilot
+      : undefined;
+  const walking = useParkWalking(walkingNetwork, walkingGeolocation);
+  const [walkingPicked, setWalkingPicked] = useState<{ id: string; label: string } | null>(null);
+  const pauseWalking = walking.pause;
+  const walkingButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const leave = () => setWalkingPicked(null);
+    window.addEventListener("pagehide", leave);
+    return () => window.removeEventListener("pagehide", leave);
+  }, []);
+  const walkingCameraPrivate = useRef(false);
+  const walkingPerson = walking.overlay?.person;
+  const walkingFollowing = walking.state.following;
+  const manualWalkingRoute = walking.state.origin ? walking.state.guidance?.route : undefined;
+  const manualWalkingPath = useMemo(
+    () => manualWalkingRoute?.path.map(referenceMetresToScene),
+    [manualWalkingRoute],
+  );
+  const recenterWalking = () => {
+    walking.dispatch({ type: "follow" });
+    if (walkingPerson) {
+      walkingCameraPrivate.current = true;
+      handle()?.followWalkingPoint?.(walkingPerson.point);
+    }
+  };
+  useEffect(() => {
+    if (!walkingFollowing || !walkingPerson) return;
+    walkingCameraPrivate.current = true;
+    (representation === "ready" ? map.current : lightMap.current)?.followWalkingPoint?.(
+      walkingPerson.point,
+    );
+  }, [walkingFollowing, walkingPerson, representation]);
+  useEffect(() => {
+    if (!manualWalkingPath) return;
+    walkingCameraPrivate.current = true;
+    (representation === "ready" ? map.current : lightMap.current)?.frameWalkingPath?.(
+      manualWalkingPath,
+    );
+  }, [manualWalkingPath, representation]);
+  const endWalking = () => {
+    walking.dispatch({ type: "close" });
+    setWalkingPicked(null);
+    if (walkingCameraPrivate.current) {
+      lastTarget.current = undefined;
+      handle()?.restoreCommercial();
+    }
+    requestAnimationFrame(() => walkingButton.current?.focus({ preventScroll: true }));
+  };
+  const walkingAction = (id: string) => {
+    const destination = walkingNetwork?.destinations.find((item) => item.id === id);
+    return destination ? (
+      <button
+        type="button"
+        className="im-map-action im-walking-route-action"
+        onClick={() => walking.dispatch({ type: "destination", destination })}
+      >
+        <RouteIcon size={17} /> Traçar rota a pé
+      </button>
+    ) : (
+      walking.state.active && (
+        <p className="im-walking-missing">Sem caminho validado para este destino.</p>
+      )
+    );
+  };
   const entity = ENTITIES.find((e) => e.id === selection.panelId);
   const interiorPavilion =
     entity?.kind === "pavilion" ? interiorPavilionNumber(entity.id.split(":").at(-1)) : undefined;
@@ -294,27 +376,31 @@ export function CommercialMapWorkspace({
     [],
   );
   const handle = () => (representation === "ready" ? map.current : lightMap.current);
-  const select = useCallback((id: string, keyboard = false) => {
-    if (!ENTITIES.some((e) => e.id === id)) return;
-    if (!selectionOrigin.current) {
-      selectionOrigin.current = { ...presentation.current };
-      const focused = document.activeElement;
-      origin.current =
-        focused instanceof HTMLElement &&
-        focused !== document.body &&
-        !focused.closest(".im-map-popover")
-          ? focused
-          : (workspace.current?.querySelector<HTMLButtonElement>(
-              'button[aria-label="Buscar lote, pavilhão, via ou estrutura"]',
-            ) ?? null);
-    }
-    performance.mark("indumoveis:selection-input");
-    setInspectedId((previous) => (previous && previous !== id ? null : previous));
-    lightNavigated.current = false;
-    dispatch({ type: "select", id });
-    setMenu(null);
-    if (keyboard) requestAnimationFrame(() => closeButton.current?.focus());
-  }, []);
+  const select = useCallback(
+    (id: string, keyboard = false) => {
+      if (!ENTITIES.some((e) => e.id === id)) return;
+      pauseWalking();
+      if (!selectionOrigin.current) {
+        selectionOrigin.current = { ...presentation.current };
+        const focused = document.activeElement;
+        origin.current =
+          focused instanceof HTMLElement &&
+          focused !== document.body &&
+          !focused.closest(".im-map-popover")
+            ? focused
+            : (workspace.current?.querySelector<HTMLButtonElement>(
+                'button[aria-label="Buscar lote, pavilhão, via ou estrutura"]',
+              ) ?? null);
+      }
+      performance.mark("indumoveis:selection-input");
+      setInspectedId((previous) => (previous && previous !== id ? null : previous));
+      lightNavigated.current = false;
+      dispatch({ type: "select", id });
+      setMenu(null);
+      if (keyboard) requestAnimationFrame(() => closeButton.current?.focus());
+    },
+    [pauseWalking],
+  );
   const close = useCallback(() => {
     const saved = selectionOrigin.current;
     if (saved) {
@@ -334,6 +420,12 @@ export function CommercialMapWorkspace({
   }, [onCloseExternal]);
   const selectFromMap = (id: string, keyboard = false) => {
     const entry = ENTITIES.find((candidate) => candidate.id === id);
+    if (walking.state.active && entry) {
+      pauseWalking();
+      setWalkingPicked({ id, label: entry.label });
+      setMenu(null);
+      return;
+    }
     if (salesActive && entry?.kind === "lot") {
       const lot = lotsByGeometry?.get(id);
       if (lot) {
@@ -370,6 +462,7 @@ export function CommercialMapWorkspace({
     setMenu(next);
   };
   const chooseView = (next: MapView) => {
+    pauseWalking();
     setView(next);
     setViewRevision((revision) => revision + 1);
     setOrientationFree(false);
@@ -560,8 +653,19 @@ export function CommercialMapWorkspace({
     gesture: "move",
     insets,
     onSelect: selectFromMap,
-    onDeselect: close,
-    onLandmark: setIdentified,
+    onDeselect: walking.state.active ? () => setWalkingPicked(null) : close,
+    onLandmark: (id) => {
+      if (id) pauseWalking();
+      if (walking.state.active) {
+        const landmark = id && PERMANENT_PARK_LANDMARKS.find((item) => item.id === id);
+        if (landmark) setWalkingPicked({ id: landmark.id, label: landmark.name });
+      } else setIdentified(id);
+    },
+    walkingOverlay: walking.overlay,
+    walkingContext: walking.state.active,
+    walkingCameraPrivate:
+      walkingCameraPrivate.current || (!!walkingPerson && walkingFollowing) || !!manualWalkingPath,
+    onManualNavigation: pauseWalking,
     onReady: () => {},
     onFailure: fail,
     statuses,
@@ -652,9 +756,11 @@ export function CommercialMapWorkspace({
           {tool("Girar à direita", <RotateCw />, () => handle()?.rotate(1))}
         </>
       )}
-      {tool(inspectedId ? "Reenquadrar pavilhão" : "Reenquadrar área Indumóveis", <Scan />, () =>
-        inspectedId ? handle()?.focus(inspectedId) : handle()?.restoreCommercial(),
-      )}
+      {tool(inspectedId ? "Reenquadrar pavilhão" : "Reenquadrar área Indumóveis", <Scan />, () => {
+        pauseWalking();
+        if (inspectedId) handle()?.focus(inspectedId);
+        else handle()?.restoreCommercial();
+      })}
     </div>
   );
   const headerActions = (
@@ -731,6 +837,23 @@ export function CommercialMapWorkspace({
     >
       <header className="im-map-header">
         <h1>Mapa Comercial</h1>
+        <button
+          ref={walkingButton}
+          type="button"
+          className="im-map-button im-walking-toggle"
+          aria-label="Navegar pelo parque"
+          aria-expanded={walking.state.active}
+          onClick={() => {
+            if (walking.state.active) endWalking();
+            else {
+              if (menu) setMenu(null);
+              walking.dispatch({ type: "open" });
+            }
+          }}
+        >
+          <Footprints size={17} aria-hidden="true" />
+          <span>Navegar pelo parque</span>
+        </button>
         {selection.id && (
           <button
             className="im-map-button im-map-return"
@@ -759,6 +882,7 @@ export function CommercialMapWorkspace({
             onPavilionProjection={pavilionProgress.length ? projectPavilions : undefined}
             onNavigate={() => {
               lightNavigated.current = true;
+              pauseWalking();
             }}
             onGestureChange={(active) => {
               lightGesture.current = active;
@@ -782,6 +906,17 @@ export function CommercialMapWorkspace({
               }}
             />
           </div>
+        )}
+        {walking.state.active && (
+          <WalkingPanel
+            walking={walking}
+            network={walkingNetwork}
+            preview={!!walkingPreview}
+            close={endWalking}
+            recenter={recenterWalking}
+            picked={walkingPicked}
+            clearPicked={() => setWalkingPicked(null)}
+          />
         )}
         <PavilionSalesProgressMarkers
           ref={progressLayer}
@@ -850,6 +985,7 @@ export function CommercialMapWorkspace({
           >
             <strong>{identifiedName}</strong>
             <span>Estrutura permanente do parque · sem situação comercial</span>
+            {identified && walkingAction(identified)}
           </div>
         )}
         {displayedMenu && (
@@ -953,7 +1089,16 @@ export function CommercialMapWorkspace({
                           onClick={(e) => {
                             if (result.type === "entity")
                               selectFromMap(result.entity.id, e.detail === 0);
-                            else if (handle()?.focusLandmark(result.landmark.id)) {
+                            else if (walking.state.active) {
+                              pauseWalking();
+                              setWalkingPicked({
+                                id: result.landmark.id,
+                                label: result.landmark.name,
+                              });
+                              dismissMenu();
+                            } else if (handle()?.focusLandmark(result.landmark.id)) {
+                              pauseWalking();
+                              setIdentified(result.landmark.id);
                               setLandmarkNotice("");
                               dismissMenu();
                             } else
@@ -1203,6 +1348,7 @@ export function CommercialMapWorkspace({
                   </div>
                 )}
               </div>
+              {walkingAction(entity.id)}
               {interiorPavilion && onOpenInterior && (
                 <button
                   className="im-map-action im-map-action-primary im-map-interior-action"
@@ -1211,7 +1357,9 @@ export function CommercialMapWorkspace({
                       saveParkReturn({
                         editionId,
                         selectionId: entity.id,
-                        camera: handle()?.captureCamera?.(),
+                        camera: walkingCameraPrivate.current
+                          ? undefined
+                          : handle()?.captureCamera?.(),
                         view,
                         orientationFree,
                         search: parkSearch,

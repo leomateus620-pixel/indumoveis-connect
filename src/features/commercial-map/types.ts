@@ -1,3 +1,4 @@
+import type { WalkingOverlay } from "./walking/useParkWalking";
 import type { Point } from "./data/territory";
 import type { PermanentParkLandmark } from "./permanentParkLayout";
 
@@ -37,6 +38,8 @@ export interface MapHandle {
   rotate(direction: number): void;
   getTarget(): Point;
   captureCamera?(): MapCameraSnapshot | undefined;
+  followWalkingPoint?(point: Point): void;
+  frameWalkingPath?(path: Point[]): void;
   restoreOverview(): void;
   restoreCommercial(): void;
 }
@@ -48,6 +51,10 @@ export interface MapRendererProps {
   /** Reapply a preset after manual orbit without inventing a fourth view button. */
   viewRevision?: number;
   onManualOrientation?(): void;
+  onManualNavigation?(): void;
+  walkingOverlay?: WalkingOverlay | null;
+  walkingContext?: boolean;
+  walkingCameraPrivate?: boolean;
   quality: MapQuality;
   lighting?: MapLightingMode;
   /** Retained for callers; mouse/touch bindings are stable and ignore modes. */

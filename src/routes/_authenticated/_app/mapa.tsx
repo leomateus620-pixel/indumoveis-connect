@@ -5,7 +5,7 @@ import {
   useCan,
   useCommercialLots,
   useCommercialOverview,
-  useEditionId,
+  useEdition,
   useMapDealSpaces,
   useIsAdmin,
 } from "@/lib/api";
@@ -52,7 +52,8 @@ function MapaPage() {
   const canReadCommercial = can.read && isAdmin;
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/mapa" });
-  const editionId = useEditionId();
+  const { data: edition } = useEdition();
+  const editionId = edition?.id;
   const lots = useCommercialLots(undefined, can.read);
   const overview = useCommercialOverview(canReadCommercial);
   const deal = useMapDealSpaces(search.deal, canReadCommercial);
@@ -93,6 +94,7 @@ function MapaPage() {
     <CommercialMapWorkspace
       key={`${editionId}:${pavilionNumber ?? "park"}`}
       editionId={editionId}
+      editionYear={edition?.is_active ? edition.year : undefined}
       restorePark={restorePark}
       initialPavilionNumber={pavilionNumber}
       parkSearch={search}

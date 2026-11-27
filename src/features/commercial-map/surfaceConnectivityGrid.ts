@@ -126,8 +126,8 @@ export function buildSurfaceConnectivityGrid(
         queue[end++] = next;
       }
   }
-  const trace = (target: Point): Point[] | null => {
-    if (supported([root, target])) return [root, target];
+  const trace = (target: Point, keepGrid = false): Point[] | null => {
+    if (!keepGrid && supported([root, target])) return [root, target];
     for (const targetCell of nearby(target)) {
       if (parent[targetCell] === -2) continue;
       const path: Point[] = [target];
@@ -148,7 +148,7 @@ export function buildSurfaceConnectivityGrid(
         }
         simple.push(p);
       }
-      if (supported(simple)) return simple;
+      if (supported(simple)) return keepGrid ? path : simple;
     }
     return null;
   };

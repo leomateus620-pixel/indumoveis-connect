@@ -1,3 +1,4 @@
+import { PILOT_SCENE_EDGES, pilotScenePath } from "./walking/pilot";
 import { describe, expect, it } from "vitest";
 import type { Point } from "./data/territory";
 import { ENTITIES } from "./data/territory";
@@ -62,7 +63,8 @@ describe("surface-supported physical park connectivity", () => {
   });
 
   it("reports uncovered gate and equipment anchors instead of accepting proximity", () => {
-    const report = auditParkConnectivity();
+    const report = auditParkConnectivity(PILOT_SCENE_EDGES.map(pilotScenePath));
+    expect(report.candidatePaths).toEqual(PILOT_SCENE_EDGES.map(() => ({ supported: true })));
     expect(report.anchors.find((anchor) => anchor.id === "A2")?.vehicleConnected).toBe(false);
     expect(report.externalPassages.map((p) => [p.id, p.supported])).toEqual([
       ["A3-1", true],

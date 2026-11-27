@@ -361,15 +361,15 @@ const METRES_PER_RADIAN = 6378137;
 const referenceScale = 0.195;
 const anchor = OSM_NODES[ANCHOR_ID];
 const longitudeScale = Math.cos(anchor[1] * RADIANS);
-function localMetres(node: readonly number[]): Point {
+export function referenceLocalMetres(node: readonly number[]): Point {
   return [
     (node[0] - anchor[0]) * RADIANS * METRES_PER_RADIAN * longitudeScale,
     (node[1] - anchor[1]) * RADIANS * METRES_PER_RADIAN,
   ];
 }
-const cam = localMetres(OSM_NODES[CAMPEIRA_BENVENUTO_ID]);
+const cam = referenceLocalMetres(OSM_NODES[CAMPEIRA_BENVENUTO_ID]);
 const measuredAnchorDistance = Math.hypot(...cam);
-const unitsPerMetre = (referenceScale * 760) / measuredAnchorDistance;
+export const REFERENCE_UNITS_PER_METRE = (referenceScale * 760) / measuredAnchorDistance;
 const u: Point = [-cam[0] / measuredAnchorDistance, -cam[1] / measuredAnchorDistance];
 const v: Point = [u[1], -u[0]];
 export function projectReferenceNode(id: string): Point {
@@ -378,10 +378,27 @@ export function projectReferenceNode(id: string): Point {
   return projectReferenceCoordinate(node);
 }
 export function projectReferenceCoordinate(coordinate: readonly number[]): Point {
-  const [east, north] = localMetres(coordinate);
+  return referenceMetresToScene(referenceLocalMetres(coordinate));
+}
+export function referenceMetresToScene([east, north]: readonly [number, number]): Point {
   return [
-    ANCHOR_WORLD[0] + (east * u[0] + north * u[1]) * unitsPerMetre,
-    ANCHOR_WORLD[1] + (east * v[0] + north * v[1]) * unitsPerMetre,
+    ANCHOR_WORLD[0] + (east * u[0] + north * u[1]) * REFERENCE_UNITS_PER_METRE,
+    ANCHOR_WORLD[1] + (east * v[0] + north * v[1]) * REFERENCE_UNITS_PER_METRE,
+  ];
+}
+
+/** Inverse of the same local similarity. Scene coordinates are [x, z],
+ * local metric coordinates are [east, north], geographic input is [lon, lat]. */
+export function sceneToReferenceMetres([x, z]: readonly [number, number]): Point {
+  const dx = (x - ANCHOR_WORLD[0]) / REFERENCE_UNITS_PER_METRE;
+  const dz = (z - ANCHOR_WORLD[1]) / REFERENCE_UNITS_PER_METRE;
+  return [dx * u[0] + dz * v[0], dx * u[1] + dz * v[1]];
+}
+export function sceneToReferenceCoordinate(scene: readonly [number, number]): Point {
+  const [east, north] = sceneToReferenceMetres(scene);
+  return [
+    anchor[0] + east / (RADIANS * METRES_PER_RADIAN * longitudeScale),
+    anchor[1] + north / (RADIANS * METRES_PER_RADIAN),
   ];
 }
 
@@ -452,7 +469,7 @@ export const URBAN_REFERENCE = {
   mainGate: { x: 146.9, north: 92.9, south: 103.5 },
   center: ANCHOR_WORLD[1],
   referenceScale,
-  unitsPerMetre,
+  unitsPerMetre: REFERENCE_UNITS_PER_METRE,
   anchor: { nodeId: ANCHOR_ID, world: ANCHOR_WORLD },
   axis: { u, v, measuredAnchorDistanceMetres: measuredAnchorDistance },
   roundabout: { ...fittedRoundabout, nodeIds: roundaboutNodeIds, roadWidth: 4.2 },

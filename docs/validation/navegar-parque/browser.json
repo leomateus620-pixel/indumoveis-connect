@@ -1,0 +1,81 @@
+{
+  "browser": "158.0.8127.37",
+  "checks": [
+    "aérea, média, próxima, parado, caminhada, órbita, pan, recentralizar, progresso, desvio, chegada, perda de sinal, clearWatch, contexto WebGL preservado",
+    "390 × 844 toque emulado, redução de movimento, sem WebGL, permissão negada, origem manual, linha e texto em SVG",
+    "WebGL a 390 × 844, toque em Recentralizar e personagem estático com movimento reduzido",
+    "lotes 01, 57 e 66, pavilhões 1, 3 e 14, duas opções no P14 e saída pelos nós candidatos",
+    "dois contextos independentes, rótula, posição aproximada e cidade fora da área"
+  ],
+  "performance": {
+    "desktopOff": {
+      "frameSamples": 30,
+      "intervalMedianMs": 16.699999999999818,
+      "intervalP95Ms": 16.700000000000273,
+      "drawCalls": 84,
+      "triangles": 338685,
+      "contexts": 1,
+      "tier": "balanced",
+      "renderer": "hardware requested"
+    },
+    "desktopOn": {
+      "frameSamples": 30,
+      "intervalMedianMs": 16.699999999999818,
+      "intervalP95Ms": 16.700000000000273,
+      "drawCalls": 103,
+      "triangles": 340845,
+      "contexts": 1,
+      "tier": "balanced",
+      "renderer": "hardware requested"
+    },
+    "mobileOff": {
+      "frameSamples": 30,
+      "intervalMedianMs": 16.700000000000045,
+      "intervalP95Ms": 16.800000000000182,
+      "drawCalls": 74,
+      "triangles": 324639,
+      "contexts": 1,
+      "tier": "balanced",
+      "renderer": "hardware requested"
+    },
+    "mobileOn": {
+      "frameSamples": 30,
+      "intervalMedianMs": 16.699999999999818,
+      "intervalP95Ms": 16.799999999999727,
+      "drawCalls": 93,
+      "triangles": 326751,
+      "contexts": 1,
+      "tier": "balanced",
+      "renderer": "hardware requested"
+    }
+  },
+  "privacy": {
+    "requestsIntercepted": 150,
+    "unexpected": 0,
+    "candidateDataLeaks": 0,
+    "cookies": 0,
+    "storedSessionEntries": 0,
+    "isolatedContexts": 2,
+    "syntheticFixesOnly": true
+  },
+  "routeOptions": {
+    "contrast": [
+      11.79,
+      9.44
+    ],
+    "cards": [
+      {
+        "pressed": "false",
+        "text": "rgb(23, 57, 83)",
+        "surface": "rgb(251, 253, 255)"
+      },
+      {
+        "pressed": "true",
+        "text": "rgb(255, 255, 255)",
+        "surface": "rgb(13, 71, 127)"
+      }
+    ],
+    "fontReady": true,
+    "noHeaderOverlap": true
+  }
+}
