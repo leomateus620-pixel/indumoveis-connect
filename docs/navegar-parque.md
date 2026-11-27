@@ -72,7 +72,21 @@ Em 26/11/2026, usei a régua do Google Earth no mosaico exibido de 19/03/2026. O
 | Lote 56                  |       322,3 m |       147,4 m | 145 m · cerca de 2 min |
 | Lote 66                  |       269,6 m |       228,3 m | 230 m · cerca de 3 min |
 
-Uma origem simulada na Rua Brasil, na altura do Lote 53, selecionou a frente do Lote 56 por essa rua. A rota modelada foi de 27,2 m. O teste automatizado calcula trajetos para os 68 lotes a partir de oito pontos em setores diferentes e verifica todas as ligações contra obstáculos e superfícies. [Capturas da revisão](validation/navegar-parque/revisao-rotas) · [Relatório de navegador](validation/navegar-parque/revisao-rotas/browser.json).
+Uma origem simulada na Rua Brasil, na altura do Lote 53, selecionou a frente do Lote 56 por essa rua. A rota modelada foi de 27,2 m. Os ensaios de cobertura abaixo conferem todo o catálogo. O teste físico verifica as 625 ligações do modelo contra as superfícies e os obstáculos da planta. [Capturas da revisão](validation/navegar-parque/revisao-rotas) · [Relatório de navegador](validation/navegar-parque/revisao-rotas/browser.json).
+
+## Cobertura automatizada do catálogo
+
+Foram exercitados os **127 itens do catálogo** (68 lotes, 6 pavilhões, 9 áreas de apoio, 19 estruturas contextuais, 11 vias e 14 áreas de paisagem). O navegador cruzou cada item com oito situações de partida. As 1.016 combinações verificam a seleção na busca, a entrada de chegada, a distância e o ETA quando há rota, e a instrução apropriada quando a partida está incerta ou o item não tem acesso no grafo. Os 112 elementos desenhados foram selecionados por cliques reais tanto na planta 2D quanto no mapa WebGL. No 3D, o teste conferiu também se o botão de rota aparecia para cada destino com caminho cadastrado. [Seleções verificadas no WebGL](validation/navegar-parque/revisao-rotas/cliques-3d.json). As oito tentativas do botão **Quero sair** foram verificadas à parte. O relatório lista cada destino sem ligação cadastrada. [Resultado por cenário e catálogo sem rota](validation/navegar-parque/revisao-rotas/catalogo.json).
+
+| Teste no Chrome                                                                              | Combinações |
+| -------------------------------------------------------------------------------------------- | ----------: |
+| Trajeto, entrada de chegada, distância e ETA com origem reconhecida ou escolhida manualmente |         380 |
+| Espera por origem confiável, incluindo sinal aproximado, entorno e fora da área              |         380 |
+| Aviso de destino sem passagem validada (14 áreas de paisagem, 11 vias e 7 apoios)            |         256 |
+
+Os testes de integração da rede também cruzam 106 destinos (incluindo os portões e a saída mais próxima) com nove posições de GPS nas margens de ±2, ±5 e ±8 m e quatro partidas manuais. As 3.286 rotas são comparadas com um cálculo independente de menor caminho e conferidas quanto à entrada, à continuidade, à metragem e ao arredondamento do ETA. Leituras de ±12 e ±35 m mantêm a incerteza. Leituras antigas, ambiguidade na entrada e perda de encaixe devem impedir uma confirmação de chegada.
+
+A Sede e o Espaço Mão na Massa usam o mesmo acesso físico candidato, identificado pelo vínculo existente na planta. Ao sair da área do mapa, uma linha iniciada pelo GPS é retirada da cena. Os ensaios usam posições sintéticas. A confirmação dos acessos em operação, a precisão real dos aparelhos e o erro do ETA seguem como **não validados em campo**.
 
 ## Privacidade e ensaios
 
@@ -87,6 +101,8 @@ npx vite build
 npx vite build --config scripts/park-walking-preview/vite.config.ts
 python3 -m http.server 4207 --bind 127.0.0.1 --directory artifacts.local/park-walking-preview
 node scripts/park-walking-preview/check.mjs
+PARK_WALKING_CHECK=catalog PARK_WALKING_ARTIFACTS=artifacts.local/navegar-parque-catalogo node scripts/park-walking-preview/check.mjs
+PARK_WALKING_CHECK=map-hits PARK_WALKING_ARTIFACTS=artifacts.local/navegar-parque-cliques-3d node scripts/park-walking-preview/check.mjs
 ```
 
 O roteiro de navegador usa Playwright disponível no ambiente ou indicado por `PLAYWRIGHT_MODULE`. O relatório guarda totais e métricas, sem coordenadas dos cenários. As imagens mostram posições sintéticas. Para recompilar a rede ampliada com a prova física do checkout:

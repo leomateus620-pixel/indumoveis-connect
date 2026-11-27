@@ -21,7 +21,7 @@ import {
   type WalkingNetwork,
 } from "./network";
 import { deviceCoordinateLabels } from "./position";
-import type { useParkWalking } from "./useParkWalking";
+import { findWalkingDestination, type useParkWalking } from "./useParkWalking";
 
 type Walking = ReturnType<typeof useParkWalking>;
 
@@ -66,7 +66,7 @@ export function WalkingPanel({
       ? (state.match?.location ?? null)
       : null;
   const destinations = network && start ? walkingDestinationTimes(network, start).slice(0, 6) : [];
-  const pickedDestination = network?.destinations.find((item) => item.id === picked?.id);
+  const pickedDestination = findWalkingDestination(network, picked?.id);
   const exit = network?.exits?.length
     ? { id: "exit", label: "Saída do parque", entries: network.exits }
     : null;

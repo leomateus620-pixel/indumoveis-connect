@@ -15,9 +15,23 @@ import {
   type WalkingRoute,
 } from "./network";
 import { filterFix, FRESH_MS, readFix, WALK_IDLE_MS, type Position } from "./position";
-import type { Point } from "../data/territory";
+import { ENTITIES, type Point } from "../data/territory";
+import { PERMANENT_PARK_LANDMARKS } from "../permanentParkLayout";
 import { GATE_03_APPROACH_METRES } from "./pilot";
 import { walkingCoverage } from "./coverage";
+
+export function findWalkingDestination(
+  network: WalkingNetwork | undefined,
+  id: string | undefined,
+): WalkingDestination | undefined {
+  const direct = network?.destinations.find((candidate) => candidate.id === id);
+  if (direct || !id || !network) return direct;
+  // A contextual name and its selectable building can share one physical access.
+  const landmark = PERMANENT_PARK_LANDMARKS.find((item) => item.existingOwner === id);
+  const entry = landmark && network.destinations.find((candidate) => candidate.id === landmark.id);
+  const owner = entry && ENTITIES.find((entity) => entity.id === id);
+  return owner && entry ? { ...entry, id, label: owner.label } : undefined;
+}
 
 export type WalkingOverlay = {
   person: {
@@ -314,7 +328,7 @@ export function useParkWalking(
     return () => window.removeEventListener("pagehide", leave);
   }, [state.active, state.watching]);
 
-  const route = state.guidance?.route;
+  const route = state.signal === "outside" && !state.origin ? undefined : state.guidance?.route;
   // Route geometry is rebuilt only when the route or meaningful progress changes.
   const progress = state.guidance ? Math.floor(state.guidance.progress / 2) * 2 : 0;
   const arrived = state.guidance?.arrived ?? false;

@@ -193,7 +193,7 @@ const gate = point("gate-03");
 const p1 = network.destinations[0];
 const baseRoute = findWalkingRoute(network, { node: "gate-03" }, p1);
 const altRoute = findWalkingRoute(network, { node: "gate-03" }, network.destinations[1]);
-try {
+async function checkInteraction() {
   const { context, page } = await open();
   await startBrowserGps(page);
   await ready(page);
@@ -448,6 +448,24 @@ try {
   report.checks.push(
     "dois contextos independentes, rótula, posição aproximada e cidade fora da área",
   );
+}
+
+try {
+  if (process.env.PARK_WALKING_CHECK === "catalog") {
+    const { checkCatalogue } = await import("./check-catalog.mjs");
+    report.catalogue = await checkCatalogue({
+      open,
+      startBrowserGps,
+      send,
+      button,
+      findWalkingRoute,
+    });
+  } else if (process.env.PARK_WALKING_CHECK === "map-hits") {
+    const { checkMap3D } = await import("./check-catalog.mjs");
+    report.map3D = await checkMap3D({ open, ready, setPose, button });
+  } else {
+    await checkInteraction();
+  }
   assert.equal(errors.length, 0, JSON.stringify(errors));
   assert.equal(unexpected.length, 0, JSON.stringify(unexpected));
   const leaked = allRequests.filter((request) =>
@@ -465,7 +483,7 @@ try {
     candidateDataLeaks: leaked.length,
     cookies: 0,
     storedSessionEntries: 0,
-    isolatedContexts: 2,
+    isolatedContexts: report.catalogue || report.map3D ? 1 : 2,
     syntheticFixesOnly: true,
   };
 } catch (error) {

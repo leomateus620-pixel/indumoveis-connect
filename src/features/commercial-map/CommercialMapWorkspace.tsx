@@ -70,7 +70,7 @@ import { useCommercialSaleMode } from "@/features/guided-sales/sale-mode-context
 import { CommercialLotLegend } from "./CommercialLotLegend";
 import type { WalkingNetwork } from "./walking/network";
 import { referenceMetresToScene } from "./urbanReference";
-import { useParkWalking } from "./walking/useParkWalking";
+import { findWalkingDestination, useParkWalking } from "./walking/useParkWalking";
 import { INDOMOVEIS_WALKING_PILOT } from "./walking/pilot";
 import { WalkingPanel } from "./walking/WalkingPanel";
 import "./map.css";
@@ -330,7 +330,7 @@ export function CommercialMapWorkspace({
     requestAnimationFrame(() => walkingButton.current?.focus({ preventScroll: true }));
   };
   const walkingAction = (id: string) => {
-    const destination = walkingNetwork?.destinations.find((item) => item.id === id);
+    const destination = findWalkingDestination(walkingNetwork, id);
     return destination ? (
       <button
         type="button"
