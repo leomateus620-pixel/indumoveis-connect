@@ -1,3 +1,7 @@
+import { PILOT_SCENE_EDGES, pilotScenePath } from "./walking/pilot";
+import type { WalkingNetwork } from "./walking/network";
+import { referenceMetresToScene } from "./urbanReference";
+import extendedPreview from "../../../scripts/park-walking-preview/extended-network.json";
 import { describe, expect, it } from "vitest";
 import type { Point } from "./data/territory";
 import { ENTITIES } from "./data/territory";
@@ -62,7 +66,13 @@ describe("surface-supported physical park connectivity", () => {
   });
 
   it("reports uncovered gate and equipment anchors instead of accepting proximity", () => {
-    const report = auditParkConnectivity();
+    const report = auditParkConnectivity(PILOT_SCENE_EDGES.map(pilotScenePath));
+    expect(report.candidatePaths).toEqual(PILOT_SCENE_EDGES.map(() => ({ supported: true })));
+    const expanded = extendedPreview as unknown as WalkingNetwork;
+    const unsupported = expanded.edges.filter(
+      ({ path }) => !report.verifyPreviewPath(path.map(referenceMetresToScene)).supported,
+    );
+    expect(unsupported.map(({ id }) => id)).toEqual([]);
     expect(report.anchors.find((anchor) => anchor.id === "A2")?.vehicleConnected).toBe(false);
     expect(report.externalPassages.map((p) => [p.id, p.supported])).toEqual([
       ["A3-1", true],

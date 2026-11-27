@@ -1,0 +1,256 @@
+{
+  "browser": "158.0.8127.37",
+  "checks": [],
+  "performance": {},
+  "privacy": {
+    "requestsIntercepted": 14,
+    "unexpected": 0,
+    "candidateDataLeaks": 0,
+    "cookies": 0,
+    "storedSessionEntries": 0,
+    "isolatedContexts": 1,
+    "syntheticFixesOnly": true
+  },
+  "catalogue": {
+    "selectable": 127,
+    "withoutRoute": [
+      {
+        "id": "indumoveis:landscape:grove",
+        "label": "Bosque da Mostra",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:upper-west",
+        "label": "Área sem identificação comercial",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:upper-middle",
+        "label": "Área sem identificação comercial",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:upper-east",
+        "label": "Área sem identificação comercial",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:upper-support",
+        "label": "Área de apoio sem identificação",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:event-east",
+        "label": "Área aberta · eventos",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:workshop-east",
+        "label": "Área aberta · Mão na Massa",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:workshop-south",
+        "label": "Apoio · Mão na Massa",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:lot70-east",
+        "label": "Área sem identificação comercial",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:b7-west",
+        "label": "Área aberta · Centro Administrativo",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:administrative-garden",
+        "label": "Jardim do Centro Administrativo",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:east-garden",
+        "label": "Área verde · setor leste",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:frontage",
+        "label": "Faixa verde dos pavilhões",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:landscape:p14-front",
+        "label": "Jardim do pavilhão 14",
+        "kind": "landscape"
+      },
+      {
+        "id": "indumoveis:road:argentina",
+        "label": "Rua Argentina",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:uruguai",
+        "label": "Rua Uruguai",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:brasil",
+        "label": "Rua Brasil",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:mercosul",
+        "label": "Alameda Mercosul",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:brasilia",
+        "label": "Rua Brasília",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:la-paz",
+        "label": "Rua La Paz",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:benvenuto",
+        "label": "Av. Benvenuto de Conti",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:imigrantes",
+        "label": "Avenida dos Imigrantes",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:arvoredo",
+        "label": "Calçada do Arvoredo",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:east-walk-upper",
+        "label": "Passeio · Espaço de eventos",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:road:east-walk-lower",
+        "label": "Passeio · setor leste",
+        "kind": "road"
+      },
+      {
+        "id": "indumoveis:support:cafe",
+        "label": "Café",
+        "kind": "support"
+      },
+      {
+        "id": "indumoveis:support:bar",
+        "label": "Bar",
+        "kind": "support"
+      },
+      {
+        "id": "indumoveis:support:restaurant",
+        "label": "Restaurante",
+        "kind": "support"
+      },
+      {
+        "id": "indumoveis:support:events",
+        "label": "Centro de Eventos",
+        "kind": "support"
+      },
+      {
+        "id": "indumoveis:support:b7",
+        "label": "Centro Administrativo",
+        "kind": "support"
+      },
+      {
+        "id": "indumoveis:support:b7-annex-a",
+        "label": "Apoio do Centro Administrativo",
+        "kind": "support"
+      },
+      {
+        "id": "indumoveis:support:b7-annex-b",
+        "label": "Apoio do Centro Administrativo",
+        "kind": "support"
+      }
+    ],
+    "scenarios": [
+      {
+        "area": "Portão 3",
+        "accuracy": 2,
+        "route": 95,
+        "waitForOrigin": 0,
+        "noDestination": 32,
+        "exit": "route"
+      },
+      {
+        "area": "Alameda Mercosul",
+        "accuracy": 5,
+        "route": 95,
+        "waitForOrigin": 0,
+        "noDestination": 32,
+        "exit": "route"
+      },
+      {
+        "area": "Rua Brasil",
+        "accuracy": 8,
+        "route": 95,
+        "waitForOrigin": 0,
+        "noDestination": 32,
+        "exit": "route"
+      },
+      {
+        "area": "Setor leste sem corredor",
+        "accuracy": 2,
+        "route": 0,
+        "waitForOrigin": 95,
+        "noDestination": 32,
+        "exit": "waitForOrigin"
+      },
+      {
+        "area": "Rótula do entorno",
+        "accuracy": 8,
+        "route": 0,
+        "waitForOrigin": 95,
+        "noDestination": 32,
+        "exit": "waitForOrigin"
+      },
+      {
+        "area": "Leitura aproximada na Rua Argentina",
+        "accuracy": 35,
+        "route": 0,
+        "waitForOrigin": 95,
+        "noDestination": 32,
+        "exit": "waitForOrigin"
+      },
+      {
+        "area": "Fora da área do mapa",
+        "accuracy": 5,
+        "route": 0,
+        "waitForOrigin": 95,
+        "noDestination": 32,
+        "exit": "waitForOrigin"
+      },
+      {
+        "area": "Partida manual no Pavilhão 12",
+        "accuracy": null,
+        "route": 95,
+        "waitForOrigin": 0,
+        "noDestination": 32,
+        "exit": "route"
+      }
+    ],
+    "mapTargets": 112,
+    "activeRouteHiddenOutside": true,
+    "mapHitTesting": {
+      "actualClicks": 112,
+      "overlapped": []
+    },
+    "totals": {
+      "route": 380,
+      "waitForOrigin": 380,
+      "noDestination": 256
+    }
+  }
+}

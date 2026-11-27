@@ -1,5 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as THREE from "three";
+import { WALKING_CONTEXT_POLYGONS } from "./walking/coverage";
+import { createWalkingLayer } from "./walking/walkingLayer";
+import type { WalkingOverlay } from "./walking/useParkWalking";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { configureMapInput, prepareSecondaryPan } from "./mapInput";
 import { createReflectionEnvironment } from "./reflectionEnvironment";
@@ -40,7 +43,7 @@ import {
   PARK_RENDER_ENTITIES,
 } from "./permanentParkLayout";
 import type { PermanentParkLandmark } from "./permanentParkLayout";
-import { pointInPolygon } from "./geometry";
+import { pointInPolygon, polygonBounds } from "./geometry";
 import { createParkDetails, deriveParkDetails, lotStatusBands } from "./parkDetails";
 import { createCommercialBoundaries } from "./commercialBoundaries";
 import {
@@ -107,7 +110,11 @@ import {
 } from "./architecture";
 
 type Pose = { position: THREE.Vector3; target: THREE.Vector3 };
-type Runtime = MapHandle & { update(): void; dispose(): void };
+type Runtime = MapHandle & {
+  update(): void;
+  setWalkingOverlay(overlay: WalkingOverlay | null): void;
+  dispose(): void;
+};
 const ENTITIES = PARK_CORE_ENTITIES;
 function rebasePoseTarget(pose: Pose, target: Point) {
   pose.position.x += target[0] - pose.target.x;
@@ -338,6 +345,8 @@ const MapRenderer = forwardRef<MapHandle, MapRendererProps>(function MapRenderer
       rotate: (direction) => runtimeRef.current?.rotate(direction),
       getTarget: () => runtimeRef.current?.getTarget() ?? CENTER,
       captureCamera: () => runtimeRef.current?.captureCamera?.(),
+      followWalkingPoint: (point) => runtimeRef.current?.followWalkingPoint?.(point),
+      frameWalkingPath: (path) => runtimeRef.current?.frameWalkingPath?.(path),
       restoreOverview: () => runtimeRef.current?.restoreOverview(),
       restoreCommercial: () => runtimeRef.current?.restoreCommercial(),
     }),
@@ -376,7 +385,12 @@ const MapRenderer = forwardRef<MapHandle, MapRendererProps>(function MapRenderer
     props.highlightedIds,
     props.saleSelectedGeometryIds,
     props.onPavilionProjection,
+    props.walkingContext,
   ]);
+
+  useEffect(() => {
+    runtimeRef.current?.setWalkingOverlay(props.walkingOverlay ?? null);
+  }, [props.walkingOverlay]);
 
   return (
     <div
@@ -779,7 +793,9 @@ function initializeMapRuntime(
     height,
     insets: props().insets,
     protectedPolygons: COMMERCIAL_POLYGONS,
-    explorationPolygons: [PARK_NAVIGATION_FOOTPRINT],
+    explorationPolygons: props().walkingContext
+      ? WALKING_CONTEXT_POLYGONS
+      : [PARK_NAVIGATION_FOOTPRINT],
     fov: camera.fov,
   });
   const pavilionGround = derivePavilionGround(PARK_RENDER_ENTITIES);
@@ -824,6 +840,25 @@ function initializeMapRuntime(
   });
   commercialGroup.add(pavement.group);
   pavement.resources.forEach(track);
+  let walkingLayer: ReturnType<typeof createWalkingLayer> | null = null;
+  const heightRay = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 16);
+  const groundMeshes = [...pavement.group.children, ...terrain.group.children];
+  let groundUrban: ReturnType<typeof createUrbanContext> | null | undefined;
+  let streetDecks: THREE.Object3D[] = [];
+  function walkingGround(point: Point) {
+    if (groundUrban !== urban) {
+      groundUrban = urban;
+      streetDecks = [];
+      urban?.group.traverse((mesh) => {
+        if (mesh.name === "urban-road" || mesh.name === "urban-sidewalk") streetDecks.push(mesh);
+      });
+    }
+    heightRay.ray.origin.set(point[0], 8, point[1]);
+    const hits = heightRay.intersectObjects([...groundMeshes, ...streetDecks], false);
+    return hits[0]?.point.y ?? TERRAIN.elevation;
+  }
+  rollback.push(() => walkingLayer?.dispose());
+
   diag.textureBytes += pavement.textureBytes;
   // Picking remains attached to the original surfaces despite network batching.
   for (const entity of ENTITIES.filter((entry) => entry.kind === "road")) {
@@ -1831,6 +1866,8 @@ function initializeMapRuntime(
       rollback.push(() => contextVegetation?.dispose());
       urban.group.visible = false;
       scene.add(urban.group);
+      urban.group.updateMatrixWorld(true);
+      walkingLayer?.refreshGround();
       diag.realism.urban = urban.metadata;
       rollback.push(() => urban?.dispose());
       softwareMaterials.sync(lotGrass.group);
@@ -2370,6 +2407,12 @@ function initializeMapRuntime(
     );
     camera.updateProjectionMatrix();
     updateLabels();
+    if (walkingLayer) {
+      const marker = walkingLayer.frame(camera, height, polar, now, reduceMotion.matches);
+      host.dataset.walkingMarker = marker.representation;
+      host.dataset.walkingMotion = marker.animating ? "walking" : "still";
+      if (marker.animating) invalidate();
+    }
     try {
       if (solarShadows.enabled && sunlight.shadow.needsUpdate) diag.realism.shadows.updates++;
       renderer.render(scene, camera);
@@ -2391,9 +2434,14 @@ function initializeMapRuntime(
     const shadowBytes = solarShadows.textureBytes;
     diag.textureBytes += shadowBytes - diag.realism.shadows.textureBytes;
     diag.realism.shadows.textureBytes = shadowBytes;
-    diag.target[0] = controls.target.x;
-    diag.target[1] = controls.target.z;
-    camera.position.toArray(diag.position);
+    if (props().walkingCameraPrivate) {
+      diag.target.fill(0);
+      diag.position.fill(0);
+    } else {
+      diag.target[0] = controls.target.x;
+      diag.target[1] = controls.target.z;
+      camera.position.toArray(diag.position);
+    }
     diag.distance = camera.position.distanceTo(controls.target);
     diag.polar = controls.getPolarAngle();
     diag.azimuth = controls.getAzimuthalAngle();
@@ -2628,10 +2676,12 @@ function initializeMapRuntime(
       primary: event.button === 0 && !event.shiftKey && !event.ctrlKey && !event.metaKey,
     });
     clickCancelled = activePointers.size > 1;
+    if (clickCancelled) props().onManualNavigation?.();
   }
   function pointerMove(event: PointerEvent) {
     const initial = activePointers.get(event.pointerId);
     if (initial && !isClick(initial, event.clientX, event.clientY)) {
+      props().onManualNavigation?.();
       clickCancelled = true;
       selectionManuallyNavigated = true;
     }
@@ -2729,6 +2779,7 @@ function initializeMapRuntime(
     pendingVisibilityCheck = false;
     const delta = normalizedWheelDelta(event.deltaY, event.deltaMode, height);
     if (!delta) return;
+    props().onManualNavigation?.();
     const direction = Math.sign(delta);
     const base =
       transition?.kind === "wheel" && direction === wheelDirection ? transition.to : pose();
@@ -2936,7 +2987,9 @@ function initializeMapRuntime(
       height,
       insets: props().insets,
       protectedPolygons: COMMERCIAL_POLYGONS,
-      explorationPolygons: [PARK_NAVIGATION_FOOTPRINT],
+      explorationPolygons: props().walkingContext
+        ? WALKING_CONTEXT_POLYGONS
+        : [PARK_NAVIGATION_FOOTPRINT],
       fov: camera.fov,
     });
     navigationLimits();
@@ -2950,8 +3003,13 @@ function initializeMapRuntime(
   const selectionSurfaces = new Map<string, Float32Array>();
   const previousStatusColors = new Map<string, string>();
   let previousSaleSelection: ReadonlySet<string> | undefined;
+  let previousWalkingContext = props().walkingContext;
   function update() {
     const state = props();
+    if (state.walkingContext !== previousWalkingContext) {
+      previousWalkingContext = state.walkingContext;
+      refreshEnvelope();
+    }
     lighting.select(state.lighting ?? "natural", performance.now());
     diag.daylight.mode = lighting.mode;
     diag.daylight.profileKey = lighting.profileKey;
@@ -3129,6 +3187,7 @@ function initializeMapRuntime(
   return {
     focus,
     zoom(factor) {
+      props().onManualNavigation?.();
       selectionManuallyNavigated = true;
       pendingVisibilityCheck = false;
       const direction = Math.sign(factor - 1);
@@ -3149,6 +3208,7 @@ function initializeMapRuntime(
       animate(next, MOVEMENT.zoomMs, "zoom");
     },
     pan(dx, dy) {
+      props().onManualNavigation?.();
       selectionManuallyNavigated = true;
       cancelTransition();
       const range = camera.position.distanceTo(controls.target) * 0.08;
@@ -3170,6 +3230,7 @@ function initializeMapRuntime(
       invalidate();
     },
     rotate(direction) {
+      props().onManualNavigation?.();
       selectionManuallyNavigated = true;
       pendingVisibilityCheck = false;
       if (!controls.enableRotate) return;
@@ -3179,6 +3240,50 @@ function initializeMapRuntime(
       scratch.subVectors(next.position, next.target).applyAxisAngle(up, (direction * Math.PI) / 8);
       next.position.copy(next.target).add(scratch);
       animate(next, MOVEMENT.zoomMs, "rotate");
+    },
+    frameWalkingPath(path) {
+      if (path.length < 2) return;
+      const bounds = polygonBounds(path);
+      const center: Point = [(bounds.minX + bounds.maxX) / 2, (bounds.minY + bounds.maxY) / 2];
+      const direction = camera.position.clone().sub(controls.target).normalize();
+      animate(
+        freeRegionPose(
+          center,
+          0,
+          props().view,
+          {
+            width: Math.max(15, bounds.maxX - bounds.minX) * 1.42,
+            depth: Math.max(15, bounds.maxY - bounds.minY) * 1.42,
+            height: 2,
+          },
+          direction,
+        ),
+        360,
+      );
+    },
+    followWalkingPoint(point) {
+      if (
+        activePointers.size ||
+        Math.hypot(point[0] - controls.target.x, point[1] - controls.target.z) < 0.38
+      )
+        return;
+      selectionManuallyNavigated = true;
+      pendingVisibilityCheck = false;
+      const next = pose();
+      rebasePoseTarget(next, point);
+      animate(next, 300);
+    },
+    setWalkingOverlay(overlay) {
+      if (!overlay) {
+        walkingLayer?.dispose();
+        walkingLayer = null;
+        delete host.dataset.walkingMarker;
+        delete host.dataset.walkingMotion;
+      } else {
+        walkingLayer ??= createWalkingLayer(scene, walkingGround);
+        walkingLayer.set(overlay);
+      }
+      invalidate();
     },
     getTarget: () => [controls.target.x, controls.target.z],
     captureCamera: () => ({
@@ -3212,6 +3317,7 @@ function initializeMapRuntime(
       contextShadows?.dispose();
       parkDetails?.dispose();
       solarShadows.dispose();
+      walkingLayer?.dispose();
       terrain.dispose();
       sunShadows.dispose();
       daylightBackground.dispose();

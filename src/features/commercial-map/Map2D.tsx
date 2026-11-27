@@ -1,3 +1,8 @@
+import { walkingContextBounds } from "./walking/coverage";
+import { ACTIVE_REFERENCE_ROADS } from "./urbanReference";
+import { EAST_APPROACH, PUBLIC_AVENUE } from "./urbanPavement";
+import { memo } from "react";
+import { WalkingPlanOverlay } from "./walking/WalkingPlanOverlay";
 import { forwardRef, useEffect, useId, useImperativeHandle, useRef } from "react";
 import { MAP_BOUNDS, TREES } from "./data/territory";
 import {
@@ -140,6 +145,30 @@ function physicalSurfacePath(surface: MapEntity & { holes?: Point[][] }) {
     .join("");
 }
 
+const WalkingPlanContext = memo(function WalkingPlanContext() {
+  return (
+    <g pointerEvents="none" aria-hidden="true" fill="none" stroke="#9d9b94">
+      <polygon fill="#9d9b94" points={PUBLIC_AVENUE.map((p) => p.join(",")).join(" ")} />
+      {ACTIVE_REFERENCE_ROADS.map(({ id, path, width }) => (
+        <polyline
+          key={id}
+          points={path.map((p) => p.join(",")).join(" ")}
+          strokeWidth={width}
+          strokeLinejoin="round"
+        />
+      ))}
+      <polyline
+        points={EAST_APPROACH.highway.map((p) => p.join(",")).join(" ")}
+        strokeWidth={3.5}
+      />
+      <polyline
+        points={EAST_APPROACH.returnArm.map((p) => p.join(",")).join(" ")}
+        strokeWidth={2.8}
+      />
+    </g>
+  );
+});
+
 /** Same territorial polygons, independent of the engine, usable while the 3D chunk loads. */
 export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref) {
   const svg = useRef<SVGSVGElement>(null);
@@ -167,10 +196,13 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
     const b = box.current;
     const rect = svg.current?.getBoundingClientRect();
     const aspect = rect?.width && rect.height ? rect.height / rect.width : base.height / base.width;
-    const [cx, cy] = clampPointToPolygon(
-      [b.x + b.width / 2, b.y + b.height / 2],
-      PARK_NAVIGATION_FOOTPRINT,
-    );
+    const midpoint: Point = [b.x + b.width / 2, b.y + b.height / 2];
+    const [cx, cy] = current.current.walkingOverlay
+      ? [
+          Math.max(walkingContextBounds.minX, Math.min(walkingContextBounds.maxX, midpoint[0])),
+          Math.max(walkingContextBounds.minY, Math.min(walkingContextBounds.maxY, midpoint[1])),
+        ]
+      : clampPointToPolygon(midpoint, PARK_NAVIGATION_FOOTPRINT);
     b.width = Math.min(parkWidth * 2.2, Math.max(fullWidth * 0.035, b.width));
     b.height = b.width * aspect;
     b.x = cx - b.width / 2;
@@ -422,6 +454,34 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
       write();
     },
     rotate: () => {},
+    frameWalkingPath: (path) => {
+      if (path.length < 2) return;
+      const bounds = polygonBounds(path);
+      const rect = svg.current?.getBoundingClientRect();
+      const aspect = (rect?.height ?? 1) / Math.max(1, rect?.width ?? 1);
+      const width =
+        Math.max(26, bounds.maxX - bounds.minX, (bounds.maxY - bounds.minY) / aspect) * 1.6;
+      const height = width * aspect;
+      // The route summary occupies the lower part of a narrow viewport.
+      const upperShift = rect && rect.width < 900 ? height * 0.17 : 0;
+      animateBox(
+        {
+          x: (bounds.minX + bounds.maxX - width) / 2,
+          y: (bounds.minY + bounds.maxY - height) / 2 + upperShift,
+          width,
+          height,
+        },
+        310,
+      );
+    },
+    followWalkingPoint: ([x, y]) => {
+      const b = box.current;
+      const dx = x - b.x - b.width / 2,
+        dy = y - b.y - b.height / 2;
+      if (pointers.current.size || Math.hypot(dx, dy) < 0.38) return;
+      manuallyNavigated.current = true;
+      animateBox({ ...b, x: b.x + dx, y: b.y + dy }, 280);
+    },
     getTarget: () => [
       box.current.x + box.current.width / 2,
       box.current.y + box.current.height / 2,
@@ -657,6 +717,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
         height={parkWidth * 4}
         fill={VISUAL_THEME.background}
       />
+      {props.walkingOverlay && <WalkingPlanContext />}
       <g className="im-map-physical-context" pointerEvents="none" aria-hidden="true">
         {PARK_CONTEXT_BLOCKS.flatMap((block) =>
           (block.referencePieces ?? [block.referencePolygon]).map((polygon, index) => (
@@ -816,6 +877,7 @@ export const Map2D = forwardRef<MapHandle, Map2DProps>(function Map2D(props, ref
           </g>
         ))}
       </g>
+      {props.walkingOverlay && <WalkingPlanOverlay overlay={props.walkingOverlay} />}
     </svg>
   );
 });
